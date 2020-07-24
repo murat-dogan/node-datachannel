@@ -6,77 +6,65 @@ Please check [libdatachannel](https://github.com/paullouisageneau/libdatachannel
 
 ## Examples
 ```js
-const nodeDataChannel = require('node-datachannel');
+const nodeDataChannel = require('../lib/index');
+
+console.log('Main Exports: ', nodeDataChannel);
 
 nodeDataChannel.initLogger("Debug");
 
 let dc1 = null;
 let dc2 = null;
 
-let peer1 = new nodeDataChannel.PeerConnection(
-    "Peer1",
-    { iceServers: ["stun.l.google.com:19302"] },
-    (event, payload) => {
-        switch (event) {
-            case "state":
-                console.log("Peer1 State:", payload);
-                break;
-            case "gathering-state":
-                console.log("Peer1 GatheringState:", payload);
-                break;
-            case "sdp":
-                console.log("Peer1 SDP:", payload);
-                peer2.setRemoteDescription(payload);
-                break;
-            case "candidate":
-                console.log("Peer1 Candidate:", payload);
-                peer2.addRemoteCandidate(payload);
-                break;
+let peer1 = new nodeDataChannel.PeerConnection("Peer1", { iceServers: ["stun.l.google.com:19302"] });
 
-            default:
-                break;
-        }
-    }
-);
+// Set Callbacks
+peer1.onStateChange((state) => {
+    console.log("Peer1 State:", state);
+});
+peer1.onGatheringStateChange((state) => {
+    console.log("Peer1 GatheringState:", state);
+});
+peer1.onLocalDescription((sdp) => {
+    console.log("Peer1 SDP:", sdp);
+    peer2.setRemoteDescription(sdp);
+});
+peer1.onLocalCandidate((candidate) => {
+    console.log("Peer1 Candidate:", candidate);
+    peer2.addRemoteCandidate(candidate);
+});
 
-let peer2 = new nodeDataChannel.PeerConnection(
-    "Peer2",
-    { iceServers: ["stun.l.google.com:19302"] },
-    (event, payload) => {
-        switch (event) {
-            case "state":
-                console.log("Peer2 State:", payload);
-                break;
-            case "gathering-state":
-                console.log("Peer2 GatheringState:", payload);
-                break;
-            case "sdp":
-                console.log("Peer2 SDP:", payload);
-                peer1.setRemoteDescription(payload);
-                break;
-            case "candidate":
-                console.log("Peer2 Candidate:", payload);
-                peer1.addRemoteCandidate(payload);
-                break;
-            case "data-channel":
-                console.log("Peer2 Got DataChannel: ", payload.getLabel());
-                dc2 = payload;
-                dc2.setCallback((event, payload) => {
-                    console.log("Peer2 DataChannel Event:", event, " Payload:", payload);
-                });
-                dc2.sendMessage("Hello From Peer2");
+let peer2 = new nodeDataChannel.PeerConnection("Peer2", { iceServers: ["stun.l.google.com:19302"] });
 
-            default:
-                break;
-        }
-    }
-);
+// Set Callbacks
+peer2.onStateChange((state) => {
+    console.log("Peer2 State:", state);
+});
+peer2.onGatheringStateChange((state) => {
+    console.log("Peer2 GatheringState:", state);
+});
+peer2.onLocalDescription((sdp) => {
+    console.log("Peer2 SDP:", sdp);
+    peer1.setRemoteDescription(sdp);
+});
+peer2.onLocalCandidate((candidate) => {
+    console.log("Peer2 Candidate:", candidate);
+    peer1.addRemoteCandidate(candidate);
+});
+peer2.onDataChannel((dc) => {
+    console.log("Peer2 Got DataChannel: ", dc.getLabel());
+    dc2 = dc;
+    dc2.onMessage((msg) => {
+        console.log('Peer2 Received Msg:', msg);
+    });
+    dc2.sendMessage("Hello From Peer2");
+});
 
 dc1 = peer1.createDataChannel("test");
-dc1.setCallback((event, payload) => {
-    console.log("Peer1 DataChannel Event:", event, " Payload:", payload);
-    if (event === "open")
-        dc1.sendMessage("Hello From Peer1");
+dc1.onOpen(() => {
+    dc1.sendMessage("Hello from Peer1");
+});
+dc1.onMessage((msg) => {
+    console.log('Peer1 Received Msg:', msg);
 });
 
 setTimeout(() => {
