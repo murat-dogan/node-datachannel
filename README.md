@@ -6,7 +6,7 @@ Please check [libdatachannel](https://github.com/paullouisageneau/libdatachannel
 
 ## Examples
 ```js
-const nodeDataChannel = require('../lib/main');
+const nodeDataChannel = require('node-datachannel');
 
 nodeDataChannel.initLogger("Debug");
 

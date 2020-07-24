@@ -1,4 +1,4 @@
-const nodeDataChannel = require('../lib/main');
+const nodeDataChannel = require('../lib/index');
 
 console.log('Main Exports: ', nodeDataChannel);
 
