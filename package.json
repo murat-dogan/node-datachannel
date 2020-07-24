@@ -1,0 +1,38 @@
+{
+  "name": "node-datachannel",
+  "version": "0.0.1",
+  "description": "libdatachannel node bindings",
+  "main": "lib/index.js",
+  "typings": "lib/index.d.ts",
+  "directories": {
+    "lib": "lib",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "test/main.js",
+    "install": "ncmake build",
+    "clean": "ncmake distclean"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/murat-dogan/node-datachannel.git"
+  },
+  "keywords": [
+    "libdatachannel"
+  ],
+  "author": "Murat Doğan",
+  "license": "GPL-2.0-or-later",
+  "gypfile": true,
+  "bugs": {
+    "url": "https://github.com/murat-dogan/node-datachannel/issues"
+  },
+  "homepage": "https://github.com/murat-dogan/node-datachannel#readme",
+  "dependencies": {
+    "nan": "^2.14.1",
+    "napi-thread-safe-callback": "0.0.6",
+    "node-addon-api": "^3.0.1",
+    "node-cmake": "^2.5.1",
+    "node-pre-gyp": "^0.15.0"
+  },
+  "devDependencies": {}
+}
