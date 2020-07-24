@@ -10,13 +10,18 @@ Napi::Object DataChannelWrapper::Init(Napi::Env env, Napi::Object exports)
         env,
         "DataChannel",
         {InstanceMethod("close", &DataChannelWrapper::close),
-         InstanceMethod("setCallback", &DataChannelWrapper::setCallback),
          InstanceMethod("getLabel", &DataChannelWrapper::getLabel),
          InstanceMethod("sendMessage", &DataChannelWrapper::sendMessage),
          InstanceMethod("isOpen", &DataChannelWrapper::isOpen),
          InstanceMethod("availableAmount", &DataChannelWrapper::availableAmount),
          InstanceMethod("bufferedAmount", &DataChannelWrapper::bufferedAmount),
-         InstanceMethod("maxMessageSize", &DataChannelWrapper::maxMessageSize)});
+         InstanceMethod("maxMessageSize", &DataChannelWrapper::maxMessageSize),
+         InstanceMethod("onOpen", &DataChannelWrapper::onOpen),
+         InstanceMethod("onClosed", &DataChannelWrapper::onClosed),
+         InstanceMethod("onError", &DataChannelWrapper::onError),
+         InstanceMethod("onAvailable", &DataChannelWrapper::onAvailable),
+         InstanceMethod("onBufferedAmountLow", &DataChannelWrapper::onBufferedAmountLow),
+         InstanceMethod("onMessage", &DataChannelWrapper::onMessage)});
 
     constructor = Napi::Persistent(func);
     constructor.SuppressDestruct();
@@ -31,81 +36,60 @@ DataChannelWrapper::DataChannelWrapper(const Napi::CallbackInfo &info) : Napi::O
 
     // Signals
     mDataChannelPtr->onOpen([&]() {
-        if (!mCallback)
-            return;
-        mCallback->call([](Napi::Env env, std::vector<napi_value> &args) {
-            // This will run in main thread and needs to construct the
-            // arguments for the call
-            args = {
-                Napi::String::New(env, "open"),
-                env.Null()};
-        });
+        if (mOnOpenCallback)
+            mOnOpenCallback->call([](Napi::Env env, std::vector<napi_value> &args) {
+                // This will run in main thread and needs to construct the
+                // arguments for the call
+                args = {};
+            });
     });
 
     mDataChannelPtr->onClosed([&]() {
-        if (!mCallback)
-            return;
-        mCallback->call([](Napi::Env env, std::vector<napi_value> &args) {
-            // This will run in main thread and needs to construct the
-            // arguments for the call
-            args = {
-                Napi::String::New(env, "closed"),
-                env.Null()};
-        });
+        if (mOnClosedCallback)
+            mOnClosedCallback->call([](Napi::Env env, std::vector<napi_value> &args) {
+                // This will run in main thread and needs to construct the
+                // arguments for the call
+                args = {};
+            });
     });
 
     mDataChannelPtr->onError([&](const std::string &error) {
-        if (!mCallback)
-            return;
-        mCallback->call([error](Napi::Env env, std::vector<napi_value> &args) {
-            // This will run in main thread and needs to construct the
-            // arguments for the call
-            Napi::Object payload = Napi::Object::New(env);
-            payload.Set("error", error);
-            args = {
-                Napi::String::New(env, "error"),
-                payload};
-        });
+        if (mOnErrorCallback)
+            mOnErrorCallback->call([error](Napi::Env env, std::vector<napi_value> &args) {
+                // This will run in main thread and needs to construct the
+                // arguments for the call
+                args = {Napi::String::New(env, error)};
+            });
     });
 
     mDataChannelPtr->onAvailable([&]() {
-        if (!mCallback)
-            return;
-        mCallback->call([](Napi::Env env, std::vector<napi_value> &args) {
-            // This will run in main thread and needs to construct the
-            // arguments for the call
-            args = {
-                Napi::String::New(env, "available"),
-                env.Null()};
-        });
+        if (mOnAvailableCallback)
+            mOnAvailableCallback->call([](Napi::Env env, std::vector<napi_value> &args) {
+                // This will run in main thread and needs to construct the
+                // arguments for the call
+                args = {};
+            });
     });
 
     mDataChannelPtr->onBufferedAmountLow([&]() {
-        if (!mCallback)
-            return;
-        mCallback->call([](Napi::Env env, std::vector<napi_value> &args) {
-            // This will run in main thread and needs to construct the
-            // arguments for the call
-            args = {
-                Napi::String::New(env, "buffered-amount-low"),
-                env.Null()};
-        });
+        if (mOnBufferedAmountLowCallback)
+            mOnBufferedAmountLowCallback->call([](Napi::Env env, std::vector<napi_value> &args) {
+                // This will run in main thread and needs to construct the
+                // arguments for the call
+                args = {};
+            });
     });
 
     mDataChannelPtr->onMessage([&](const std::variant<rtc::binary, std::string> &message) {
-        if (!mCallback)
-            return;
-        mCallback->call([message](Napi::Env env, std::vector<napi_value> &args) {
-            // This will run in main thread and needs to construct the
-            // arguments for the call
-            Napi::Object payload = Napi::Object::New(env);
-            // FIX ME
-            // Binary Message?
-            payload.Set("message", std::get<std::string>(message));
-            args = {
-                Napi::String::New(env, "message"),
-                payload};
-        });
+        if (mOnMessageCallback)
+            mOnMessageCallback->call([message](Napi::Env env, std::vector<napi_value> &args) {
+                // This will run in main thread and needs to construct the
+                // arguments for the call
+                Napi::Object payload = Napi::Object::New(env);
+                // FIX ME
+                // Binary Message?
+                args = {Napi::String::New(env, std::get<std::string>(message))};
+            });
     });
 }
 
@@ -128,21 +112,6 @@ void DataChannelWrapper::close(const Napi::CallbackInfo &info)
 
     mDataChannelPtr->close();
     mDataChannelPtr.reset();
-}
-
-void DataChannelWrapper::setCallback(const Napi::CallbackInfo &info)
-{
-    Napi::Env env = info.Env();
-    int length = info.Length();
-
-    if (length < 1 || !info[0].IsFunction())
-    {
-        Napi::TypeError::New(env, "Function expected").ThrowAsJavaScriptException();
-        return;
-    }
-
-    // Callback
-    mCallback = std::make_shared<ThreadSafeCallback>(info[0].As<Napi::Function>());
 }
 
 Napi::Value DataChannelWrapper::getLabel(const Napi::CallbackInfo &info)
@@ -211,4 +180,94 @@ Napi::Value DataChannelWrapper::maxMessageSize(const Napi::CallbackInfo &info)
         return Napi::Number::New(info.Env(), 0);
     }
     return Napi::Number::New(info.Env(), mDataChannelPtr->maxMessageSize());
+}
+
+void DataChannelWrapper::onOpen(const Napi::CallbackInfo &info)
+{
+    Napi::Env env = info.Env();
+    int length = info.Length();
+
+    if (length < 1 || !info[0].IsFunction())
+    {
+        Napi::TypeError::New(env, "Function expected").ThrowAsJavaScriptException();
+        return;
+    }
+
+    // Callback
+    mOnOpenCallback = std::make_shared<ThreadSafeCallback>(info[0].As<Napi::Function>());
+}
+
+void DataChannelWrapper::onClosed(const Napi::CallbackInfo &info)
+{
+    Napi::Env env = info.Env();
+    int length = info.Length();
+
+    if (length < 1 || !info[0].IsFunction())
+    {
+        Napi::TypeError::New(env, "Function expected").ThrowAsJavaScriptException();
+        return;
+    }
+
+    // Callback
+    mOnClosedCallback = std::make_shared<ThreadSafeCallback>(info[0].As<Napi::Function>());
+}
+
+void DataChannelWrapper::onError(const Napi::CallbackInfo &info)
+{
+    Napi::Env env = info.Env();
+    int length = info.Length();
+
+    if (length < 1 || !info[0].IsFunction())
+    {
+        Napi::TypeError::New(env, "Function expected").ThrowAsJavaScriptException();
+        return;
+    }
+
+    // Callback
+    mOnErrorCallback = std::make_shared<ThreadSafeCallback>(info[0].As<Napi::Function>());
+}
+
+void DataChannelWrapper::onAvailable(const Napi::CallbackInfo &info)
+{
+    Napi::Env env = info.Env();
+    int length = info.Length();
+
+    if (length < 1 || !info[0].IsFunction())
+    {
+        Napi::TypeError::New(env, "Function expected").ThrowAsJavaScriptException();
+        return;
+    }
+
+    // Callback
+    mOnAvailableCallback = std::make_shared<ThreadSafeCallback>(info[0].As<Napi::Function>());
+}
+
+void DataChannelWrapper::onBufferedAmountLow(const Napi::CallbackInfo &info)
+{
+    Napi::Env env = info.Env();
+    int length = info.Length();
+
+    if (length < 1 || !info[0].IsFunction())
+    {
+        Napi::TypeError::New(env, "Function expected").ThrowAsJavaScriptException();
+        return;
+    }
+
+    // Callback
+    mOnBufferedAmountLowCallback = std::make_shared<ThreadSafeCallback>(info[0].As<Napi::Function>());
+}
+
+void DataChannelWrapper::onMessage(const Napi::CallbackInfo &info)
+{
+    Napi::Env env = info.Env();
+    int length = info.Length();
+
+    if (length < 1 || !info[0].IsFunction())
+    {
+        Napi::TypeError::New(env, "Function expected").ThrowAsJavaScriptException();
+        return;
+    }
+
+    // Callback
+    mOnMessageCallback = std::make_shared<ThreadSafeCallback>(info[0].As<Napi::Function>());
 }

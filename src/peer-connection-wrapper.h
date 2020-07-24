@@ -21,13 +21,25 @@ public:
   void setRemoteDescription(const Napi::CallbackInfo &info);
   void addRemoteCandidate(const Napi::CallbackInfo &info);
   Napi::Value createDataChannel(const Napi::CallbackInfo &info);
-  // void sendMessage(std::string &data);
+
+  // Callbacks
+  void onLocalDescription(const Napi::CallbackInfo &info);
+  void onLocalCandidate(const Napi::CallbackInfo &info);
+  void onStateChange(const Napi::CallbackInfo &info);
+  void onGatheringStateChange(const Napi::CallbackInfo &info);
+  void onDataChannel(const Napi::CallbackInfo &info);
 
 private:
   static Napi::FunctionReference constructor;
   std::string mPeerName;
   std::shared_ptr<rtc::PeerConnection> mRtcPeerConnPtr = nullptr;
-  std::shared_ptr<ThreadSafeCallback> mCallback = nullptr;
+
+  // Callback Ptrs
+  std::shared_ptr<ThreadSafeCallback> mOnLocalDescriptionCallback = nullptr;
+  std::shared_ptr<ThreadSafeCallback> mOnLocalCandidateCallback = nullptr;
+  std::shared_ptr<ThreadSafeCallback> mOnStateChangeCallback = nullptr;
+  std::shared_ptr<ThreadSafeCallback> mOnGatheringStateChangeCallback = nullptr;
+  std::shared_ptr<ThreadSafeCallback> mOnDataChannelCallback = nullptr;
 };
 
 #endif // PEER_CONNECTION_WRAPPER_H

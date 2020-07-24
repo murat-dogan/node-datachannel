@@ -13,7 +13,12 @@ Napi::Object PeerConnectionWrapper::Init(Napi::Env env, Napi::Object exports)
         {InstanceMethod("close", &PeerConnectionWrapper::close),
          InstanceMethod("setRemoteDescription", &PeerConnectionWrapper::setRemoteDescription),
          InstanceMethod("addRemoteCandidate", &PeerConnectionWrapper::addRemoteCandidate),
-         InstanceMethod("createDataChannel", &PeerConnectionWrapper::createDataChannel)});
+         InstanceMethod("createDataChannel", &PeerConnectionWrapper::createDataChannel),
+         InstanceMethod("onLocalDescription", &PeerConnectionWrapper::onLocalDescription),
+         InstanceMethod("onLocalCandidate", &PeerConnectionWrapper::onLocalCandidate),
+         InstanceMethod("onStateChange", &PeerConnectionWrapper::onStateChange),
+         InstanceMethod("onGatheringStateChange", &PeerConnectionWrapper::onGatheringStateChange),
+         InstanceMethod("onDataChannel", &PeerConnectionWrapper::onDataChannel)});
 
     constructor = Napi::Persistent(func);
     constructor.SuppressDestruct();
@@ -28,9 +33,9 @@ PeerConnectionWrapper::PeerConnectionWrapper(const Napi::CallbackInfo &info) : N
     int length = info.Length();
 
     // We expect (String, Object, Function) as param
-    if (length < 3 || !info[0].IsString() || !info[1].IsObject() || !info[2].IsFunction())
+    if (length < 2 || !info[0].IsString() || !info[1].IsObject())
     {
-        Napi::TypeError::New(env, "Peer Name (String) & Configuration (Object) & Callback expected").ThrowAsJavaScriptException();
+        Napi::TypeError::New(env, "Peer Name (String) & Configuration (Object) expected").ThrowAsJavaScriptException();
         return;
     }
 
@@ -55,64 +60,56 @@ PeerConnectionWrapper::PeerConnectionWrapper(const Napi::CallbackInfo &info) : N
     // Create peer-connection
     mRtcPeerConnPtr = std::make_shared<rtc::PeerConnection>(rtcConfig);
 
-    // Callback
-    mCallback = std::make_shared<ThreadSafeCallback>(info[2].As<Napi::Function>());
-
     // Signals
     mRtcPeerConnPtr->onLocalDescription([&](const rtc::Description &sdp) {
-        mCallback->call([sdp](Napi::Env env, std::vector<napi_value> &args) {
-            // This will run in main thread and needs to construct the
-            // arguments for the call
-            args = {
-                Napi::String::New(env, "sdp"),
-                Napi::String::New(env, std::string(sdp))};
-        });
+        if (mOnLocalDescriptionCallback)
+            mOnLocalDescriptionCallback->call([sdp](Napi::Env env, std::vector<napi_value> &args) {
+                // This will run in main thread and needs to construct the
+                // arguments for the call
+                args = {Napi::String::New(env, std::string(sdp))};
+            });
     });
 
     mRtcPeerConnPtr->onLocalCandidate([&](const rtc::Candidate &candidate) {
-        mCallback->call([candidate](Napi::Env env, std::vector<napi_value> &args) {
-            // This will run in main thread and needs to construct the
-            // arguments for the call
-            args = {
-                Napi::String::New(env, "candidate"),
-                Napi::String::New(env, std::string(candidate))};
-        });
+        if (mOnLocalCandidateCallback)
+            mOnLocalCandidateCallback->call([candidate](Napi::Env env, std::vector<napi_value> &args) {
+                // This will run in main thread and needs to construct the
+                // arguments for the call
+                args = {Napi::String::New(env, std::string(candidate))};
+            });
     });
 
     mRtcPeerConnPtr->onStateChange([&](rtc::PeerConnection::State state) {
-        mCallback->call([state](Napi::Env env, std::vector<napi_value> &args) {
-            // This will run in main thread and needs to construct the
-            // arguments for the call
-            std::ostringstream stream;
-            stream << state;
-            args = {
-                Napi::String::New(env, "state"),
-                Napi::String::New(env, stream.str())};
-        });
+        if (mOnStateChangeCallback)
+            mOnStateChangeCallback->call([state](Napi::Env env, std::vector<napi_value> &args) {
+                // This will run in main thread and needs to construct the
+                // arguments for the call
+                std::ostringstream stream;
+                stream << state;
+                args = {Napi::String::New(env, stream.str())};
+            });
     });
 
     mRtcPeerConnPtr->onGatheringStateChange([&](rtc::PeerConnection::GatheringState state) {
-        mCallback->call([state](Napi::Env env, std::vector<napi_value> &args) {
-            // This will run in main thread and needs to construct the
-            // arguments for the call
-            std::ostringstream stream;
-            stream << state;
-            args = {
-                Napi::String::New(env, "gathering-state"),
-                Napi::String::New(env, stream.str())};
-        });
+        if (mOnGatheringStateChangeCallback)
+            mOnGatheringStateChangeCallback->call([state](Napi::Env env, std::vector<napi_value> &args) {
+                // This will run in main thread and needs to construct the
+                // arguments for the call
+                std::ostringstream stream;
+                stream << state;
+                args = {Napi::String::New(env, stream.str())};
+            });
     });
 
     mRtcPeerConnPtr->onDataChannel([&](std::shared_ptr<rtc::DataChannel> dc) {
-        mCallback->call([dc](Napi::Env env, std::vector<napi_value> &args) {
-            // This will run in main thread and needs to construct the
-            // arguments for the call
-            std::shared_ptr<rtc::DataChannel> dataChannel = dc;
-            auto instance = DataChannelWrapper::constructor.New({Napi::External<std::shared_ptr<rtc::DataChannel>>::New(env, &dataChannel)});
-            args = {
-                Napi::String::New(env, "data-channel"),
-                instance};
-        });
+        if (mOnDataChannelCallback)
+            mOnDataChannelCallback->call([dc](Napi::Env env, std::vector<napi_value> &args) {
+                // This will run in main thread and needs to construct the
+                // arguments for the call
+                std::shared_ptr<rtc::DataChannel> dataChannel = dc;
+                auto instance = DataChannelWrapper::constructor.New({Napi::External<std::shared_ptr<rtc::DataChannel>>::New(env, &dataChannel)});
+                args = {instance};
+            });
     });
 }
 
@@ -198,4 +195,79 @@ Napi::Value PeerConnectionWrapper::createDataChannel(const Napi::CallbackInfo &i
 
     auto instance = DataChannelWrapper::constructor.New({Napi::External<std::shared_ptr<rtc::DataChannel>>::New(info.Env(), &dataChannel)});
     return instance;
+}
+
+void PeerConnectionWrapper::onLocalDescription(const Napi::CallbackInfo &info)
+{
+    Napi::Env env = info.Env();
+    int length = info.Length();
+
+    if (length < 1 || !info[0].IsFunction())
+    {
+        Napi::TypeError::New(env, "Function expected").ThrowAsJavaScriptException();
+        return;
+    }
+
+    // Callback
+    mOnLocalDescriptionCallback = std::make_shared<ThreadSafeCallback>(info[0].As<Napi::Function>());
+}
+
+void PeerConnectionWrapper::onLocalCandidate(const Napi::CallbackInfo &info)
+{
+    Napi::Env env = info.Env();
+    int length = info.Length();
+
+    if (length < 1 || !info[0].IsFunction())
+    {
+        Napi::TypeError::New(env, "Function expected").ThrowAsJavaScriptException();
+        return;
+    }
+
+    // Callback
+    mOnLocalCandidateCallback = std::make_shared<ThreadSafeCallback>(info[0].As<Napi::Function>());
+}
+
+void PeerConnectionWrapper::onStateChange(const Napi::CallbackInfo &info)
+{
+    Napi::Env env = info.Env();
+    int length = info.Length();
+
+    if (length < 1 || !info[0].IsFunction())
+    {
+        Napi::TypeError::New(env, "Function expected").ThrowAsJavaScriptException();
+        return;
+    }
+
+    // Callback
+    mOnStateChangeCallback = std::make_shared<ThreadSafeCallback>(info[0].As<Napi::Function>());
+}
+
+void PeerConnectionWrapper::onGatheringStateChange(const Napi::CallbackInfo &info)
+{
+    Napi::Env env = info.Env();
+    int length = info.Length();
+
+    if (length < 1 || !info[0].IsFunction())
+    {
+        Napi::TypeError::New(env, "Function expected").ThrowAsJavaScriptException();
+        return;
+    }
+
+    // Callback
+    mOnGatheringStateChangeCallback = std::make_shared<ThreadSafeCallback>(info[0].As<Napi::Function>());
+}
+
+void PeerConnectionWrapper::onDataChannel(const Napi::CallbackInfo &info)
+{
+    Napi::Env env = info.Env();
+    int length = info.Length();
+
+    if (length < 1 || !info[0].IsFunction())
+    {
+        Napi::TypeError::New(env, "Function expected").ThrowAsJavaScriptException();
+        return;
+    }
+
+    // Callback
+    mOnDataChannelCallback = std::make_shared<ThreadSafeCallback>(info[0].As<Napi::Function>());
 }

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.1)
-project(node_datachannel VERSION 0.0.1)
+project(node_datachannel VERSION 0.0.2)
     
 include(NodeJS.cmake)
 nodejs_init()
