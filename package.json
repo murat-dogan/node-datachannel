@@ -10,7 +10,7 @@
   },
   "scripts": {
     "test": "test/main.js",
-    "install": "ncmake configure && ncmake build",
+    "install": "prebuild-install || ( ncmake configure && ncmake build )",
     "clean": "ncmake distclean"
   },
   "repository": {
@@ -31,7 +31,11 @@
     "nan": "^2.14.1",
     "napi-thread-safe-callback": "0.0.6",
     "node-addon-api": "^3.0.1",
-    "node-cmake": "^2.5.1"
+    "node-cmake": "^2.5.1",
+    "prebuild-install": "^5.3.5"
   },
-  "devDependencies": {}
+  "devDependencies": {},
+  "bundledDependencies": [
+    "prebuild-install"
+  ]
 }
