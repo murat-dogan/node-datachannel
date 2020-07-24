@@ -10,7 +10,7 @@
   },
   "scripts": {
     "test": "test/main.js",
-    "install": "ncmake build",
+    "install": "ncmake configure && ncmake build",
     "clean": "ncmake distclean"
   },
   "repository": {
