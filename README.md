@@ -79,7 +79,7 @@ setTimeout(() => {
 ## Building
 
 ### Requirements
-* cmake > V3.1
+* cmake >= V3.1
 * [libdatachannel dependencies](https://github.com/paullouisageneau/libdatachannel/blob/master/README.md#dependencies)
 
 ### Building from source
