@@ -97,6 +97,10 @@ PeerConnectionWrapper::PeerConnectionWrapper(const Napi::CallbackInfo &info) : N
     if (config.Get("portRangeEnd").IsNumber())
         rtcConfig.portRangeEnd = config.Get("portRangeEnd").As<Napi::Number>().Uint32Value();
 
+    // enableIceTcp option
+    if (config.Get("enableIceTcp").IsBoolean())
+        rtcConfig.enableIceTcp = config.Get("enableIceTcp").As<Napi::Boolean>();
+
     // Create peer-connection
     mRtcPeerConnPtr = std::make_shared<rtc::PeerConnection>(rtcConfig);
 

@@ -29,6 +29,7 @@ export interface ProxyServer {
 export interface RtcConfig {
     iceServers: string[];
     proxyServer?: ProxyServer;
+    enableIceTcp?: boolean;
     portRangeBegin?: Number;
     portRangeEnd?: Number;
 }
