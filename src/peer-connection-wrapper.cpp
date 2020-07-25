@@ -57,6 +57,40 @@ PeerConnectionWrapper::PeerConnectionWrapper(const Napi::CallbackInfo &info) : N
         rtcConfig.iceServers.emplace_back(iceServers.Get(i).As<Napi::String>().ToString());
     }
 
+    // Proxy Server
+    if (config.Get("proxyServer").IsObject())
+    {
+        Napi::Object proxyServer = config.Get("proxyServer").As<Napi::Object>();
+
+        // IP
+        std::string ip = proxyServer.Get("ip").As<Napi::String>();
+
+        // Port
+        uint16_t port = proxyServer.Get("port").As<Napi::Number>().Uint32Value();
+
+        // Type
+        std::string strType = proxyServer.Get("type").As<Napi::String>().ToString();
+        rtc::ProxyServer::Type type = rtc::ProxyServer::Type::Http;
+
+        if (strType == "None")
+            type = rtc::ProxyServer::Type::None;
+        if (strType == "Http")
+            type = rtc::ProxyServer::Type::Http;
+        if (strType == "Socks5")
+            type = rtc::ProxyServer::Type::Socks5;
+
+        // Username & Password
+        std::string username = "";
+        std::string password = "";
+
+        if (proxyServer.Get("username").IsString())
+            username = proxyServer.Get("username").As<Napi::String>().ToString();
+        if (proxyServer.Get("password").IsString())
+            username = proxyServer.Get("password").As<Napi::String>().ToString();
+
+        rtcConfig.proxyServer = rtc::ProxyServer(type, ip, port, username, password);
+    }
+
     // Port Ranges
     if (config.Get("portRangeBegin").IsNumber())
         rtcConfig.portRangeBegin = config.Get("portRangeBegin").As<Napi::Number>().Uint32Value();

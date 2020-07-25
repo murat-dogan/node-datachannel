@@ -12,11 +12,25 @@ export enum LogLevel {
 // Functions
 export function initLogger(level: LogLevel): void;
 
+export enum ProxyServerType {
+    None = 'None',
+    Socks5 = 'Socks5',
+    Http = 'Http'
+}
+
+export interface ProxyServer {
+    type: ProxyServerType;
+    ip: string;
+    port: Number;
+    username?: string;
+    password?: string;
+}
 
 export interface RtcConfig {
     iceServers: string[];
-    portRangeBegin: Number;
-    portRangeEnd: Number;
+    proxyServer?: ProxyServer;
+    portRangeBegin?: Number;
+    portRangeEnd?: Number;
 }
 
 export class DataChannel {
