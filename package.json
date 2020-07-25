@@ -9,9 +9,11 @@
     "test": "test"
   },
   "scripts": {
-    "test": "test/main.js",
     "install": "prebuild-install || ( ncmake configure && ncmake build )",
-    "clean": "ncmake distclean"
+    "build": "ncmake build",
+    "rebuild": "ncmake rebuild",
+    "clean": "ncmake distclean",
+    "test": "test/main.js"
   },
   "repository": {
     "type": "git",
