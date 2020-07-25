@@ -1,10 +1,17 @@
-interface ErrorEventPayload {
-    error: string;
+export as namespace NodeDataChannel;
+
+export enum LogLevel {
+    Verbose = 'Verbose',
+    Debug = 'Debug',
+    Info = 'Info',
+    Warning = 'Warning',
+    Error = 'Error',
+    Fatal = 'Fatal'
 }
 
-interface MessageEventPayload {
-    message: string;
-}
+// Functions
+export function initLogger(level: LogLevel): void;
+
 
 export interface RtcConfig {
     iceServers: string[];
