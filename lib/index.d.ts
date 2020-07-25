@@ -15,6 +15,8 @@ export function initLogger(level: LogLevel): void;
 
 export interface RtcConfig {
     iceServers: string[];
+    portRangeBegin: Number;
+    portRangeEnd: Number;
 }
 
 export class DataChannel {

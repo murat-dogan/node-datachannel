@@ -57,6 +57,12 @@ PeerConnectionWrapper::PeerConnectionWrapper(const Napi::CallbackInfo &info) : N
         rtcConfig.iceServers.emplace_back(iceServers.Get(i).As<Napi::String>().ToString());
     }
 
+    // Port Ranges
+    if (config.Get("portRangeBegin").IsNumber())
+        rtcConfig.portRangeBegin = config.Get("portRangeBegin").As<Napi::Number>().Uint32Value();
+    if (config.Get("portRangeEnd").IsNumber())
+        rtcConfig.portRangeEnd = config.Get("portRangeEnd").As<Napi::Number>().Uint32Value();
+
     // Create peer-connection
     mRtcPeerConnPtr = std::make_shared<rtc::PeerConnection>(rtcConfig);
 
