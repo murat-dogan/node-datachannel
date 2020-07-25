@@ -1,5 +1,7 @@
 # node-datachannel - libdatachannel node bindings 
 
+> "libdatachannel is a standalone implementation of WebRTC Data Channels and WebSockets in C++17 with C bindings for POSIX platforms (including Linux and Apple macOS) and Microsoft Windows. "
+
 NodeJS bindings for [libdatachannel](https://github.com/paullouisageneau/libdatachannel) library. 
 
 Please check [libdatachannel](https://github.com/paullouisageneau/libdatachannel) for Compatibility & WebRTC details.
