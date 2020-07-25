@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.1)
-project(node_datachannel VERSION 0.0.2)
+project(node_datachannel VERSION 0.0.3)
     
 include(NodeJS.cmake)
 nodejs_init()
@@ -12,7 +12,7 @@ include(FetchContent)
 FetchContent_Declare(
     libdatachannel
     GIT_REPOSITORY https://github.com/paullouisageneau/libdatachannel.git
-    GIT_TAG        "v0.7.0"
+    GIT_TAG        "v0.7.2"
 )
 FetchContent_MakeAvailable(libdatachannel)
 
