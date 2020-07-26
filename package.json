@@ -9,11 +9,12 @@
     "test": "test"
   },
   "scripts": {
-    "install": "prebuild-install || ( ncmake configure && ncmake build )",
+    "install": "prebuild-install || ncmake rebuild -- -DNO_EXAMPLES=1",
+    "install-nice": "npm run distclean && ncmake rebuild -- -DUSE_NICE=1 -DNO_EXAMPLES=1",
     "build": "ncmake build",
-    "rebuild": "ncmake rebuild",
-    "clean": "ncmake distclean",
-    "test": "test/main.js"
+    "clean": "ncmake clean",
+    "distclean": "ncmake distclean",
+    "test": "node test/main.js"
   },
   "repository": {
     "type": "git",

@@ -85,10 +85,22 @@ setTimeout(() => {
 * [libdatachannel dependencies](https://github.com/paullouisageneau/libdatachannel/blob/master/README.md#dependencies)
 
 ### Building from source
-```
+
+```sh
 git clone https://github.com/murat-dogan/node-datachannel.git
 cd node-datachannel
 npm i
+```
+
+Build with libnice support
+```sh
+npm run install-nice
+```
+
+Other Options
+```sh
+npm run install -- -DUSE_GNUTLS=1   # Use GNU TLS instead of OpenSSL (Default False)
+npm run install -- -DUSE_SRTP=1   # Enable SRTP for media support ( Default False)
 ```
 
 ### Test
