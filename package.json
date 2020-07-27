@@ -14,7 +14,7 @@
     "build": "ncmake build",
     "clean": "ncmake clean",
     "distclean": "ncmake distclean",
-    "test": "node test/main.js"
+    "test": "node test/connectivity.js"
   },
   "repository": {
     "type": "git",
