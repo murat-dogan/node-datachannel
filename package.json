@@ -30,6 +30,9 @@
     "url": "https://github.com/murat-dogan/node-datachannel/issues"
   },
   "homepage": "https://github.com/murat-dogan/node-datachannel#readme",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/@murat-dogan"
+  },
   "dependencies": {
     "nan": "^2.14.1",
     "napi-thread-safe-callback": "0.0.6",
