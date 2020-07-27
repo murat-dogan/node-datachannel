@@ -1,7 +1,5 @@
 const nodeDataChannel = require('../lib/index');
 
-console.log('Main Exports: ', nodeDataChannel);
-
 nodeDataChannel.initLogger("Debug");
 
 let dc1 = null;
@@ -9,10 +7,10 @@ let dc2 = null;
 
 // "iceServers" option is an array of stun/turn server urls
 // Examples;
-// stun:stun.l.google.com:19302
-// turn:USERNAME:PASSWORD@TURN_IP_OR_ADDRESS:PORT
-// turn:USERNAME:PASSWORD@TURN_IP_OR_ADDRESS:PORT?transport=tcp
-// turns:USERNAME:PASSWORD@TURN_IP_OR_ADDRESS:PORT
+// STUN Server Example          : stun:stun.l.google.com:19302
+// TURN Server Example          : turn:USERNAME:PASSWORD@TURN_IP_OR_ADDRESS:PORT
+// TURN Server Example (TCP)    : turn:USERNAME:PASSWORD@TURN_IP_OR_ADDRESS:PORT?transport=tcp
+// TURN Server Example (TLS)    : turns:USERNAME:PASSWORD@TURN_IP_OR_ADDRESS:PORT
 
 let peer1 = new nodeDataChannel.PeerConnection("Peer1", { iceServers: ["stun:stun.l.google.com:19302"] });
 
