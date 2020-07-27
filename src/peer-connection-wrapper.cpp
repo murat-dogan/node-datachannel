@@ -110,7 +110,9 @@ PeerConnectionWrapper::PeerConnectionWrapper(const Napi::CallbackInfo &info) : N
             mOnLocalDescriptionCallback->call([sdp](Napi::Env env, std::vector<napi_value> &args) {
                 // This will run in main thread and needs to construct the
                 // arguments for the call
-                args = {Napi::String::New(env, std::string(sdp))};
+                args = {
+                    Napi::String::New(env, std::string(sdp)),
+                    Napi::String::New(env, sdp.typeString())};
             });
     });
 
@@ -119,7 +121,9 @@ PeerConnectionWrapper::PeerConnectionWrapper(const Napi::CallbackInfo &info) : N
             mOnLocalCandidateCallback->call([candidate](Napi::Env env, std::vector<napi_value> &args) {
                 // This will run in main thread and needs to construct the
                 // arguments for the call
-                args = {Napi::String::New(env, std::string(candidate))};
+                args = {
+                    Napi::String::New(env, std::string(candidate)),
+                    Napi::String::New(env, candidate.mid())};
             });
     });
 
@@ -187,14 +191,15 @@ void PeerConnectionWrapper::setRemoteDescription(const Napi::CallbackInfo &info)
     }
 
     int length = info.Length();
-    if (length < 1 || !info[0].IsString())
+    if (length < 2 || !info[0].IsString() || !info[1].IsString())
     {
-        Napi::TypeError::New(info.Env(), "String expected").ThrowAsJavaScriptException();
+        Napi::TypeError::New(info.Env(), "String,String expected").ThrowAsJavaScriptException();
         return;
     }
 
-    std::string sdp = mPeerName = info[0].As<Napi::String>().ToString();
-    rtc::Description desc(sdp);
+    std::string sdp = info[0].As<Napi::String>().ToString();
+    std::string type = info[1].As<Napi::String>().ToString();
+    rtc::Description desc(sdp, type);
     mRtcPeerConnPtr->setRemoteDescription(desc);
 }
 
@@ -207,14 +212,15 @@ void PeerConnectionWrapper::addRemoteCandidate(const Napi::CallbackInfo &info)
     }
 
     int length = info.Length();
-    if (length < 1 || !info[0].IsString())
+    if (length < 2 || !info[0].IsString() || !info[1].IsString())
     {
-        Napi::TypeError::New(info.Env(), "String expected").ThrowAsJavaScriptException();
+        Napi::TypeError::New(info.Env(), "String,String expected").ThrowAsJavaScriptException();
         return;
     }
 
-    std::string candidate = mPeerName = info[0].As<Napi::String>().ToString();
-    mRtcPeerConnPtr->addRemoteCandidate(candidate);
+    std::string candidate = info[0].As<Napi::String>().ToString();
+    std::string mid = info[0].As<Napi::String>().ToString();
+    mRtcPeerConnPtr->addRemoteCandidate(rtc::Candidate(candidate, mid));
 }
 
 Napi::Value PeerConnectionWrapper::createDataChannel(const Napi::CallbackInfo &info)

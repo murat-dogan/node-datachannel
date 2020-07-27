@@ -21,13 +21,13 @@ peer1.onStateChange((state) => {
 peer1.onGatheringStateChange((state) => {
     console.log("Peer1 GatheringState:", state);
 });
-peer1.onLocalDescription((sdp) => {
-    console.log("Peer1 SDP:", sdp);
-    peer2.setRemoteDescription(sdp);
+peer1.onLocalDescription((sdp, type) => {
+    console.log("Peer1 SDP:", sdp, " Type:", type);
+    peer2.setRemoteDescription(sdp, type);
 });
-peer1.onLocalCandidate((candidate) => {
+peer1.onLocalCandidate((candidate, mid) => {
     console.log("Peer1 Candidate:", candidate);
-    peer2.addRemoteCandidate(candidate);
+    peer2.addRemoteCandidate(candidate, mid);
 });
 
 let peer2 = new nodeDataChannel.PeerConnection("Peer2", { iceServers: ["stun:stun.l.google.com:19302"] });
@@ -39,13 +39,13 @@ peer2.onStateChange((state) => {
 peer2.onGatheringStateChange((state) => {
     console.log("Peer2 GatheringState:", state);
 });
-peer2.onLocalDescription((sdp) => {
-    console.log("Peer2 SDP:", sdp);
-    peer1.setRemoteDescription(sdp);
+peer2.onLocalDescription((sdp, type) => {
+    console.log("Peer2 SDP:", sdp, " Type:", type);
+    peer1.setRemoteDescription(sdp, type);
 });
-peer2.onLocalCandidate((candidate) => {
+peer2.onLocalCandidate((candidate, mid) => {
     console.log("Peer2 Candidate:", candidate);
-    peer1.addRemoteCandidate(candidate);
+    peer1.addRemoteCandidate(candidate, mid);
 });
 peer2.onDataChannel((dc) => {
     console.log("Peer2 Got DataChannel: ", dc.getLabel());

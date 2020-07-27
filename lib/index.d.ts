@@ -34,6 +34,12 @@ export interface RtcConfig {
     portRangeEnd?: Number;
 }
 
+export enum DescriptionType {
+    Unspec = 'Unspec',
+    Offer = 'Offer',
+    Answer = 'Answer'
+}
+
 export class DataChannel {
     close: () => void;
     getLabel: () => string;
@@ -53,11 +59,11 @@ export class DataChannel {
 export class PeerConnection {
     constructor(peerName: string, config: RtcConfig);
     close: () => void;
-    setRemoteDescription: (sdp: string) => void;
-    addRemoteCandidate: (candidate: string) => void;
+    setRemoteDescription: (sdp: string, type: DescriptionType) => void;
+    addRemoteCandidate: (candidate: string, mid: String) => void;
     createDataChannel: (label: string) => DataChannel;
-    onLocalDescription: (cb: (sdp: string) => void) => void;
-    onLocalCandidate: (cb: (candidate: string) => void) => void;
+    onLocalDescription: (cb: (sdp: string, type: DescriptionType) => void) => void;
+    onLocalCandidate: (cb: (candidate: string, mid: String) => void) => void;
     onStateChange: (cb: (state: string) => void) => void;
     onGatheringStateChange: (state: (sdp: string) => void) => void;
     onDataChannel: (cb: (dc: DataChannel) => void) => void;
