@@ -1,3 +1,4 @@
 /build
+/prebuilds
 node_modules
 .vscode/ipch

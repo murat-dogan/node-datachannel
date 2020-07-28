@@ -9,11 +9,11 @@
     "test": "test"
   },
   "scripts": {
-    "install": "prebuild-install || ncmake rebuild -- -DNO_EXAMPLES=1",
-    "install-nice": "npm run distclean && ncmake rebuild -- -DUSE_NICE=1 -DNO_EXAMPLES=1",
-    "build": "ncmake build",
-    "clean": "ncmake clean",
-    "distclean": "ncmake distclean",
+    "install": "prebuild-install || cmake-js rebuild --CDNO_EXAMPLES=1 --CDNO_TESTS=1",
+    "install-nice": "npm run clean && cmake-js rebuild --CDUSE_NICE=1 --CDNO_EXAMPLES=1 --DCNO_TESTS=1",
+    "build": "cmake-js build --CDNO_EXAMPLES=1 --CDNO_TESTS=1",
+    "clean": "cmake-js clean",
+    "prebuild": "prebuild -t 10.22.0 --backend cmake-js --CDNO_EXAMPLES=1 --CDNO_TESTS=1",
     "test": "node test/connectivity.js"
   },
   "repository": {
@@ -35,6 +35,7 @@
     "nan": "^2.14.1",
     "napi-thread-safe-callback": "0.0.6",
     "node-addon-api": "^3.0.1",
+    "prebuild": "^10.0.0",
     "prebuild-install": "^5.3.5"
   },
   "devDependencies": {},
