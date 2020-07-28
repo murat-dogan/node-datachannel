@@ -60,10 +60,10 @@ export class PeerConnection {
     constructor(peerName: string, config: RtcConfig);
     close: () => void;
     setRemoteDescription: (sdp: string, type: DescriptionType) => void;
-    addRemoteCandidate: (candidate: string, mid: String) => void;
+    addRemoteCandidate: (candidate: string, mid: string) => void;
     createDataChannel: (label: string) => DataChannel;
     onLocalDescription: (cb: (sdp: string, type: DescriptionType) => void) => void;
-    onLocalCandidate: (cb: (candidate: string, mid: String) => void) => void;
+    onLocalCandidate: (cb: (candidate: string, mid: string) => void) => void;
     onStateChange: (cb: (state: string) => void) => void;
     onGatheringStateChange: (state: (sdp: string) => void) => void;
     onDataChannel: (cb: (dc: DataChannel) => void) => void;
