@@ -1,0 +1,31 @@
+name: Node.js CI
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: 	ubuntu-20.04
+
+    strategy:
+      matrix:
+        node-version: [10.x]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+    - run: npm install --build-from-source
+      env:
+        CI: true
+    - run: node_modules/.bin/prebuild --upload -u ${{ secrets.GITHUB_TOKEN }}
+      env:
+        CI: true
+    - uses: actions/upload-artifact@v2
+      with:
+        name: node_datachannel.node
+        path: build/Release/node_datachannel.node    
+        
+      
