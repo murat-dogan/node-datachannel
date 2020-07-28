@@ -1,8 +1,7 @@
 cmake_minimum_required(VERSION 3.1)
 project(node_datachannel VERSION 0.0.4)
     
-include(NodeJS.cmake)
-nodejs_init()
+include_directories(${CMAKE_JS_INC})
 
 set(CMAKE_BUILD_TYPE Release)
 
@@ -16,14 +15,16 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(libdatachannel)
 
-add_nodejs_module(${PROJECT_NAME} 
+add_library(${PROJECT_NAME} SHARED
     src/rtc-wrapper.cpp
     src/data-channel-wrapper.cpp
     src/peer-connection-wrapper.cpp
     src/main.cpp
+    ${CMAKE_JS_SRC}
 )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES CXX_STANDARD 17)
+set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "" SUFFIX ".node")
 
 target_include_directories(${PROJECT_NAME} PRIVATE 
     ${CMAKE_SOURCE_DIR}/node_modules/node-addon-api 
@@ -32,5 +33,6 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE 
+    ${CMAKE_JS_LIB}
     datachannel-static
 )    
