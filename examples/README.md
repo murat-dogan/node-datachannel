@@ -1,25 +1,21 @@
 # Examples
 
-## client
- * You can use client example project to test WebRTC Data Channels with WebSocket signaling.
+## client-server
+ * You can use client-server example project to test WebRTC Data Channels with WebSocket signaling.
  * It uses same logic of [libdatachannel/examples/client](https://github.com/paullouisageneau/libdatachannel/tree/master/examples) project.
-
-## web
-* Copied from [libdatachannel/examples/web](https://github.com/paullouisageneau/libdatachannel/tree/master/examples)
-* Contains an equivalent implementation for web browsers and a node.js signaling server
+ * Contains an equivalent implementation for a node.js signaling server
 
 ## How to Use?
-* Start ws signaling server;
-  * cd examples/web
-  * npm i
-  * node server.js
-* Start answerer;
+* Prepare Project
   * cd examples/client
   * npm i
+* Start ws signaling server;
+  * node signaling-server.js
+* Start answerer (On a new Console);
   * node client.js
   * Note local ID
-* Start Offerer;
-  * cd examples/client
-  * npm i
+* Start Offerer (On a new Console);
   * node client.js
   * Enter answerer ID
+
+  > You can also use [libdatachannel/examples/client](https://github.com/paullouisageneau/libdatachannel/tree/master/examples) project's client & signaling server
