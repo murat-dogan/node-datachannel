@@ -112,7 +112,11 @@ Other Options
 ```
 
 ### Test
-```
-> node test/main.js
+```sh
+> npm run test                  # Unit tests
+> node test/connectivity.js     # Connectivity
 ```
 
+### Examples
+
+Check `examples` folder
