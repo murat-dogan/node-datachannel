@@ -5,9 +5,6 @@ include_directories(${CMAKE_JS_INC})
 
 set(CMAKE_BUILD_TYPE Release)
 
-set(OPENSSL_USE_STATIC_LIBS TRUE)
-find_package(OpenSSL REQUIRED)
-
 include(FetchContent)
 
 # Fetch libdatachannel
@@ -41,8 +38,10 @@ set(LINK_LIBRARIES
     datachannel-static
 )
 
-if (UNIX)
-    list(APPEND LINK_LIBRARIES -static-libgcc -static-libstdc++) 
-endif (UNIX)
+if(APPLE)
+  ###
+elseif(UNIX)
+    list(APPEND LINK_LIBRARIES -static-libgcc -static-libstdc++)
+endif()
 
 target_link_libraries(${PROJECT_NAME} PRIVATE ${LINK_LIBRARIES})    
