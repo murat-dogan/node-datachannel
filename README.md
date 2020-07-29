@@ -1,5 +1,7 @@
 # node-datachannel - libdatachannel node bindings 
 
+![Build CI](https://github.com/murat-dogan/node-datachannel/workflows/Build%20CI/badge.svg)
+
 > "libdatachannel is a standalone implementation of WebRTC Data Channels and WebSockets in C++17 with C bindings for POSIX platforms (including Linux and Apple macOS) and Microsoft Windows. "
 
 NodeJS bindings for [libdatachannel](https://github.com/paullouisageneau/libdatachannel) library. 
@@ -76,9 +78,15 @@ setTimeout(() => {
     peer2.close();
 }, 10 * 1000);
 ```
+## Install
 
+Prebuilt binaries are available for Windows, Linux & Mac (Node Version >= 10)
 
-## Building
+```sh
+> npm install node-datachannel --save
+```
+
+## Build
 
 ### Requirements
 * cmake >= V3.1
@@ -87,24 +95,24 @@ setTimeout(() => {
 ### Building from source
 
 ```sh
-git clone https://github.com/murat-dogan/node-datachannel.git
-cd node-datachannel
-npm i
+> git clone https://github.com/murat-dogan/node-datachannel.git
+> cd node-datachannel
+> npm i
 ```
 
 Build with libnice support
 ```sh
-npm run install-nice
+> npm run install-nice
 ```
 
 Other Options
 ```sh
-npm run install -- -DUSE_GNUTLS=1   # Use GNU TLS instead of OpenSSL (Default False)
-npm run install -- -DUSE_SRTP=1   # Enable SRTP for media support ( Default False)
+> npm run install -- -DUSE_GNUTLS=1   # Use GNU TLS instead of OpenSSL (Default False)
+> npm run install -- -DUSE_SRTP=1   # Enable SRTP for media support ( Default False)
 ```
 
 ### Test
 ```
-node test/main.js
+> node test/main.js
 ```
 
