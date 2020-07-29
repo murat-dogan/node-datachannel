@@ -1,0 +1,74 @@
+name: Node.js CI
+
+on:
+  create:
+    tags:
+      - v*
+
+jobs:
+  build-linux:
+    runs-on: 	ubuntu-20.04
+    strategy:
+      matrix:
+        node-version: [14.x]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+        architecture: 'x64'
+    - run: npm install --build-from-source
+      env:
+        CI: true
+    - run: node_modules/.bin/prebuild --upload -u ${{ secrets.GITHUB_TOKEN }}
+      env:
+        CI: true  
+  
+  build-windows:
+    runs-on: 	windows-latest
+    strategy:
+      matrix:
+        node-version: [14.x]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install OpenSSL
+      uses: crazy-max/ghaction-chocolatey@v1
+      with:
+        args: install openssl
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+    - run: npm install --build-from-source
+      env:
+        CI: true
+    - run: node_modules/.bin/prebuild --upload -u ${{ secrets.GITHUB_TOKEN }}
+      env:
+        CI: true  
+  
+  build-macos:
+    runs-on: 	macos-latest
+    strategy:
+      matrix:
+        node-version: [14.x]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install OpenSSL
+      run: brew install openssl
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+    - run: npm install --build-from-source
+      env:
+        CI: true
+        OPENSSL_ROOT_DIR: /usr/local/opt/openssl/ 
+    - run: node_modules/.bin/prebuild --upload -u ${{ secrets.GITHUB_TOKEN }}
+      env:
+        CI: true
+        
+      

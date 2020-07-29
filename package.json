@@ -8,10 +8,11 @@
     "lib": "lib",
     "test": "test"
   },
+  "_from": "node-datachannel@latest",
   "scripts": {
-    "install": "prebuild-install || prebuild --backend cmake-js --CDNO_EXAMPLES=1 --CDNO_TESTS=1",
+    "install": "prebuild-install || npm run build",
     "install-nice": "npm run clean && cmake-js rebuild --CDUSE_NICE=1 --CDNO_EXAMPLES=1 --DCNO_TESTS=1",
-    "build": "cmake-js build --CDNO_EXAMPLES=1 --CDNO_TESTS=1",
+    "build": "prebuild --backend cmake-js --CDNO_EXAMPLES=1 --CDNO_TESTS=1",
     "clean": "cmake-js clean",
     "test": "node test/connectivity.js"
   },
