@@ -15,7 +15,8 @@
     "build": "cmake-js build --CDNO_EXAMPLES=1 --CDNO_TESTS=1",
     "_prebuild": "prebuild --backend cmake-js -- --CDNO_EXAMPLES=1 --CDNO_TESTS=1",
     "clean": "cmake-js clean",
-    "test": "node test/connectivity.js"
+    "test": "node test/connectivity.js",
+    "jest": "jest"
   },
   "repository": {
     "type": "git",
@@ -33,6 +34,7 @@
   "homepage": "https://github.com/murat-dogan/node-datachannel#readme",
   "devDependencies": {
     "cmake-js": "^6.1.0",
+    "jest": "^26.1.0",
     "nan": "^2.14.1",
     "napi-thread-safe-callback": "0.0.6",
     "node-addon-api": "^3.0.1",
