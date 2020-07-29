@@ -34,7 +34,6 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 
 set(LINK_LIBRARIES
     ${CMAKE_JS_LIB}
-    OpenSSL::Crypto
     datachannel-static
 )
 
