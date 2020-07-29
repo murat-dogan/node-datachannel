@@ -10,7 +10,7 @@
   },
   "_from": "node-datachannel@latest",
   "scripts": {
-    "install": "prebuild-install || npm run build",
+    "install": "prebuild-install || npm run _prebuild",
     "install-nice": "npm run clean && cmake-js build --CDUSE_NICE=1 --CDNO_EXAMPLES=1 --CDNO_TESTS=1",
     "build": "cmake-js build --CDNO_EXAMPLES=1 --CDNO_TESTS=1",
     "_prebuild": "prebuild --backend cmake-js -- --CDNO_EXAMPLES=1 --CDNO_TESTS=1",
