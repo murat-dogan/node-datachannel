@@ -1,6 +1,6 @@
 {
   "name": "node-datachannel",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "libdatachannel node bindings",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
@@ -10,7 +10,7 @@
   },
   "_from": "node-datachannel@latest",
   "scripts": {
-    "install": "prebuild-install || npm run _prebuild",
+    "install": "prebuild-install || (npm install --ignore-scripts --only=dev && npm run _prebuild)",
     "install-nice": "npm run clean && cmake-js build --CDUSE_NICE=1 --CDNO_EXAMPLES=1 --CDNO_TESTS=1",
     "build": "cmake-js build --CDNO_EXAMPLES=1 --CDNO_TESTS=1",
     "_prebuild": "prebuild --backend cmake-js -- --CDNO_EXAMPLES=1 --CDNO_TESTS=1",
@@ -31,16 +31,17 @@
     "url": "https://github.com/murat-dogan/node-datachannel/issues"
   },
   "homepage": "https://github.com/murat-dogan/node-datachannel#readme",
-  "dependencies": {
+  "devDependencies": {
     "cmake-js": "^6.1.0",
     "nan": "^2.14.1",
     "napi-thread-safe-callback": "0.0.6",
     "node-addon-api": "^3.0.1",
-    "prebuild": "^10.0.0",
-    "prebuild-install": "^5.3.5"
+    "prebuild": "^10.0.0"
   },
-  "devDependencies": {},
   "bundledDependencies": [
     "prebuild-install"
-  ]
+  ],
+  "dependencies": {
+    "prebuild-install": "^5.3.5"
+  }
 }
