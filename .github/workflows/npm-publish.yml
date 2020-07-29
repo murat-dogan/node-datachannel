@@ -1,4 +1,4 @@
-name: Build CI
+name: NPM Publish
 
 on:
   create:
