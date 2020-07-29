@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.14)
 project(node_datachannel VERSION 0.0.8)
     
 include_directories(${CMAKE_JS_INC})
