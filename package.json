@@ -15,8 +15,7 @@
     "build": "cmake-js build --CDNO_EXAMPLES=1 --CDNO_TESTS=1",
     "_prebuild": "prebuild --backend cmake-js -- --CDNO_EXAMPLES=1 --CDNO_TESTS=1",
     "clean": "cmake-js clean",
-    "test": "node test/connectivity.js",
-    "jest": "jest"
+    "test": "jest"
   },
   "repository": {
     "type": "git",
