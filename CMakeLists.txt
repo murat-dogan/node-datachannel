@@ -4,7 +4,9 @@ project(node_datachannel VERSION 0.0.8)
 include_directories(${CMAKE_JS_INC})
 
 set(CMAKE_BUILD_TYPE Release)
+
 set(OPENSSL_USE_STATIC_LIBS TRUE)
+find_package(OpenSSL REQUIRED)
 
 include(FetchContent)
 
@@ -33,8 +35,14 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_BINARY_DIR}/_deps/libdatachannel-src/include
 )
 
-target_link_libraries(${PROJECT_NAME} PRIVATE 
+set(LINK_LIBRARIES
     ${CMAKE_JS_LIB}
-    -static-libgcc -static-libstdc++
+    OpenSSL::Crypto
     datachannel-static
-)    
+)
+
+if (UNIX)
+    list(APPEND LINK_LIBRARIES -static-libgcc -static-libstdc++) 
+endif (UNIX)
+
+target_link_libraries(${PROJECT_NAME} PRIVATE ${LINK_LIBRARIES})    
