@@ -114,18 +114,18 @@ describe('P2P', () => {
             peer2 = null;
 
             // State Callbacks
-            expect(p1StateMock.mock.calls.length).toBeGreaterThan(1);
-            expect(p1GatheringStateMock.mock.calls.length).toBeGreaterThan(1);
-            expect(p2StateMock.mock.calls.length).toBeGreaterThan(1);
-            expect(p2GatheringStateMock.mock.calls.length).toBeGreaterThan(1);
+            expect(p1StateMock.mock.calls.length).toBeGreaterThanOrEqual(1);
+            expect(p1GatheringStateMock.mock.calls.length).toBeGreaterThanOrEqual(1);
+            expect(p2StateMock.mock.calls.length).toBeGreaterThanOrEqual(1);
+            expect(p2GatheringStateMock.mock.calls.length).toBeGreaterThanOrEqual(1);
 
             // SDP
             expect(p1SDPMock.mock.calls.length).toBe(1);
             expect(p2SDPMock.mock.calls.length).toBe(1);
 
             // Candidates
-            expect(p1CandidateMock.mock.calls.length).toBeGreaterThan(1);
-            expect(p2CandidateMock.mock.calls.length).toBeGreaterThan(1);
+            expect(p1CandidateMock.mock.calls.length).toBeGreaterThanOrEqual(1);
+            expect(p2CandidateMock.mock.calls.length).toBeGreaterThanOrEqual(1);
 
             // DataChannel
             expect(p1DCMock.mock.calls.length).toBe(1);
