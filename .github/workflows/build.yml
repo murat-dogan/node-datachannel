@@ -39,8 +39,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Install OpenSSL
-      uses: ilammy/msvc-dev-cmd@v1
+    - uses: ilammy/msvc-dev-cmd@v1
+    - name: Install OpenSSL      
       run: choco install openssl
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v1
