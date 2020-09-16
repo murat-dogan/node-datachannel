@@ -10,7 +10,7 @@ jobs:
     runs-on: 	ubuntu-20.04
     strategy:
       matrix:
-        node-version: [10.x,11.x,12.x,13.x,14.x]
+        node-version: [14.x]
 
     steps:
     - uses: actions/checkout@v2
@@ -40,9 +40,8 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Install OpenSSL
-      uses: crazy-max/ghaction-chocolatey@v1
-      with:
-        args: install openssl
+      uses: ilammy/msvc-dev-cmd@v1
+      run: choco install openssl
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v1
       with:
