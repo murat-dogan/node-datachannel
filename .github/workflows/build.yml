@@ -47,7 +47,7 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
     - name: Build
-      run: set NPM_CONFIG_CACHE= && npm install --build-from-source
+      run: set npm_config_cache= && set NPM_CONFIG_CACHE= && npm install --build-from-source
       env:
         CI: true
     - name: Test
