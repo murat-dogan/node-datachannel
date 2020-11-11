@@ -69,4 +69,10 @@ setTimeout(() => {
     dc2.close();
     peer1.close();
     peer2.close();
+    dc1 = null;
+    dc2 = null;
+    peer1 = null;
+    peer2 = null;
+    nodeDataChannel.cleanup();
+
 }, 10 * 1000);
