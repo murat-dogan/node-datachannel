@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.14)
-project(node_datachannel VERSION 0.0.10)
+project(node_datachannel VERSION 0.0.11)
     
 include_directories(${CMAKE_JS_INC})
 
@@ -11,7 +11,7 @@ include(FetchContent)
 FetchContent_Declare(
     libdatachannel
     GIT_REPOSITORY https://github.com/paullouisageneau/libdatachannel.git
-    GIT_TAG        "v0.8.0"
+    GIT_TAG        "v0.9.4"
 )
 FetchContent_MakeAvailable(libdatachannel)
 

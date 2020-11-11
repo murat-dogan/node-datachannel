@@ -15,7 +15,7 @@
     "build": "cmake-js build --CDNO_EXAMPLES=1 --CDNO_TESTS=1",
     "_prebuild": "prebuild --backend cmake-js -- --CDNO_EXAMPLES=1 --CDNO_TESTS=1 -DUSE_GNUTLS=0",
     "clean": "cmake-js clean",
-    "test": "jest"
+    "test": "jest -detectOpenHandles"
   },
   "repository": {
     "type": "git",
