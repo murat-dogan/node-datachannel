@@ -11,6 +11,7 @@ export enum LogLevel {
 
 // Functions
 export function initLogger(level: LogLevel): void;
+export function cleanup(): void;
 
 export enum ProxyServerType {
     None = 'None',
@@ -48,6 +49,7 @@ export class DataChannel {
     availableAmount: () => Number;
     bufferedAmount: () => Number;
     maxMessageSize: () => Number;
+    setBufferedAmountLowThreshold: (newSize: Number) => void;
     onOpen: (cb: () => void) => void;
     onClosed: (cb: () => void) => void;
     onError: (cb: (err: string) => void) => void;

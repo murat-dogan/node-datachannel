@@ -25,6 +25,7 @@ public:
   Napi::Value availableAmount(const Napi::CallbackInfo &info);
   Napi::Value bufferedAmount(const Napi::CallbackInfo &info);
   Napi::Value maxMessageSize(const Napi::CallbackInfo &info);
+  void setBufferedAmountLowThreshold(const Napi::CallbackInfo &info);
 
   // Callbacks
   void onOpen(const Napi::CallbackInfo &info);
