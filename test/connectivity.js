@@ -57,7 +57,6 @@ peer2.onDataChannel((dc) => {
 });
 
 dc1 = peer1.createDataChannel("test");
-dc1.setBufferedAmountLowThreshold(100);
 dc1.onOpen(() => {
     dc1.sendMessage("Hello from Peer1");
 });
