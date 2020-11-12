@@ -113,6 +113,11 @@ describe('P2P', () => {
             peer1 = null;
             peer2 = null;
 
+            // Cleanup Threads
+            nodeDataChannel.cleanup();
+        }, 5 * 1000);
+
+        setTimeout(() => {
             // State Callbacks
             expect(p1StateMock.mock.calls.length).toBeGreaterThanOrEqual(1);
             expect(p1GatheringStateMock.mock.calls.length).toBeGreaterThanOrEqual(1);
@@ -136,7 +141,7 @@ describe('P2P', () => {
             expect(p2DCMessageMock.mock.calls[0][0]).toEqual("Hello From Peer1");
 
             done();
-        }, 10 * 1000);
+        }, 15 * 1000);
 
     });
 });

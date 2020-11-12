@@ -5,6 +5,7 @@ Napi::Object RtcWrapper::Init(Napi::Env env, Napi::Object exports)
     Napi::HandleScope scope(env);
 
     exports.Set("initLogger", Napi::Function::New(env, &RtcWrapper::initLogger));
+    exports.Set("cleanup", Napi::Function::New(env, &RtcWrapper::cleanup));
     return exports;
 }
 
@@ -37,4 +38,9 @@ void RtcWrapper::initLogger(const Napi::CallbackInfo &info)
         logLevel = rtc::LogLevel::Fatal;
 
     rtc::InitLogger(logLevel);
+}
+
+void RtcWrapper::cleanup(const Napi::CallbackInfo &info)
+{
+    rtc::Cleanup();
 }

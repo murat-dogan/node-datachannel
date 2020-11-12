@@ -16,6 +16,7 @@ Napi::Object DataChannelWrapper::Init(Napi::Env env, Napi::Object exports)
          InstanceMethod("availableAmount", &DataChannelWrapper::availableAmount),
          InstanceMethod("bufferedAmount", &DataChannelWrapper::bufferedAmount),
          InstanceMethod("maxMessageSize", &DataChannelWrapper::maxMessageSize),
+         InstanceMethod("setBufferedAmountLowThreshold", &DataChannelWrapper::setBufferedAmountLowThreshold),
          InstanceMethod("onOpen", &DataChannelWrapper::onOpen),
          InstanceMethod("onClosed", &DataChannelWrapper::onClosed),
          InstanceMethod("onError", &DataChannelWrapper::onError),
@@ -180,6 +181,26 @@ Napi::Value DataChannelWrapper::maxMessageSize(const Napi::CallbackInfo &info)
         return Napi::Number::New(info.Env(), 0);
     }
     return Napi::Number::New(info.Env(), mDataChannelPtr->maxMessageSize());
+}
+
+void DataChannelWrapper::setBufferedAmountLowThreshold(const Napi::CallbackInfo &info)
+{
+    if (!mDataChannelPtr)
+    {
+        Napi::TypeError::New(info.Env(), "It seems data-channel is destroyed!").ThrowAsJavaScriptException();
+        return;
+    }
+
+    Napi::Env env = info.Env();
+    int length = info.Length();
+
+    if (length < 1 || !info[0].IsNumber())
+    {
+        Napi::TypeError::New(env, "Number expected").ThrowAsJavaScriptException();
+        return;
+    }
+
+    mDataChannelPtr->setBufferedAmountLowThreshold(info[0].ToNumber().Uint32Value());
 }
 
 void DataChannelWrapper::onOpen(const Napi::CallbackInfo &info)
