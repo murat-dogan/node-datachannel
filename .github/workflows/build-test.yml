@@ -1,0 +1,45 @@
+name: Build CI
+
+on: 
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: 'Log level'     
+        required: true
+        default: 'warning'
+      tags:
+        description: 'Test scenario tags'
+
+jobs:
+  build-windows:
+    runs-on: 	windows-latest
+    strategy:
+      matrix:
+        node-version: [10.x]
+        node-arch: [x86]
+
+    steps:
+    - uses: actions/checkout@v2
+    - uses: ilammy/msvc-dev-cmd@v1
+      with:
+        arch: x86
+    - name: Install OpenSSL      
+      run: choco install openssl
+    - name: Node ${{ matrix.node_version }} - ${{ matrix.node_arch }} on ${{ matrix.os }}
+      uses: actions/aminya@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+        node-arch: ${{ matrix.node_arch }}
+    - name: Build
+      run: set npm_config_cache= && set NPM_CONFIG_CACHE= && npm install --build-from-source
+      env:
+        CI: true
+    - name: Test
+      run: npm run test
+      env:
+        CI: true  
+    - name: Upload 
+      run: node_modules/.bin/prebuild --upload -u ${{ secrets.GITHUB_TOKEN }}
+      env:
+        CI: true  
+  
