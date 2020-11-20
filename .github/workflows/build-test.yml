@@ -9,14 +9,19 @@ on:
         default: 'warning'
       tags:
         description: 'Test scenario tags'
+        
+env:
+  ACTIONS_ALLOW_UNSECURE_COMMANDS: true
 
 jobs:
   build-windows:
     runs-on: 	windows-latest
     strategy:
       matrix:
-        node-version: [10.x]
-        node-arch: [x86]
+        node_version:
+          - 10
+        node_arch:
+          - x86
 
     steps:
     - uses: actions/checkout@v2
@@ -26,9 +31,9 @@ jobs:
     - name: Install OpenSSL      
       run: choco install openssl
     - name: Node ${{ matrix.node_version }} - ${{ matrix.node_arch }} on ${{ matrix.os }}
-      uses: aminya/setup-node@v1
+      uses: aminya/setup-node@x86
       with:
-        node-version: ${{ matrix.node-version }}
+        node-version: ${{ matrix.node_version }}
         node-arch: ${{ matrix.node_arch }}
     - name: Build
       run: set npm_config_cache= && set NPM_CONFIG_CACHE= && npm install --build-from-source
