@@ -33,16 +33,16 @@
   "homepage": "https://github.com/murat-dogan/node-datachannel#readme",
   "devDependencies": {
     "cmake-js": "^6.1.0",
-    "jest": "^26.1.0",
-    "nan": "^2.14.1",
+    "jest": "^26.6.3",
+    "nan": "^2.14.2",
     "napi-thread-safe-callback": "0.0.6",
-    "node-addon-api": "^3.0.1",
-    "prebuild": "^10.0.0"
+    "node-addon-api": "^3.0.2",
+    "prebuild": "^10.0.1"
   },
   "bundledDependencies": [
     "prebuild-install"
   ],
   "dependencies": {
-    "prebuild-install": "^5.3.5"
+    "prebuild-install": "^5.3.6"
   }
 }
