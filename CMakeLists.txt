@@ -5,6 +5,10 @@ include_directories(${CMAKE_JS_INC})
 
 set(CMAKE_BUILD_TYPE Release)
 
+# Required for libdatachannel
+set(OPENSSL_USE_STATIC_LIBS TRUE)
+find_package(OpenSSL REQUIRED)
+
 include(FetchContent)
 
 # Fetch libdatachannel
