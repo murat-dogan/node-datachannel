@@ -80,7 +80,7 @@ setTimeout(() => {
 ```
 ## Install
 
-Prebuilt binaries are available for Windows, Linux & Mac (Node Version >= 10)
+Prebuilt binaries are available for Windows (x86,x64), Linux & Mac (Node Version >= 10)
 
 ```sh
 > npm install node-datachannel --save

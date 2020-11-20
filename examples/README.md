@@ -7,7 +7,7 @@
 
 ## How to Use?
 * Prepare Project
-  * cd examples/client
+  * cd examples/client-server
   * npm i
 * Start ws signaling server;
   * node signaling-server.js
