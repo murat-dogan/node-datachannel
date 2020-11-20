@@ -28,8 +28,16 @@ jobs:
     - uses: ilammy/msvc-dev-cmd@v1
       with:
         arch: x86
-    - name: Install OpenSSL      
-      run: choco install openssl
+    - name: Restore from cache and install vcpkg
+      # Download and build vcpkg, without installing any port. If content is cached already, it is a no-op.
+      uses: lukka/run-vcpkg@v5
+      with:
+        setupOnly: true
+    # Now that vcpkg is installed, it is being used to run desired arguments.
+    - run: |
+        $VCPKG_ROOT/vcpkg @$vcpkgResponseFile
+        $VCPKG_ROOT/vcpkg install openssl-windows:x86-windows
+      shell: bash
     - name: Node ${{ matrix.node_version }} - ${{ matrix.node_arch }} on ${{ matrix.os }}
       uses: aminya/setup-node@x86
       with:
