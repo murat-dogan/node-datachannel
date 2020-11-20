@@ -2,6 +2,11 @@ name: Build CI
 
 on:
   workflow_dispatch:
+    inputs:
+      logLevel:
+        description: "Log level"
+        required: true
+        default: "warning"
   create:
     tags:
       - v*
