@@ -1,0 +1,154 @@
+name: Build CI - All
+
+on:
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: "Log level"
+        required: true
+        default: "warning"
+  create:
+    tags:
+      - v*
+
+env:
+  ACTIONS_ALLOW_UNSECURE_COMMANDS: true
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        node-version: [10.x, 11.x, 12.x, 13.x, 14.x]
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Build
+        run: npm install --build-from-source
+        env:
+          CI: true
+      - name: Test
+        run: npm run test
+        env:
+          CI: true
+      - name: Upload
+        run: node_modules/.bin/prebuild --upload -u ${{ secrets.GITHUB_TOKEN }}
+        env:
+          CI: true
+
+  build-windows-x64:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        node-version: [10.x, 11.x, 12.x, 13.x, 14.x]
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ilammy/msvc-dev-cmd@v1
+      - name: Install OpenSSL
+        run: choco install openssl
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Build
+        run: set npm_config_cache= && set NPM_CONFIG_CACHE= && npm install --build-from-source
+        env:
+          CI: true
+      - name: Test
+        run: npm run test
+        env:
+          CI: true
+      - name: Upload
+        run: node_modules/.bin/prebuild --upload -u ${{ secrets.GITHUB_TOKEN }}
+        env:
+          CI: true
+
+  build-windows-x86:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        node_version:
+          - 10
+          - 11
+          - 12
+          - 13
+          - 14
+        node_arch:
+          - x86
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x86
+      - name: Install OpenSSL
+        run: choco install openssl --x86=true
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: aminya/setup-node@x86
+        with:
+          node-version: ${{ matrix.node_version }}
+          node-arch: ${{ matrix.node_arch }}
+      - name: Build
+        run: set npm_config_cache= && set NPM_CONFIG_CACHE= && npm install --build-from-source
+        env:
+          CI: true
+      - name: Test
+        run: npm run test
+        env:
+          CI: true
+      - name: Upload
+        run: node_modules/.bin/prebuild --upload -u ${{ secrets.GITHUB_TOKEN }}
+        env:
+          CI: true
+
+  build-macos:
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        node-version: [10.x, 11.x, 12.x, 13.x, 14.x]
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install OpenSSL
+        run: HOMEBREW_NO_INSTALL_CLEANUP=1 brew reinstall openssl@1.1
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Build
+        run: npm install --build-from-source
+        env:
+          CI: true
+          OPENSSL_ROOT_DIR: /usr/local/opt/openssl
+          OPENSSL_LIBRARIES: /usr/local/opt/openssl/lib
+      - name: Test
+        run: npm run test
+        env:
+          CI: true
+      - name: Upload
+        run: node_modules/.bin/prebuild --upload -u ${{ secrets.GITHUB_TOKEN }}
+        env:
+          CI: true
+
+  npm-publish:
+    needs: [build-linux, build-windows-x64, build-windows-x86, build-macos]
+    name: npm-publish
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: Set up Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12.x
+          registry-url: "https://registry.npmjs.org"
+      - name: Publish
+        run: |
+          npm install
+          npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
