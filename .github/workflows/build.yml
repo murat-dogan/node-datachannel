@@ -130,7 +130,7 @@ jobs:
           CI: true
 
   npm-publish:
-    needs: [build-linux, build-windows, build-macos]
+    needs: [build-linux, build-windows-x64, build-windows-x86, build-macos]
     name: npm-publish
     runs-on: ubuntu-latest
     steps:
