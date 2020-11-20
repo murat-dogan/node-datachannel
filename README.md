@@ -89,7 +89,7 @@ Prebuilt binaries are available for Windows (x86,x64), Linux & Mac (Node Version
 ## Build
 
 ### Requirements
-* cmake >= V3.1
+* cmake >= V3.14
 * [libdatachannel dependencies](https://github.com/paullouisageneau/libdatachannel/blob/master/README.md#dependencies)
 
 ### Building from source
