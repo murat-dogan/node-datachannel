@@ -46,9 +46,11 @@ set(LINK_LIBRARIES
     datachannel-static
 )
 
-if(UNIX)
-  list(APPEND LINK_LIBRARIES -static-libgcc -static-libstdc++)
-endif()  
+if(APPLE)
+  ###
+elseif(UNIX)
+    list(APPEND LINK_LIBRARIES -static-libgcc -static-libstdc++)
+endif()
 
 if(WIN32)
   list(APPEND LINK_LIBRARIES crypt32.lib)
