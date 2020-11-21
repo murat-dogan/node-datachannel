@@ -1,11 +1,10 @@
 cmake_minimum_required(VERSION 3.14)
-project(node_datachannel VERSION 0.0.13)
+project(node_datachannel VERSION 0.0.14)
     
 include_directories(${CMAKE_JS_INC})
 
 set(CMAKE_BUILD_TYPE Release)
 
-# Required for libdatachannel
 set(OPENSSL_USE_STATIC_LIBS TRUE)
 find_package(OpenSSL REQUIRED)
 
@@ -17,7 +16,13 @@ FetchContent_Declare(
     GIT_REPOSITORY https://github.com/paullouisageneau/libdatachannel.git
     GIT_TAG        "v0.10.2"
 )
-FetchContent_MakeAvailable(libdatachannel)
+
+FetchContent_GetProperties(libdatachannel)
+if(NOT libdatachannel)
+  FetchContent_Populate(libdatachannel)
+  add_subdirectory(${libdatachannel_SOURCE_DIR} ${libdatachannel_BINARY_DIR} EXCLUDE_FROM_ALL)
+endif()
+
 
 add_library(${PROJECT_NAME} SHARED
     src/rtc-wrapper.cpp
@@ -45,6 +50,10 @@ if(APPLE)
   ###
 elseif(UNIX)
     list(APPEND LINK_LIBRARIES -static-libgcc -static-libstdc++)
+endif()
+
+if(WIN32)
+  list(APPEND LINK_LIBRARIES crypt32.lib)
 endif()
 
 target_link_libraries(${PROJECT_NAME} PRIVATE ${LINK_LIBRARIES})    
