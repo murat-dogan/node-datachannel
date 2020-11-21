@@ -16,7 +16,13 @@ FetchContent_Declare(
     GIT_REPOSITORY https://github.com/paullouisageneau/libdatachannel.git
     GIT_TAG        "v0.10.2"
 )
-FetchContent_MakeAvailable(libdatachannel)
+
+FetchContent_GetProperties(libdatachannel)
+if(NOT libdatachannel)
+  FetchContent_Populate(libdatachannel)
+  add_subdirectory(${libdatachannel_SOURCE_DIR} ${libdatachannel_BINARY_DIR} EXCLUDE_FROM_ALL)
+endif()
+
 
 add_library(${PROJECT_NAME} SHARED
     src/rtc-wrapper.cpp
