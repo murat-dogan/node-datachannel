@@ -5,7 +5,6 @@ include_directories(${CMAKE_JS_INC})
 
 set(CMAKE_BUILD_TYPE Release)
 
-# Required for libdatachannel
 set(OPENSSL_USE_STATIC_LIBS TRUE)
 find_package(OpenSSL REQUIRED)
 
@@ -41,10 +40,12 @@ set(LINK_LIBRARIES
     datachannel-static
 )
 
-if(APPLE)
-  ###
-elseif(UNIX)
-    list(APPEND LINK_LIBRARIES -static-libgcc -static-libstdc++)
+if(UNIX)
+  list(APPEND LINK_LIBRARIES -static-libgcc -static-libstdc++)
+endif()  
+
+if(WIN32)
+  list(APPEND LINK_LIBRARIES crypt32.lib)
 endif()
 
 target_link_libraries(${PROJECT_NAME} PRIVATE ${LINK_LIBRARIES})    
