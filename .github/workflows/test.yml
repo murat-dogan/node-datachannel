@@ -9,12 +9,10 @@ env:
 jobs:
   testbox:
     runs-on: ubuntu-latest
-    container:
-      image: arm32v7/ubuntu:xenial
+    container: arm32v7/ubuntu:xenial
     steps:  
-    - uses: actions/checkout@v2
-    - name: What OS is running
-      run: apt update
-    - name: What java version do we have
-      run: apt install libssl-dev
+      - run: |
+           apt update
+           apt install libssl-dev
+      - uses: actions/checkout@v2
      
