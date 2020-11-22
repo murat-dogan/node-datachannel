@@ -1,0 +1,23 @@
+name: Build Test
+
+on:
+  workflow_dispatch:
+
+env:
+  ACTIONS_ALLOW_UNSECURE_COMMANDS: true
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        node-version: [10.x]
+
+    steps:
+      - name: Install ARM Tools
+        run: |
+          cd opt
+          wget https://releases.linaro.org/components/toolchain/binaries/7.5-2019.12/arm-linux-gnueabihf/gcc-linaro-7.5.0-2019.12-i686_arm-linux-gnueabihf.tar.xz
+          tar xf gcc-linaro-7.5.0-2019.12-i686_arm-linux-gnueabihf.tar.xz
+          echo >> $(pwd)/gcc-linaro-7.5.0-2019.12-i686_arm-linux-gnueabihf.tar.xz
+     
