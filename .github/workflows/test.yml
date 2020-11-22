@@ -9,7 +9,7 @@ env:
 jobs:
   testbox:
     runs-on: ubuntu-latest
-    container: arm32v7/ubuntu:xenial
+    container: node:10.16-jessie
     steps:  
       - run: |
            apt update
