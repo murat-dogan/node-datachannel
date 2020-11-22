@@ -10,11 +10,11 @@ jobs:
   testbox:
     runs-on: ubuntu-latest
     container:
-      image: azul/zulu-openjdk-alpine:8-jre
+      image: arm32v7/ubuntu:xenial
     steps:  
     - uses: actions/checkout@v2
     - name: What OS is running
-      run: uname -a
+      run: apt update
     - name: What java version do we have
-      run: java -version
+      run: apt install libssl-dev
      
