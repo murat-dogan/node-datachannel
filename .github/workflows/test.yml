@@ -7,17 +7,14 @@ env:
   ACTIONS_ALLOW_UNSECURE_COMMANDS: true
 
 jobs:
-  build-linux:
-    runs-on: ubuntu-20.04
-    strategy:
-      matrix:
-        node-version: [10.x]
-
-    steps:
-      - name: Install ARM Tools
-        run: |
-          cd opt
-          wget https://releases.linaro.org/components/toolchain/binaries/7.5-2019.12/arm-linux-gnueabihf/gcc-linaro-7.5.0-2019.12-i686_arm-linux-gnueabihf.tar.xz
-          tar xf gcc-linaro-7.5.0-2019.12-i686_arm-linux-gnueabihf.tar.xz
-          echo >> $(pwd)/gcc-linaro-7.5.0-2019.12-i686_arm-linux-gnueabihf.tar.xz
+  testbox:
+    runs-on: ubuntu-latest
+    container:
+      image: azul/zulu-openjdk-alpine:8-jre
+    steps:  
+    - uses: actions/checkout@v2
+    - name: What OS is running
+      run: uname -a
+    - name: What java version do we have
+      run: java -version
      
