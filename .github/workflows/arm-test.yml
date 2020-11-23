@@ -17,7 +17,9 @@ jobs:
           mkdir sysroot && cd sysroot
           wget https://commondatastorage.googleapis.com/chrome-linux-sysroot/toolchain/ef5c4f84bcafb7a3796d36bb1db7826317dde51c/debian_sid_arm_sysroot.tar.xz        
           tar xf debian_sid_arm_sysroot.tar.xz
-          export ARM_SYSROOT=$(pwd)
+          echo "ARM_SYSROOT=$(pwd)" >> $GITHUB_ENV
+          export
+          pwd
           ls -l
       - uses: actions/checkout@v2
       - name: Use Node.js ${{ matrix.node-version }}
@@ -26,6 +28,7 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - name: Build
         run: |
+          pwd
           npm install --ignore-scripts
           npm run build-armv7
         env:
