@@ -13,6 +13,7 @@ jobs:
     steps:
       - name: Prepare Cross Compile
         run: |
+          apt install -y g++-arm-linux-gnueabihf gcc-arm-linux-gnueabihf
           mkdir sysroot && cd sysroot
           wget https://commondatastorage.googleapis.com/chrome-linux-sysroot/toolchain/ef5c4f84bcafb7a3796d36bb1db7826317dde51c/debian_sid_arm_sysroot.tar.xz        
           tar xf debian_sid_arm_sysroot.tar.xz
