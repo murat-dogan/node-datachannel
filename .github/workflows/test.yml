@@ -1,13 +1,11 @@
-name: Test
+name: Build Test
 
 on:
   workflow_dispatch:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     steps:
     - run: |
         dpkg --print-foreign-architectures
