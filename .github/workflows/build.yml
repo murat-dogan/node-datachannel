@@ -35,6 +35,33 @@ jobs:
         env:
           CI: true
 
+  build-linux-armv7:
+    runs-on: ubuntu-20.04
+
+    strategy:
+      matrix:
+        node-version: [10.x, 11.x, 12.x, 13.x, 14.x]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Prepare Cross Compile
+        run: |
+          sudo apt install -y g++-arm-linux-gnueabihf gcc-arm-linux-gnueabihf
+          mkdir sysroot && cd sysroot
+          wget https://commondatastorage.googleapis.com/chrome-linux-sysroot/toolchain/ef5c4f84bcafb7a3796d36bb1db7826317dde51c/debian_sid_arm_sysroot.tar.xz        
+          tar xf debian_sid_arm_sysroot.tar.xz
+          echo "ARM_SYSROOT=$(pwd)" >> $GITHUB_ENV
+          ls -l
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Build & Upload
+        run: |
+          npm install --ignore-scripts
+          node_modules/.bin/prebuild --backend cmake-js --arch arm --upload -u ${{ secrets.GITHUB_TOKEN }} -- --CDCMAKE_TOOLCHAIN_FILE:FILEPATH=./cmake/toolchain/armv7.cmake
+        env:
+          CI: true
+
   build-windows-x64:
     runs-on: windows-latest
     strategy:
@@ -130,7 +157,14 @@ jobs:
           CI: true
 
   npm-publish:
-    needs: [build-linux, build-windows-x64, build-windows-x86, build-macos]
+    needs:
+      [
+        build-linux,
+        build-linux-armv7,
+        build-windows-x64,
+        build-windows-x86,
+        build-macos,
+      ]
     name: npm-publish
     runs-on: ubuntu-latest
     steps:
