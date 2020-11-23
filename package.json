@@ -1,6 +1,6 @@
 {
   "name": "node-datachannel",
-  "version": "0.0.14",
+  "version": "0.0.15",
   "description": "libdatachannel node bindings",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
@@ -11,9 +11,9 @@
   "_from": "node-datachannel@latest",
   "scripts": {
     "install": "prebuild-install || (npm install --ignore-scripts --only=dev && npm run _prebuild)",
-    "install-nice": "npm run clean && cmake-js build --CDUSE_NICE=1 --CDNO_EXAMPLES=1 --CDNO_TESTS=1 -DUSE_GNUTLS=0",
-    "build": "cmake-js build --CDNO_EXAMPLES=1 --CDNO_TESTS=1",
-    "_prebuild": "prebuild --backend cmake-js -- --CDNO_EXAMPLES=1 --CDNO_TESTS=1 -DUSE_GNUTLS=0",
+    "install-nice": "npm run clean && cmake-js build --CDUSE_NICE=1",
+    "build": "cmake-js build",
+    "_prebuild": "prebuild --backend cmake-js",
     "clean": "cmake-js clean",
     "test": "jest --forceExit"
   },
