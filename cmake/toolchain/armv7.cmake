@@ -7,7 +7,7 @@ set(CMAKE_CXX_COMPILER ${TOOLCHAIN_PREFIX}-g++)
 
 # Needed sysroot
 # https://github.com/webrtc-uwp/chromium-build/blob/master/linux/sysroot_scripts/sysroots.json
-set(CMAKE_SYSROOT "$ENV{ARM_SYSROOT}")
+set(CMAKE_SYSROOT "/home/runner/work/node-datachannel/node-datachannel/sysroot")
 
 set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
 set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
