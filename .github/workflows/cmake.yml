@@ -8,5 +8,5 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - run: |
-        dpkg --print-foreign-architectures
+        sudo dpkg --print-foreign-architectures
         apt install libssl-dev:armhf 
