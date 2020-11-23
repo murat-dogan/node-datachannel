@@ -5,8 +5,8 @@ include_directories(${CMAKE_JS_INC})
 
 set(CMAKE_BUILD_TYPE Release)
 
-set(OPENSSL_USE_STATIC_LIBS TRUE)
-find_package(OpenSSL REQUIRED)
+# set(OPENSSL_USE_STATIC_LIBS TRUE)
+# find_package(OpenSSL REQUIRED)
 
 include(FetchContent)
 
