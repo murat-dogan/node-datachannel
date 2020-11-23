@@ -2,7 +2,7 @@
 
 ![Build CI](https://github.com/murat-dogan/node-datachannel/workflows/Build%20CI/badge.svg)
 
-> "libdatachannel is a standalone implementation of WebRTC Data Channels and WebSockets in C++17 with C bindings for POSIX platforms (including Linux and Apple macOS) and Microsoft Windows. "
+> "libdatachannel is a standalone implementation of WebRTC Data Channels, WebRTC Media Transport, and WebSockets in C++17 with C bindings for POSIX platforms (including GNU/Linux, Android, and Apple macOS) and Microsoft Windows. It enables direct connectivity between native applications and web browsers without the pain of importing the entire WebRTC stack. "
 
 NodeJS bindings for [libdatachannel](https://github.com/paullouisageneau/libdatachannel) library. 
 
@@ -10,7 +10,7 @@ Please check [libdatachannel](https://github.com/paullouisageneau/libdatachannel
 
 ## Examples
 ```js
-const nodeDataChannel = require('../lib/index');
+const nodeDataChannel = require('node-datachannel');
 
 nodeDataChannel.initLogger("Debug");
 
@@ -97,7 +97,10 @@ setTimeout(() => {
 ```
 ## Install
 
-Prebuilt binaries are available for Windows (x86,x64), Linux & Mac (Node Version >= 10)
+Prebuilt binaries are available (Node Version >= 10);
+* Windows (x86, x64)
+* Linux (x64, armv7, arm64)
+* Mac
 
 ```sh
 > npm install node-datachannel --save
@@ -134,6 +137,6 @@ Other Options
 > node test/connectivity.js     # Connectivity
 ```
 
-### Examples
+### More Examples
 
 Check `examples` folder
