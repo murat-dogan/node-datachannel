@@ -2,10 +2,33 @@ name: Build Arm
 
 on:
   workflow_dispatch:
+  push:
 
 jobs:
   build-linux:
     runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        node-version: [10.x]
     steps:
-      - run: |
-        apt-get install libssl-dev:armhf
+      - name: Prepare Cross Compile
+        run: |
+          mkdir sysroot && cd sysroot
+          wget https://commondatastorage.googleapis.com/chrome-linux-sysroot/toolchain/ef5c4f84bcafb7a3796d36bb1db7826317dde51c/debian_sid_arm_sysroot.tar.xz        
+          tar xf debian_sid_arm_sysroot.tar.xz
+          ARM_SYSROOT=$(pwd)
+      - uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Build
+        run: |
+          npm install --ignore-scripts
+          npm run build-armv7
+        env:
+          CI: true
+      - name: Upload
+        run: node_modules/.bin/prebuild --upload -u ${{ secrets.GITHUB_TOKEN }}
+        env:
+          CI: true
