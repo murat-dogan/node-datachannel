@@ -1,0 +1,14 @@
+name: Test
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - run: |
+        dpkg --print-foreign-architectures
+        apt install libssl-dev:armhf 
