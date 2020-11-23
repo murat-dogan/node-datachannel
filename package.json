@@ -11,9 +11,10 @@
   "_from": "node-datachannel@latest",
   "scripts": {
     "install": "prebuild-install || (npm install --ignore-scripts --only=dev && npm run _prebuild)",
-    "install-nice": "npm run clean && cmake-js build --CDUSE_NICE=1 --CDNO_EXAMPLES=1 --CDNO_TESTS=1 -DUSE_GNUTLS=0",
-    "build": "cmake-js build --CDNO_EXAMPLES=1 --CDNO_TESTS=1",
-    "_prebuild": "prebuild --backend cmake-js -- --CDNO_EXAMPLES=1 --CDNO_TESTS=1 -DUSE_GNUTLS=0",
+    "install-nice": "npm run clean && cmake-js build --CDUSE_NICE=1",
+    "build": "cmake-js build",
+    "build-armv7": "cmake-js build --arch=arm --CDCMAKE_TOOLCHAIN_FILE:FILEPATH=/home/murat/js/node-datachannel/cmake/toolchain/armv7.cmake",
+    "_prebuild": "prebuild --backend cmake-js",
     "clean": "cmake-js clean",
     "test": "jest --forceExit"
   },
