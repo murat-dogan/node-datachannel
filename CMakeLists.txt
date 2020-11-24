@@ -1,9 +1,15 @@
-cmake_minimum_required(VERSION 3.14)
-project(node_datachannel VERSION 0.0.15)
+cmake_minimum_required(VERSION 3.15)
+cmake_policy(SET CMP0091 NEW)
+project(node_datachannel VERSION 0.0.16)
     
 include_directories(${CMAKE_JS_INC})
 
 set(CMAKE_BUILD_TYPE Release)
+
+if(WIN32)
+    set(OPENSSL_MSVC_STATIC_RT TRUE)
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+endif()
 
 # Got linker error for arm64
 # /usr/lib/gcc-cross/aarch64-linux-gnu/9/../../../../aarch64-linux-gnu/bin/ld: ../sysroot/usr/lib/aarch64-linux-gnu/libcrypto.a(sha1-armv8.o): relocation R_AARCH64_PREL64 against symbol `OPENSSL_armcap_P' which may bind externally can not be used when making a shared object; recompile with -fPIC
@@ -60,7 +66,8 @@ elseif(UNIX)
 endif()
 
 if(WIN32)
-  list(APPEND LINK_LIBRARIES crypt32.lib)
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MT")
+    list(APPEND LINK_LIBRARIES crypt32.lib)
 endif()
 
 target_link_libraries(${PROJECT_NAME} PRIVATE ${LINK_LIBRARIES})    
