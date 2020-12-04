@@ -1,6 +1,7 @@
 const nodeDataChannel = require('../lib/index');
 
 nodeDataChannel.initLogger("Debug");
+nodeDataChannel.preload();
 
 let dc1 = null;
 let dc2 = null;

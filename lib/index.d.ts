@@ -10,6 +10,7 @@ export enum LogLevel {
 }
 
 // Functions
+export function preload(): void;
 export function initLogger(level: LogLevel): void;
 export function cleanup(): void;
 

@@ -10,6 +10,7 @@ class RtcWrapper
 {
 public:
     static Napi::Object Init(Napi::Env env, Napi::Object exports);
+    static void preload(const Napi::CallbackInfo &info);
     static void initLogger(const Napi::CallbackInfo &info);
     static void cleanup(const Napi::CallbackInfo &info);
 };

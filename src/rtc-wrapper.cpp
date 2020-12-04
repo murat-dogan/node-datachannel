@@ -6,7 +6,22 @@ Napi::Object RtcWrapper::Init(Napi::Env env, Napi::Object exports)
 
     exports.Set("initLogger", Napi::Function::New(env, &RtcWrapper::initLogger));
     exports.Set("cleanup", Napi::Function::New(env, &RtcWrapper::cleanup));
+    exports.Set("preload", Napi::Function::New(env, &RtcWrapper::preload));
+
     return exports;
+}
+
+void RtcWrapper::preload(const Napi::CallbackInfo &info)
+{
+    Napi::Env env = info.Env();
+    try
+    {
+        rtc::Preload();
+    }
+    catch (std::exception &ex)
+    {
+        Napi::Error::New(env, std::string("libdatachannel error# ") + ex.what()).ThrowAsJavaScriptException();
+    }
 }
 
 void RtcWrapper::initLogger(const Napi::CallbackInfo &info)
