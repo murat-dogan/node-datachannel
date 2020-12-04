@@ -98,28 +98,45 @@ DataChannelWrapper::~DataChannelWrapper()
 {
     if (mDataChannelPtr)
     {
-        mDataChannelPtr->close();
-        mDataChannelPtr.reset();
+        try
+        {
+            mDataChannelPtr->close();
+            mDataChannelPtr.reset();
+        }
+        catch (std::exception &ex)
+        {
+            std::cout << std::string("libdatachannel error while closing dataChannel# ") + ex.what() << std::endl;
+            return;
+        }
     }
 }
 
 void DataChannelWrapper::close(const Napi::CallbackInfo &info)
 {
+    Napi::Env env = info.Env();
     if (!mDataChannelPtr)
     {
-        Napi::TypeError::New(info.Env(), "It seems data-channel is destroyed!").ThrowAsJavaScriptException();
+        Napi::Error::New(env, "It seems data-channel is destroyed!").ThrowAsJavaScriptException();
         return;
     }
 
-    mDataChannelPtr->close();
-    mDataChannelPtr.reset();
+    try
+    {
+        mDataChannelPtr->close();
+        mDataChannelPtr.reset();
+    }
+    catch (std::exception &ex)
+    {
+        Napi::Error::New(env, std::string("libdatachannel error while closing dataChannel# ") + ex.what()).ThrowAsJavaScriptException();
+        return;
+    }
 }
 
 Napi::Value DataChannelWrapper::getLabel(const Napi::CallbackInfo &info)
 {
     if (!mDataChannelPtr)
     {
-        Napi::TypeError::New(info.Env(), "It seems data-channel is destroyed!").ThrowAsJavaScriptException();
+        Napi::Error::New(info.Env(), "It seems data-channel is destroyed!").ThrowAsJavaScriptException();
         return info.Env().Null();
     }
 
@@ -130,7 +147,7 @@ Napi::Value DataChannelWrapper::sendMessage(const Napi::CallbackInfo &info)
 {
     if (!mDataChannelPtr)
     {
-        Napi::TypeError::New(info.Env(), "It seems data-channel is destroyed!").ThrowAsJavaScriptException();
+        Napi::Error::New(info.Env(), "It seems data-channel is destroyed!").ThrowAsJavaScriptException();
         return info.Env().Null();
     }
 
@@ -143,51 +160,98 @@ Napi::Value DataChannelWrapper::sendMessage(const Napi::CallbackInfo &info)
         return info.Env().Null();
     }
 
-    return Napi::Boolean::New(info.Env(), mDataChannelPtr->send(info[0].As<Napi::String>().ToString()));
+    try
+    {
+        return Napi::Boolean::New(info.Env(), mDataChannelPtr->send(info[0].As<Napi::String>().ToString()));
+    }
+    catch (std::exception &ex)
+    {
+        Napi::Error::New(env, std::string("libdatachannel error while sending dataChannel msg# ") + ex.what()).ThrowAsJavaScriptException();
+        return Napi::Boolean::New(info.Env(), false);
+    }
 }
 
 Napi::Value DataChannelWrapper::isOpen(const Napi::CallbackInfo &info)
 {
+    Napi::Env env = info.Env();
     if (!mDataChannelPtr)
     {
         return Napi::Boolean::New(info.Env(), false);
     }
 
-    return Napi::Boolean::New(info.Env(), mDataChannelPtr->isOpen());
+    try
+    {
+        return Napi::Boolean::New(info.Env(), mDataChannelPtr->isOpen());
+    }
+    catch (std::exception &ex)
+    {
+        Napi::Error::New(env, std::string("libdatachannel error# ") + ex.what()).ThrowAsJavaScriptException();
+        return Napi::Boolean::New(info.Env(), false);
+    }
 }
 
 Napi::Value DataChannelWrapper::availableAmount(const Napi::CallbackInfo &info)
 {
+    Napi::Env env = info.Env();
     if (!mDataChannelPtr)
     {
         return Napi::Number::New(info.Env(), 0);
     }
-    return Napi::Number::New(info.Env(), mDataChannelPtr->availableAmount());
+
+    try
+    {
+        return Napi::Number::New(info.Env(), mDataChannelPtr->availableAmount());
+    }
+    catch (std::exception &ex)
+    {
+        Napi::Error::New(env, std::string("libdatachannel error# ") + ex.what()).ThrowAsJavaScriptException();
+        return Napi::Number::New(info.Env(), 0);
+    }
 }
 
 Napi::Value DataChannelWrapper::bufferedAmount(const Napi::CallbackInfo &info)
 {
+    Napi::Env env = info.Env();
     if (!mDataChannelPtr)
     {
         return Napi::Number::New(info.Env(), 0);
     }
-    return Napi::Number::New(info.Env(), mDataChannelPtr->bufferedAmount());
+
+    try
+    {
+        return Napi::Number::New(info.Env(), mDataChannelPtr->bufferedAmount());
+    }
+    catch (std::exception &ex)
+    {
+        Napi::Error::New(env, std::string("libdatachannel error# ") + ex.what()).ThrowAsJavaScriptException();
+        return Napi::Number::New(info.Env(), 0);
+    }
 }
 
 Napi::Value DataChannelWrapper::maxMessageSize(const Napi::CallbackInfo &info)
 {
+    Napi::Env env = info.Env();
     if (!mDataChannelPtr)
     {
         return Napi::Number::New(info.Env(), 0);
     }
-    return Napi::Number::New(info.Env(), mDataChannelPtr->maxMessageSize());
+
+    try
+    {
+        return Napi::Number::New(info.Env(), mDataChannelPtr->maxMessageSize());
+    }
+    catch (std::exception &ex)
+    {
+        Napi::Error::New(env, std::string("libdatachannel error# ") + ex.what()).ThrowAsJavaScriptException();
+        return Napi::Number::New(info.Env(), 0);
+    }
 }
 
 void DataChannelWrapper::setBufferedAmountLowThreshold(const Napi::CallbackInfo &info)
 {
     if (!mDataChannelPtr)
     {
-        Napi::TypeError::New(info.Env(), "It seems data-channel is destroyed!").ThrowAsJavaScriptException();
+        Napi::Error::New(info.Env(), "It seems data-channel is destroyed!").ThrowAsJavaScriptException();
         return;
     }
 
@@ -200,7 +264,15 @@ void DataChannelWrapper::setBufferedAmountLowThreshold(const Napi::CallbackInfo 
         return;
     }
 
-    mDataChannelPtr->setBufferedAmountLowThreshold(info[0].ToNumber().Uint32Value());
+    try
+    {
+        mDataChannelPtr->setBufferedAmountLowThreshold(info[0].ToNumber().Uint32Value());
+    }
+    catch (std::exception &ex)
+    {
+        Napi::Error::New(env, std::string("libdatachannel error# ") + ex.what()).ThrowAsJavaScriptException();
+        return;
+    }
 }
 
 void DataChannelWrapper::onOpen(const Napi::CallbackInfo &info)

@@ -102,7 +102,15 @@ PeerConnectionWrapper::PeerConnectionWrapper(const Napi::CallbackInfo &info) : N
         rtcConfig.enableIceTcp = config.Get("enableIceTcp").As<Napi::Boolean>();
 
     // Create peer-connection
-    mRtcPeerConnPtr = std::make_shared<rtc::PeerConnection>(rtcConfig);
+    try
+    {
+        mRtcPeerConnPtr = std::make_shared<rtc::PeerConnection>(rtcConfig);
+    }
+    catch (std::exception &ex)
+    {
+        Napi::Error::New(env, std::string("libdatachannel error while creating peerConnection# ") + ex.what()).ThrowAsJavaScriptException();
+        return;
+    }
 
     // Signals
     mRtcPeerConnPtr->onLocalDescription([&](const rtc::Description &sdp) {
@@ -165,28 +173,46 @@ PeerConnectionWrapper::~PeerConnectionWrapper()
 {
     if (mRtcPeerConnPtr)
     {
-        mRtcPeerConnPtr->close();
-        mRtcPeerConnPtr.reset();
+        try
+        {
+            mRtcPeerConnPtr->close();
+            mRtcPeerConnPtr.reset();
+        }
+        catch (std::exception &ex)
+        {
+            std::cout << std::string("libdatachannel error while closing peerConnection# ") + ex.what() << std::endl;
+            return;
+        }
     }
 }
 
 void PeerConnectionWrapper::close(const Napi::CallbackInfo &info)
 {
+    Napi::Env env = info.Env();
     if (!mRtcPeerConnPtr)
     {
-        Napi::TypeError::New(info.Env(), "It seems peer-connection is closed").ThrowAsJavaScriptException();
+        Napi::Error::New(info.Env(), "It seems peer-connection is closed").ThrowAsJavaScriptException();
         return;
     }
 
-    mRtcPeerConnPtr->close();
-    mRtcPeerConnPtr.reset();
+    try
+    {
+        mRtcPeerConnPtr->close();
+        mRtcPeerConnPtr.reset();
+    }
+    catch (std::exception &ex)
+    {
+        Napi::Error::New(env, std::string("libdatachannel error while closing peerConnection# ") + ex.what()).ThrowAsJavaScriptException();
+        return;
+    }
 }
 
 void PeerConnectionWrapper::setRemoteDescription(const Napi::CallbackInfo &info)
 {
+    Napi::Env env = info.Env();
     if (!mRtcPeerConnPtr)
     {
-        Napi::TypeError::New(info.Env(), "It seems peer-connection is closed").ThrowAsJavaScriptException();
+        Napi::Error::New(info.Env(), "It seems peer-connection is closed").ThrowAsJavaScriptException();
         return;
     }
 
@@ -199,15 +225,25 @@ void PeerConnectionWrapper::setRemoteDescription(const Napi::CallbackInfo &info)
 
     std::string sdp = info[0].As<Napi::String>().ToString();
     std::string type = info[1].As<Napi::String>().ToString();
-    rtc::Description desc(sdp, type);
-    mRtcPeerConnPtr->setRemoteDescription(desc);
+
+    try
+    {
+        rtc::Description desc(sdp, type);
+        mRtcPeerConnPtr->setRemoteDescription(desc);
+    }
+    catch (std::exception &ex)
+    {
+        Napi::Error::New(env, std::string("libdatachannel error while adding remote decsription # ") + ex.what()).ThrowAsJavaScriptException();
+        return;
+    }
 }
 
 void PeerConnectionWrapper::addRemoteCandidate(const Napi::CallbackInfo &info)
 {
+    Napi::Env env = info.Env();
     if (!mRtcPeerConnPtr)
     {
-        Napi::TypeError::New(info.Env(), "It seems peer-connection is closed").ThrowAsJavaScriptException();
+        Napi::Error::New(info.Env(), "It seems peer-connection is closed").ThrowAsJavaScriptException();
         return;
     }
 
@@ -218,16 +254,24 @@ void PeerConnectionWrapper::addRemoteCandidate(const Napi::CallbackInfo &info)
         return;
     }
 
-    std::string candidate = info[0].As<Napi::String>().ToString();
-    std::string mid = info[0].As<Napi::String>().ToString();
-    mRtcPeerConnPtr->addRemoteCandidate(rtc::Candidate(candidate, mid));
+    try
+    {
+        std::string candidate = info[0].As<Napi::String>().ToString();
+        std::string mid = info[0].As<Napi::String>().ToString();
+        mRtcPeerConnPtr->addRemoteCandidate(rtc::Candidate(candidate, mid));
+    }
+    catch (std::exception &ex)
+    {
+        Napi::Error::New(env, std::string("libdatachannel error while adding remote candidate# ") + ex.what()).ThrowAsJavaScriptException();
+        return;
+    }
 }
 
 Napi::Value PeerConnectionWrapper::createDataChannel(const Napi::CallbackInfo &info)
 {
     if (!mRtcPeerConnPtr)
     {
-        Napi::TypeError::New(info.Env(), "It seems peer-connection is closed").ThrowAsJavaScriptException();
+        Napi::Error::New(info.Env(), "It seems peer-connection is closed").ThrowAsJavaScriptException();
         return info.Env().Null();
     }
 
@@ -240,11 +284,18 @@ Napi::Value PeerConnectionWrapper::createDataChannel(const Napi::CallbackInfo &i
         return info.Env().Null();
     }
 
-    std::string label = info[0].As<Napi::String>().ToString();
-    std::shared_ptr<rtc::DataChannel> dataChannel = mRtcPeerConnPtr->createDataChannel(label);
-
-    auto instance = DataChannelWrapper::constructor.New({Napi::External<std::shared_ptr<rtc::DataChannel>>::New(info.Env(), &dataChannel)});
-    return instance;
+    try
+    {
+        std::string label = info[0].As<Napi::String>().ToString();
+        std::shared_ptr<rtc::DataChannel> dataChannel = mRtcPeerConnPtr->createDataChannel(label);
+        auto instance = DataChannelWrapper::constructor.New({Napi::External<std::shared_ptr<rtc::DataChannel>>::New(info.Env(), &dataChannel)});
+        return instance;
+    }
+    catch (std::exception &ex)
+    {
+        Napi::Error::New(env, std::string("libdatachannel error while creating datachannel# ") + ex.what()).ThrowAsJavaScriptException();
+        return info.Env().Null();
+    }
 }
 
 void PeerConnectionWrapper::onLocalDescription(const Napi::CallbackInfo &info)

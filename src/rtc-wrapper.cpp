@@ -52,10 +52,27 @@ void RtcWrapper::initLogger(const Napi::CallbackInfo &info)
     if (logLevelStr == "Fatal")
         logLevel = rtc::LogLevel::Fatal;
 
-    rtc::InitLogger(logLevel);
+    try
+    {
+        rtc::InitLogger(logLevel);
+    }
+    catch (std::exception &ex)
+    {
+        Napi::Error::New(env, std::string("libdatachannel error# ") + ex.what()).ThrowAsJavaScriptException();
+        return;
+    }
 }
 
 void RtcWrapper::cleanup(const Napi::CallbackInfo &info)
 {
-    rtc::Cleanup();
+    Napi::Env env = info.Env();
+    try
+    {
+        rtc::Cleanup();
+    }
+    catch (std::exception &ex)
+    {
+        Napi::Error::New(env, std::string("libdatachannel error# ") + ex.what()).ThrowAsJavaScriptException();
+        return;
+    }
 }
