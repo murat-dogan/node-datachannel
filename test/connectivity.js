@@ -60,6 +60,7 @@ peer2.onDataChannel((dc) => {
 dc1 = peer1.createDataChannel("test");
 dc1.onOpen(() => {
     dc1.sendMessage("Hello from Peer1");
+    // Binary message: Use sendMessageBinary(Buffer)
 });
 dc1.onMessage((msg) => {
     console.log('Peer1 Received Msg:', msg);

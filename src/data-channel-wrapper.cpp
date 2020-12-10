@@ -12,6 +12,7 @@ Napi::Object DataChannelWrapper::Init(Napi::Env env, Napi::Object exports)
         {InstanceMethod("close", &DataChannelWrapper::close),
          InstanceMethod("getLabel", &DataChannelWrapper::getLabel),
          InstanceMethod("sendMessage", &DataChannelWrapper::sendMessage),
+         InstanceMethod("sendMessageBinary", &DataChannelWrapper::sendMessageBinary),
          InstanceMethod("isOpen", &DataChannelWrapper::isOpen),
          InstanceMethod("availableAmount", &DataChannelWrapper::availableAmount),
          InstanceMethod("bufferedAmount", &DataChannelWrapper::bufferedAmount),
@@ -87,9 +88,14 @@ DataChannelWrapper::DataChannelWrapper(const Napi::CallbackInfo &info) : Napi::O
                 // This will run in main thread and needs to construct the
                 // arguments for the call
                 Napi::Object payload = Napi::Object::New(env);
-                // FIX ME
-                // Binary Message?
-                args = {Napi::String::New(env, std::get<std::string>(message))};
+                if (std::holds_alternative<std::string>(message))
+                {
+                    args = {Napi::String::New(env, std::get<std::string>(message))};
+                }
+                else
+                {
+                    args = {Napi::Buffer<std::byte>::Copy(env, std::get<rtc::binary>(message).data(), std::get<rtc::binary>(message).size())};
+                }
             });
     });
 }
@@ -163,6 +169,35 @@ Napi::Value DataChannelWrapper::sendMessage(const Napi::CallbackInfo &info)
     try
     {
         return Napi::Boolean::New(info.Env(), mDataChannelPtr->send(info[0].As<Napi::String>().ToString()));
+    }
+    catch (std::exception &ex)
+    {
+        Napi::Error::New(env, std::string("libdatachannel error while sending dataChannel msg# ") + ex.what()).ThrowAsJavaScriptException();
+        return Napi::Boolean::New(info.Env(), false);
+    }
+}
+
+Napi::Value DataChannelWrapper::sendMessageBinary(const Napi::CallbackInfo &info)
+{
+    if (!mDataChannelPtr)
+    {
+        Napi::Error::New(info.Env(), "It seems data-channel is destroyed!").ThrowAsJavaScriptException();
+        return info.Env().Null();
+    }
+
+    Napi::Env env = info.Env();
+    int length = info.Length();
+
+    if (length < 1 || !info[0].IsBuffer())
+    {
+        Napi::TypeError::New(env, "Buffer expected").ThrowAsJavaScriptException();
+        return info.Env().Null();
+    }
+
+    try
+    {
+        Napi::Uint8Array buffer = info[0].As<Napi::Uint8Array>();
+        return Napi::Boolean::New(info.Env(), mDataChannelPtr->send((std::byte *)buffer.Data(), buffer.ByteLength()));
     }
     catch (std::exception &ex)
     {

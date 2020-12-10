@@ -46,6 +46,7 @@ export class DataChannel {
     close: () => void;
     getLabel: () => string;
     sendMessage: (msg: string) => boolean;
+    sendMessageBinary: (buffer: Buffer) => boolean;
     isOpen: () => boolean;
     availableAmount: () => Number;
     bufferedAmount: () => Number;
@@ -56,7 +57,7 @@ export class DataChannel {
     onError: (cb: (err: string) => void) => void;
     onAvailable: (cb: () => void) => void;
     onBufferedAmountLow: (cb: () => void) => void;
-    onMessage: (cb: (msg: string) => void) => void;
+    onMessage: (cb: (msg: string | Buffer) => void) => void;
 }
 
 export class PeerConnection {
