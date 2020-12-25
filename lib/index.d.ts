@@ -42,6 +42,20 @@ export enum DescriptionType {
     Answer = 'Answer'
 }
 
+export enum ReliabilityType {
+    Reliable = 0, Rexmit = 1, Timed = 2
+}
+
+export interface DataChannelInitConfig {
+    reliability: {
+        type: ReliabilityType;
+        unordered: boolean;
+        rexmit: number;
+    }
+    negotiated: boolean;
+    protocol: string;
+}
+
 export class DataChannel {
     close: () => void;
     getLabel: () => string;
@@ -65,7 +79,7 @@ export class PeerConnection {
     close: () => void;
     setRemoteDescription: (sdp: string, type: DescriptionType) => void;
     addRemoteCandidate: (candidate: string, mid: string) => void;
-    createDataChannel: (label: string) => DataChannel;
+    createDataChannel: (label: string, config?: DataChannelInitConfig) => DataChannel;
     onLocalDescription: (cb: (sdp: string, type: DescriptionType) => void) => void;
     onLocalCandidate: (cb: (candidate: string, mid: string) => void) => void;
     onStateChange: (cb: (state: string) => void) => void;

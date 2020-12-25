@@ -284,10 +284,104 @@ Napi::Value PeerConnectionWrapper::createDataChannel(const Napi::CallbackInfo &i
         return info.Env().Null();
     }
 
+    // Optional Params
+    rtc::DataChannelInit init;
+    if (length > 1)
+    {
+        if (!info[1].IsObject())
+        {
+            Napi::TypeError::New(env, "Data Channel Init Config expected(As Object)").ThrowAsJavaScriptException();
+            return info.Env().Null();
+        }
+
+        Napi::Object initConfig = info[1].As<Napi::Object>();
+        if (!initConfig.Get("negotiated").IsUndefined())
+        {
+            if (!initConfig.Get("negotiated").IsBoolean())
+            {
+                Napi::TypeError::New(env, "Wrong DataChannel Init Config (negotiated)").ThrowAsJavaScriptException();
+                return info.Env().Null();
+            }
+            init.negotiated = initConfig.Get("negotiated").As<Napi::Boolean>();
+        }
+
+        if (!initConfig.Get("protocol").IsUndefined())
+        {
+            if (!initConfig.Get("protocol").IsString())
+            {
+                Napi::TypeError::New(env, "Wrong DataChannel Init Config (protocol)").ThrowAsJavaScriptException();
+                return info.Env().Null();
+            }
+            init.protocol = initConfig.Get("protocol").As<Napi::String>();
+        }
+
+        if (!initConfig.Get("reliability").IsUndefined())
+        {
+            if (!initConfig.Get("reliability").IsObject())
+            {
+                Napi::TypeError::New(env, "Wrong DataChannel Init Config (reliability)").ThrowAsJavaScriptException();
+                return info.Env().Null();
+            }
+
+            Napi::Object reliability = initConfig.Get("reliability").As<Napi::Object>();
+            if (!reliability.Get("type").IsUndefined())
+            {
+                if (!reliability.Get("type").IsNumber())
+                {
+                    Napi::TypeError::New(env, "Wrong Reliability Config (type)").ThrowAsJavaScriptException();
+                    return info.Env().Null();
+                }
+                switch ((int)reliability.Get("type").As<Napi::Number>())
+                {
+                case 0:
+                    init.reliability.type = rtc::Reliability::Type::Reliable;
+                    break;
+                case 1:
+                    init.reliability.type = rtc::Reliability::Type::Rexmit;
+                    break;
+                case 2:
+                    init.reliability.type = rtc::Reliability::Type::Timed;
+                    break;
+                default:
+                    Napi::TypeError::New(env, "UnKnown DataChannel Reliability Type").ThrowAsJavaScriptException();
+                    return info.Env().Null();
+                }
+            }
+
+            if (!reliability.Get("unordered").IsUndefined())
+            {
+                if (!reliability.Get("unordered").IsBoolean())
+                {
+                    Napi::TypeError::New(env, "Wrong reliability Config (unordered)").ThrowAsJavaScriptException();
+                    return info.Env().Null();
+                }
+                init.reliability.unordered = reliability.Get("unordered").As<Napi::Boolean>();
+            }
+
+            if (!reliability.Get("rexmit").IsUndefined())
+            {
+                if (!reliability.Get("rexmit").IsNumber())
+                {
+                    Napi::TypeError::New(env, "Wrong Reliability Config (rexmit)").ThrowAsJavaScriptException();
+                    return info.Env().Null();
+                }
+                switch ((int)reliability.Get("type").As<Napi::Number>())
+                {
+                case 1:
+                    init.reliability.rexmit = reliability.Get("rexmit").As<Napi::Number>();
+                    break;
+                case 2:
+                    init.reliability.rexmit = std::chrono::milliseconds(reliability.Get("rexmit").As<Napi::Number>());
+                    break;
+                }
+            }
+        }
+    }
+
     try
     {
         std::string label = info[0].As<Napi::String>().ToString();
-        std::shared_ptr<rtc::DataChannel> dataChannel = mRtcPeerConnPtr->createDataChannel(label);
+        std::shared_ptr<rtc::DataChannel> dataChannel = mRtcPeerConnPtr->createDataChannel(label, init);
         auto instance = DataChannelWrapper::constructor.New({Napi::External<std::shared_ptr<rtc::DataChannel>>::New(info.Env(), &dataChannel)});
         return instance;
     }

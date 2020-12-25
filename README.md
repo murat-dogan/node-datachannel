@@ -75,6 +75,16 @@ peer2.onDataChannel((dc) => {
     dc2.sendMessage("Hello From Peer2");
 });
 
+// DataChannel Options
+// export interface DataChannelInitConfig {
+//     reliability: {
+//         type: ReliabilityType;
+//         unordered: boolean;
+//         rexmit: number;
+//     }
+//     negotiated: boolean;
+//     protocol: string;
+// }
 dc1 = peer1.createDataChannel("test");
 dc1.onOpen(() => {
     dc1.sendMessage("Hello from Peer1");
