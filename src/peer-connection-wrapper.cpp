@@ -54,7 +54,54 @@ PeerConnectionWrapper::PeerConnectionWrapper(const Napi::CallbackInfo &info) : N
     Napi::Array iceServers = config.Get("iceServers").As<Napi::Array>();
     for (uint32_t i = 0; i < iceServers.Length(); i++)
     {
-        rtcConfig.iceServers.emplace_back(iceServers.Get(i).As<Napi::String>().ToString());
+        if (iceServers.Get(i).IsString())
+            rtcConfig.iceServers.emplace_back(iceServers.Get(i).As<Napi::String>().ToString());
+        else
+        {
+            if (!iceServers.Get(i).IsObject())
+            {
+                Napi::TypeError::New(env, "IceServer config should be a string Or an object").ThrowAsJavaScriptException();
+                return;
+            }
+
+            Napi::Object iceServer = iceServers.Get(i).As<Napi::Object>();
+            if (!iceServer.Get("hostname").IsString() || !iceServer.Get("port").IsNumber())
+            {
+                Napi::TypeError::New(env, "IceServer config error (hostname OR/AND port is not suitable)").ThrowAsJavaScriptException();
+                return;
+            }
+
+            if (iceServer.Get("relayType").IsString() &&
+                (!iceServer.Get("username").IsString() || !iceServer.Get("password").IsString()))
+            {
+                Napi::TypeError::New(env, "IceServer config error (username AND password is needed)").ThrowAsJavaScriptException();
+                return;
+            }
+
+            if (iceServer.Get("relayType").IsString())
+            {
+                std::string relayTypeStr = iceServer.Get("relayType").As<Napi::String>();
+                rtc::IceServer::RelayType relayType = rtc::IceServer::RelayType::TurnUdp;
+                if (relayTypeStr.compare("TurnTcp") == 0)
+                    relayType = rtc::IceServer::RelayType::TurnTcp;
+                if (relayTypeStr.compare("TurnTls") == 0)
+                    relayType = rtc::IceServer::RelayType::TurnTls;
+
+                rtcConfig.iceServers.emplace_back(
+                    rtc::IceServer(iceServer.Get("hostname").As<Napi::String>(),
+                                   (uint16_t)iceServer.Get("port").As<Napi::Number>().Uint32Value(),
+                                   iceServer.Get("username").As<Napi::String>(),
+                                   iceServer.Get("password").As<Napi::String>(),
+                                   relayType));
+            }
+            else
+            {
+                rtcConfig.iceServers.emplace_back(
+                    rtc::IceServer(
+                        iceServer.Get("hostname").As<Napi::String>(),
+                        (uint16_t)iceServer.Get("port").As<Napi::Number>().Uint32Value()));
+            }
+        }
     }
 
     // Proxy Server

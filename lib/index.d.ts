@@ -28,8 +28,22 @@ export interface ProxyServer {
     password?: string;
 }
 
+export enum RelayType {
+    TurnUdp = 'TurnUdp',
+    TurnTcp = 'TurnTcp',
+    TurnTls = 'TurnTls'
+}
+
+export interface IceServer {
+    hostname: string;
+    port: Number;
+    username?: string;
+    password?: string;
+    relayType: RelayType;
+}
+
 export interface RtcConfig {
-    iceServers: string[];
+    iceServers: (string | IceServer)[];
     proxyServer?: ProxyServer;
     enableIceTcp?: boolean;
     portRangeBegin?: Number;
