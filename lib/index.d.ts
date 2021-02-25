@@ -39,7 +39,7 @@ export interface IceServer {
     port: Number;
     username?: string;
     password?: string;
-    relayType: RelayType;
+    relayType?: RelayType;
 }
 
 export interface RtcConfig {
