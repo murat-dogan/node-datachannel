@@ -86,5 +86,5 @@ setTimeout(() => {
     peer1 = null;
     peer2 = null;
     nodeDataChannel.cleanup();
-
-}, 10 * 1000);
+    process.exit();
+}, 5 * 1000);
