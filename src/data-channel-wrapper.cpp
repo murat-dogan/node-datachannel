@@ -160,9 +160,10 @@ Napi::Value DataChannelWrapper::sendMessage(const Napi::CallbackInfo &info)
     Napi::Env env = info.Env();
     int length = info.Length();
 
-    if (length < 1 || !info[0].IsString())
+    // Allow call with NULL
+    if (length < 1 || (!info[0].IsString() && !info[0].IsNull()))
     {
-        Napi::TypeError::New(env, "String expected").ThrowAsJavaScriptException();
+        Napi::TypeError::New(env, "String or Null expected").ThrowAsJavaScriptException();
         return info.Env().Null();
     }
 
