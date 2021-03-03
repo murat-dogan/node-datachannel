@@ -158,62 +158,6 @@ PeerConnectionWrapper::PeerConnectionWrapper(const Napi::CallbackInfo &info) : N
         Napi::Error::New(env, std::string("libdatachannel error while creating peerConnection# ") + ex.what()).ThrowAsJavaScriptException();
         return;
     }
-
-    // Signals
-    mRtcPeerConnPtr->onLocalDescription([&](const rtc::Description &sdp) {
-        if (mOnLocalDescriptionCallback)
-            mOnLocalDescriptionCallback->call([sdp](Napi::Env env, std::vector<napi_value> &args) {
-                // This will run in main thread and needs to construct the
-                // arguments for the call
-                args = {
-                    Napi::String::New(env, std::string(sdp)),
-                    Napi::String::New(env, sdp.typeString())};
-            });
-    });
-
-    mRtcPeerConnPtr->onLocalCandidate([&](const rtc::Candidate &candidate) {
-        if (mOnLocalCandidateCallback)
-            mOnLocalCandidateCallback->call([candidate](Napi::Env env, std::vector<napi_value> &args) {
-                // This will run in main thread and needs to construct the
-                // arguments for the call
-                args = {
-                    Napi::String::New(env, std::string(candidate)),
-                    Napi::String::New(env, candidate.mid())};
-            });
-    });
-
-    mRtcPeerConnPtr->onStateChange([&](rtc::PeerConnection::State state) {
-        if (mOnStateChangeCallback)
-            mOnStateChangeCallback->call([state](Napi::Env env, std::vector<napi_value> &args) {
-                // This will run in main thread and needs to construct the
-                // arguments for the call
-                std::ostringstream stream;
-                stream << state;
-                args = {Napi::String::New(env, stream.str())};
-            });
-    });
-
-    mRtcPeerConnPtr->onGatheringStateChange([&](rtc::PeerConnection::GatheringState state) {
-        if (mOnGatheringStateChangeCallback)
-            mOnGatheringStateChangeCallback->call([state](Napi::Env env, std::vector<napi_value> &args) {
-                // This will run in main thread and needs to construct the
-                // arguments for the call
-                std::ostringstream stream;
-                stream << state;
-                args = {Napi::String::New(env, stream.str())};
-            });
-    });
-
-    mRtcPeerConnPtr->onDataChannel([&](std::shared_ptr<rtc::DataChannel> dc) {
-        if (mOnDataChannelCallback)
-            mOnDataChannelCallback->call([dc](Napi::Env env, std::vector<napi_value> &args) {
-                // This will run in main thread and needs to construct the
-                // arguments for the call
-                std::shared_ptr<rtc::DataChannel> dataChannel = dc;
-                auto instance = DataChannelWrapper::constructor.New({Napi::External<std::shared_ptr<rtc::DataChannel>>::New(env, &dataChannel)});
-                args = {instance};
-            });
-    });
 }
 
 PeerConnectionWrapper::~PeerConnectionWrapper()
@@ -452,6 +396,17 @@ void PeerConnectionWrapper::onLocalDescription(const Napi::CallbackInfo &info)
 
     // Callback
     mOnLocalDescriptionCallback = std::make_shared<ThreadSafeCallback>(info[0].As<Napi::Function>());
+
+    mRtcPeerConnPtr->onLocalDescription([&](const rtc::Description &sdp) {
+        if (mOnLocalDescriptionCallback)
+            mOnLocalDescriptionCallback->call([sdp](Napi::Env env, std::vector<napi_value> &args) {
+                // This will run in main thread and needs to construct the
+                // arguments for the call
+                args = {
+                    Napi::String::New(env, std::string(sdp)),
+                    Napi::String::New(env, sdp.typeString())};
+            });
+    });
 }
 
 void PeerConnectionWrapper::onLocalCandidate(const Napi::CallbackInfo &info)
@@ -467,6 +422,17 @@ void PeerConnectionWrapper::onLocalCandidate(const Napi::CallbackInfo &info)
 
     // Callback
     mOnLocalCandidateCallback = std::make_shared<ThreadSafeCallback>(info[0].As<Napi::Function>());
+
+    mRtcPeerConnPtr->onLocalCandidate([&](const rtc::Candidate &candidate) {
+        if (mOnLocalCandidateCallback)
+            mOnLocalCandidateCallback->call([candidate](Napi::Env env, std::vector<napi_value> &args) {
+                // This will run in main thread and needs to construct the
+                // arguments for the call
+                args = {
+                    Napi::String::New(env, std::string(candidate)),
+                    Napi::String::New(env, candidate.mid())};
+            });
+    });
 }
 
 void PeerConnectionWrapper::onStateChange(const Napi::CallbackInfo &info)
@@ -482,6 +448,17 @@ void PeerConnectionWrapper::onStateChange(const Napi::CallbackInfo &info)
 
     // Callback
     mOnStateChangeCallback = std::make_shared<ThreadSafeCallback>(info[0].As<Napi::Function>());
+
+    mRtcPeerConnPtr->onStateChange([&](rtc::PeerConnection::State state) {
+        if (mOnStateChangeCallback)
+            mOnStateChangeCallback->call([state](Napi::Env env, std::vector<napi_value> &args) {
+                // This will run in main thread and needs to construct the
+                // arguments for the call
+                std::ostringstream stream;
+                stream << state;
+                args = {Napi::String::New(env, stream.str())};
+            });
+    });
 }
 
 void PeerConnectionWrapper::onGatheringStateChange(const Napi::CallbackInfo &info)
@@ -497,6 +474,17 @@ void PeerConnectionWrapper::onGatheringStateChange(const Napi::CallbackInfo &inf
 
     // Callback
     mOnGatheringStateChangeCallback = std::make_shared<ThreadSafeCallback>(info[0].As<Napi::Function>());
+
+    mRtcPeerConnPtr->onGatheringStateChange([&](rtc::PeerConnection::GatheringState state) {
+        if (mOnGatheringStateChangeCallback)
+            mOnGatheringStateChangeCallback->call([state](Napi::Env env, std::vector<napi_value> &args) {
+                // This will run in main thread and needs to construct the
+                // arguments for the call
+                std::ostringstream stream;
+                stream << state;
+                args = {Napi::String::New(env, stream.str())};
+            });
+    });
 }
 
 void PeerConnectionWrapper::onDataChannel(const Napi::CallbackInfo &info)
@@ -512,4 +500,15 @@ void PeerConnectionWrapper::onDataChannel(const Napi::CallbackInfo &info)
 
     // Callback
     mOnDataChannelCallback = std::make_shared<ThreadSafeCallback>(info[0].As<Napi::Function>());
+
+    mRtcPeerConnPtr->onDataChannel([&](std::shared_ptr<rtc::DataChannel> dc) {
+        if (mOnDataChannelCallback)
+            mOnDataChannelCallback->call([dc](Napi::Env env, std::vector<napi_value> &args) {
+                // This will run in main thread and needs to construct the
+                // arguments for the call
+                std::shared_ptr<rtc::DataChannel> dataChannel = dc;
+                auto instance = DataChannelWrapper::constructor.New({Napi::External<std::shared_ptr<rtc::DataChannel>>::New(env, &dataChannel)});
+                args = {instance};
+            });
+    });
 }

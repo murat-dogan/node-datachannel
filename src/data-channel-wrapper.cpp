@@ -35,69 +35,6 @@ Napi::Object DataChannelWrapper::Init(Napi::Env env, Napi::Object exports)
 DataChannelWrapper::DataChannelWrapper(const Napi::CallbackInfo &info) : Napi::ObjectWrap<DataChannelWrapper>(info)
 {
     mDataChannelPtr = *(info[0].As<Napi::External<std::shared_ptr<rtc::DataChannel>>>().Data());
-
-    // Signals
-    mDataChannelPtr->onOpen([&]() {
-        if (mOnOpenCallback)
-            mOnOpenCallback->call([](Napi::Env env, std::vector<napi_value> &args) {
-                // This will run in main thread and needs to construct the
-                // arguments for the call
-                args = {};
-            });
-    });
-
-    mDataChannelPtr->onClosed([&]() {
-        if (mOnClosedCallback)
-            mOnClosedCallback->call([](Napi::Env env, std::vector<napi_value> &args) {
-                // This will run in main thread and needs to construct the
-                // arguments for the call
-                args = {};
-            });
-    });
-
-    mDataChannelPtr->onError([&](const std::string &error) {
-        if (mOnErrorCallback)
-            mOnErrorCallback->call([error](Napi::Env env, std::vector<napi_value> &args) {
-                // This will run in main thread and needs to construct the
-                // arguments for the call
-                args = {Napi::String::New(env, error)};
-            });
-    });
-
-    mDataChannelPtr->onAvailable([&]() {
-        if (mOnAvailableCallback)
-            mOnAvailableCallback->call([](Napi::Env env, std::vector<napi_value> &args) {
-                // This will run in main thread and needs to construct the
-                // arguments for the call
-                args = {};
-            });
-    });
-
-    mDataChannelPtr->onBufferedAmountLow([&]() {
-        if (mOnBufferedAmountLowCallback)
-            mOnBufferedAmountLowCallback->call([](Napi::Env env, std::vector<napi_value> &args) {
-                // This will run in main thread and needs to construct the
-                // arguments for the call
-                args = {};
-            });
-    });
-
-    mDataChannelPtr->onMessage([&](const std::variant<rtc::binary, std::string> &message) {
-        if (mOnMessageCallback)
-            mOnMessageCallback->call([message](Napi::Env env, std::vector<napi_value> &args) {
-                // This will run in main thread and needs to construct the
-                // arguments for the call
-                Napi::Object payload = Napi::Object::New(env);
-                if (std::holds_alternative<std::string>(message))
-                {
-                    args = {Napi::String::New(env, std::get<std::string>(message))};
-                }
-                else
-                {
-                    args = {Napi::Buffer<std::byte>::Copy(env, std::get<rtc::binary>(message).data(), std::get<rtc::binary>(message).size())};
-                }
-            });
-    });
 }
 
 DataChannelWrapper::~DataChannelWrapper()
@@ -324,6 +261,15 @@ void DataChannelWrapper::onOpen(const Napi::CallbackInfo &info)
 
     // Callback
     mOnOpenCallback = std::make_shared<ThreadSafeCallback>(info[0].As<Napi::Function>());
+
+    mDataChannelPtr->onOpen([&]() {
+        if (mOnOpenCallback)
+            mOnOpenCallback->call([](Napi::Env env, std::vector<napi_value> &args) {
+                // This will run in main thread and needs to construct the
+                // arguments for the call
+                args = {};
+            });
+    });
 }
 
 void DataChannelWrapper::onClosed(const Napi::CallbackInfo &info)
@@ -339,6 +285,15 @@ void DataChannelWrapper::onClosed(const Napi::CallbackInfo &info)
 
     // Callback
     mOnClosedCallback = std::make_shared<ThreadSafeCallback>(info[0].As<Napi::Function>());
+
+    mDataChannelPtr->onClosed([&]() {
+        if (mOnClosedCallback)
+            mOnClosedCallback->call([](Napi::Env env, std::vector<napi_value> &args) {
+                // This will run in main thread and needs to construct the
+                // arguments for the call
+                args = {};
+            });
+    });
 }
 
 void DataChannelWrapper::onError(const Napi::CallbackInfo &info)
@@ -354,6 +309,15 @@ void DataChannelWrapper::onError(const Napi::CallbackInfo &info)
 
     // Callback
     mOnErrorCallback = std::make_shared<ThreadSafeCallback>(info[0].As<Napi::Function>());
+
+    mDataChannelPtr->onError([&](const std::string &error) {
+        if (mOnErrorCallback)
+            mOnErrorCallback->call([error](Napi::Env env, std::vector<napi_value> &args) {
+                // This will run in main thread and needs to construct the
+                // arguments for the call
+                args = {Napi::String::New(env, error)};
+            });
+    });
 }
 
 void DataChannelWrapper::onAvailable(const Napi::CallbackInfo &info)
@@ -369,6 +333,15 @@ void DataChannelWrapper::onAvailable(const Napi::CallbackInfo &info)
 
     // Callback
     mOnAvailableCallback = std::make_shared<ThreadSafeCallback>(info[0].As<Napi::Function>());
+
+    mDataChannelPtr->onAvailable([&]() {
+        if (mOnAvailableCallback)
+            mOnAvailableCallback->call([](Napi::Env env, std::vector<napi_value> &args) {
+                // This will run in main thread and needs to construct the
+                // arguments for the call
+                args = {};
+            });
+    });
 }
 
 void DataChannelWrapper::onBufferedAmountLow(const Napi::CallbackInfo &info)
@@ -384,6 +357,15 @@ void DataChannelWrapper::onBufferedAmountLow(const Napi::CallbackInfo &info)
 
     // Callback
     mOnBufferedAmountLowCallback = std::make_shared<ThreadSafeCallback>(info[0].As<Napi::Function>());
+
+    mDataChannelPtr->onBufferedAmountLow([&]() {
+        if (mOnBufferedAmountLowCallback)
+            mOnBufferedAmountLowCallback->call([](Napi::Env env, std::vector<napi_value> &args) {
+                // This will run in main thread and needs to construct the
+                // arguments for the call
+                args = {};
+            });
+    });
 }
 
 void DataChannelWrapper::onMessage(const Napi::CallbackInfo &info)
@@ -399,4 +381,21 @@ void DataChannelWrapper::onMessage(const Napi::CallbackInfo &info)
 
     // Callback
     mOnMessageCallback = std::make_shared<ThreadSafeCallback>(info[0].As<Napi::Function>());
+
+    mDataChannelPtr->onMessage([&](const std::variant<rtc::binary, std::string> &message) {
+        if (mOnMessageCallback)
+            mOnMessageCallback->call([message](Napi::Env env, std::vector<napi_value> &args) {
+                // This will run in main thread and needs to construct the
+                // arguments for the call
+                Napi::Object payload = Napi::Object::New(env);
+                if (std::holds_alternative<std::string>(message))
+                {
+                    args = {Napi::String::New(env, std::get<std::string>(message))};
+                }
+                else
+                {
+                    args = {Napi::Buffer<std::byte>::Copy(env, std::get<rtc::binary>(message).data(), std::get<rtc::binary>(message).size())};
+                }
+            });
+    });
 }
