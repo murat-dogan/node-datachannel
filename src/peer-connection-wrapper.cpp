@@ -18,7 +18,11 @@ Napi::Object PeerConnectionWrapper::Init(Napi::Env env, Napi::Object exports)
          InstanceMethod("onLocalCandidate", &PeerConnectionWrapper::onLocalCandidate),
          InstanceMethod("onStateChange", &PeerConnectionWrapper::onStateChange),
          InstanceMethod("onGatheringStateChange", &PeerConnectionWrapper::onGatheringStateChange),
-         InstanceMethod("onDataChannel", &PeerConnectionWrapper::onDataChannel)});
+         InstanceMethod("onDataChannel", &PeerConnectionWrapper::onDataChannel),
+         InstanceMethod("bytesSent", &PeerConnectionWrapper::bytesSent),
+         InstanceMethod("bytesReceived", &PeerConnectionWrapper::bytesReceived),
+         InstanceMethod("rtt", &PeerConnectionWrapper::rtt),
+         InstanceMethod("getSelectedCandidatePair", &PeerConnectionWrapper::getSelectedCandidatePair)});
 
     constructor = Napi::Persistent(func);
     constructor.SuppressDestruct();
@@ -511,4 +515,137 @@ void PeerConnectionWrapper::onDataChannel(const Napi::CallbackInfo &info)
                 args = {instance};
             });
     });
+}
+
+Napi::Value PeerConnectionWrapper::bytesSent(const Napi::CallbackInfo &info)
+{
+    Napi::Env env = info.Env();
+    if (!mRtcPeerConnPtr)
+    {
+        return Napi::Number::New(info.Env(), 0);
+    }
+
+    try
+    {
+        return Napi::Number::New(env, mRtcPeerConnPtr->bytesSent());
+    }
+    catch (std::exception &ex)
+    {
+        Napi::Error::New(env, std::string("libdatachannel error# ") + ex.what()).ThrowAsJavaScriptException();
+        return Napi::Number::New(info.Env(), 0);
+    }
+}
+
+Napi::Value PeerConnectionWrapper::bytesReceived(const Napi::CallbackInfo &info)
+{
+    Napi::Env env = info.Env();
+    if (!mRtcPeerConnPtr)
+    {
+        return Napi::Number::New(info.Env(), 0);
+    }
+
+    try
+    {
+        return Napi::Number::New(env, mRtcPeerConnPtr->bytesReceived());
+    }
+    catch (std::exception &ex)
+    {
+        Napi::Error::New(env, std::string("libdatachannel error# ") + ex.what()).ThrowAsJavaScriptException();
+        return Napi::Number::New(info.Env(), 0);
+    }
+}
+
+Napi::Value PeerConnectionWrapper::rtt(const Napi::CallbackInfo &info)
+{
+    Napi::Env env = info.Env();
+    if (!mRtcPeerConnPtr)
+    {
+        return Napi::Number::New(info.Env(), 0);
+    }
+
+    try
+    {
+        return Napi::Number::New(env, mRtcPeerConnPtr->rtt().value_or(std::chrono::milliseconds(-1)).count());
+    }
+    catch (std::exception &ex)
+    {
+        Napi::Error::New(env, std::string("libdatachannel error# ") + ex.what()).ThrowAsJavaScriptException();
+        return Napi::Number::New(info.Env(), -1);
+    }
+}
+
+Napi::Value PeerConnectionWrapper::getSelectedCandidatePair(const Napi::CallbackInfo &info)
+{
+    Napi::Env env = info.Env();
+    if (!mRtcPeerConnPtr)
+    {
+        return Napi::Number::New(info.Env(), 0);
+    }
+
+    try
+    {
+        rtc::Candidate local, remote;
+        if (!mRtcPeerConnPtr->getSelectedCandidatePair(&local, &remote))
+            return info.Env().Null();
+
+        Napi::Object retvalue = Napi::Object::New(env);
+        Napi::Object localObj = Napi::Object::New(env);
+        Napi::Object remoteObj = Napi::Object::New(env);
+
+        localObj.Set("address", local.address().value_or("?"));
+        localObj.Set("port", local.port().value_or(0));
+        localObj.Set("type", candidateTypeToString(local.type()));
+        localObj.Set("transportType", candidateTransportTypeToString(local.transportType()));
+
+        remoteObj.Set("address", remote.address().value_or("?"));
+        remoteObj.Set("port", remote.port().value_or(0));
+        remoteObj.Set("type", candidateTypeToString(remote.type()));
+        remoteObj.Set("transportType", candidateTransportTypeToString(remote.transportType()));
+
+        retvalue.Set("local", localObj);
+        retvalue.Set("remote", remoteObj);
+
+        return retvalue;
+    }
+    catch (std::exception &ex)
+    {
+        Napi::Error::New(env, std::string("libdatachannel error# ") + ex.what()).ThrowAsJavaScriptException();
+        return Napi::Number::New(info.Env(), -1);
+    }
+}
+
+std::string PeerConnectionWrapper::candidateTypeToString(const rtc::Candidate::Type &type)
+{
+    switch (type)
+    {
+    case rtc::Candidate::Type::Host:
+        return "host";
+    case rtc::Candidate::Type::PeerReflexive:
+        return "prflx";
+    case rtc::Candidate::Type::ServerReflexive:
+        return "srflx";
+    case rtc::Candidate::Type::Relayed:
+        return "relay";
+    default:
+        return "unknown";
+    }
+}
+
+std::string PeerConnectionWrapper::candidateTransportTypeToString(const rtc::Candidate::TransportType &transportType)
+{
+    switch (transportType)
+    {
+    case rtc::Candidate::TransportType::Udp:
+        return "UDP";
+    case rtc::Candidate::TransportType::TcpActive:
+        return "TCP_active";
+    case rtc::Candidate::TransportType::TcpPassive:
+        return "TCP_passive";
+    case rtc::Candidate::TransportType::TcpSo:
+        return "TCP_so";
+    case rtc::Candidate::TransportType::TcpUnknown:
+        return "TCP_unknown";
+    default:
+        return "unknown";
+    }
 }

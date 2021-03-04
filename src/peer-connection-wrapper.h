@@ -29,6 +29,12 @@ public:
   void onGatheringStateChange(const Napi::CallbackInfo &info);
   void onDataChannel(const Napi::CallbackInfo &info);
 
+  // Stats
+  Napi::Value bytesSent(const Napi::CallbackInfo &info);
+  Napi::Value bytesReceived(const Napi::CallbackInfo &info);
+  Napi::Value rtt(const Napi::CallbackInfo &info);
+  Napi::Value getSelectedCandidatePair(const Napi::CallbackInfo &info);
+
 private:
   static Napi::FunctionReference constructor;
   std::string mPeerName;
@@ -40,6 +46,10 @@ private:
   std::shared_ptr<ThreadSafeCallback> mOnStateChangeCallback = nullptr;
   std::shared_ptr<ThreadSafeCallback> mOnGatheringStateChangeCallback = nullptr;
   std::shared_ptr<ThreadSafeCallback> mOnDataChannelCallback = nullptr;
+
+  // Helpers
+  std::string candidateTypeToString(const rtc::Candidate::Type &type);
+  std::string candidateTransportTypeToString(const rtc::Candidate::TransportType &transportType);
 };
 
 #endif // PEER_CONNECTION_WRAPPER_H

@@ -70,6 +70,13 @@ export interface DataChannelInitConfig {
     protocol: string;
 }
 
+export interface SelectedCandidateInfo {
+    address: string;
+    port: number;
+    type: string;
+    transportType: string;
+}
+
 export class DataChannel {
     close: () => void;
     getLabel: () => string;
@@ -99,4 +106,8 @@ export class PeerConnection {
     onStateChange: (cb: (state: string) => void) => void;
     onGatheringStateChange: (state: (sdp: string) => void) => void;
     onDataChannel: (cb: (dc: DataChannel) => void) => void;
+    bytesSent: () => number;
+    bytesReceived: () => number;
+    rtt: () => number;
+    getSelectedCandidatePair: () => { local: SelectedCandidateInfo, remote: SelectedCandidateInfo } | null;
 }
