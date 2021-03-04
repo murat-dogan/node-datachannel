@@ -14,6 +14,9 @@ const id = randomId(4);
 // Message Size
 const MESSAGE_SIZE = 1000;
 
+// Buffer Size
+const BUFFER_SIZE = MESSAGE_SIZE * 10;
+
 // Read Line Interface
 const rl = readline.createInterface({
     input: process.stdin,
@@ -73,8 +76,10 @@ function readUserInput() {
 
             dc.onOpen(() => {
                 setInterval(() => {
-                    dc.sendMessage(msgToSend)
-                    bytesSent += msgToSend.length;;
+                    if (dc.bufferedAmount() <= BUFFER_SIZE) {
+                        dc.sendMessage(msgToSend)
+                        bytesSent += msgToSend.length;
+                    }
                 }, 2);
             });
 
@@ -120,8 +125,10 @@ function createPeerConnection(peerId) {
         let bytesReceived = 0;
 
         setInterval(() => {
-            dc.sendMessage(msgToSend)
-            bytesSent += msgToSend.length;;
+            if (dc.bufferedAmount() <= BUFFER_SIZE) {
+                dc.sendMessage(msgToSend)
+                bytesSent += msgToSend.length;
+            }
         }, 2);
 
 
