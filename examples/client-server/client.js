@@ -12,7 +12,8 @@ const pcMap = {};
 const id = randomId(4);
 
 // Signaling Server
-const ws = new WebSocket('ws:/localhost:8000/' + id, {
+const WS_URL = process.env.WS_URL || "ws://localhost:8000"
+const ws = new WebSocket(WS_URL + '/' + id, {
     perMessageDeflate: false
 });
 
