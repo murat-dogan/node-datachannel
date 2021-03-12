@@ -1,0 +1,77 @@
+name: Build - Win
+
+on:
+  workflow_dispatch:
+  create:
+    tags:
+      - v*
+
+env:
+  ACTIONS_ALLOW_UNSECURE_COMMANDS: true
+
+jobs:
+  build-windows-x64:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        node-version: [10.x, 11.x, 12.x, 13.x, 14.x, 15.x]
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ilammy/msvc-dev-cmd@v1
+      - name: Install OpenSSL
+        run: choco install openssl
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Build
+        run: set npm_config_cache= && set NPM_CONFIG_CACHE= && npm install --build-from-source
+        env:
+          CI: true
+      - name: Test
+        run: npm run test
+        env:
+          CI: true
+      - name: Upload
+        run: node_modules/.bin/prebuild --upload -u ${{ secrets.GITHUB_TOKEN }}
+        env:
+          CI: true
+
+  build-windows-x86:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        node_version:
+          - 10
+          - 11
+          - 12
+          - 13
+          - 14
+          - 15
+        node_arch:
+          - x86
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x86
+      - name: Install OpenSSL
+        run: choco install openssl --x86=true
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: aminya/setup-node@x86
+        with:
+          node-version: ${{ matrix.node_version }}
+          node-arch: ${{ matrix.node_arch }}
+      - name: Build
+        run: set npm_config_cache= && set NPM_CONFIG_CACHE= && npm install --build-from-source
+        env:
+          CI: true
+      - name: Test
+        run: npm run test
+        env:
+          CI: true
+      - name: Upload
+        run: node_modules/.bin/prebuild --upload -u ${{ secrets.GITHUB_TOKEN }}
+        env:
+          CI: true
