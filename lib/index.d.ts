@@ -1,13 +1,7 @@
 export as namespace NodeDataChannel;
 
-export enum LogLevel {
-    Verbose = 'Verbose',
-    Debug = 'Debug',
-    Info = 'Info',
-    Warning = 'Warning',
-    Error = 'Error',
-    Fatal = 'Fatal'
-}
+// Enum in d.ts is tricky
+export type LogLevel = "Verbose" | "Debug" | "Info" | "Warning" | "Error" | "Fatal";
 
 // Functions
 export function preload(): void;
