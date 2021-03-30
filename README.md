@@ -151,3 +151,9 @@ Other Options
 ### More Examples
 
 Check `examples` folder
+
+## Thanks
+
+ 
+Thanks to [Streamr](https://streamr.network/) for supporting this project by being a Sponsor!
+
