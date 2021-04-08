@@ -152,6 +152,10 @@ PeerConnectionWrapper::PeerConnectionWrapper(const Napi::CallbackInfo &info) : N
     if (config.Get("enableIceTcp").IsBoolean())
         rtcConfig.enableIceTcp = config.Get("enableIceTcp").As<Napi::Boolean>();
 
+    // Max Message Size
+    if (config.Get("maxMessageSize").IsNumber())
+        rtcConfig.maxMessageSize = config.Get("maxMessageSize").As<Napi::Number>().Uint32Value();
+
     // Create peer-connection
     try
     {

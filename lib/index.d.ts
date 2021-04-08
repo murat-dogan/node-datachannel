@@ -42,6 +42,7 @@ export interface RtcConfig {
     enableIceTcp?: boolean;
     portRangeBegin?: Number;
     portRangeEnd?: Number;
+    maxMessageSize?: Number;
 }
 
 export enum DescriptionType {
