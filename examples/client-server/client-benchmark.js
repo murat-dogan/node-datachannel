@@ -5,6 +5,9 @@ const readline = require("readline");
 // Init Logger
 nodeDataChannel.initLogger('Debug');
 
+// Args
+const args = process.argv.slice(2)
+
 // PeerConnection Map
 const pcMap = {};
 
@@ -12,10 +15,10 @@ const pcMap = {};
 const id = randomId(4);
 
 // Message Size
-const MESSAGE_SIZE = 1000;
+const MESSAGE_SIZE = 65535;
 
 // Buffer Size
-const BUFFER_SIZE = MESSAGE_SIZE * 10;
+const BUFFER_SIZE = MESSAGE_SIZE * 0;
 
 // Read Line Interface
 const rl = readline.createInterface({
@@ -28,6 +31,9 @@ const WS_URL = process.env.WS_URL || "ws://localhost:8000"
 const ws = new WebSocket(WS_URL + '/' + id, {
     perMessageDeflate: false
 });
+
+// Disable Send
+const disableSend = args.length > 0 && args[0];
 
 console.log(`The local ID is: ${id}`);
 console.log(`Waiting for signaling to be connected...`);
@@ -76,14 +82,14 @@ function readUserInput() {
 
             dc.setBufferedAmountLowThreshold(BUFFER_SIZE);
             dc.onOpen(() => {
-                while (dc.bufferedAmount() <= BUFFER_SIZE) {
+                while (!disableSend && dc.bufferedAmount() <= BUFFER_SIZE) {
                     dc.sendMessage(msgToSend)
                     bytesSent += msgToSend.length;;
                 };
             });
 
             dc.onBufferedAmountLow(() => {
-                while (dc.bufferedAmount() <= BUFFER_SIZE) {
+                while (!disableSend && dc.bufferedAmount() <= BUFFER_SIZE) {
                     dc.sendMessage(msgToSend)
                     bytesSent += msgToSend.length;;
                 };
@@ -96,16 +102,17 @@ function readUserInput() {
             // Report
             let i = 0;
             setInterval(() => {
-                console.log(`${i++}# Sent: ${byte2KB(bytesSent)} KB/s / Received: ${byte2KB(bytesReceived)} KB/s / SendBufferAmount: ${dc.bufferedAmount()} / DataChannelOpen: ${dc.isOpen()}`);
+                console.log(`${i}# Sent: ${byte2KB(bytesSent)} KB/s / Received: ${byte2KB(bytesReceived)} KB/s / SendBufferAmount: ${dc.bufferedAmount()} / DataChannelOpen: ${dc.isOpen()}`);
                 bytesSent = 0;
                 bytesReceived = 0;
-            }, 1000);
 
-            setInterval(() => {
-                console.log(`Stats# Sent: ${byte2MB(pcMap[peerId].bytesSent())} MB / Received: ${byte2MB(pcMap[peerId].bytesReceived())} MB / rtt: ${pcMap[peerId].rtt()} ms`);
-                console.log(`Selected Candidates# ${JSON.stringify(pcMap[peerId].getSelectedCandidatePair())}`);
-                console.log(``);
-            }, 5 * 1000);
+                if (i % 5 == 0) {
+                    console.log(`Stats# Sent: ${byte2MB(pcMap[peerId].bytesSent())} MB / Received: ${byte2MB(pcMap[peerId].bytesReceived())} MB / rtt: ${pcMap[peerId].rtt()} ms`);
+                    console.log(`Selected Candidates# ${JSON.stringify(pcMap[peerId].getSelectedCandidatePair())}`);
+                    console.log(``);
+                }
+                i++;
+            }, 1000);
         }
     });
 }
@@ -133,13 +140,13 @@ function createPeerConnection(peerId) {
         let bytesSent = 0;
         let bytesReceived = 0;
 
-        while (dc.bufferedAmount() <= BUFFER_SIZE) {
+        while (!disableSend && dc.bufferedAmount() <= BUFFER_SIZE) {
             dc.sendMessage(msgToSend)
             bytesSent += msgToSend.length;;
         };
 
         dc.onBufferedAmountLow(() => {
-            while (dc.bufferedAmount() <= BUFFER_SIZE) {
+            while (!disableSend && dc.bufferedAmount() <= BUFFER_SIZE) {
                 dc.sendMessage(msgToSend)
                 bytesSent += msgToSend.length;;
             };
@@ -153,16 +160,17 @@ function createPeerConnection(peerId) {
         // Report
         let i = 0;
         setInterval(() => {
-            console.log(`${i++}# Sent: ${byte2KB(bytesSent)} KB/s / Received: ${byte2KB(bytesReceived)} KB/s / SendBufferAmount: ${dc.bufferedAmount()} / DataChannelOpen: ${dc.isOpen()}`);
+            console.log(`${i}# Sent: ${byte2KB(bytesSent)} KB/s / Received: ${byte2KB(bytesReceived)} KB/s / SendBufferAmount: ${dc.bufferedAmount()} / DataChannelOpen: ${dc.isOpen()}`);
             bytesSent = 0;
             bytesReceived = 0;
-        }, 1000);
 
-        setInterval(() => {
-            console.log(`Stats# Sent: ${byte2MB(pcMap[peerId].bytesSent())} MB / Received: ${byte2MB(pcMap[peerId].bytesReceived())} MB / rtt: ${pcMap[peerId].rtt()} ms`);
-            console.log(`Selected Candidates# ${JSON.stringify(pcMap[peerId].getSelectedCandidatePair())}`);
-            console.log(``);
-        }, 5 * 1000);
+            if (i % 5 == 0) {
+                console.log(`Stats# Sent: ${byte2MB(pcMap[peerId].bytesSent())} MB / Received: ${byte2MB(pcMap[peerId].bytesReceived())} MB / rtt: ${pcMap[peerId].rtt()} ms`);
+                console.log(`Selected Candidates# ${JSON.stringify(pcMap[peerId].getSelectedCandidatePair())}`);
+                console.log(``);
+            }
+            i++;
+        }, 1000);
     });
 
     pcMap[peerId] = peerConnection;
@@ -179,9 +187,9 @@ function randomId(length) {
 }
 
 function byte2KB(bytes) {
-    return `${Math.round(bytes / 1024)}`
+    return `${Math.round(bytes / 1000)}`
 }
 
 function byte2MB(bytes) {
-    return `${Math.round(bytes / (1024 * 1024))}`
+    return `${Math.round(bytes / (1000 * 1000))}`
 }
