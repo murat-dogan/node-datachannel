@@ -12,7 +12,18 @@ Please check [libdatachannel](https://github.com/paullouisageneau/libdatachannel
 ```js
 const nodeDataChannel = require('node-datachannel');
 
+// Log Level
 nodeDataChannel.initLogger("Debug");
+
+// SCTP Settings ( use of nodeDataChannel.setSctpSettings() )
+// export interface SctpSettings {
+//     recvBufferSize?: number;
+//     sendBufferSize?: number;
+//     maxChunksOnQueue?: number;
+//     initialCongestionWindow?: number;
+//     congestionControlModule?: number;
+//     delayedSackTime?: number;
+// }
 
 let dc1 = null;
 let dc2 = null;
