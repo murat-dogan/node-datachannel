@@ -3,17 +3,24 @@ export as namespace NodeDataChannel;
 // Enum in d.ts is tricky
 export type LogLevel = "Verbose" | "Debug" | "Info" | "Warning" | "Error" | "Fatal";
 
+// SCTP Settings
+export interface SctpSettings {
+    recvBufferSize?: number;
+    sendBufferSize?: number;
+    maxChunksOnQueue?: number;
+    initialCongestionWindow?: number;
+    congestionControlModule?: number;
+    delayedSackTime?: number;
+}
+
 // Functions
 export function preload(): void;
 export function initLogger(level: LogLevel): void;
 export function cleanup(): void;
+export function setSctpSettings(settings: SctpSettings): void;
 
-export enum ProxyServerType {
-    None = 'None',
-    Socks5 = 'Socks5',
-    Http = 'Http'
-}
-
+// Proxy Server
+export type ProxyServerType = 'None' | 'Socks5' | 'Http';
 export interface ProxyServer {
     type: ProxyServerType;
     ip: string;

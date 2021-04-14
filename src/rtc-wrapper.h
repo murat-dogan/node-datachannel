@@ -13,6 +13,7 @@ public:
     static void preload(const Napi::CallbackInfo &info);
     static void initLogger(const Napi::CallbackInfo &info);
     static void cleanup(const Napi::CallbackInfo &info);
+    static void setSctpSettings(const Napi::CallbackInfo &info);
 };
 
 #endif // RTC_WRAPPER_H

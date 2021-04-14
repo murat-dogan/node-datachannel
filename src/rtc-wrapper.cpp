@@ -7,6 +7,7 @@ Napi::Object RtcWrapper::Init(Napi::Env env, Napi::Object exports)
     exports.Set("initLogger", Napi::Function::New(env, &RtcWrapper::initLogger));
     exports.Set("cleanup", Napi::Function::New(env, &RtcWrapper::cleanup));
     exports.Set("preload", Napi::Function::New(env, &RtcWrapper::preload));
+    exports.Set("setSctpSettings", Napi::Function::New(env, &RtcWrapper::setSctpSettings));
 
     return exports;
 }
@@ -75,4 +76,35 @@ void RtcWrapper::cleanup(const Napi::CallbackInfo &info)
         Napi::Error::New(env, std::string("libdatachannel error# ") + ex.what()).ThrowAsJavaScriptException();
         return;
     }
+}
+
+void RtcWrapper::setSctpSettings(const Napi::CallbackInfo &info)
+{
+    Napi::Env env = info.Env();
+    int length = info.Length();
+
+    // We expect (Object) as param
+    if (length < 1 || !info[0].IsObject())
+    {
+        Napi::TypeError::New(env, "Configuration (Object) expected").ThrowAsJavaScriptException();
+        return;
+    }
+
+    rtc::SctpSettings settings;
+    Napi::Object config = info[0].As<Napi::Object>();
+
+    if (config.Get("recvBufferSize").IsNumber())
+        settings.recvBufferSize = static_cast<uint16_t>(config.Get("recvBufferSize").As<Napi::Number>().Uint32Value());
+    if (config.Get("sendBufferSize").IsNumber())
+        settings.sendBufferSize = static_cast<uint16_t>(config.Get("sendBufferSize").As<Napi::Number>().Uint32Value());
+    if (config.Get("maxChunksOnQueue").IsNumber())
+        settings.maxChunksOnQueue = static_cast<uint16_t>(config.Get("maxChunksOnQueue").As<Napi::Number>().Uint32Value());
+    if (config.Get("initialCongestionWindow").IsNumber())
+        settings.initialCongestionWindow = static_cast<uint16_t>(config.Get("initialCongestionWindow").As<Napi::Number>().Uint32Value());
+    if (config.Get("congestionControlModule").IsNumber())
+        settings.congestionControlModule = static_cast<uint16_t>(config.Get("congestionControlModule").As<Napi::Number>().Uint32Value());
+    if (config.Get("delayedSackTime").IsNumber())
+        settings.delayedSackTime = std::chrono::milliseconds(config.Get("delayedSackTime").As<Napi::Number>().Uint32Value());
+
+    rtc::SetSctpSettings(settings);
 }
