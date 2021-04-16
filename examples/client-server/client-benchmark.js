@@ -180,19 +180,17 @@ function createPeerConnection(peerId) {
 
         while (!disableSend && dc.bufferedAmount() <= BUFFER_SIZE) {
             dc.sendMessage(msgToSend)
-            bytesSent += msgToSend.length;;
         };
 
         dc.onBufferedAmountLow(() => {
             while (!disableSend && dc.bufferedAmount() <= BUFFER_SIZE) {
                 dc.sendMessage(msgToSend)
-                bytesSent += msgToSend.length;;
             };
         });
 
 
         dc.onMessage((msg) => {
-            bytesReceived += msg.length;
+            // bytesReceived += msg.length;
         });
     });
 
