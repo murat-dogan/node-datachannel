@@ -1,5 +1,6 @@
 #include "peer-connection-wrapper.h"
 #include "data-channel-wrapper.h"
+#include <sstream>
 
 Napi::FunctionReference PeerConnectionWrapper::constructor;
 
