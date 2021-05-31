@@ -29,7 +29,7 @@ export interface ProxyServer {
     password?: string;
 }
 
-export enum RelayType {
+export const enum RelayType {
     TurnUdp = 'TurnUdp',
     TurnTcp = 'TurnTcp',
     TurnTls = 'TurnTls'
@@ -52,13 +52,13 @@ export interface RtcConfig {
     maxMessageSize?: Number;
 }
 
-export enum DescriptionType {
+export const enum DescriptionType {
     Unspec = 'Unspec',
     Offer = 'Offer',
     Answer = 'Answer'
 }
 
-export enum ReliabilityType {
+export const enum ReliabilityType {
     Reliable = 0, Rexmit = 1, Timed = 2
 }
 
