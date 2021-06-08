@@ -12,7 +12,6 @@
 class DataChannelWrapper : public Napi::ObjectWrap<DataChannelWrapper>
 {
 public:
-  static Napi::FunctionReference constructor;
   static Napi::Object Init(Napi::Env env, Napi::Object exports);
   DataChannelWrapper(const Napi::CallbackInfo &info);
   ~DataChannelWrapper();
@@ -37,6 +36,7 @@ public:
   void onMessage(const Napi::CallbackInfo &info);
 
 private:
+  static Napi::FunctionReference constructor;
   std::string mLabel;
   std::shared_ptr<rtc::DataChannel> mDataChannelPtr = nullptr;
 
