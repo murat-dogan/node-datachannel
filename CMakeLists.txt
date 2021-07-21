@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.15)
 cmake_policy(SET CMP0091 NEW)
 project(node_datachannel VERSION 0.1.4)
-    
+
 include_directories(${CMAKE_JS_INC})
 
 set(CMAKE_BUILD_TYPE Release)
@@ -17,7 +17,7 @@ endif()
 # (.text+0x1240): dangerous relocation: unsupported relocation
 if(NOT ${NODE_ARCH} STREQUAL "arm64")
   set(OPENSSL_USE_STATIC_LIBS TRUE)
-  find_package(OpenSSL REQUIRED)  
+  find_package(OpenSSL REQUIRED)
 endif()
 
 
@@ -27,7 +27,7 @@ include(FetchContent)
 FetchContent_Declare(
     libdatachannel
     GIT_REPOSITORY https://github.com/paullouisageneau/libdatachannel.git
-    GIT_TAG        "v0.13.0"
+    GIT_TAG "v0.14.0"
 )
 
 FetchContent_GetProperties(libdatachannel)
@@ -48,9 +48,9 @@ add_library(${PROJECT_NAME} SHARED
 set_target_properties(${PROJECT_NAME} PROPERTIES CXX_STANDARD 17)
 set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "" SUFFIX ".node")
 
-target_include_directories(${PROJECT_NAME} PRIVATE 
-    ${CMAKE_SOURCE_DIR}/node_modules/node-addon-api 
-    ${CMAKE_SOURCE_DIR}/node_modules/napi-thread-safe-callback 
+target_include_directories(${PROJECT_NAME} PRIVATE
+    ${CMAKE_SOURCE_DIR}/node_modules/node-addon-api
+    ${CMAKE_SOURCE_DIR}/node_modules/napi-thread-safe-callback
     ${CMAKE_BINARY_DIR}/_deps/libdatachannel-src/include
 )
 
@@ -70,4 +70,4 @@ if(WIN32)
     list(APPEND LINK_LIBRARIES crypt32.lib)
 endif()
 
-target_link_libraries(${PROJECT_NAME} PRIVATE ${LINK_LIBRARIES})    
+target_link_libraries(${PROJECT_NAME} PRIVATE ${LINK_LIBRARIES})
