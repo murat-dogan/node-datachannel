@@ -94,15 +94,15 @@ void RtcWrapper::setSctpSettings(const Napi::CallbackInfo &info)
     Napi::Object config = info[0].As<Napi::Object>();
 
     if (config.Get("recvBufferSize").IsNumber())
-        settings.recvBufferSize = static_cast<uint16_t>(config.Get("recvBufferSize").As<Napi::Number>().Uint32Value());
+        settings.recvBufferSize = config.Get("recvBufferSize").As<Napi::Number>().Uint32Value();
     if (config.Get("sendBufferSize").IsNumber())
-        settings.sendBufferSize = static_cast<uint16_t>(config.Get("sendBufferSize").As<Napi::Number>().Uint32Value());
+        settings.sendBufferSize = config.Get("sendBufferSize").As<Napi::Number>().Uint32Value();
     if (config.Get("maxChunksOnQueue").IsNumber())
-        settings.maxChunksOnQueue = static_cast<uint16_t>(config.Get("maxChunksOnQueue").As<Napi::Number>().Uint32Value());
+        settings.maxChunksOnQueue = config.Get("maxChunksOnQueue").As<Napi::Number>().Uint32Value();
     if (config.Get("initialCongestionWindow").IsNumber())
-        settings.initialCongestionWindow = static_cast<uint16_t>(config.Get("initialCongestionWindow").As<Napi::Number>().Uint32Value());
+        settings.initialCongestionWindow = config.Get("initialCongestionWindow").As<Napi::Number>().Uint32Value();
     if (config.Get("congestionControlModule").IsNumber())
-        settings.congestionControlModule = static_cast<uint16_t>(config.Get("congestionControlModule").As<Napi::Number>().Uint32Value());
+        settings.congestionControlModule = config.Get("congestionControlModule").As<Napi::Number>().Uint32Value();
     if (config.Get("delayedSackTime").IsNumber())
         settings.delayedSackTime = std::chrono::milliseconds(config.Get("delayedSackTime").As<Napi::Number>().Uint32Value());
 
