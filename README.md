@@ -1,10 +1,10 @@
-# node-datachannel - libdatachannel node bindings 
+# node-datachannel - libdatachannel node bindings
 
 ![Build CI](https://github.com/murat-dogan/node-datachannel/workflows/Build%20CI/badge.svg)
 
 > "libdatachannel is a standalone implementation of WebRTC Data Channels, WebRTC Media Transport, and WebSockets in C++17 with C bindings for POSIX platforms (including GNU/Linux, Android, and Apple macOS) and Microsoft Windows. It enables direct connectivity between native applications and web browsers without the pain of importing the entire WebRTC stack. "
 
-NodeJS bindings for [libdatachannel](https://github.com/paullouisageneau/libdatachannel) library. 
+NodeJS bindings for [libdatachannel](https://github.com/paullouisageneau/libdatachannel) library.
 
 Please check [libdatachannel](https://github.com/paullouisageneau/libdatachannel) for Compatibility & WebRTC details.
 
@@ -34,6 +34,7 @@ let dc2 = null;
 // enableIceTcp?: boolean;
 // portRangeBegin?: Number;
 // portRangeEnd?: Number;
+// iceTransportPolicy?: 'all' | 'relay';
 
 // "iceServers" option is an array of stun/turn server urls
 // Examples;
@@ -165,6 +166,6 @@ Check `examples` folder
 
 ## Thanks
 
- 
+
 Thanks to [Streamr](https://streamr.network/) for supporting this project by being a Sponsor!
 
