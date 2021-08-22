@@ -157,6 +157,26 @@ PeerConnectionWrapper::PeerConnectionWrapper(const Napi::CallbackInfo &info) : N
     if (config.Get("maxMessageSize").IsNumber())
         rtcConfig.maxMessageSize = config.Get("maxMessageSize").As<Napi::Number>().Uint32Value();
 
+    // ICE transport policy
+    if (!config.Get("iceTransportPolicy").IsUndefined())
+    {
+        if (!config.Get("iceTransportPolicy").IsString())
+        {
+            Napi::TypeError::New(env, "Invalid ICE transport policy, expected string").ThrowAsJavaScriptException();
+            return;
+        }
+        std::string strPolicy = config.Get("iceTransportPolicy").As<Napi::String>().ToString();
+        if(strPolicy == "all")
+            rtcConfig.iceTransportPolicy = rtc::TransportPolicy::All;
+        if(strPolicy == "relay")
+            rtcConfig.iceTransportPolicy = rtc::TransportPolicy::Relay;
+        else
+        {
+            Napi::TypeError::New(env, "Unknown ICE transport policy").ThrowAsJavaScriptException();
+            return;
+        }
+    }
+
     // Create peer-connection
     try
     {
@@ -343,7 +363,7 @@ Napi::Value PeerConnectionWrapper::createDataChannel(const Napi::CallbackInfo &i
                     init.reliability.type = rtc::Reliability::Type::Timed;
                     break;
                 default:
-                    Napi::TypeError::New(env, "UnKnown DataChannel Reliability Type").ThrowAsJavaScriptException();
+                    Napi::TypeError::New(env, "Unknown DataChannel Reliability Type").ThrowAsJavaScriptException();
                     return info.Env().Null();
                 }
             }
