@@ -94,7 +94,7 @@ PeerConnectionWrapper::PeerConnectionWrapper(const Napi::CallbackInfo &info) : N
 
                 rtcConfig.iceServers.emplace_back(
                     rtc::IceServer(iceServer.Get("hostname").As<Napi::String>(),
-                                   (uint16_t)iceServer.Get("port").As<Napi::Number>().Uint32Value(),
+                                   uint16_t(iceServer.Get("port").As<Napi::Number>().Uint32Value()),
                                    iceServer.Get("username").As<Napi::String>(),
                                    iceServer.Get("password").As<Napi::String>(),
                                    relayType));
@@ -104,7 +104,7 @@ PeerConnectionWrapper::PeerConnectionWrapper(const Napi::CallbackInfo &info) : N
                 rtcConfig.iceServers.emplace_back(
                     rtc::IceServer(
                         iceServer.Get("hostname").As<Napi::String>(),
-                        (uint16_t)iceServer.Get("port").As<Napi::Number>().Uint32Value()));
+                        uint16_t(iceServer.Get("port").As<Napi::Number>().Uint32Value())));
             }
         }
     }
@@ -363,7 +363,7 @@ Napi::Value PeerConnectionWrapper::createDataChannel(const Napi::CallbackInfo &i
                     Napi::TypeError::New(env, "Wrong Reliability Config (type)").ThrowAsJavaScriptException();
                     return info.Env().Null();
                 }
-                switch ((int)reliability.Get("type").As<Napi::Number>())
+                switch (reliability.Get("type").As<Napi::Number>().Uint32Value())
                 {
                 case 0:
                     init.reliability.type = rtc::Reliability::Type::Reliable;
@@ -397,7 +397,7 @@ Napi::Value PeerConnectionWrapper::createDataChannel(const Napi::CallbackInfo &i
                     Napi::TypeError::New(env, "Wrong Reliability Config (rexmit)").ThrowAsJavaScriptException();
                     return info.Env().Null();
                 }
-                switch ((int)reliability.Get("type").As<Napi::Number>())
+                switch (reliability.Get("type").As<Napi::Number>().Uint32Value())
                 {
                 case 1:
                     init.reliability.rexmit = reliability.Get("rexmit").As<Napi::Number>();
