@@ -415,9 +415,15 @@ Napi::Value PeerConnectionWrapper::createDataChannel(const Napi::CallbackInfo &i
             if (!initConfig.Get("ordered").IsBoolean())
             {
                 Napi::TypeError::New(env, "Wrong DataChannel Init Config (ordered)").ThrowAsJavaScriptException();
-                    return info.Env().Null();
+                return info.Env().Null();
             }
             init.reliability.unordered = !initConfig.Get("ordered").As<Napi::Boolean>();
+        }
+
+        if(initConfig.Get("maxPacketLifeTime").IsNumber() && initConfig.Get("maxRetransmits").IsNumber())
+        {
+            Napi::TypeError::New(env, "Wrong DataChannel Init Config, maxPacketLifeTime and maxRetransmits are exclusive").ThrowAsJavaScriptException();
+            return info.Env().Null();
         }
 
         if (initConfig.Get("maxPacketLifeTime").IsNumber())
