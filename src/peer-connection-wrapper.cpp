@@ -168,7 +168,7 @@ PeerConnectionWrapper::PeerConnectionWrapper(const Napi::CallbackInfo &info) : N
         std::string strPolicy = config.Get("iceTransportPolicy").As<Napi::String>().ToString();
         if(strPolicy == "all")
             rtcConfig.iceTransportPolicy = rtc::TransportPolicy::All;
-        if(strPolicy == "relay")
+        else if(strPolicy == "relay")
             rtcConfig.iceTransportPolicy = rtc::TransportPolicy::Relay;
         else
         {
