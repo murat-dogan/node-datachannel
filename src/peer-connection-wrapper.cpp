@@ -335,6 +335,7 @@ Napi::Value PeerConnectionWrapper::createDataChannel(const Napi::CallbackInfo &i
             init.protocol = initConfig.Get("protocol").As<Napi::String>();
         }
 
+        // Deprecated reliability object, kept for retro-compatibility
         if (!initConfig.Get("reliability").IsUndefined())
         {
             if (!initConfig.Get("reliability").IsObject())
@@ -396,12 +397,38 @@ Napi::Value PeerConnectionWrapper::createDataChannel(const Napi::CallbackInfo &i
                 }
             }
         }
+
+        // Reliability parameters
+        if (!initConfig.Get("ordered").IsUndefined())
+        {
+            if (!initConfig.Get("ordered").IsBoolean())
+            {
+                Napi::TypeError::New(env, "Wrong DataChannel Init Config (ordered)").ThrowAsJavaScriptException();
+                    return info.Env().Null();
+            }
+            init.reliability.unordered = !initConfig.Get("ordered").As<Napi::Boolean>();
+        }
+
+        if (initConfig.Get("maxPacketLifeTime").IsNumber())
+        {
+            init.reliability.type = rtc::Reliability::Type::Timed;
+            init.reliability.rexmit = std::chrono::milliseconds(initConfig.Get("maxPacketLifeTime").As<Napi::Number>().Uint32Value());
+        }
+        else if (initConfig.Get("maxRetransmits").IsNumber())
+        {
+            init.reliability.type = rtc::Reliability::Type::Rexmit;
+            init.reliability.rexmit = int(initConfig.Get("maxRetransmits").As<Napi::Number>().Uint32Value());
+        }
+        else
+        {
+            init.reliability.type = rtc::Reliability::Type::Reliable;
+        }
     }
 
     try
     {
         std::string label = info[0].As<Napi::String>().ToString();
-        std::shared_ptr<rtc::DataChannel> dataChannel = mRtcPeerConnPtr->createDataChannel(label, init);
+        std::shared_ptr<rtc::DataChannel> dataChannel = mRtcPeerConnPtr->createDataChannel(label, std::move(init));
         auto instance = DataChannelWrapper::constructor.New({Napi::External<std::shared_ptr<rtc::DataChannel>>::New(info.Env(), &dataChannel)});
         return instance;
     }

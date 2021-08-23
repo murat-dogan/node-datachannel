@@ -89,13 +89,18 @@ peer2.onDataChannel((dc) => {
 
 // DataChannel Options
 // export interface DataChannelInitConfig {
-//     reliability: {
-//         type: ReliabilityType;
-//         unordered: boolean;
-//         rexmit: number;
+//     protocol?: string;
+//     negotiated?: boolean;
+//     ordered?: boolean;
+//     maxPacketLifeTime?: number;
+//     maxRetransmits?: number;
+//
+//     // Deprecated, use ordered, maxPacketLifeTime, and maxRetransmits
+//     reliability?: {
+//         type?: ReliabilityType;
+//         unordered?: boolean;
+//         rexmit?: number;
 //     }
-//     negotiated: boolean;
-//     protocol: string;
 // }
 dc1 = peer1.createDataChannel("test");
 dc1.onOpen(() => {
