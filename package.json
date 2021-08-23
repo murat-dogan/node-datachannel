@@ -33,7 +33,7 @@
   "homepage": "https://github.com/murat-dogan/node-datachannel#readme",
   "devDependencies": {
     "cmake-js": "^6.1.0",
-    "jest": "^26.6.3",
+    "jest": "^27.0.6",
     "nan": "^2.14.2",
     "napi-thread-safe-callback": "0.0.6",
     "node-addon-api": "^3.1.0",
