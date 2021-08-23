@@ -29,12 +29,15 @@ let dc1 = null;
 let dc2 = null;
 
 // Config options
-// iceServers: string[];
-// proxyServer?: ProxyServer;
-// enableIceTcp?: boolean;
-// portRangeBegin?: Number;
-// portRangeEnd?: Number;
-// iceTransportPolicy?: 'all' | 'relay';
+// export interface RtcConfig {
+//     iceServers: string[];
+//     proxyServer?: ProxyServer;
+//     enableIceTcp?: boolean;
+//     portRangeBegin?: number;
+//     portRangeEnd?: number;
+//     maxMessageSize?: number;
+//     iceTransportPolicy?: TransportPolicy;
+// }
 
 // "iceServers" option is an array of stun/turn server urls
 // Examples;
@@ -89,13 +92,19 @@ peer2.onDataChannel((dc) => {
 
 // DataChannel Options
 // export interface DataChannelInitConfig {
-//     reliability: {
-//         type: ReliabilityType;
-//         unordered: boolean;
-//         rexmit: number;
+//     protocol?: string;
+//     negotiated?: boolean;
+//     id?: number;
+//     ordered?: boolean;
+//     maxPacketLifeTime?: number;
+//     maxRetransmits?: number;
+//
+//     // Deprecated, use ordered, maxPacketLifeTime, and maxRetransmits
+//     reliability?: {
+//         type?: ReliabilityType;
+//         unordered?: boolean;
+//         rexmit?: number;
 //     }
-//     negotiated: boolean;
-//     protocol: string;
 // }
 dc1 = peer1.createDataChannel("test");
 dc1.onOpen(() => {

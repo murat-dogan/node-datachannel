@@ -94,7 +94,7 @@ PeerConnectionWrapper::PeerConnectionWrapper(const Napi::CallbackInfo &info) : N
 
                 rtcConfig.iceServers.emplace_back(
                     rtc::IceServer(iceServer.Get("hostname").As<Napi::String>(),
-                                   (uint16_t)iceServer.Get("port").As<Napi::Number>().Uint32Value(),
+                                   uint16_t(iceServer.Get("port").As<Napi::Number>().Uint32Value()),
                                    iceServer.Get("username").As<Napi::String>(),
                                    iceServer.Get("password").As<Napi::String>(),
                                    relayType));
@@ -104,7 +104,7 @@ PeerConnectionWrapper::PeerConnectionWrapper(const Napi::CallbackInfo &info) : N
                 rtcConfig.iceServers.emplace_back(
                     rtc::IceServer(
                         iceServer.Get("hostname").As<Napi::String>(),
-                        (uint16_t)iceServer.Get("port").As<Napi::Number>().Uint32Value()));
+                        uint16_t(iceServer.Get("port").As<Napi::Number>().Uint32Value())));
             }
         }
     }
@@ -315,15 +315,6 @@ Napi::Value PeerConnectionWrapper::createDataChannel(const Napi::CallbackInfo &i
         }
 
         Napi::Object initConfig = info[1].As<Napi::Object>();
-        if (!initConfig.Get("negotiated").IsUndefined())
-        {
-            if (!initConfig.Get("negotiated").IsBoolean())
-            {
-                Napi::TypeError::New(env, "Wrong DataChannel Init Config (negotiated)").ThrowAsJavaScriptException();
-                return info.Env().Null();
-            }
-            init.negotiated = initConfig.Get("negotiated").As<Napi::Boolean>();
-        }
 
         if (!initConfig.Get("protocol").IsUndefined())
         {
@@ -335,6 +326,27 @@ Napi::Value PeerConnectionWrapper::createDataChannel(const Napi::CallbackInfo &i
             init.protocol = initConfig.Get("protocol").As<Napi::String>();
         }
 
+        if (!initConfig.Get("negotiated").IsUndefined())
+        {
+            if (!initConfig.Get("negotiated").IsBoolean())
+            {
+                Napi::TypeError::New(env, "Wrong DataChannel Init Config (negotiated)").ThrowAsJavaScriptException();
+                return info.Env().Null();
+            }
+            init.negotiated = initConfig.Get("negotiated").As<Napi::Boolean>();
+        }
+
+        if (!initConfig.Get("id").IsUndefined())
+        {
+            if (!initConfig.Get("id").IsNumber())
+            {
+                Napi::TypeError::New(env, "Wrong DataChannel Init Config (id)").ThrowAsJavaScriptException();
+                return info.Env().Null();
+            }
+            init.id = uint16_t(initConfig.Get("id").As<Napi::Number>().Uint32Value());
+        }
+
+        // Deprecated reliability object, kept for retro-compatibility
         if (!initConfig.Get("reliability").IsUndefined())
         {
             if (!initConfig.Get("reliability").IsObject())
@@ -351,7 +363,7 @@ Napi::Value PeerConnectionWrapper::createDataChannel(const Napi::CallbackInfo &i
                     Napi::TypeError::New(env, "Wrong Reliability Config (type)").ThrowAsJavaScriptException();
                     return info.Env().Null();
                 }
-                switch ((int)reliability.Get("type").As<Napi::Number>())
+                switch (reliability.Get("type").As<Napi::Number>().Uint32Value())
                 {
                 case 0:
                     init.reliability.type = rtc::Reliability::Type::Reliable;
@@ -385,7 +397,7 @@ Napi::Value PeerConnectionWrapper::createDataChannel(const Napi::CallbackInfo &i
                     Napi::TypeError::New(env, "Wrong Reliability Config (rexmit)").ThrowAsJavaScriptException();
                     return info.Env().Null();
                 }
-                switch ((int)reliability.Get("type").As<Napi::Number>())
+                switch (reliability.Get("type").As<Napi::Number>().Uint32Value())
                 {
                 case 1:
                     init.reliability.rexmit = reliability.Get("rexmit").As<Napi::Number>();
@@ -396,12 +408,44 @@ Napi::Value PeerConnectionWrapper::createDataChannel(const Napi::CallbackInfo &i
                 }
             }
         }
+
+        // Reliability parameters
+        if (!initConfig.Get("ordered").IsUndefined())
+        {
+            if (!initConfig.Get("ordered").IsBoolean())
+            {
+                Napi::TypeError::New(env, "Wrong DataChannel Init Config (ordered)").ThrowAsJavaScriptException();
+                return info.Env().Null();
+            }
+            init.reliability.unordered = !initConfig.Get("ordered").As<Napi::Boolean>();
+        }
+
+        if(initConfig.Get("maxPacketLifeTime").IsNumber() && initConfig.Get("maxRetransmits").IsNumber())
+        {
+            Napi::TypeError::New(env, "Wrong DataChannel Init Config, maxPacketLifeTime and maxRetransmits are exclusive").ThrowAsJavaScriptException();
+            return info.Env().Null();
+        }
+
+        if (initConfig.Get("maxPacketLifeTime").IsNumber())
+        {
+            init.reliability.type = rtc::Reliability::Type::Timed;
+            init.reliability.rexmit = std::chrono::milliseconds(initConfig.Get("maxPacketLifeTime").As<Napi::Number>().Uint32Value());
+        }
+        else if (initConfig.Get("maxRetransmits").IsNumber())
+        {
+            init.reliability.type = rtc::Reliability::Type::Rexmit;
+            init.reliability.rexmit = int(initConfig.Get("maxRetransmits").As<Napi::Number>().Uint32Value());
+        }
+        else
+        {
+            init.reliability.type = rtc::Reliability::Type::Reliable;
+        }
     }
 
     try
     {
         std::string label = info[0].As<Napi::String>().ToString();
-        std::shared_ptr<rtc::DataChannel> dataChannel = mRtcPeerConnPtr->createDataChannel(label, init);
+        std::shared_ptr<rtc::DataChannel> dataChannel = mRtcPeerConnPtr->createDataChannel(label, std::move(init));
         auto instance = DataChannelWrapper::constructor.New({Napi::External<std::shared_ptr<rtc::DataChannel>>::New(info.Env(), &dataChannel)});
         return instance;
     }
