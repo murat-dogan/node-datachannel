@@ -91,6 +91,7 @@ peer2.onDataChannel((dc) => {
 // export interface DataChannelInitConfig {
 //     protocol?: string;
 //     negotiated?: boolean;
+//     id?: number;
 //     ordered?: boolean;
 //     maxPacketLifeTime?: number;
 //     maxRetransmits?: number;

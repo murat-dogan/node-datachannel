@@ -315,6 +315,17 @@ Napi::Value PeerConnectionWrapper::createDataChannel(const Napi::CallbackInfo &i
         }
 
         Napi::Object initConfig = info[1].As<Napi::Object>();
+
+        if (!initConfig.Get("protocol").IsUndefined())
+        {
+            if (!initConfig.Get("protocol").IsString())
+            {
+                Napi::TypeError::New(env, "Wrong DataChannel Init Config (protocol)").ThrowAsJavaScriptException();
+                return info.Env().Null();
+            }
+            init.protocol = initConfig.Get("protocol").As<Napi::String>();
+        }
+
         if (!initConfig.Get("negotiated").IsUndefined())
         {
             if (!initConfig.Get("negotiated").IsBoolean())
@@ -325,14 +336,14 @@ Napi::Value PeerConnectionWrapper::createDataChannel(const Napi::CallbackInfo &i
             init.negotiated = initConfig.Get("negotiated").As<Napi::Boolean>();
         }
 
-        if (!initConfig.Get("protocol").IsUndefined())
+        if (!initConfig.Get("id").IsUndefined())
         {
-            if (!initConfig.Get("protocol").IsString())
+            if (!initConfig.Get("id").IsNumber())
             {
-                Napi::TypeError::New(env, "Wrong DataChannel Init Config (protocol)").ThrowAsJavaScriptException();
+                Napi::TypeError::New(env, "Wrong DataChannel Init Config (id)").ThrowAsJavaScriptException();
                 return info.Env().Null();
             }
-            init.protocol = initConfig.Get("protocol").As<Napi::String>();
+            init.id = uint16_t(initConfig.Get("id").As<Napi::Number>().Uint32Value());
         }
 
         // Deprecated reliability object, kept for retro-compatibility
