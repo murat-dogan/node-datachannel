@@ -43,14 +43,15 @@ export interface IceServer {
     relayType?: RelayType;
 }
 
+export type TransportPolicy = 'all' | 'relay';
 export interface RtcConfig {
     iceServers: (string | IceServer)[];
     proxyServer?: ProxyServer;
     enableIceTcp?: boolean;
-    portRangeBegin?: Number;
-    portRangeEnd?: Number;
-    maxMessageSize?: Number;
-    iceTransportPolicy?: 'all' | 'relay';
+    portRangeBegin?: number;
+    portRangeEnd?: number;
+    maxMessageSize?: number;
+    iceTransportPolicy?: TransportPolicy;
 }
 
 export const enum DescriptionType {
@@ -64,13 +65,19 @@ export const enum ReliabilityType {
 }
 
 export interface DataChannelInitConfig {
-    reliability: {
-        type: ReliabilityType;
-        unordered: boolean;
-        rexmit: number;
+    protocol?: string;
+    negotiated?: boolean;
+    id?: number;
+    ordered?: boolean;
+    maxPacketLifeTime?: number;
+    maxRetransmits?: number;
+
+    // Deprecated, use ordered, maxPacketLifeTime, and maxRetransmits
+    reliability?: {
+        type?: ReliabilityType;
+        unordered?: boolean;
+        rexmit?: number;
     }
-    negotiated: boolean;
-    protocol: string;
 }
 
 export interface SelectedCandidateInfo {

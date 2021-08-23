@@ -29,12 +29,15 @@ let dc1 = null;
 let dc2 = null;
 
 // Config options
-// iceServers: string[];
-// proxyServer?: ProxyServer;
-// enableIceTcp?: boolean;
-// portRangeBegin?: Number;
-// portRangeEnd?: Number;
-// iceTransportPolicy?: 'all' | 'relay';
+// export interface RtcConfig {
+//     iceServers: string[];
+//     proxyServer?: ProxyServer;
+//     enableIceTcp?: boolean;
+//     portRangeBegin?: number;
+//     portRangeEnd?: number;
+//     maxMessageSize?: number;
+//     iceTransportPolicy?: TransportPolicy;
+// }
 
 // "iceServers" option is an array of stun/turn server urls
 // Examples;
