@@ -50,6 +50,7 @@ export interface RtcConfig {
     portRangeBegin?: Number;
     portRangeEnd?: Number;
     maxMessageSize?: Number;
+    iceTransportPolicy?: 'all' | 'relay';
 }
 
 export const enum DescriptionType {
