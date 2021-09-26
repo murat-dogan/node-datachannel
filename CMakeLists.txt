@@ -27,7 +27,7 @@ include(FetchContent)
 FetchContent_Declare(
     libdatachannel
     GIT_REPOSITORY https://github.com/paullouisageneau/libdatachannel.git
-    GIT_TAG "v0.15.1"
+    GIT_TAG "v0.15.2"
 )
 
 FetchContent_GetProperties(libdatachannel)
