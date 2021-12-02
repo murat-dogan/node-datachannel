@@ -3,6 +3,14 @@
 #include <sstream>
 
 Napi::FunctionReference PeerConnectionWrapper::constructor;
+std::unordered_set<PeerConnectionWrapper*> PeerConnectionWrapper::instances;
+
+void PeerConnectionWrapper::CloseAll()
+{
+    auto copy(instances);
+    for(auto inst : copy)
+        inst->doClose();
+}
 
 Napi::Object PeerConnectionWrapper::Init(Napi::Env env, Napi::Object exports)
 {
@@ -187,9 +195,18 @@ PeerConnectionWrapper::PeerConnectionWrapper(const Napi::CallbackInfo &info) : N
         Napi::Error::New(env, std::string("libdatachannel error while creating peerConnection# ") + ex.what()).ThrowAsJavaScriptException();
         return;
     }
+
+    instances.insert(this);
 }
 
 PeerConnectionWrapper::~PeerConnectionWrapper()
+{
+    doClose();
+
+    instances.erase(this);
+}
+
+void PeerConnectionWrapper::doClose()
 {
     if (mRtcPeerConnPtr)
     {
@@ -215,16 +232,7 @@ void PeerConnectionWrapper::close(const Napi::CallbackInfo &info)
         return;
     }
 
-    try
-    {
-        mRtcPeerConnPtr->close();
-        mRtcPeerConnPtr.reset();
-    }
-    catch (std::exception &ex)
-    {
-        Napi::Error::New(env, std::string("libdatachannel error while closing peerConnection# ") + ex.what()).ThrowAsJavaScriptException();
-        return;
-    }
+    doClose();
 }
 
 void PeerConnectionWrapper::setRemoteDescription(const Napi::CallbackInfo &info)

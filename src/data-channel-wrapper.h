@@ -5,8 +5,11 @@
 #include <string>
 #include <variant>
 #include <memory>
+#include <unordered_set>
+
 #include <napi.h>
 #include <napi-thread-safe-callback.hpp>
+
 #include "rtc/rtc.hpp"
 
 class DataChannelWrapper : public Napi::ObjectWrap<DataChannelWrapper>
@@ -36,7 +39,14 @@ public:
   void onBufferedAmountLow(const Napi::CallbackInfo &info);
   void onMessage(const Napi::CallbackInfo &info);
 
+  // Close all existing DataChannels
+  static void CloseAll();
+
 private:
+  static std::unordered_set<DataChannelWrapper*> instances;
+
+  void doClose();
+
   std::string mLabel;
   std::shared_ptr<rtc::DataChannel> mDataChannelPtr = nullptr;
 

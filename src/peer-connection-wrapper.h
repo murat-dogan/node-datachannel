@@ -5,8 +5,11 @@
 #include <string>
 #include <variant>
 #include <memory>
+#include <unordered_set>
+
 #include <napi.h>
 #include <napi-thread-safe-callback.hpp>
+
 #include "rtc/rtc.hpp"
 
 class PeerConnectionWrapper : public Napi::ObjectWrap<PeerConnectionWrapper>
@@ -35,8 +38,15 @@ public:
   Napi::Value rtt(const Napi::CallbackInfo &info);
   Napi::Value getSelectedCandidatePair(const Napi::CallbackInfo &info);
 
+  // Close all existing DataChannels
+  static void CloseAll();
+
 private:
   static Napi::FunctionReference constructor;
+  static std::unordered_set<PeerConnectionWrapper*> instances;
+
+  void doClose();
+
   std::string mPeerName;
   std::shared_ptr<rtc::PeerConnection> mRtcPeerConnPtr = nullptr;
 

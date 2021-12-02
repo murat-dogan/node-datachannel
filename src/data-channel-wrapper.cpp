@@ -1,6 +1,14 @@
 #include "data-channel-wrapper.h"
 
 Napi::FunctionReference DataChannelWrapper::constructor;
+std::unordered_set<DataChannelWrapper*> DataChannelWrapper::instances;
+
+void DataChannelWrapper::CloseAll()
+{
+    auto copy(instances);
+    for(auto inst : copy)
+        inst->doClose();
+}
 
 Napi::Object DataChannelWrapper::Init(Napi::Env env, Napi::Object exports)
 {
@@ -35,9 +43,18 @@ Napi::Object DataChannelWrapper::Init(Napi::Env env, Napi::Object exports)
 DataChannelWrapper::DataChannelWrapper(const Napi::CallbackInfo &info) : Napi::ObjectWrap<DataChannelWrapper>(info)
 {
     mDataChannelPtr = *(info[0].As<Napi::External<std::shared_ptr<rtc::DataChannel>>>().Data());
+
+    instances.insert(this);
 }
 
 DataChannelWrapper::~DataChannelWrapper()
+{
+    doClose();
+
+    instances.erase(this);
+}
+
+void DataChannelWrapper::doClose()
 {
     if (mDataChannelPtr)
     {
@@ -63,16 +80,7 @@ void DataChannelWrapper::close(const Napi::CallbackInfo &info)
         return;
     }
 
-    try
-    {
-        mDataChannelPtr->close();
-        mDataChannelPtr.reset();
-    }
-    catch (std::exception &ex)
-    {
-        Napi::Error::New(env, std::string("libdatachannel error while closing dataChannel# ") + ex.what()).ThrowAsJavaScriptException();
-        return;
-    }
+    doClose();
 }
 
 Napi::Value DataChannelWrapper::getLabel(const Napi::CallbackInfo &info)
