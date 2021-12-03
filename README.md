@@ -152,11 +152,6 @@ Prebuilt binaries are available (Node Version >= 10);
 > npm i
 ```
 
-Build with libnice support
-```sh
-> npm run install-nice
-```
-
 Other Options
 ```sh
 > npm run install -- -DUSE_GNUTLS=1  # Use GnuTLS instead of OpenSSL (Default False)
