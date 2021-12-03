@@ -231,13 +231,6 @@ void PeerConnectionWrapper::doClose()
 
 void PeerConnectionWrapper::close(const Napi::CallbackInfo &info)
 {
-    Napi::Env env = info.Env();
-    if (!mRtcPeerConnPtr)
-    {
-        Napi::Error::New(info.Env(), "It seems peer-connection is closed").ThrowAsJavaScriptException();
-        return;
-    }
-
     doClose();
 }
 

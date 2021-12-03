@@ -80,13 +80,6 @@ void DataChannelWrapper::doClose()
 
 void DataChannelWrapper::close(const Napi::CallbackInfo &info)
 {
-    Napi::Env env = info.Env();
-    if (!mDataChannelPtr)
-    {
-        Napi::Error::New(env, "It seems data-channel is destroyed!").ThrowAsJavaScriptException();
-        return;
-    }
-
     doClose();
 }
 
