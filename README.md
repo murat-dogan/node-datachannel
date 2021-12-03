@@ -159,8 +159,8 @@ Build with libnice support
 
 Other Options
 ```sh
-> npm run install -- -DUSE_GNUTLS=1   # Use GNU TLS instead of OpenSSL (Default False)
-> npm run install -- -DUSE_SRTP=1   # Enable SRTP for media support ( Default False)
+> npm run install -- -DUSE_GNUTLS=1  # Use GnuTLS instead of OpenSSL (Default False)
+> npm run install -- -DUSE_NICE=1    # Use libnice instead of libjuice (Default False)
 ```
 
 ### Test
