@@ -272,7 +272,11 @@ void DataChannelWrapper::onOpen(const Napi::CallbackInfo &info)
 
     mDataChannelPtr->onOpen([&]() {
         if (mOnOpenCallback)
-            mOnOpenCallback->call([](Napi::Env env, std::vector<napi_value> &args) {
+            mOnOpenCallback->call([this](Napi::Env env, std::vector<napi_value> &args) {
+                // Check the peer connection is not closed
+                if(instances.find(this) == instances.end())
+                    throw ThreadSafeCallback::CancelException();
+
                 // This will run in main thread and needs to construct the
                 // arguments for the call
                 args = {};
@@ -296,7 +300,11 @@ void DataChannelWrapper::onClosed(const Napi::CallbackInfo &info)
 
     mDataChannelPtr->onClosed([&]() {
         if (mOnClosedCallback)
-            mOnClosedCallback->call([](Napi::Env env, std::vector<napi_value> &args) {
+            mOnClosedCallback->call([this](Napi::Env env, std::vector<napi_value> &args) {
+                // Check the peer connection is not closed
+                if(instances.find(this) == instances.end())
+                    throw ThreadSafeCallback::CancelException();
+
                 // This will run in main thread and needs to construct the
                 // arguments for the call
                 args = {};
@@ -320,7 +328,11 @@ void DataChannelWrapper::onError(const Napi::CallbackInfo &info)
 
     mDataChannelPtr->onError([&](const std::string &error) {
         if (mOnErrorCallback)
-            mOnErrorCallback->call([error](Napi::Env env, std::vector<napi_value> &args) {
+            mOnErrorCallback->call([this, error](Napi::Env env, std::vector<napi_value> &args) {
+                // Check the peer connection is not closed
+                if(instances.find(this) == instances.end())
+                    throw ThreadSafeCallback::CancelException();
+
                 // This will run in main thread and needs to construct the
                 // arguments for the call
                 args = {Napi::String::New(env, error)};
@@ -344,7 +356,11 @@ void DataChannelWrapper::onAvailable(const Napi::CallbackInfo &info)
 
     mDataChannelPtr->onAvailable([&]() {
         if (mOnAvailableCallback)
-            mOnAvailableCallback->call([](Napi::Env env, std::vector<napi_value> &args) {
+            mOnAvailableCallback->call([this](Napi::Env env, std::vector<napi_value> &args) {
+                // Check the peer connection is not closed
+                if(instances.find(this) == instances.end())
+                    throw ThreadSafeCallback::CancelException();
+
                 // This will run in main thread and needs to construct the
                 // arguments for the call
                 args = {};
@@ -368,7 +384,11 @@ void DataChannelWrapper::onBufferedAmountLow(const Napi::CallbackInfo &info)
 
     mDataChannelPtr->onBufferedAmountLow([&]() {
         if (mOnBufferedAmountLowCallback)
-            mOnBufferedAmountLowCallback->call([](Napi::Env env, std::vector<napi_value> &args) {
+            mOnBufferedAmountLowCallback->call([this](Napi::Env env, std::vector<napi_value> &args) {
+                // Check the peer connection is not closed
+                if(instances.find(this) == instances.end())
+                    throw ThreadSafeCallback::CancelException();
+
                 // This will run in main thread and needs to construct the
                 // arguments for the call
                 args = {};
@@ -392,7 +412,11 @@ void DataChannelWrapper::onMessage(const Napi::CallbackInfo &info)
 
     mDataChannelPtr->onMessage([&](const std::variant<rtc::binary, std::string> &message) {
         if (mOnMessageCallback)
-            mOnMessageCallback->call([message](Napi::Env env, std::vector<napi_value> &args) {
+            mOnMessageCallback->call([this, message](Napi::Env env, std::vector<napi_value> &args) {
+                // Check the peer connection is not closed
+                if(instances.find(this) == instances.end())
+                    throw ThreadSafeCallback::CancelException();
+
                 // This will run in main thread and needs to construct the
                 // arguments for the call
                 Napi::Object payload = Napi::Object::New(env);
