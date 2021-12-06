@@ -1,0 +1,58 @@
+#include "thread-safe-callback.h"
+
+const char* ThreadSafeCallback::CancelException::what() const throw()
+{
+    return "ThreadSafeCallback cancelled";
+}
+
+ThreadSafeCallback::ThreadSafeCallback(Napi::Function callback)
+{
+    if (!callback.IsFunction())
+        throw Napi::Error::New(callback.Env(), "Callback must be a function");
+
+    auto env = callback.Env();
+
+    receiver = Napi::Persistent(static_cast<Napi::Value>(Napi::Object::New(env)));
+    tsfn = tsfn_t::New(env,
+                       std::move(callback),
+                       "ThreadSafeCallback callback",
+                       0, 1, &receiver);
+}
+
+ThreadSafeCallback::~ThreadSafeCallback()
+{
+    tsfn.Abort();
+}
+
+void ThreadSafeCallback::call(arg_func_t argFunc)
+{
+    CallbackData *data = new CallbackData{std::move(argFunc)};
+    if (tsfn.BlockingCall(data) != napi_ok)
+        delete data;
+}
+
+void ThreadSafeCallback::callbackFunc(Napi::Env env,
+                                      Napi::Function callback,
+                                      Napi::Reference<Napi::Value> *context,
+                                      CallbackData *data)
+{
+    if (!data)
+        return;
+
+    arg_vector_t args;
+    arg_func_t argFunc(std::move(data->argFunc));
+    delete data;
+
+    try
+    {
+        argFunc(env, args);
+    }
+    catch (CancelException &)
+    {
+        return;
+    }
+
+    if (env && callback)
+        callback.Call(context->Value(), args);
+}
+

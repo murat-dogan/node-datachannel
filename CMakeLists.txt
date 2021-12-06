@@ -44,6 +44,7 @@ add_library(${PROJECT_NAME} SHARED
     src/rtc-wrapper.cpp
     src/data-channel-wrapper.cpp
     src/peer-connection-wrapper.cpp
+    src/thread-safe-callback.cpp
     src/main.cpp
     ${CMAKE_JS_SRC}
 )

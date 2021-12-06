@@ -8,9 +8,9 @@
 #include <unordered_set>
 
 #include <napi.h>
-#include <napi-thread-safe-callback.hpp>
+#include <rtc/rtc.hpp>
 
-#include "rtc/rtc.hpp"
+#include "thread-safe-callback.h"
 
 class PeerConnectionWrapper : public Napi::ObjectWrap<PeerConnectionWrapper>
 {
