@@ -48,14 +48,14 @@ private:
   void doClose();
 
   std::string mPeerName;
-  std::shared_ptr<rtc::PeerConnection> mRtcPeerConnPtr = nullptr;
+  std::unique_ptr<rtc::PeerConnection> mRtcPeerConnPtr = nullptr;
 
   // Callback Ptrs
-  std::shared_ptr<ThreadSafeCallback> mOnLocalDescriptionCallback = nullptr;
-  std::shared_ptr<ThreadSafeCallback> mOnLocalCandidateCallback = nullptr;
-  std::shared_ptr<ThreadSafeCallback> mOnStateChangeCallback = nullptr;
-  std::shared_ptr<ThreadSafeCallback> mOnGatheringStateChangeCallback = nullptr;
-  std::shared_ptr<ThreadSafeCallback> mOnDataChannelCallback = nullptr;
+  std::unique_ptr<ThreadSafeCallback> mOnLocalDescriptionCallback = nullptr;
+  std::unique_ptr<ThreadSafeCallback> mOnLocalCandidateCallback = nullptr;
+  std::unique_ptr<ThreadSafeCallback> mOnStateChangeCallback = nullptr;
+  std::unique_ptr<ThreadSafeCallback> mOnGatheringStateChangeCallback = nullptr;
+  std::unique_ptr<ThreadSafeCallback> mOnDataChannelCallback = nullptr;
 
   // Helpers
   std::string candidateTypeToString(const rtc::Candidate::Type &type);

@@ -50,8 +50,6 @@ DataChannelWrapper::DataChannelWrapper(const Napi::CallbackInfo &info) : Napi::O
 DataChannelWrapper::~DataChannelWrapper()
 {
     doClose();
-
-    instances.erase(this);
 }
 
 void DataChannelWrapper::doClose()
@@ -60,6 +58,13 @@ void DataChannelWrapper::doClose()
     {
         try
         {
+            mOnOpenCallback.reset();
+            mOnClosedCallback.reset();
+            mOnErrorCallback.reset();
+            mOnAvailableCallback.reset();
+            mOnBufferedAmountLowCallback.reset();
+            mOnMessageCallback.reset();
+
             mDataChannelPtr->close();
             mDataChannelPtr.reset();
         }
@@ -69,6 +74,8 @@ void DataChannelWrapper::doClose()
             return;
         }
     }
+
+    instances.erase(this);
 }
 
 void DataChannelWrapper::close(const Napi::CallbackInfo &info)
@@ -268,7 +275,7 @@ void DataChannelWrapper::onOpen(const Napi::CallbackInfo &info)
     }
 
     // Callback
-    mOnOpenCallback = std::make_shared<ThreadSafeCallback>(info[0].As<Napi::Function>());
+    mOnOpenCallback = std::make_unique<ThreadSafeCallback>(info[0].As<Napi::Function>());
 
     mDataChannelPtr->onOpen([&]() {
         if (mOnOpenCallback)
@@ -292,7 +299,7 @@ void DataChannelWrapper::onClosed(const Napi::CallbackInfo &info)
     }
 
     // Callback
-    mOnClosedCallback = std::make_shared<ThreadSafeCallback>(info[0].As<Napi::Function>());
+    mOnClosedCallback = std::make_unique<ThreadSafeCallback>(info[0].As<Napi::Function>());
 
     mDataChannelPtr->onClosed([&]() {
         if (mOnClosedCallback)
@@ -316,7 +323,7 @@ void DataChannelWrapper::onError(const Napi::CallbackInfo &info)
     }
 
     // Callback
-    mOnErrorCallback = std::make_shared<ThreadSafeCallback>(info[0].As<Napi::Function>());
+    mOnErrorCallback = std::make_unique<ThreadSafeCallback>(info[0].As<Napi::Function>());
 
     mDataChannelPtr->onError([&](const std::string &error) {
         if (mOnErrorCallback)
@@ -340,7 +347,7 @@ void DataChannelWrapper::onAvailable(const Napi::CallbackInfo &info)
     }
 
     // Callback
-    mOnAvailableCallback = std::make_shared<ThreadSafeCallback>(info[0].As<Napi::Function>());
+    mOnAvailableCallback = std::make_unique<ThreadSafeCallback>(info[0].As<Napi::Function>());
 
     mDataChannelPtr->onAvailable([&]() {
         if (mOnAvailableCallback)
@@ -364,7 +371,7 @@ void DataChannelWrapper::onBufferedAmountLow(const Napi::CallbackInfo &info)
     }
 
     // Callback
-    mOnBufferedAmountLowCallback = std::make_shared<ThreadSafeCallback>(info[0].As<Napi::Function>());
+    mOnBufferedAmountLowCallback = std::make_unique<ThreadSafeCallback>(info[0].As<Napi::Function>());
 
     mDataChannelPtr->onBufferedAmountLow([&]() {
         if (mOnBufferedAmountLowCallback)
@@ -388,7 +395,7 @@ void DataChannelWrapper::onMessage(const Napi::CallbackInfo &info)
     }
 
     // Callback
-    mOnMessageCallback = std::make_shared<ThreadSafeCallback>(info[0].As<Napi::Function>());
+    mOnMessageCallback = std::make_unique<ThreadSafeCallback>(info[0].As<Napi::Function>());
 
     mDataChannelPtr->onMessage([&](const std::variant<rtc::binary, std::string> &message) {
         if (mOnMessageCallback)

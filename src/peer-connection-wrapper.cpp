@@ -188,7 +188,7 @@ PeerConnectionWrapper::PeerConnectionWrapper(const Napi::CallbackInfo &info) : N
     // Create peer-connection
     try
     {
-        mRtcPeerConnPtr = std::make_shared<rtc::PeerConnection>(rtcConfig);
+        mRtcPeerConnPtr = std::make_unique<rtc::PeerConnection>(rtcConfig);
     }
     catch (std::exception &ex)
     {
@@ -202,8 +202,6 @@ PeerConnectionWrapper::PeerConnectionWrapper(const Napi::CallbackInfo &info) : N
 PeerConnectionWrapper::~PeerConnectionWrapper()
 {
     doClose();
-
-    instances.erase(this);
 }
 
 void PeerConnectionWrapper::doClose()
@@ -212,6 +210,12 @@ void PeerConnectionWrapper::doClose()
     {
         try
         {
+            mOnLocalDescriptionCallback.reset();
+            mOnLocalCandidateCallback.reset();
+            mOnStateChangeCallback.reset();
+            mOnGatheringStateChangeCallback.reset();
+            mOnDataChannelCallback.reset();
+
             mRtcPeerConnPtr->close();
             mRtcPeerConnPtr.reset();
         }
@@ -221,6 +225,8 @@ void PeerConnectionWrapper::doClose()
             return;
         }
     }
+
+    instances.erase(this);
 }
 
 void PeerConnectionWrapper::close(const Napi::CallbackInfo &info)
@@ -476,7 +482,7 @@ void PeerConnectionWrapper::onLocalDescription(const Napi::CallbackInfo &info)
     }
 
     // Callback
-    mOnLocalDescriptionCallback = std::make_shared<ThreadSafeCallback>(info[0].As<Napi::Function>());
+    mOnLocalDescriptionCallback = std::make_unique<ThreadSafeCallback>(info[0].As<Napi::Function>());
 
     mRtcPeerConnPtr->onLocalDescription([&](const rtc::Description &sdp) {
         if (mOnLocalDescriptionCallback)
@@ -502,7 +508,7 @@ void PeerConnectionWrapper::onLocalCandidate(const Napi::CallbackInfo &info)
     }
 
     // Callback
-    mOnLocalCandidateCallback = std::make_shared<ThreadSafeCallback>(info[0].As<Napi::Function>());
+    mOnLocalCandidateCallback = std::make_unique<ThreadSafeCallback>(info[0].As<Napi::Function>());
 
     mRtcPeerConnPtr->onLocalCandidate([&](const rtc::Candidate &candidate) {
         if (mOnLocalCandidateCallback)
@@ -528,7 +534,7 @@ void PeerConnectionWrapper::onStateChange(const Napi::CallbackInfo &info)
     }
 
     // Callback
-    mOnStateChangeCallback = std::make_shared<ThreadSafeCallback>(info[0].As<Napi::Function>());
+    mOnStateChangeCallback = std::make_unique<ThreadSafeCallback>(info[0].As<Napi::Function>());
 
     mRtcPeerConnPtr->onStateChange([&](rtc::PeerConnection::State state) {
         if (mOnStateChangeCallback)
@@ -554,7 +560,7 @@ void PeerConnectionWrapper::onGatheringStateChange(const Napi::CallbackInfo &inf
     }
 
     // Callback
-    mOnGatheringStateChangeCallback = std::make_shared<ThreadSafeCallback>(info[0].As<Napi::Function>());
+    mOnGatheringStateChangeCallback = std::make_unique<ThreadSafeCallback>(info[0].As<Napi::Function>());
 
     mRtcPeerConnPtr->onGatheringStateChange([&](rtc::PeerConnection::GatheringState state) {
         if (mOnGatheringStateChangeCallback)
@@ -580,7 +586,7 @@ void PeerConnectionWrapper::onDataChannel(const Napi::CallbackInfo &info)
     }
 
     // Callback
-    mOnDataChannelCallback = std::make_shared<ThreadSafeCallback>(info[0].As<Napi::Function>());
+    mOnDataChannelCallback = std::make_unique<ThreadSafeCallback>(info[0].As<Napi::Function>());
 
     mRtcPeerConnPtr->onDataChannel([&](std::shared_ptr<rtc::DataChannel> dc) {
         if (mOnDataChannelCallback)
