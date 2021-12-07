@@ -54,8 +54,14 @@ set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "" SUFFIX ".node")
 
 target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_SOURCE_DIR}/node_modules/node-addon-api
-    ${CMAKE_SOURCE_DIR}/node_modules/napi-thread-safe-callback
     ${CMAKE_BINARY_DIR}/_deps/libdatachannel-src/include
+)
+
+# For compatibility with Node.js 12
+# This should be removed along with the napi-thread-safe-callback-cancellable dependency when dropping support at end-of-life
+target_compile_definitions(${PROJECT_NAME} PRIVATE -DLEGACY_NAPI_THREAD_SAFE_CALLBACK)
+target_include_directories(${PROJECT_NAME} PRIVATE
+    ${CMAKE_SOURCE_DIR}/node_modules/napi-thread-safe-callback-cancellable
 )
 
 set(LINK_LIBRARIES

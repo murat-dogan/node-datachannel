@@ -1,6 +1,12 @@
 #ifndef THREAD_SAFE_CALLBACK_H
 #define THREAD_SAFE_CALLBACK_H
 
+#ifdef LEGACY_NAPI_THREAD_SAFE_CALLBACK
+
+#include "napi-thread-safe-callback.hpp"
+
+#else
+
 #include <napi.h>
 
 #include <vector>
@@ -44,6 +50,8 @@ private:
     Napi::Reference<Napi::Value> receiver;
     tsfn_t tsfn;
 };
+
+#endif // LEGACY_NAPI_THREAD_SAFE_CALLBACK
 
 #endif // THREAD_SAFE_CALLBACK_H
 
