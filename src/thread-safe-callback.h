@@ -23,12 +23,14 @@ public:
 
     void call(arg_func_t argFunc);
 
-    class CancelException : public std::exception {
+    class CancelException : public std::exception
+    {
         const char* what() const throw();
     };
 
 private:
-    struct CallbackData {
+    struct CallbackData
+    {
         arg_func_t argFunc;
     };
 

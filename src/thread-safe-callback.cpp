@@ -27,7 +27,8 @@ ThreadSafeCallback::~ThreadSafeCallback()
 void ThreadSafeCallback::call(arg_func_t argFunc)
 {
     CallbackData *data = new CallbackData{std::move(argFunc)};
-    if (tsfn.BlockingCall(data) != napi_ok) {
+    if (tsfn.BlockingCall(data) != napi_ok)
+    {
         delete data;
         throw std::runtime_error("Failed to call JavaScript callback");
     }
