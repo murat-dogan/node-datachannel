@@ -96,5 +96,6 @@ setTimeout(() => {
     peer1 = null;
     peer2 = null;
     nodeDataChannel.cleanup();
-    process.exit();
+    // No need for this (>= V0.1.14)
+    // process.exit();
 }, 5 * 1000);

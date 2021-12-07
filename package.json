@@ -1,6 +1,6 @@
 {
   "name": "node-datachannel",
-  "version": "0.1.13",
+  "version": "0.1.14-dev",
   "description": "libdatachannel node bindings",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
@@ -24,7 +24,16 @@
   "keywords": [
     "libdatachannel"
   ],
-  "author": "Murat Doğan",
+  "contributors": [
+    {
+      "name": "Murat Doğan",
+      "url": "https://github.com/murat-dogan"
+    },
+    {
+      "name": "Paul-Louis Ageneau",
+      "url": "https://github.com/paullouisageneau"
+    }
+  ],
   "license": "GPL-2.0-or-later",
   "gypfile": true,
   "bugs": {
