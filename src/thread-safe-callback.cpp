@@ -10,7 +10,7 @@ ThreadSafeCallback::ThreadSafeCallback(Napi::Function callback)
     if (!callback.IsFunction())
         throw Napi::Error::New(callback.Env(), "Callback must be a function");
 
-    auto env = callback.Env();
+    Napi::Env env = callback.Env();
 
     receiver = Napi::Persistent(static_cast<Napi::Value>(Napi::Object::New(env)));
     tsfn = tsfn_t::New(env,
@@ -27,8 +27,10 @@ ThreadSafeCallback::~ThreadSafeCallback()
 void ThreadSafeCallback::call(arg_func_t argFunc)
 {
     CallbackData *data = new CallbackData{std::move(argFunc)};
-    if (tsfn.BlockingCall(data) != napi_ok)
+    if (tsfn.BlockingCall(data) != napi_ok) {
         delete data;
+        throw std::runtime_error("Failed to call JavaScript callback");
+    }
 }
 
 void ThreadSafeCallback::callbackFunc(Napi::Env env,
