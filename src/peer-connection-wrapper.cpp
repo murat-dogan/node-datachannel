@@ -1,8 +1,17 @@
 #include "peer-connection-wrapper.h"
 #include "data-channel-wrapper.h"
+
 #include <sstream>
 
 Napi::FunctionReference PeerConnectionWrapper::constructor;
+std::unordered_set<PeerConnectionWrapper*> PeerConnectionWrapper::instances;
+
+void PeerConnectionWrapper::CloseAll()
+{
+    auto copy(instances);
+    for(auto inst : copy)
+        inst->doClose();
+}
 
 Napi::Object PeerConnectionWrapper::Init(Napi::Env env, Napi::Object exports)
 {
@@ -180,21 +189,36 @@ PeerConnectionWrapper::PeerConnectionWrapper(const Napi::CallbackInfo &info) : N
     // Create peer-connection
     try
     {
-        mRtcPeerConnPtr = std::make_shared<rtc::PeerConnection>(rtcConfig);
+        mRtcPeerConnPtr = std::make_unique<rtc::PeerConnection>(rtcConfig);
     }
     catch (std::exception &ex)
     {
         Napi::Error::New(env, std::string("libdatachannel error while creating peerConnection# ") + ex.what()).ThrowAsJavaScriptException();
         return;
     }
+
+    instances.insert(this);
 }
 
 PeerConnectionWrapper::~PeerConnectionWrapper()
 {
+    doClose();
+}
+
+void PeerConnectionWrapper::doClose()
+{
+    instances.erase(this);
+
     if (mRtcPeerConnPtr)
     {
         try
         {
+            mOnLocalDescriptionCallback.reset();
+            mOnLocalCandidateCallback.reset();
+            mOnStateChangeCallback.reset();
+            mOnGatheringStateChangeCallback.reset();
+            mOnDataChannelCallback.reset();
+
             mRtcPeerConnPtr->close();
             mRtcPeerConnPtr.reset();
         }
@@ -208,23 +232,7 @@ PeerConnectionWrapper::~PeerConnectionWrapper()
 
 void PeerConnectionWrapper::close(const Napi::CallbackInfo &info)
 {
-    Napi::Env env = info.Env();
-    if (!mRtcPeerConnPtr)
-    {
-        Napi::Error::New(info.Env(), "It seems peer-connection is closed").ThrowAsJavaScriptException();
-        return;
-    }
-
-    try
-    {
-        mRtcPeerConnPtr->close();
-        mRtcPeerConnPtr.reset();
-    }
-    catch (std::exception &ex)
-    {
-        Napi::Error::New(env, std::string("libdatachannel error while closing peerConnection# ") + ex.what()).ThrowAsJavaScriptException();
-        return;
-    }
+    doClose();
 }
 
 void PeerConnectionWrapper::setRemoteDescription(const Napi::CallbackInfo &info)
@@ -468,11 +476,15 @@ void PeerConnectionWrapper::onLocalDescription(const Napi::CallbackInfo &info)
     }
 
     // Callback
-    mOnLocalDescriptionCallback = std::make_shared<ThreadSafeCallback>(info[0].As<Napi::Function>());
+    mOnLocalDescriptionCallback = std::make_unique<ThreadSafeCallback>(info[0].As<Napi::Function>());
 
     mRtcPeerConnPtr->onLocalDescription([&](const rtc::Description &sdp) {
         if (mOnLocalDescriptionCallback)
-            mOnLocalDescriptionCallback->call([sdp](Napi::Env env, std::vector<napi_value> &args) {
+            mOnLocalDescriptionCallback->call([this, sdp](Napi::Env env, std::vector<napi_value> &args) {
+                // Check the peer connection is not closed
+                if(instances.find(this) == instances.end())
+                    throw ThreadSafeCallback::CancelException();
+
                 // This will run in main thread and needs to construct the
                 // arguments for the call
                 args = {
@@ -494,11 +506,15 @@ void PeerConnectionWrapper::onLocalCandidate(const Napi::CallbackInfo &info)
     }
 
     // Callback
-    mOnLocalCandidateCallback = std::make_shared<ThreadSafeCallback>(info[0].As<Napi::Function>());
+    mOnLocalCandidateCallback = std::make_unique<ThreadSafeCallback>(info[0].As<Napi::Function>());
 
     mRtcPeerConnPtr->onLocalCandidate([&](const rtc::Candidate &candidate) {
         if (mOnLocalCandidateCallback)
-            mOnLocalCandidateCallback->call([candidate](Napi::Env env, std::vector<napi_value> &args) {
+            mOnLocalCandidateCallback->call([this, candidate](Napi::Env env, std::vector<napi_value> &args) {
+                 // Check the peer connection is not closed
+                if(instances.find(this) == instances.end())
+                    throw ThreadSafeCallback::CancelException();
+
                 // This will run in main thread and needs to construct the
                 // arguments for the call
                 args = {
@@ -520,11 +536,15 @@ void PeerConnectionWrapper::onStateChange(const Napi::CallbackInfo &info)
     }
 
     // Callback
-    mOnStateChangeCallback = std::make_shared<ThreadSafeCallback>(info[0].As<Napi::Function>());
+    mOnStateChangeCallback = std::make_unique<ThreadSafeCallback>(info[0].As<Napi::Function>());
 
     mRtcPeerConnPtr->onStateChange([&](rtc::PeerConnection::State state) {
         if (mOnStateChangeCallback)
-            mOnStateChangeCallback->call([state](Napi::Env env, std::vector<napi_value> &args) {
+            mOnStateChangeCallback->call([this, state](Napi::Env env, std::vector<napi_value> &args) {
+                // Check the peer connection is not closed
+                if(instances.find(this) == instances.end())
+                    throw ThreadSafeCallback::CancelException();
+
                 // This will run in main thread and needs to construct the
                 // arguments for the call
                 std::ostringstream stream;
@@ -546,11 +566,15 @@ void PeerConnectionWrapper::onGatheringStateChange(const Napi::CallbackInfo &inf
     }
 
     // Callback
-    mOnGatheringStateChangeCallback = std::make_shared<ThreadSafeCallback>(info[0].As<Napi::Function>());
+    mOnGatheringStateChangeCallback = std::make_unique<ThreadSafeCallback>(info[0].As<Napi::Function>());
 
     mRtcPeerConnPtr->onGatheringStateChange([&](rtc::PeerConnection::GatheringState state) {
         if (mOnGatheringStateChangeCallback)
-            mOnGatheringStateChangeCallback->call([state](Napi::Env env, std::vector<napi_value> &args) {
+            mOnGatheringStateChangeCallback->call([this, state](Napi::Env env, std::vector<napi_value> &args) {
+                // Check the peer connection is not closed
+                if(instances.find(this) == instances.end())
+                    throw ThreadSafeCallback::CancelException();
+
                 // This will run in main thread and needs to construct the
                 // arguments for the call
                 std::ostringstream stream;
@@ -572,11 +596,15 @@ void PeerConnectionWrapper::onDataChannel(const Napi::CallbackInfo &info)
     }
 
     // Callback
-    mOnDataChannelCallback = std::make_shared<ThreadSafeCallback>(info[0].As<Napi::Function>());
+    mOnDataChannelCallback = std::make_unique<ThreadSafeCallback>(info[0].As<Napi::Function>());
 
     mRtcPeerConnPtr->onDataChannel([&](std::shared_ptr<rtc::DataChannel> dc) {
         if (mOnDataChannelCallback)
-            mOnDataChannelCallback->call([dc](Napi::Env env, std::vector<napi_value> &args) {
+            mOnDataChannelCallback->call([this, dc](Napi::Env env, std::vector<napi_value> &args) {
+                // Check the peer connection is not closed
+                if(instances.find(this) == instances.end())
+                    throw ThreadSafeCallback::CancelException();
+
                 // This will run in main thread and needs to construct the
                 // arguments for the call
                 std::shared_ptr<rtc::DataChannel> dataChannel = dc;

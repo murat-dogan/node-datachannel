@@ -27,7 +27,7 @@ include(FetchContent)
 FetchContent_Declare(
     libdatachannel
     GIT_REPOSITORY https://github.com/paullouisageneau/libdatachannel.git
-    GIT_TAG "v0.15.6"
+    GIT_TAG "v0.16.0"
 )
 
 option(NO_MEDIA "Disable media transport support in libdatachannel" ON)
@@ -44,6 +44,7 @@ add_library(${PROJECT_NAME} SHARED
     src/rtc-wrapper.cpp
     src/data-channel-wrapper.cpp
     src/peer-connection-wrapper.cpp
+    src/thread-safe-callback.cpp
     src/main.cpp
     ${CMAKE_JS_SRC}
 )

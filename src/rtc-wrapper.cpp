@@ -1,4 +1,9 @@
 #include "rtc-wrapper.h"
+#include "peer-connection-wrapper.h"
+#include "data-channel-wrapper.h"
+
+#include <chrono>
+#include <future>
 
 Napi::Object RtcWrapper::Init(Napi::Env env, Napi::Object exports)
 {
@@ -69,7 +74,12 @@ void RtcWrapper::cleanup(const Napi::CallbackInfo &info)
     Napi::Env env = info.Env();
     try
     {
-        rtc::Cleanup();
+        PeerConnectionWrapper::CloseAll();
+        DataChannelWrapper::CloseAll();
+
+        const auto timeout = std::chrono::seconds(10);
+        if(rtc::Cleanup().wait_for(std::chrono::seconds(timeout)) == std::future_status::timeout)
+            throw std::runtime_error("cleanup timeout (possible deadlock)");
     }
     catch (std::exception &ex)
     {

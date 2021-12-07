@@ -5,9 +5,12 @@
 #include <string>
 #include <variant>
 #include <memory>
+#include <unordered_set>
+
 #include <napi.h>
-#include <napi-thread-safe-callback.hpp>
-#include "rtc/rtc.hpp"
+#include <rtc/rtc.hpp>
+
+#include "thread-safe-callback.h"
 
 class PeerConnectionWrapper : public Napi::ObjectWrap<PeerConnectionWrapper>
 {
@@ -35,17 +38,24 @@ public:
   Napi::Value rtt(const Napi::CallbackInfo &info);
   Napi::Value getSelectedCandidatePair(const Napi::CallbackInfo &info);
 
+  // Close all existing DataChannels
+  static void CloseAll();
+
 private:
   static Napi::FunctionReference constructor;
+  static std::unordered_set<PeerConnectionWrapper*> instances;
+
+  void doClose();
+
   std::string mPeerName;
-  std::shared_ptr<rtc::PeerConnection> mRtcPeerConnPtr = nullptr;
+  std::unique_ptr<rtc::PeerConnection> mRtcPeerConnPtr = nullptr;
 
   // Callback Ptrs
-  std::shared_ptr<ThreadSafeCallback> mOnLocalDescriptionCallback = nullptr;
-  std::shared_ptr<ThreadSafeCallback> mOnLocalCandidateCallback = nullptr;
-  std::shared_ptr<ThreadSafeCallback> mOnStateChangeCallback = nullptr;
-  std::shared_ptr<ThreadSafeCallback> mOnGatheringStateChangeCallback = nullptr;
-  std::shared_ptr<ThreadSafeCallback> mOnDataChannelCallback = nullptr;
+  std::unique_ptr<ThreadSafeCallback> mOnLocalDescriptionCallback = nullptr;
+  std::unique_ptr<ThreadSafeCallback> mOnLocalCandidateCallback = nullptr;
+  std::unique_ptr<ThreadSafeCallback> mOnStateChangeCallback = nullptr;
+  std::unique_ptr<ThreadSafeCallback> mOnGatheringStateChangeCallback = nullptr;
+  std::unique_ptr<ThreadSafeCallback> mOnDataChannelCallback = nullptr;
 
   // Helpers
   std::string candidateTypeToString(const rtc::Candidate::Type &type);
