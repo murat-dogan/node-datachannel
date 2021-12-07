@@ -207,6 +207,8 @@ PeerConnectionWrapper::~PeerConnectionWrapper()
 
 void PeerConnectionWrapper::doClose()
 {
+    instances.erase(this);
+
     if (mRtcPeerConnPtr)
     {
         try
@@ -226,8 +228,6 @@ void PeerConnectionWrapper::doClose()
             return;
         }
     }
-
-    instances.erase(this);
 }
 
 void PeerConnectionWrapper::close(const Napi::CallbackInfo &info)

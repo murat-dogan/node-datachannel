@@ -54,6 +54,8 @@ DataChannelWrapper::~DataChannelWrapper()
 
 void DataChannelWrapper::doClose()
 {
+    instances.erase(this);
+
     if (mDataChannelPtr)
     {
         try
@@ -74,8 +76,6 @@ void DataChannelWrapper::doClose()
             return;
         }
     }
-
-    instances.erase(this);
 }
 
 void DataChannelWrapper::close(const Napi::CallbackInfo &info)
