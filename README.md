@@ -7,6 +7,7 @@
   - No need to deal with WebRTC stack!
   - Small binary sizes
 - Has Prebuilt binaries (Linux,Windows,ARM)
+- Type infos for Typescript
 
 > "libdatachannel is a standalone implementation of WebRTC Data Channels, WebRTC Media Transport, and WebSockets in C++17 with C bindings for POSIX platforms (including GNU/Linux, Android, and Apple macOS) and Microsoft Windows. It enables direct connectivity between native applications and web browsers without the pain of importing the entire WebRTC stack. "
 
