@@ -22,7 +22,7 @@
     "url": "git+https://github.com/murat-dogan/node-datachannel.git"
   },
   "keywords": [
-    "libdatachannel"
+    "libdatachannel", "webrtc", "p2p", "peer-to-peer", "datachannel", "data channel"
   ],
   "contributors": [
     {

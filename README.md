@@ -1,60 +1,31 @@
-# node-datachannel - libdatachannel node bindings
+# Easy to use WebRTC data channels and media transport
 
 ![Build CI](https://github.com/murat-dogan/node-datachannel/workflows/Build%20CI/badge.svg)
 
 > "libdatachannel is a standalone implementation of WebRTC Data Channels, WebRTC Media Transport, and WebSockets in C++17 with C bindings for POSIX platforms (including GNU/Linux, Android, and Apple macOS) and Microsoft Windows. It enables direct connectivity between native applications and web browsers without the pain of importing the entire WebRTC stack. "
 
-NodeJS bindings for [libdatachannel](https://github.com/paullouisageneau/libdatachannel) library.
+- Easy to use
+- Lightweight
+- Has Prebuilt binaries
+
+
+This project is NodeJS bindings for [libdatachannel](https://github.com/paullouisageneau/libdatachannel) library.
 
 Please check [libdatachannel](https://github.com/paullouisageneau/libdatachannel) for Compatibility & WebRTC details.
 
-## Examples
+## Example Usage
 ```js
 const nodeDataChannel = require('node-datachannel');
 
 // Log Level
 nodeDataChannel.initLogger("Debug");
 
-// SCTP Settings ( use of nodeDataChannel.setSctpSettings() )
-// export interface SctpSettings {
-//     recvBufferSize?: number;
-//     sendBufferSize?: number;
-//     maxChunksOnQueue?: number;
-//     initialCongestionWindow?: number;
-//     congestionControlModule?: number;
-//     delayedSackTime?: number;
-// }
-
 let dc1 = null;
 let dc2 = null;
-
-// Config options
-// export interface RtcConfig {
-//     iceServers: string[];
-//     proxyServer?: ProxyServer;
-//     enableIceTcp?: boolean;
-//     portRangeBegin?: number;
-//     portRangeEnd?: number;
-//     maxMessageSize?: number;
-//     iceTransportPolicy?: TransportPolicy;
-// }
-
-// "iceServers" option is an array of stun/turn server urls
-// Examples;
-// STUN Server Example          : stun:stun.l.google.com:19302
-// TURN Server Example          : turn:USERNAME:PASSWORD@TURN_IP_OR_ADDRESS:PORT
-// TURN Server Example (TCP)    : turn:USERNAME:PASSWORD@TURN_IP_OR_ADDRESS:PORT?transport=tcp
-// TURN Server Example (TLS)    : turns:USERNAME:PASSWORD@TURN_IP_OR_ADDRESS:PORT
 
 let peer1 = new nodeDataChannel.PeerConnection("Peer1", { iceServers: ["stun:stun.l.google.com:19302"] });
 
 // Set Callbacks
-peer1.onStateChange((state) => {
-    console.log("Peer1 State:", state);
-});
-peer1.onGatheringStateChange((state) => {
-    console.log("Peer1 GatheringState:", state);
-});
 peer1.onLocalDescription((sdp, type) => {
     console.log("Peer1 SDP:", sdp, " Type:", type);
     peer2.setRemoteDescription(sdp, type);
@@ -67,12 +38,6 @@ peer1.onLocalCandidate((candidate, mid) => {
 let peer2 = new nodeDataChannel.PeerConnection("Peer2", { iceServers: ["stun:stun.l.google.com:19302"] });
 
 // Set Callbacks
-peer2.onStateChange((state) => {
-    console.log("Peer2 State:", state);
-});
-peer2.onGatheringStateChange((state) => {
-    console.log("Peer2 GatheringState:", state);
-});
 peer2.onLocalDescription((sdp, type) => {
     console.log("Peer2 SDP:", sdp, " Type:", type);
     peer1.setRemoteDescription(sdp, type);
@@ -90,27 +55,12 @@ peer2.onDataChannel((dc) => {
     dc2.sendMessage("Hello From Peer2");
 });
 
-// DataChannel Options
-// export interface DataChannelInitConfig {
-//     protocol?: string;
-//     negotiated?: boolean;
-//     id?: number;
-//     ordered?: boolean;
-//     maxPacketLifeTime?: number;
-//     maxRetransmits?: number;
-//
-//     // Deprecated, use ordered, maxPacketLifeTime, and maxRetransmits
-//     reliability?: {
-//         type?: ReliabilityType;
-//         unordered?: boolean;
-//         rexmit?: number;
-//     }
-// }
 dc1 = peer1.createDataChannel("test");
+
 dc1.onOpen(() => {
     dc1.sendMessage("Hello from Peer1");
-    // Binary message: Use sendMessageBinary(Buffer)
 });
+
 dc1.onMessage((msg) => {
     console.log('Peer1 Received Msg:', msg);
 });
@@ -120,10 +70,6 @@ setTimeout(() => {
     dc2.close();
     peer1.close();
     peer2.close();
-    dc1 = null;
-    dc2 = null;
-    peer1 = null;
-    peer2 = null;
     nodeDataChannel.cleanup();
 }, 10 * 1000);
 ```
@@ -137,6 +83,212 @@ Prebuilt binaries are available (Node Version >= 10);
 ```sh
 > npm install node-datachannel --save
 ```
+
+## API
+
+###  PeerConnection Class
+
+**Constructor**
+
+let pc = new PeerConnection(peerName[,options])
+- peerName `<string>` Peer name to use for logs etc..
+- options `<Object>` WebRTC Config Options
+```
+export interface RtcConfig {
+    iceServers: (string | IceServer)[];
+    proxyServer?: ProxyServer;
+    enableIceTcp?: boolean;
+    portRangeBegin?: number;
+    portRangeEnd?: number;
+    maxMessageSize?: number;
+    iceTransportPolicy?: TransportPolicy;
+}
+
+export const enum RelayType {
+    TurnUdp = 'TurnUdp',
+    TurnTcp = 'TurnTcp',
+    TurnTls = 'TurnTls'
+}
+
+export interface IceServer {
+    hostname: string;
+    port: Number;
+    username?: string;
+    password?: string;
+    relayType?: RelayType;
+}
+
+export type TransportPolicy = 'all' | 'relay';
+
+"iceServers" option is an array of stun/turn server urls
+Examples;
+STUN Server Example          : stun:stun.l.google.com:19302
+TURN Server Example          : turn:USERNAME:PASSWORD@TURN_IP_OR_ADDRESS:PORT
+TURN Server Example (TCP)    : turn:USERNAME:PASSWORD@TURN_IP_OR_ADDRESS:PORT?transport=tcp
+TURN Server Example (TLS)    : turns:USERNAME:PASSWORD@TURN_IP_OR_ADDRESS:PORT
+
+``` 
+
+**close: () => void**
+
+Close Peer Connection
+
+**setRemoteDescription: (sdp: string, type: DescriptionType) => void**
+
+Set Remote Description
+```
+export const enum DescriptionType {
+    Unspec = 'Unspec',
+    Offer = 'Offer',
+    Answer = 'Answer'
+}
+```
+
+**addRemoteCandidate: (candidate: string, mid: string) => void**
+
+Add remote candidate info
+
+**createDataChannel: (label: string, config?: DataChannelInitConfig) => DataChannel**
+
+Create new data-channel
+* label `<string>` Data channel name
+* config `<Object>` Data channel options
+```
+export interface DataChannelInitConfig {
+    protocol?: string;
+    negotiated?: boolean;
+    id?: number;
+    ordered?: boolean;
+    maxPacketLifeTime?: number;
+    maxRetransmits?: number;
+
+    // Deprecated, use ordered, maxPacketLifeTime, and maxRetransmits
+    reliability?: {
+        type?: ReliabilityType;
+        unordered?: boolean;
+        rexmit?: number;
+    }
+}
+
+export const enum ReliabilityType {
+    Reliable = 0, Rexmit = 1, Timed = 2
+}
+``` 
+
+**onLocalDescription: (cb: (sdp: string, type: DescriptionType) => void) => void**
+
+Local Description Callback
+```
+export const enum DescriptionType {
+    Unspec = 'Unspec',
+    Offer = 'Offer',
+    Answer = 'Answer'
+}
+```
+
+**onLocalCandidate: (cb: (candidate: string, mid: string) => void) => void**
+
+Local Candidate Callback
+
+**onStateChange: (cb: (state: string) => void) => void**
+
+State Change Callback
+
+**onGatheringStateChange: (state: (sdp: string) => void) => void**
+
+Gathering State Change Callback
+
+**onDataChannel: (cb: (dc: DataChannel) => void) => void**
+
+New Data Channel Callback
+
+**bytesSent: () => number**
+
+Get bytes sent stat
+
+**bytesReceived: () => number**
+
+Get bytes received stat
+
+**rtt: () => number**
+
+Get rtt stat
+
+**getSelectedCandidatePair: () => { local: SelectedCandidateInfo, remote: SelectedCandidateInfo }**
+
+Get info about selected candidate pair
+```
+export interface SelectedCandidateInfo {
+    address: string;
+    port: number;
+    type: string;
+    transportType: string;
+}
+```
+
+###  DataChannel Class
+
+> You can create a new Datachannel instance by calling `PeerConnection.createDataChannel` function.
+
+**close: () => void**
+
+Close data channel 
+
+**getLabel: () => string**
+
+Get label of data-channel
+
+**sendMessage: (msg: string) => boolean**
+
+Send Message as string
+
+**sendMessageBinary: (buffer: Buffer) => boolean**
+
+Send Message as binary
+
+**isOpen: () => boolean**
+
+Query data-channel
+
+**availableAmount: () => Number**
+
+Get available data amount
+
+**bufferedAmount: () => Number**
+
+Get current buffered amount level
+
+**maxMessageSize: () => Number**
+
+Get max message size of the data-channel, that could be sent
+
+**setBufferedAmountLowThreshold: (newSize: Number) => void**
+
+Set buffer level of the `onBufferedAmountLow` callback
+
+**onOpen: (cb: () => void) => void**
+
+Open callback
+
+**onClosed: (cb: () => void) => void**
+
+Closed callback
+
+**onError: (cb: (err: string) => void) => void**
+
+Error callback
+
+**onAvailable: (cb: () => void) => void**
+
+Available callback
+
+**onBufferedAmountLow: (cb: () => void) => void**
+
+Buffer level low callback
+
+**onMessage: (cb: (msg: string | Buffer) => void) => void**
+
+New Message callback
 
 ## Build
 
