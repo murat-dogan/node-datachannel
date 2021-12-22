@@ -87,6 +87,15 @@ export interface SelectedCandidateInfo {
     transportType: string;
 }
 
+// Must be same as rtc enum class Direction
+export enum Direction {
+    SendOnly = 1,
+    RecvOnly = 2,
+    SendRecv = 3,
+    Inactive = 4,
+    Unknown = 0
+}
+
 export class DataChannel {
     close: () => void;
     getLabel: () => string;
