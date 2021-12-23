@@ -183,7 +183,7 @@ export class PeerConnection {
     localDescription: () => { type: string, sdp: string };
     addRemoteCandidate: (candidate: string, mid: string) => void;
     createDataChannel: (label: string, config?: DataChannelInitConfig) => DataChannel;
-    addTrack: (media: Video | Audio) => void;
+    addTrack: (media: Video | Audio) => Track;
     hasMedia: () => boolean;
     onLocalDescription: (cb: (sdp: string, type: DescriptionType) => void) => void;
     onLocalCandidate: (cb: (candidate: string, mid: string) => void) => void;
