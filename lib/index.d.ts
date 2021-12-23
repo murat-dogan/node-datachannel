@@ -89,11 +89,11 @@ export interface SelectedCandidateInfo {
 
 // Must be same as rtc enum class Direction
 export enum Direction {
-    SendOnly = 1,
-    RecvOnly = 2,
-    SendRecv = 3,
-    Inactive = 4,
-    Unknown = 0
+    SendOnly = 'SendOnly',
+    RecvOnly = 'RecvOnly',
+    SendRecv = 'SendRecv',
+    Inactive = 'Inactive',
+    Unknown = 'Unknown'
 }
 
 export class DataChannel {
