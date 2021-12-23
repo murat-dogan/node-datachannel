@@ -133,7 +133,7 @@ void VideoWrapper::addH264Codec(const Napi::CallbackInfo &info)
     }
 
     int payloadType = info[0].As<Napi::Number>().ToNumber();
-    std::optional<std::string> profile = rtc::DEFAULT_H264_VIDEO_PROFILE;
+    std::string profile = rtc::DEFAULT_H264_VIDEO_PROFILE;
 
     if (length > 1)
     {
@@ -144,7 +144,7 @@ void VideoWrapper::addH264Codec(const Napi::CallbackInfo &info)
         }
         profile = info[1].As<Napi::String>().ToString();
     }
-
+    
     mVideoPtr->addH264Codec(payloadType, profile);
 }
 
