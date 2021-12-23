@@ -19,6 +19,7 @@ public:
   static Napi::Object Init(Napi::Env env, Napi::Object exports);
   RtcpReceivingSessionWrapper(const Napi::CallbackInfo &info);
   ~RtcpReceivingSessionWrapper();
+  std::shared_ptr<rtc::RtcpReceivingSession> getSessionInstance();
 
   // Functions
   void requestBitrate(const Napi::CallbackInfo &info);

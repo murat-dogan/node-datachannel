@@ -1,5 +1,6 @@
 #include "media-track-wrapper.h"
 #include "media-direction.h"
+#include "media-rtcpreceivingsession-wrapper.h"
 
 Napi::FunctionReference TrackWrapper::constructor;
 std::unordered_set<TrackWrapper *> TrackWrapper::instances;
@@ -60,8 +61,14 @@ void TrackWrapper::doClose()
     {
         try
         {
-            if (mTrackPtr->isOpen())
-                mTrackPtr->close();
+            mOnOpenCallback.reset();
+            mOnClosedCallback.reset();
+            mOnErrorCallback.reset();
+            mOnAvailableCallback.reset();
+            mOnBufferedAmountLowCallback.reset();
+            mOnMessageCallback.reset();
+
+            mTrackPtr->close();
             mTrackPtr.reset();
         }
         catch (std::exception &ex)
@@ -261,14 +268,14 @@ void TrackWrapper::setMediaHandler(const Napi::CallbackInfo &info)
     Napi::Env env = info.Env();
     int length = info.Length();
 
-    if (length < 1 || !info[0].IsExternal())
+    if (length < 1 || !info[0].IsObject())
     {
         Napi::TypeError::New(env, "Mediahandler class instance expected").ThrowAsJavaScriptException();
         return;
     }
 
-    std::shared_ptr<rtc::MediaHandler> handler = *(info[0].As<Napi::External<std::shared_ptr<rtc::MediaHandler>>>().Data());
-    mTrackPtr->setMediaHandler(handler);
+    RtcpReceivingSessionWrapper *handler = Napi::ObjectWrap<RtcpReceivingSessionWrapper>::Unwrap(info[0].As<Napi::Object>());
+    mTrackPtr->setMediaHandler(handler->getSessionInstance());
 }
 
 void TrackWrapper::onOpen(const Napi::CallbackInfo &info)
@@ -427,6 +434,7 @@ void TrackWrapper::onMessage(const Napi::CallbackInfo &info)
 
     mTrackPtr->onMessage([&](const std::variant<rtc::binary, std::string> &message)
                          {
+                             std::cout << 1 << std::endl;
         if (mOnMessageCallback)
             mOnMessageCallback->call([this, message](Napi::Env env, std::vector<napi_value> &args) {
                 // Check the peer connection is not closed

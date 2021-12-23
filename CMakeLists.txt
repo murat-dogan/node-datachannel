@@ -43,6 +43,7 @@ endif()
 add_library(${PROJECT_NAME} SHARED
     src/rtc-wrapper.cpp
     src/media-direction.cpp
+    src/media-rtcpreceivingsession-wrapper.cpp
     src/media-track-wrapper.cpp
     src/media-audio-wrapper.cpp
     src/media-video-wrapper.cpp

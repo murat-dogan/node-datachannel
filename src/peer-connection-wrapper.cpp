@@ -1,6 +1,7 @@
 #include "peer-connection-wrapper.h"
 #include "data-channel-wrapper.h"
 #include "media-track-wrapper.h"
+#include "media-video-wrapper.h"
 
 #include <sstream>
 
@@ -23,7 +24,9 @@ Napi::Object PeerConnectionWrapper::Init(Napi::Env env, Napi::Object exports)
         "PeerConnection",
         {
             InstanceMethod("close", &PeerConnectionWrapper::close),
+            InstanceMethod("setLocalDescription", &PeerConnectionWrapper::setLocalDescription),
             InstanceMethod("setRemoteDescription", &PeerConnectionWrapper::setRemoteDescription),
+            InstanceMethod("localDescription", &PeerConnectionWrapper::localDescription),
             InstanceMethod("addRemoteCandidate", &PeerConnectionWrapper::addRemoteCandidate),
             InstanceMethod("createDataChannel", &PeerConnectionWrapper::createDataChannel),
             InstanceMethod("addTrack", &PeerConnectionWrapper::addTrack),
@@ -241,6 +244,42 @@ void PeerConnectionWrapper::close(const Napi::CallbackInfo &info)
     doClose();
 }
 
+void PeerConnectionWrapper::setLocalDescription(const Napi::CallbackInfo &info)
+{
+    Napi::Env env = info.Env();
+    if (!mRtcPeerConnPtr)
+    {
+        Napi::Error::New(info.Env(), "It seems peer-connection is closed").ThrowAsJavaScriptException();
+        return;
+    }
+
+    int length = info.Length();
+
+    rtc::Description::Type type = rtc::Description::Type::Unspec;
+
+    // optional
+    if (length > 0)
+    {
+        if (!info[0].IsString())
+        {
+            Napi::TypeError::New(env, "type (String) expected").ThrowAsJavaScriptException();
+            return;
+        }
+        std::string typeStr = info[0].As<Napi::String>().ToString();
+
+        if (typeStr == "Answer")
+            type = rtc::Description::Type::Answer;
+        if (typeStr == "Offer")
+            type = rtc::Description::Type::Offer;
+        if (typeStr == "Pranswer")
+            type = rtc::Description::Type::Pranswer;
+        if (typeStr == "Rollback")
+            type = rtc::Description::Type::Rollback;
+    }
+
+    mRtcPeerConnPtr->setLocalDescription(type);
+}
+
 void PeerConnectionWrapper::setRemoteDescription(const Napi::CallbackInfo &info)
 {
     Napi::Env env = info.Env();
@@ -270,6 +309,17 @@ void PeerConnectionWrapper::setRemoteDescription(const Napi::CallbackInfo &info)
         Napi::Error::New(env, std::string("libdatachannel error while adding remote decsription # ") + ex.what()).ThrowAsJavaScriptException();
         return;
     }
+}
+
+Napi::Value PeerConnectionWrapper::localDescription(const Napi::CallbackInfo &info)
+{
+    Napi::Env env = info.Env();
+    std::optional<rtc::Description> desc = mRtcPeerConnPtr->localDescription();
+
+    Napi::Object obj = Napi::Object::New(env);
+    obj.Set("type", desc->typeString());
+    obj.Set("sdp", desc.value());
+    return obj;
 }
 
 void PeerConnectionWrapper::addRemoteCandidate(const Napi::CallbackInfo &info)
@@ -764,18 +814,17 @@ Napi::Value PeerConnectionWrapper::addTrack(const Napi::CallbackInfo &info)
         return env.Null();
     }
 
-    if (length < 1 || !info[0].IsExternal())
+    if (length < 1 || !info[0].IsObject())
     {
         Napi::TypeError::New(env, "Media class instance expected").ThrowAsJavaScriptException();
         return env.Null();
     }
 
-    rtc::Description::Media *mediaPtr = info[0].As<Napi::External<rtc::Description::Media>>().Data();
-
     try
     {
-        std::shared_ptr<rtc::Track> track = mRtcPeerConnPtr->addTrack(*mediaPtr);
-        auto instance = PeerConnectionWrapper::constructor.New({Napi::External<std::shared_ptr<rtc::Track>>::New(info.Env(), &track)});
+        VideoWrapper *videoPtr = Napi::ObjectWrap<VideoWrapper>::Unwrap(info[0].As<Napi::Object>());
+        std::shared_ptr<rtc::Track> track = mRtcPeerConnPtr->addTrack(videoPtr->getVideoInstance());
+        auto instance = TrackWrapper::constructor.New({Napi::External<std::shared_ptr<rtc::Track>>::New(info.Env(), &track)});
         return instance;
     }
     catch (std::exception &ex)

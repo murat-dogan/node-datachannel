@@ -16,6 +16,8 @@ public:
   VideoWrapper(const Napi::CallbackInfo &info);
   ~VideoWrapper();
 
+  rtc::Description::Video getVideoInstance();
+
   // Functions
   void addVideoCodec(const Napi::CallbackInfo &info);
   void addH264Codec(const Napi::CallbackInfo &info);

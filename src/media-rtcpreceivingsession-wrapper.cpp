@@ -18,7 +18,7 @@ Napi::Object RtcpReceivingSessionWrapper::Init(Napi::Env env, Napi::Object expor
     constructor = Napi::Persistent(func);
     constructor.SuppressDestruct();
 
-    exports.Set("RtcpReceivingSessionWrapper", func);
+    exports.Set("RtcpReceivingSession", func);
     return exports;
 }
 
@@ -33,6 +33,11 @@ RtcpReceivingSessionWrapper::~RtcpReceivingSessionWrapper()
 {
     mSessionPtr.reset();
     instances.erase(this);
+}
+
+std::shared_ptr<rtc::RtcpReceivingSession> RtcpReceivingSessionWrapper::getSessionInstance()
+{
+    return mSessionPtr;
 }
 
 void RtcpReceivingSessionWrapper::requestBitrate(const Napi::CallbackInfo &info)

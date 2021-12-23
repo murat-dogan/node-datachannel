@@ -54,7 +54,7 @@ VideoWrapper::VideoWrapper(const Napi::CallbackInfo &info) : Napi::ObjectWrap<Vi
     rtc::Description::Direction dir = rtc::Description::Direction::Unknown;
 
     // optional
-    if (length > 1)
+    if (length > 0)
     {
         if (!info[0].IsString())
         {
@@ -65,7 +65,7 @@ VideoWrapper::VideoWrapper(const Napi::CallbackInfo &info) : Napi::ObjectWrap<Vi
     }
 
     // ootional
-    if (length > 2)
+    if (length > 1)
     {
         if (!info[1].IsString())
         {
@@ -78,7 +78,7 @@ VideoWrapper::VideoWrapper(const Napi::CallbackInfo &info) : Napi::ObjectWrap<Vi
     }
 
     mVideoPtr = std::make_unique<rtc::Description::Video>(mid, dir);
-
+    
     instances.insert(this);
 }
 
@@ -86,6 +86,11 @@ VideoWrapper::~VideoWrapper()
 {
     mVideoPtr.reset();
     instances.erase(this);
+}
+
+rtc::Description::Video VideoWrapper::getVideoInstance()
+{
+    return *(mVideoPtr.get());
 }
 
 void VideoWrapper::addVideoCodec(const Napi::CallbackInfo &info)
@@ -105,7 +110,7 @@ void VideoWrapper::addVideoCodec(const Napi::CallbackInfo &info)
 
     if (length > 2)
     {
-        if (!info[0].IsString())
+        if (!info[2].IsString())
         {
             Napi::TypeError::New(env, "profile (String) expected").ThrowAsJavaScriptException();
             return;
@@ -132,7 +137,7 @@ void VideoWrapper::addH264Codec(const Napi::CallbackInfo &info)
 
     if (length > 1)
     {
-        if (!info[0].IsString())
+        if (!info[1].IsString())
         {
             Napi::TypeError::New(env, "profile (String) expected").ThrowAsJavaScriptException();
             return;
