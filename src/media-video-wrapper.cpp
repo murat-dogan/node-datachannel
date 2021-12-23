@@ -1,4 +1,5 @@
 #include "media-video-wrapper.h"
+#include "media-direction.h"
 
 Napi::FunctionReference VideoWrapper::constructor;
 std::unordered_set<VideoWrapper *> VideoWrapper::instances;
@@ -20,7 +21,7 @@ Napi::Object VideoWrapper::Init(Napi::Env env, Napi::Object exports)
             Napi::ObjectWrap<VideoWrapper>::InstanceMethod("generateSdp", &VideoWrapper::generateSdp),
             Napi::ObjectWrap<VideoWrapper>::InstanceMethod("mid", &VideoWrapper::mid),
             Napi::ObjectWrap<VideoWrapper>::InstanceMethod("setDirection", &VideoWrapper::setDirection),
-            
+
             Napi::ObjectWrap<VideoWrapper>::InstanceMethod("description", &VideoWrapper::description),
             Napi::ObjectWrap<VideoWrapper>::InstanceMethod("removeFormat", &VideoWrapper::removeFormat),
             Napi::ObjectWrap<VideoWrapper>::InstanceMethod("addSSRC", &VideoWrapper::addSSRC),
@@ -73,15 +74,7 @@ VideoWrapper::VideoWrapper(const Napi::CallbackInfo &info) : Napi::ObjectWrap<Vi
         }
 
         std::string dirAsStr = info[1].As<Napi::String>().ToString();
-
-        if (dirAsStr == "SendOnly")
-            dir = rtc::Description::Direction::SendOnly;
-        if (dirAsStr == "SendRecv")
-            dir = rtc::Description::Direction::SendRecv;
-        if (dirAsStr == "RecvOnly")
-            dir = rtc::Description::Direction::RecvOnly;
-        if (dirAsStr == "Inactive")
-            dir = rtc::Description::Direction::Inactive;
+        dir = strToDirection(dirAsStr);
     }
 
     mVideoPtr = std::make_unique<rtc::Description::Video>(mid, dir);
@@ -91,6 +84,8 @@ VideoWrapper::VideoWrapper(const Napi::CallbackInfo &info) : Napi::ObjectWrap<Vi
 
 VideoWrapper::~VideoWrapper()
 {
+    mVideoPtr.reset();
+    instances.erase(this);
 }
 
 void VideoWrapper::addVideoCodec(const Napi::CallbackInfo &info)
@@ -183,39 +178,7 @@ void VideoWrapper::addVP9Codec(const Napi::CallbackInfo &info)
 Napi::Value VideoWrapper::direction(const Napi::CallbackInfo &info)
 {
     Napi::Env env = info.Env();
-
-    try
-    {
-        rtc::Description::Direction dir = mVideoPtr->direction();
-        std::string dirAsStr;
-        switch (dir)
-        {
-        case rtc::Description::Direction::Unknown:
-            dirAsStr = "Unknown";
-            break;
-        case rtc::Description::Direction::SendOnly:
-            dirAsStr = "SendOnly";
-            break;
-        case rtc::Description::Direction::RecvOnly:
-            dirAsStr = "RecvOnly";
-            break;
-        case rtc::Description::Direction::SendRecv:
-            dirAsStr = "SendRecv";
-            break;
-        case rtc::Description::Direction::Inactive:
-            dirAsStr = "Inactive";
-            break;
-        default:
-            dirAsStr = "UNKNOWN_DIR_TYPE";
-        }
-
-        return Napi::String::New(env, dirAsStr);
-    }
-    catch (std::exception &ex)
-    {
-        Napi::Error::New(env, std::string("libdatachannel error# ") + ex.what()).ThrowAsJavaScriptException();
-        return Napi::String::New(info.Env(), "");
-    }
+    return Napi::String::New(env, directionToStr(mVideoPtr->direction()));
 }
 
 Napi::Value VideoWrapper::generateSdp(const Napi::CallbackInfo &info)
@@ -254,17 +217,7 @@ void VideoWrapper::setDirection(const Napi::CallbackInfo &info)
     }
 
     std::string dirAsStr = info[0].As<Napi::String>().ToString();
-    rtc::Description::Direction dir = rtc::Description::Direction::Unknown;
-
-    if (dirAsStr == "SendOnly")
-        dir = rtc::Description::Direction::SendOnly;
-    if (dirAsStr == "SendRecv")
-        dir = rtc::Description::Direction::SendRecv;
-    if (dirAsStr == "RecvOnly")
-        dir = rtc::Description::Direction::RecvOnly;
-    if (dirAsStr == "Inactive")
-        dir = rtc::Description::Direction::Inactive;
-
+    rtc::Description::Direction dir = strToDirection(dirAsStr);
     mVideoPtr->setDirection(dir);
 }
 

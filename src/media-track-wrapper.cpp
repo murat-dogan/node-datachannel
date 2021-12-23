@@ -1,106 +1,99 @@
-#include "data-channel-wrapper.h"
+#include "media-track-wrapper.h"
+#include "media-direction.h"
 
-Napi::FunctionReference DataChannelWrapper::constructor;
-std::unordered_set<DataChannelWrapper *> DataChannelWrapper::instances;
+Napi::FunctionReference TrackWrapper::constructor;
+std::unordered_set<TrackWrapper *> TrackWrapper::instances;
 
-void DataChannelWrapper::CloseAll()
-{
-    auto copy(instances);
-    for (auto inst : copy)
-        inst->doClose();
-}
-
-Napi::Object DataChannelWrapper::Init(Napi::Env env, Napi::Object exports)
+Napi::Object TrackWrapper::Init(Napi::Env env, Napi::Object exports)
 {
     Napi::HandleScope scope(env);
 
     Napi::Function func = DefineClass(
         env,
-        "DataChannel",
+        "Track",
         {
-            InstanceMethod("close", &DataChannelWrapper::close),
-            InstanceMethod("getLabel", &DataChannelWrapper::getLabel),
-            InstanceMethod("sendMessage", &DataChannelWrapper::sendMessage),
-            InstanceMethod("sendMessageBinary", &DataChannelWrapper::sendMessageBinary),
-            InstanceMethod("isOpen", &DataChannelWrapper::isOpen),
-            InstanceMethod("availableAmount", &DataChannelWrapper::availableAmount),
-            InstanceMethod("bufferedAmount", &DataChannelWrapper::bufferedAmount),
-            InstanceMethod("maxMessageSize", &DataChannelWrapper::maxMessageSize),
-            InstanceMethod("setBufferedAmountLowThreshold", &DataChannelWrapper::setBufferedAmountLowThreshold),
-            InstanceMethod("onOpen", &DataChannelWrapper::onOpen),
-            InstanceMethod("onClosed", &DataChannelWrapper::onClosed),
-            InstanceMethod("onError", &DataChannelWrapper::onError),
-            InstanceMethod("onAvailable", &DataChannelWrapper::onAvailable),
-            InstanceMethod("onBufferedAmountLow", &DataChannelWrapper::onBufferedAmountLow),
-            InstanceMethod("onMessage", &DataChannelWrapper::onMessage),
+            InstanceMethod("direction", &TrackWrapper::direction),
+            InstanceMethod("mid", &TrackWrapper::mid),
+            InstanceMethod("close", &TrackWrapper::close),
+            InstanceMethod("sendMessage", &TrackWrapper::sendMessage),
+            InstanceMethod("sendMessageBinary", &TrackWrapper::sendMessageBinary),
+            InstanceMethod("isOpen", &TrackWrapper::isOpen),
+            InstanceMethod("isClosed", &TrackWrapper::isClosed),
+            InstanceMethod("availableAmount", &TrackWrapper::availableAmount),
+            InstanceMethod("bufferedAmount", &TrackWrapper::bufferedAmount),
+            InstanceMethod("maxMessageSize", &TrackWrapper::maxMessageSize),
+            InstanceMethod("setBufferedAmountLowThreshold", &TrackWrapper::setBufferedAmountLowThreshold),
+            InstanceMethod("requestKeyframe", &TrackWrapper::requestKeyframe),
+            InstanceMethod("setMediaHandler", &TrackWrapper::setMediaHandler),
+            InstanceMethod("onOpen", &TrackWrapper::onOpen),
+            InstanceMethod("onClosed", &TrackWrapper::onClosed),
+            InstanceMethod("onError", &TrackWrapper::onError),
+            InstanceMethod("onAvailable", &TrackWrapper::onAvailable),
+            InstanceMethod("onBufferedAmountLow", &TrackWrapper::onBufferedAmountLow),
+            InstanceMethod("onMessage", &TrackWrapper::onMessage),
         });
 
     constructor = Napi::Persistent(func);
     constructor.SuppressDestruct();
 
-    exports.Set("DataChannel", func);
+    exports.Set("Track", func);
     return exports;
 }
 
-DataChannelWrapper::DataChannelWrapper(const Napi::CallbackInfo &info) : Napi::ObjectWrap<DataChannelWrapper>(info)
+TrackWrapper::TrackWrapper(const Napi::CallbackInfo &info) : Napi::ObjectWrap<TrackWrapper>(info)
 {
-    mDataChannelPtr = *(info[0].As<Napi::External<std::shared_ptr<rtc::DataChannel>>>().Data());
+    mTrackPtr = *(info[0].As<Napi::External<std::shared_ptr<rtc::Track>>>().Data());
 
     instances.insert(this);
 }
 
-DataChannelWrapper::~DataChannelWrapper()
+TrackWrapper::~TrackWrapper()
 {
     doClose();
 }
 
-void DataChannelWrapper::doClose()
+void TrackWrapper::doClose()
 {
     instances.erase(this);
 
-    if (mDataChannelPtr)
+    if (mTrackPtr)
     {
         try
         {
-            mOnOpenCallback.reset();
-            mOnClosedCallback.reset();
-            mOnErrorCallback.reset();
-            mOnAvailableCallback.reset();
-            mOnBufferedAmountLowCallback.reset();
-            mOnMessageCallback.reset();
-
-            mDataChannelPtr->close();
-            mDataChannelPtr.reset();
+            if (mTrackPtr->isOpen())
+                mTrackPtr->close();
+            mTrackPtr.reset();
         }
         catch (std::exception &ex)
         {
-            std::cout << std::string("libdatachannel error while closing dataChannel# ") + ex.what() << std::endl;
+            std::cout << std::string("libdatachannel error while closing track# ") + ex.what() << std::endl;
             return;
         }
     }
 }
 
-void DataChannelWrapper::close(const Napi::CallbackInfo &info)
+Napi::Value TrackWrapper::direction(const Napi::CallbackInfo &info)
 {
-    doClose();
+    Napi::Env env = info.Env();
+    return Napi::String::New(env, directionToStr(mTrackPtr->direction()));
 }
 
-Napi::Value DataChannelWrapper::getLabel(const Napi::CallbackInfo &info)
+Napi::Value TrackWrapper::mid(const Napi::CallbackInfo &info)
 {
-    if (!mDataChannelPtr)
-    {
-        Napi::Error::New(info.Env(), "It seems data-channel is destroyed!").ThrowAsJavaScriptException();
-        return info.Env().Null();
-    }
-
-    return Napi::String::New(info.Env(), mDataChannelPtr->label());
+    Napi::Env env = info.Env();
+    return Napi::String::New(env, mTrackPtr->mid());
 }
 
-Napi::Value DataChannelWrapper::sendMessage(const Napi::CallbackInfo &info)
+void TrackWrapper::close(const Napi::CallbackInfo &info)
 {
-    if (!mDataChannelPtr)
+    mTrackPtr->close();
+}
+
+Napi::Value TrackWrapper::sendMessage(const Napi::CallbackInfo &info)
+{
+    if (!mTrackPtr)
     {
-        Napi::Error::New(info.Env(), "It seems data-channel is destroyed!").ThrowAsJavaScriptException();
+        Napi::Error::New(info.Env(), "It seems track is destroyed!").ThrowAsJavaScriptException();
         return info.Env().Null();
     }
 
@@ -116,20 +109,20 @@ Napi::Value DataChannelWrapper::sendMessage(const Napi::CallbackInfo &info)
 
     try
     {
-        return Napi::Boolean::New(info.Env(), mDataChannelPtr->send(info[0].As<Napi::String>().ToString()));
+        return Napi::Boolean::New(info.Env(), mTrackPtr->send(info[0].As<Napi::String>().ToString()));
     }
     catch (std::exception &ex)
     {
-        Napi::Error::New(env, std::string("libdatachannel error while sending dataChannel msg# ") + ex.what()).ThrowAsJavaScriptException();
+        Napi::Error::New(env, std::string("libdatachannel error while sending track msg# ") + ex.what()).ThrowAsJavaScriptException();
         return Napi::Boolean::New(info.Env(), false);
     }
 }
 
-Napi::Value DataChannelWrapper::sendMessageBinary(const Napi::CallbackInfo &info)
+Napi::Value TrackWrapper::sendMessageBinary(const Napi::CallbackInfo &info)
 {
-    if (!mDataChannelPtr)
+    if (!mTrackPtr)
     {
-        Napi::Error::New(info.Env(), "It seems data-channel is destroyed!").ThrowAsJavaScriptException();
+        Napi::Error::New(info.Env(), "It seems track is destroyed!").ThrowAsJavaScriptException();
         return info.Env().Null();
     }
 
@@ -145,45 +138,38 @@ Napi::Value DataChannelWrapper::sendMessageBinary(const Napi::CallbackInfo &info
     try
     {
         Napi::Uint8Array buffer = info[0].As<Napi::Uint8Array>();
-        return Napi::Boolean::New(info.Env(), mDataChannelPtr->send((std::byte *)buffer.Data(), buffer.ByteLength()));
+        return Napi::Boolean::New(info.Env(), mTrackPtr->send((std::byte *)buffer.Data(), buffer.ByteLength()));
     }
     catch (std::exception &ex)
     {
-        Napi::Error::New(env, std::string("libdatachannel error while sending dataChannel msg# ") + ex.what()).ThrowAsJavaScriptException();
+        Napi::Error::New(env, std::string("libdatachannel error while sending track msg# ") + ex.what()).ThrowAsJavaScriptException();
         return Napi::Boolean::New(info.Env(), false);
     }
 }
 
-Napi::Value DataChannelWrapper::isOpen(const Napi::CallbackInfo &info)
+Napi::Value TrackWrapper::isOpen(const Napi::CallbackInfo &info)
 {
     Napi::Env env = info.Env();
-    if (!mDataChannelPtr)
-    {
-        return Napi::Boolean::New(info.Env(), false);
-    }
-
-    try
-    {
-        return Napi::Boolean::New(info.Env(), mDataChannelPtr->isOpen());
-    }
-    catch (std::exception &ex)
-    {
-        Napi::Error::New(env, std::string("libdatachannel error# ") + ex.what()).ThrowAsJavaScriptException();
-        return Napi::Boolean::New(info.Env(), false);
-    }
+    return Napi::Boolean::New(env, mTrackPtr->isOpen());
 }
 
-Napi::Value DataChannelWrapper::availableAmount(const Napi::CallbackInfo &info)
+Napi::Value TrackWrapper::isClosed(const Napi::CallbackInfo &info)
 {
     Napi::Env env = info.Env();
-    if (!mDataChannelPtr)
+    return Napi::Boolean::New(env, mTrackPtr->isClosed());
+}
+
+Napi::Value TrackWrapper::availableAmount(const Napi::CallbackInfo &info)
+{
+    Napi::Env env = info.Env();
+    if (!mTrackPtr)
     {
         return Napi::Number::New(info.Env(), 0);
     }
 
     try
     {
-        return Napi::Number::New(info.Env(), mDataChannelPtr->availableAmount());
+        return Napi::Number::New(info.Env(), mTrackPtr->availableAmount());
     }
     catch (std::exception &ex)
     {
@@ -192,17 +178,17 @@ Napi::Value DataChannelWrapper::availableAmount(const Napi::CallbackInfo &info)
     }
 }
 
-Napi::Value DataChannelWrapper::bufferedAmount(const Napi::CallbackInfo &info)
+Napi::Value TrackWrapper::bufferedAmount(const Napi::CallbackInfo &info)
 {
     Napi::Env env = info.Env();
-    if (!mDataChannelPtr)
+    if (!mTrackPtr)
     {
         return Napi::Number::New(info.Env(), 0);
     }
 
     try
     {
-        return Napi::Number::New(info.Env(), mDataChannelPtr->bufferedAmount());
+        return Napi::Number::New(info.Env(), mTrackPtr->bufferedAmount());
     }
     catch (std::exception &ex)
     {
@@ -211,17 +197,17 @@ Napi::Value DataChannelWrapper::bufferedAmount(const Napi::CallbackInfo &info)
     }
 }
 
-Napi::Value DataChannelWrapper::maxMessageSize(const Napi::CallbackInfo &info)
+Napi::Value TrackWrapper::maxMessageSize(const Napi::CallbackInfo &info)
 {
     Napi::Env env = info.Env();
-    if (!mDataChannelPtr)
+    if (!mTrackPtr)
     {
         return Napi::Number::New(info.Env(), 0);
     }
 
     try
     {
-        return Napi::Number::New(info.Env(), mDataChannelPtr->maxMessageSize());
+        return Napi::Number::New(info.Env(), mTrackPtr->maxMessageSize());
     }
     catch (std::exception &ex)
     {
@@ -230,9 +216,9 @@ Napi::Value DataChannelWrapper::maxMessageSize(const Napi::CallbackInfo &info)
     }
 }
 
-void DataChannelWrapper::setBufferedAmountLowThreshold(const Napi::CallbackInfo &info)
+void TrackWrapper::setBufferedAmountLowThreshold(const Napi::CallbackInfo &info)
 {
-    if (!mDataChannelPtr)
+    if (!mTrackPtr)
     {
         Napi::Error::New(info.Env(), "It seems data-channel is destroyed!").ThrowAsJavaScriptException();
         return;
@@ -249,7 +235,7 @@ void DataChannelWrapper::setBufferedAmountLowThreshold(const Napi::CallbackInfo 
 
     try
     {
-        mDataChannelPtr->setBufferedAmountLowThreshold(info[0].ToNumber().Uint32Value());
+        mTrackPtr->setBufferedAmountLowThreshold(info[0].ToNumber().Uint32Value());
     }
     catch (std::exception &ex)
     {
@@ -258,7 +244,34 @@ void DataChannelWrapper::setBufferedAmountLowThreshold(const Napi::CallbackInfo 
     }
 }
 
-void DataChannelWrapper::onOpen(const Napi::CallbackInfo &info)
+Napi::Value TrackWrapper::requestKeyframe(const Napi::CallbackInfo &info)
+{
+    Napi::Env env = info.Env();
+    return Napi::Boolean::New(env, mTrackPtr->requestKeyframe());
+}
+
+void TrackWrapper::setMediaHandler(const Napi::CallbackInfo &info)
+{
+    if (!mTrackPtr)
+    {
+        Napi::Error::New(info.Env(), "It seems track is destroyed!").ThrowAsJavaScriptException();
+        return;
+    }
+
+    Napi::Env env = info.Env();
+    int length = info.Length();
+
+    if (length < 1 || !info[0].IsExternal())
+    {
+        Napi::TypeError::New(env, "Mediahandler class instance expected").ThrowAsJavaScriptException();
+        return;
+    }
+
+    std::shared_ptr<rtc::MediaHandler> handler = *(info[0].As<Napi::External<std::shared_ptr<rtc::MediaHandler>>>().Data());
+    mTrackPtr->setMediaHandler(handler);
+}
+
+void TrackWrapper::onOpen(const Napi::CallbackInfo &info)
 {
     Napi::Env env = info.Env();
     int length = info.Length();
@@ -272,8 +285,8 @@ void DataChannelWrapper::onOpen(const Napi::CallbackInfo &info)
     // Callback
     mOnOpenCallback = std::make_unique<ThreadSafeCallback>(info[0].As<Napi::Function>());
 
-    mDataChannelPtr->onOpen([&]()
-                            {
+    mTrackPtr->onOpen([&]()
+                      {
         if (mOnOpenCallback)
             mOnOpenCallback->call([this](Napi::Env env, std::vector<napi_value> &args) {
                 // Check the peer connection is not closed
@@ -286,7 +299,7 @@ void DataChannelWrapper::onOpen(const Napi::CallbackInfo &info)
             }); });
 }
 
-void DataChannelWrapper::onClosed(const Napi::CallbackInfo &info)
+void TrackWrapper::onClosed(const Napi::CallbackInfo &info)
 {
     Napi::Env env = info.Env();
     int length = info.Length();
@@ -300,8 +313,8 @@ void DataChannelWrapper::onClosed(const Napi::CallbackInfo &info)
     // Callback
     mOnClosedCallback = std::make_unique<ThreadSafeCallback>(info[0].As<Napi::Function>());
 
-    mDataChannelPtr->onClosed([&]()
-                              {
+    mTrackPtr->onClosed([&]()
+                        {
         if (mOnClosedCallback)
             mOnClosedCallback->call([this](Napi::Env env, std::vector<napi_value> &args) {
                 // Check the peer connection is not closed
@@ -314,7 +327,7 @@ void DataChannelWrapper::onClosed(const Napi::CallbackInfo &info)
             }); });
 }
 
-void DataChannelWrapper::onError(const Napi::CallbackInfo &info)
+void TrackWrapper::onError(const Napi::CallbackInfo &info)
 {
     Napi::Env env = info.Env();
     int length = info.Length();
@@ -328,8 +341,8 @@ void DataChannelWrapper::onError(const Napi::CallbackInfo &info)
     // Callback
     mOnErrorCallback = std::make_unique<ThreadSafeCallback>(info[0].As<Napi::Function>());
 
-    mDataChannelPtr->onError([&](const std::string &error)
-                             {
+    mTrackPtr->onError([&](const std::string &error)
+                       {
         if (mOnErrorCallback)
             mOnErrorCallback->call([this, error](Napi::Env env, std::vector<napi_value> &args) {
                 // Check the peer connection is not closed
@@ -342,7 +355,7 @@ void DataChannelWrapper::onError(const Napi::CallbackInfo &info)
             }); });
 }
 
-void DataChannelWrapper::onAvailable(const Napi::CallbackInfo &info)
+void TrackWrapper::onAvailable(const Napi::CallbackInfo &info)
 {
     Napi::Env env = info.Env();
     int length = info.Length();
@@ -356,8 +369,8 @@ void DataChannelWrapper::onAvailable(const Napi::CallbackInfo &info)
     // Callback
     mOnAvailableCallback = std::make_unique<ThreadSafeCallback>(info[0].As<Napi::Function>());
 
-    mDataChannelPtr->onAvailable([&]()
-                                 {
+    mTrackPtr->onAvailable([&]()
+                           {
         if (mOnAvailableCallback)
             mOnAvailableCallback->call([this](Napi::Env env, std::vector<napi_value> &args) {
                 // Check the peer connection is not closed
@@ -370,7 +383,7 @@ void DataChannelWrapper::onAvailable(const Napi::CallbackInfo &info)
             }); });
 }
 
-void DataChannelWrapper::onBufferedAmountLow(const Napi::CallbackInfo &info)
+void TrackWrapper::onBufferedAmountLow(const Napi::CallbackInfo &info)
 {
     Napi::Env env = info.Env();
     int length = info.Length();
@@ -384,8 +397,8 @@ void DataChannelWrapper::onBufferedAmountLow(const Napi::CallbackInfo &info)
     // Callback
     mOnBufferedAmountLowCallback = std::make_unique<ThreadSafeCallback>(info[0].As<Napi::Function>());
 
-    mDataChannelPtr->onBufferedAmountLow([&]()
-                                         {
+    mTrackPtr->onBufferedAmountLow([&]()
+                                   {
         if (mOnBufferedAmountLowCallback)
             mOnBufferedAmountLowCallback->call([this](Napi::Env env, std::vector<napi_value> &args) {
                 // Check the peer connection is not closed
@@ -398,7 +411,7 @@ void DataChannelWrapper::onBufferedAmountLow(const Napi::CallbackInfo &info)
             }); });
 }
 
-void DataChannelWrapper::onMessage(const Napi::CallbackInfo &info)
+void TrackWrapper::onMessage(const Napi::CallbackInfo &info)
 {
     Napi::Env env = info.Env();
     int length = info.Length();
@@ -412,8 +425,8 @@ void DataChannelWrapper::onMessage(const Napi::CallbackInfo &info)
     // Callback
     mOnMessageCallback = std::make_unique<ThreadSafeCallback>(info[0].As<Napi::Function>());
 
-    mDataChannelPtr->onMessage([&](const std::variant<rtc::binary, std::string> &message)
-                               {
+    mTrackPtr->onMessage([&](const std::variant<rtc::binary, std::string> &message)
+                         {
         if (mOnMessageCallback)
             mOnMessageCallback->call([this, message](Napi::Env env, std::vector<napi_value> &args) {
                 // Check the peer connection is not closed

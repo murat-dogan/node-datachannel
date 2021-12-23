@@ -1,15 +1,16 @@
 #include "peer-connection-wrapper.h"
 #include "data-channel-wrapper.h"
+#include "media-track-wrapper.h"
 
 #include <sstream>
 
 Napi::FunctionReference PeerConnectionWrapper::constructor;
-std::unordered_set<PeerConnectionWrapper*> PeerConnectionWrapper::instances;
+std::unordered_set<PeerConnectionWrapper *> PeerConnectionWrapper::instances;
 
 void PeerConnectionWrapper::CloseAll()
 {
     auto copy(instances);
-    for(auto inst : copy)
+    for (auto inst : copy)
         inst->doClose();
 }
 
@@ -20,19 +21,24 @@ Napi::Object PeerConnectionWrapper::Init(Napi::Env env, Napi::Object exports)
     Napi::Function func = DefineClass(
         env,
         "PeerConnection",
-        {InstanceMethod("close", &PeerConnectionWrapper::close),
-         InstanceMethod("setRemoteDescription", &PeerConnectionWrapper::setRemoteDescription),
-         InstanceMethod("addRemoteCandidate", &PeerConnectionWrapper::addRemoteCandidate),
-         InstanceMethod("createDataChannel", &PeerConnectionWrapper::createDataChannel),
-         InstanceMethod("onLocalDescription", &PeerConnectionWrapper::onLocalDescription),
-         InstanceMethod("onLocalCandidate", &PeerConnectionWrapper::onLocalCandidate),
-         InstanceMethod("onStateChange", &PeerConnectionWrapper::onStateChange),
-         InstanceMethod("onGatheringStateChange", &PeerConnectionWrapper::onGatheringStateChange),
-         InstanceMethod("onDataChannel", &PeerConnectionWrapper::onDataChannel),
-         InstanceMethod("bytesSent", &PeerConnectionWrapper::bytesSent),
-         InstanceMethod("bytesReceived", &PeerConnectionWrapper::bytesReceived),
-         InstanceMethod("rtt", &PeerConnectionWrapper::rtt),
-         InstanceMethod("getSelectedCandidatePair", &PeerConnectionWrapper::getSelectedCandidatePair)});
+        {
+            InstanceMethod("close", &PeerConnectionWrapper::close),
+            InstanceMethod("setRemoteDescription", &PeerConnectionWrapper::setRemoteDescription),
+            InstanceMethod("addRemoteCandidate", &PeerConnectionWrapper::addRemoteCandidate),
+            InstanceMethod("createDataChannel", &PeerConnectionWrapper::createDataChannel),
+            InstanceMethod("addTrack", &PeerConnectionWrapper::addTrack),
+            InstanceMethod("hasMedia", &PeerConnectionWrapper::hasMedia),
+            InstanceMethod("onLocalDescription", &PeerConnectionWrapper::onLocalDescription),
+            InstanceMethod("onLocalCandidate", &PeerConnectionWrapper::onLocalCandidate),
+            InstanceMethod("onStateChange", &PeerConnectionWrapper::onStateChange),
+            InstanceMethod("onGatheringStateChange", &PeerConnectionWrapper::onGatheringStateChange),
+            InstanceMethod("onDataChannel", &PeerConnectionWrapper::onDataChannel),
+            InstanceMethod("onTrack", &PeerConnectionWrapper::onTrack),
+            InstanceMethod("bytesSent", &PeerConnectionWrapper::bytesSent),
+            InstanceMethod("bytesReceived", &PeerConnectionWrapper::bytesReceived),
+            InstanceMethod("rtt", &PeerConnectionWrapper::rtt),
+            InstanceMethod("getSelectedCandidatePair", &PeerConnectionWrapper::getSelectedCandidatePair),
+        });
 
     constructor = Napi::Persistent(func);
     constructor.SuppressDestruct();
@@ -175,9 +181,9 @@ PeerConnectionWrapper::PeerConnectionWrapper(const Napi::CallbackInfo &info) : N
             return;
         }
         std::string strPolicy = config.Get("iceTransportPolicy").As<Napi::String>().ToString();
-        if(strPolicy == "all")
+        if (strPolicy == "all")
             rtcConfig.iceTransportPolicy = rtc::TransportPolicy::All;
-        else if(strPolicy == "relay")
+        else if (strPolicy == "relay")
             rtcConfig.iceTransportPolicy = rtc::TransportPolicy::Relay;
         else
         {
@@ -428,7 +434,7 @@ Napi::Value PeerConnectionWrapper::createDataChannel(const Napi::CallbackInfo &i
             init.reliability.unordered = !initConfig.Get("ordered").As<Napi::Boolean>();
         }
 
-        if(initConfig.Get("maxPacketLifeTime").IsNumber() && initConfig.Get("maxRetransmits").IsNumber())
+        if (initConfig.Get("maxPacketLifeTime").IsNumber() && initConfig.Get("maxRetransmits").IsNumber())
         {
             Napi::TypeError::New(env, "Wrong DataChannel Init Config, maxPacketLifeTime and maxRetransmits are exclusive").ThrowAsJavaScriptException();
             return info.Env().Null();
@@ -478,7 +484,8 @@ void PeerConnectionWrapper::onLocalDescription(const Napi::CallbackInfo &info)
     // Callback
     mOnLocalDescriptionCallback = std::make_unique<ThreadSafeCallback>(info[0].As<Napi::Function>());
 
-    mRtcPeerConnPtr->onLocalDescription([&](const rtc::Description &sdp) {
+    mRtcPeerConnPtr->onLocalDescription([&](const rtc::Description &sdp)
+                                        {
         if (mOnLocalDescriptionCallback)
             mOnLocalDescriptionCallback->call([this, sdp](Napi::Env env, std::vector<napi_value> &args) {
                 // Check the peer connection is not closed
@@ -490,8 +497,7 @@ void PeerConnectionWrapper::onLocalDescription(const Napi::CallbackInfo &info)
                 args = {
                     Napi::String::New(env, std::string(sdp)),
                     Napi::String::New(env, sdp.typeString())};
-            });
-    });
+            }); });
 }
 
 void PeerConnectionWrapper::onLocalCandidate(const Napi::CallbackInfo &info)
@@ -508,7 +514,8 @@ void PeerConnectionWrapper::onLocalCandidate(const Napi::CallbackInfo &info)
     // Callback
     mOnLocalCandidateCallback = std::make_unique<ThreadSafeCallback>(info[0].As<Napi::Function>());
 
-    mRtcPeerConnPtr->onLocalCandidate([&](const rtc::Candidate &candidate) {
+    mRtcPeerConnPtr->onLocalCandidate([&](const rtc::Candidate &candidate)
+                                      {
         if (mOnLocalCandidateCallback)
             mOnLocalCandidateCallback->call([this, candidate](Napi::Env env, std::vector<napi_value> &args) {
                  // Check the peer connection is not closed
@@ -520,8 +527,7 @@ void PeerConnectionWrapper::onLocalCandidate(const Napi::CallbackInfo &info)
                 args = {
                     Napi::String::New(env, std::string(candidate)),
                     Napi::String::New(env, candidate.mid())};
-            });
-    });
+            }); });
 }
 
 void PeerConnectionWrapper::onStateChange(const Napi::CallbackInfo &info)
@@ -538,7 +544,8 @@ void PeerConnectionWrapper::onStateChange(const Napi::CallbackInfo &info)
     // Callback
     mOnStateChangeCallback = std::make_unique<ThreadSafeCallback>(info[0].As<Napi::Function>());
 
-    mRtcPeerConnPtr->onStateChange([&](rtc::PeerConnection::State state) {
+    mRtcPeerConnPtr->onStateChange([&](rtc::PeerConnection::State state)
+                                   {
         if (mOnStateChangeCallback)
             mOnStateChangeCallback->call([this, state](Napi::Env env, std::vector<napi_value> &args) {
                 // Check the peer connection is not closed
@@ -550,8 +557,7 @@ void PeerConnectionWrapper::onStateChange(const Napi::CallbackInfo &info)
                 std::ostringstream stream;
                 stream << state;
                 args = {Napi::String::New(env, stream.str())};
-            });
-    });
+            }); });
 }
 
 void PeerConnectionWrapper::onGatheringStateChange(const Napi::CallbackInfo &info)
@@ -568,7 +574,8 @@ void PeerConnectionWrapper::onGatheringStateChange(const Napi::CallbackInfo &inf
     // Callback
     mOnGatheringStateChangeCallback = std::make_unique<ThreadSafeCallback>(info[0].As<Napi::Function>());
 
-    mRtcPeerConnPtr->onGatheringStateChange([&](rtc::PeerConnection::GatheringState state) {
+    mRtcPeerConnPtr->onGatheringStateChange([&](rtc::PeerConnection::GatheringState state)
+                                            {
         if (mOnGatheringStateChangeCallback)
             mOnGatheringStateChangeCallback->call([this, state](Napi::Env env, std::vector<napi_value> &args) {
                 // Check the peer connection is not closed
@@ -580,8 +587,7 @@ void PeerConnectionWrapper::onGatheringStateChange(const Napi::CallbackInfo &inf
                 std::ostringstream stream;
                 stream << state;
                 args = {Napi::String::New(env, stream.str())};
-            });
-    });
+            }); });
 }
 
 void PeerConnectionWrapper::onDataChannel(const Napi::CallbackInfo &info)
@@ -598,7 +604,8 @@ void PeerConnectionWrapper::onDataChannel(const Napi::CallbackInfo &info)
     // Callback
     mOnDataChannelCallback = std::make_unique<ThreadSafeCallback>(info[0].As<Napi::Function>());
 
-    mRtcPeerConnPtr->onDataChannel([&](std::shared_ptr<rtc::DataChannel> dc) {
+    mRtcPeerConnPtr->onDataChannel([&](std::shared_ptr<rtc::DataChannel> dc)
+                                   {
         if (mOnDataChannelCallback)
             mOnDataChannelCallback->call([this, dc](Napi::Env env, std::vector<napi_value> &args) {
                 // Check the peer connection is not closed
@@ -610,8 +617,7 @@ void PeerConnectionWrapper::onDataChannel(const Napi::CallbackInfo &info)
                 std::shared_ptr<rtc::DataChannel> dataChannel = dc;
                 auto instance = DataChannelWrapper::constructor.New({Napi::External<std::shared_ptr<rtc::DataChannel>>::New(env, &dataChannel)});
                 args = {instance};
-            });
-    });
+            }); });
 }
 
 Napi::Value PeerConnectionWrapper::bytesSent(const Napi::CallbackInfo &info)
@@ -745,4 +751,72 @@ std::string PeerConnectionWrapper::candidateTransportTypeToString(const rtc::Can
     default:
         return "unknown";
     }
+}
+
+Napi::Value PeerConnectionWrapper::addTrack(const Napi::CallbackInfo &info)
+{
+    Napi::Env env = info.Env();
+    int length = info.Length();
+
+    if (!mRtcPeerConnPtr)
+    {
+        Napi::Error::New(info.Env(), "It seems peer-connection is closed").ThrowAsJavaScriptException();
+        return env.Null();
+    }
+
+    if (length < 1 || !info[0].IsExternal())
+    {
+        Napi::TypeError::New(env, "Media class instance expected").ThrowAsJavaScriptException();
+        return env.Null();
+    }
+
+    rtc::Description::Media *mediaPtr = info[0].As<Napi::External<rtc::Description::Media>>().Data();
+
+    try
+    {
+        std::shared_ptr<rtc::Track> track = mRtcPeerConnPtr->addTrack(*mediaPtr);
+        auto instance = PeerConnectionWrapper::constructor.New({Napi::External<std::shared_ptr<rtc::Track>>::New(info.Env(), &track)});
+        return instance;
+    }
+    catch (std::exception &ex)
+    {
+        Napi::Error::New(env, std::string("libdatachannel error# ") + ex.what()).ThrowAsJavaScriptException();
+        return env.Null();
+    }
+}
+
+void PeerConnectionWrapper::onTrack(const Napi::CallbackInfo &info)
+{
+    Napi::Env env = info.Env();
+    int length = info.Length();
+
+    if (length < 1 || !info[0].IsFunction())
+    {
+        Napi::TypeError::New(env, "Function expected").ThrowAsJavaScriptException();
+        return;
+    }
+
+    // Callback
+    mOnTrackCallback = std::make_unique<ThreadSafeCallback>(info[0].As<Napi::Function>());
+
+    mRtcPeerConnPtr->onTrack([&](std::shared_ptr<rtc::Track> track)
+                             {
+        if (mOnTrackCallback)
+            mOnTrackCallback->call([this, track](Napi::Env env, std::vector<napi_value> &args) {
+                // Check the peer connection is not closed
+                if(instances.find(this) == instances.end())
+                    throw ThreadSafeCallback::CancelException();
+
+                // This will run in main thread and needs to construct the
+                // arguments for the call
+                std::shared_ptr<rtc::Track> newTrack = track;
+                auto instance = TrackWrapper::constructor.New({Napi::External<std::shared_ptr<rtc::Track>>::New(env, &newTrack)});
+                args = {instance};
+            }); });
+}
+
+Napi::Value PeerConnectionWrapper::hasMedia(const Napi::CallbackInfo &info)
+{
+    Napi::Env env = info.Env();
+    return Napi::Boolean::New(env, mRtcPeerConnPtr->hasMedia());
 }

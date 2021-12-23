@@ -1,4 +1,5 @@
 #include "media-audio-wrapper.h"
+#include "media-direction.h"
 
 Napi::FunctionReference AudioWrapper::constructor;
 std::unordered_set<AudioWrapper *> AudioWrapper::instances;
@@ -42,33 +43,14 @@ AudioWrapper::AudioWrapper(const Napi::CallbackInfo &info) : Napi::ObjectWrap<Au
     // ootional
     if (length > 2)
     {
-        if (!info[0].IsNumber())
+        if (!info[1].IsString())
         {
-            Napi::TypeError::New(env, "direction (Number) expected").ThrowAsJavaScriptException();
+            Napi::TypeError::New(env, "direction (String) expected").ThrowAsJavaScriptException();
             return;
         }
 
-        switch (static_cast<unsigned int>(info[0].As<Napi::Number>().ToNumber()))
-        {
-        case 0:
-            dir = rtc::Description::Direction::Unknown;
-            break;
-        case 1:
-            dir = rtc::Description::Direction::SendOnly;
-            break;
-        case 2:
-            dir = rtc::Description::Direction::RecvOnly;
-            break;
-        case 3:
-            dir = rtc::Description::Direction::SendRecv;
-            break;
-        case 4:
-            dir = rtc::Description::Direction::Unknown;
-            break;
-        default:
-            Napi::TypeError::New(env, "direction must be between [0,4]").ThrowAsJavaScriptException();
-            return;
-        }
+        std::string dirAsStr = info[1].As<Napi::String>().ToString();
+        dir = strToDirection(dirAsStr);
     }
 
     mAudioPtr = std::make_unique<rtc::Description::Audio>(mid, dir);
@@ -78,6 +60,8 @@ AudioWrapper::AudioWrapper(const Napi::CallbackInfo &info) : Napi::ObjectWrap<Au
 
 AudioWrapper::~AudioWrapper()
 {
+    mAudioPtr.reset();
+    instances.erase(this);
 }
 
 void AudioWrapper::addAudioCodec(const Napi::CallbackInfo &info)
