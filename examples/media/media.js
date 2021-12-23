@@ -30,7 +30,7 @@ peerConnection.onGatheringStateChange((state) => {
         rl.question('Please copy/paste the answer provided by the browser: \n', (sdp) => {
             let sdpObj = JSON.parse(sdp);
             peerConnection.setRemoteDescription(sdpObj.sdp, sdpObj.type);
-    
+            console.log(track.isOpen())
             rl.close();
     
         });
@@ -47,9 +47,13 @@ let session = new nodeDataChannel.RtcpReceivingSession();
 track.setMediaHandler(session);
 track.onMessage((msg)=>{
     client.send(msg,5000,'127.0.0.1',(err,n)=>{
-        console.log(err,n);
+        if(err) console.log(err,n);
     });
-    // console.log(msg);
 });
 
 peerConnection.setLocalDescription();
+
+
+// setInterval(()=>{
+
+// },1000);
