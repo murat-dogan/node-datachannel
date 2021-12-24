@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.15)
 cmake_policy(SET CMP0091 NEW)
-project(node_datachannel VERSION 0.1.14)
+project(node_datachannel VERSION 0.2.0)
 
 include_directories(${CMAKE_JS_INC})
 
