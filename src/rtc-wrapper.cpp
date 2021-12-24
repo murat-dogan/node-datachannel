@@ -1,6 +1,7 @@
 #include "rtc-wrapper.h"
 #include "peer-connection-wrapper.h"
 #include "data-channel-wrapper.h"
+#include "media-track-wrapper.h"
 
 #include <chrono>
 #include <future>
@@ -76,6 +77,7 @@ void RtcWrapper::cleanup(const Napi::CallbackInfo &info)
     {
         PeerConnectionWrapper::CloseAll();
         DataChannelWrapper::CloseAll();
+        TrackWrapper::CloseAll();
 
         const auto timeout = std::chrono::seconds(10);
         if(rtc::Cleanup().wait_for(std::chrono::seconds(timeout)) == std::future_status::timeout)

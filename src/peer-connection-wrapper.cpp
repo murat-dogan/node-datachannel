@@ -227,6 +227,7 @@ void PeerConnectionWrapper::doClose()
             mOnStateChangeCallback.reset();
             mOnGatheringStateChangeCallback.reset();
             mOnDataChannelCallback.reset();
+            mOnTrackCallback.reset();
 
             mRtcPeerConnPtr->close();
             mRtcPeerConnPtr.reset();

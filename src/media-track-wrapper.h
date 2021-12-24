@@ -43,6 +43,9 @@ public:
   void onBufferedAmountLow(const Napi::CallbackInfo &info);
   void onMessage(const Napi::CallbackInfo &info);
 
+  // Close all existing track
+  static void CloseAll();
+
 private:
   static std::unordered_set<TrackWrapper *> instances;
 

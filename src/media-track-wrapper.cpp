@@ -5,6 +5,13 @@
 Napi::FunctionReference TrackWrapper::constructor;
 std::unordered_set<TrackWrapper *> TrackWrapper::instances;
 
+void TrackWrapper::CloseAll()
+{
+    auto copy(instances);
+    for (auto inst : copy)
+        inst->doClose();
+}
+
 Napi::Object TrackWrapper::Init(Napi::Env env, Napi::Object exports)
 {
     Napi::HandleScope scope(env);
@@ -79,6 +86,11 @@ void TrackWrapper::doClose()
     }
 }
 
+void TrackWrapper::close(const Napi::CallbackInfo &info)
+{
+    doClose();
+}
+
 Napi::Value TrackWrapper::direction(const Napi::CallbackInfo &info)
 {
     Napi::Env env = info.Env();
@@ -89,11 +101,6 @@ Napi::Value TrackWrapper::mid(const Napi::CallbackInfo &info)
 {
     Napi::Env env = info.Env();
     return Napi::String::New(env, mTrackPtr->mid());
-}
-
-void TrackWrapper::close(const Napi::CallbackInfo &info)
-{
-    mTrackPtr->close();
 }
 
 Napi::Value TrackWrapper::sendMessage(const Napi::CallbackInfo &info)
@@ -434,7 +441,6 @@ void TrackWrapper::onMessage(const Napi::CallbackInfo &info)
 
     mTrackPtr->onMessage([&](const std::variant<rtc::binary, std::string> &message)
                          {
-                             std::cout << 1 << std::endl;
         if (mOnMessageCallback)
             mOnMessageCallback->call([this, message](Napi::Env env, std::vector<napi_value> &args) {
                 // Check the peer connection is not closed
