@@ -107,6 +107,25 @@ export class Audio {
     constructor(mid: string, dir: Direction);
     addAudioCodec: (payloadType: Number, codec: string, profile?: string) => void;
     addOpusCodec: (payloadType: Number, profile?: string) => string;
+
+    direction: () => Direction;
+    generateSdp: (eol: string, addr: string, port: string) => string;
+    mid: () => string;
+    setDirection: (dir: Direction) => void;
+    description: () => string;
+    removeFormat: (fmt: string) => void;
+    addSSRC: (ssrc: Number, name?: string, msid?: string, trackID?: string) => void;
+    removeSSRC: (ssrc: Number) => void;
+    replaceSSRC: (oldSsrc: Number, ssrc: Number, name?: string, msid?: string, trackID?: string) => void;
+    hasSSRC: (ssrc: Number) => boolean;
+    getSSRCs: () => Number[];
+    getCNameForSsrc: (ssrc: Number) => string;
+    setBitrate: (bitRate: Number) => void;
+    getBitrate: () => Number;
+    hasPayloadType: (payloadType: Number) => boolean;
+    addRTXCodec: (payloadType: Number, originalPayloadType: Number, clockRate: Number) => void;
+    addRTPMap: () => void;
+    parseSdpLine: (line: string) => void;
 }
 
 export class Video {
@@ -115,6 +134,7 @@ export class Video {
     addH264Codec: (payloadType: Number, profile?: string) => void;
     addVP8Codec: (payloadType: Number) => void;
     addVP9Codec: (payloadType: Number) => void;
+    
     direction: () => Direction;
     generateSdp: (eol: string, addr: string, port: string) => string;
     mid: () => string;

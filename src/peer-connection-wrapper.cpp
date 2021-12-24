@@ -2,6 +2,7 @@
 #include "data-channel-wrapper.h"
 #include "media-track-wrapper.h"
 #include "media-video-wrapper.h"
+#include "media-audio-wrapper.h"
 
 #include <sstream>
 
@@ -823,10 +824,25 @@ Napi::Value PeerConnectionWrapper::addTrack(const Napi::CallbackInfo &info)
 
     try
     {
-        VideoWrapper *videoPtr = Napi::ObjectWrap<VideoWrapper>::Unwrap(info[0].As<Napi::Object>());
-        std::shared_ptr<rtc::Track> track = mRtcPeerConnPtr->addTrack(videoPtr->getVideoInstance());
-        auto instance = TrackWrapper::constructor.New({Napi::External<std::shared_ptr<rtc::Track>>::New(info.Env(), &track)});
-        return instance;
+        Napi::Object obj = info[0].As<Napi::Object>();
+        if (obj.Get("media-type-video").IsBoolean())
+        {
+            VideoWrapper *videoPtr = Napi::ObjectWrap<VideoWrapper>::Unwrap(obj);
+            std::shared_ptr<rtc::Track> track = mRtcPeerConnPtr->addTrack(videoPtr->getVideoInstance());
+            auto instance = TrackWrapper::constructor.New({Napi::External<std::shared_ptr<rtc::Track>>::New(info.Env(), &track)});
+            return instance;
+        }
+
+        if (obj.Get("media-type-audio").IsBoolean())
+        {
+            AudioWrapper *audioPtr = Napi::ObjectWrap<AudioWrapper>::Unwrap(obj);
+            std::shared_ptr<rtc::Track> track = mRtcPeerConnPtr->addTrack(audioPtr->getAudioInstance());
+            auto instance = TrackWrapper::constructor.New({Napi::External<std::shared_ptr<rtc::Track>>::New(info.Env(), &track)});
+            return instance;
+        }
+
+          Napi::Error::New(env, std::string("Unknown media type")).ThrowAsJavaScriptException();
+        return env.Null();
     }
     catch (std::exception &ex)
     {

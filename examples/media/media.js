@@ -40,7 +40,7 @@ peerConnection.onGatheringStateChange((state) => {
 let video = new nodeDataChannel.Video('video','RecvOnly');
 video.addH264Codec(96);
 video.setBitrate(3000);
-
+console.log(video.mediaType);
 let track = peerConnection.addTrack(video);
 let session = new nodeDataChannel.RtcpReceivingSession();
 
@@ -52,8 +52,3 @@ track.onMessage((msg)=>{
 });
 
 peerConnection.setLocalDescription();
-
-
-// setInterval(()=>{
-
-// },1000);

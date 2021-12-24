@@ -11,8 +11,29 @@ Napi::Object AudioWrapper::Init(Napi::Env env, Napi::Object exports)
     Napi::Function func = DefineClass(
         env,
         "Audio",
-        {InstanceMethod("addAudioCodec", &AudioWrapper::addAudioCodec),
-         InstanceMethod("addOpusCodec", &AudioWrapper::addOpusCodec)});
+        {
+            InstanceValue("media-type-audio", Napi::Boolean::New(env, true)),
+            InstanceMethod("addAudioCodec", &AudioWrapper::addAudioCodec),
+            InstanceMethod("addOpusCodec", &AudioWrapper::addOpusCodec),
+            InstanceMethod("direction", &AudioWrapper::direction),
+            InstanceMethod("generateSdp", &AudioWrapper::generateSdp),
+            InstanceMethod("mid", &AudioWrapper::mid),
+            InstanceMethod("setDirection", &AudioWrapper::setDirection),
+            InstanceMethod("description", &AudioWrapper::description),
+            InstanceMethod("removeFormat", &AudioWrapper::removeFormat),
+            InstanceMethod("addSSRC", &AudioWrapper::addSSRC),
+            InstanceMethod("removeSSRC", &AudioWrapper::removeSSRC),
+            InstanceMethod("replaceSSRC", &AudioWrapper::replaceSSRC),
+            InstanceMethod("hasSSRC", &AudioWrapper::hasSSRC),
+            InstanceMethod("getSSRCs", &AudioWrapper::getSSRCs),
+            InstanceMethod("getCNameForSsrc", &AudioWrapper::getCNameForSsrc),
+            InstanceMethod("setBitrate", &AudioWrapper::setBitrate),
+            InstanceMethod("getBitrate", &AudioWrapper::getBitrate),
+            InstanceMethod("hasPayloadType", &AudioWrapper::hasPayloadType),
+            InstanceMethod("addRTXCodec", &AudioWrapper::addRTXCodec),
+            InstanceMethod("addRTPMap", &AudioWrapper::addRTPMap),
+            InstanceMethod("parseSdpLine", &AudioWrapper::parseSdpLine),
+        });
 
     constructor = Napi::Persistent(func);
     constructor.SuppressDestruct();
@@ -64,6 +85,11 @@ AudioWrapper::~AudioWrapper()
     instances.erase(this);
 }
 
+rtc::Description::Audio AudioWrapper::getAudioInstance()
+{
+    return *(mAudioPtr.get());
+}
+
 void AudioWrapper::addAudioCodec(const Napi::CallbackInfo &info)
 {
     Napi::Env env = info.Env();
@@ -81,7 +107,7 @@ void AudioWrapper::addAudioCodec(const Napi::CallbackInfo &info)
 
     if (length > 2)
     {
-        if (!info[0].IsString())
+        if (!info[2].IsString())
         {
             Napi::TypeError::New(env, "profile (String) expected").ThrowAsJavaScriptException();
             return;
@@ -108,7 +134,7 @@ void AudioWrapper::addOpusCodec(const Napi::CallbackInfo &info)
 
     if (length > 1)
     {
-        if (!info[0].IsString())
+        if (!info[1].IsString())
         {
             Napi::TypeError::New(env, "profile (String) expected").ThrowAsJavaScriptException();
             return;
@@ -117,4 +143,315 @@ void AudioWrapper::addOpusCodec(const Napi::CallbackInfo &info)
     }
 
     mAudioPtr->addOpusCodec(payloadType, profile);
+}
+
+
+Napi::Value AudioWrapper::direction(const Napi::CallbackInfo &info)
+{
+    Napi::Env env = info.Env();
+    return Napi::String::New(env, directionToStr(mAudioPtr->direction()));
+}
+
+Napi::Value AudioWrapper::generateSdp(const Napi::CallbackInfo &info)
+{
+    Napi::Env env = info.Env();
+    int length = info.Length();
+
+    if (length < 3 || !info[0].IsString() || !info[1].IsString() || !info[2].IsString())
+    {
+        Napi::TypeError::New(env, "We expect (String, String, String) as param").ThrowAsJavaScriptException();
+        return Napi::String::New(env, "");
+    }
+
+    std::string eol = info[0].As<Napi::String>().ToString();
+    std::string addr = info[1].As<Napi::String>().ToString();
+    std::string port = info[2].As<Napi::String>().ToString();
+
+    return Napi::String::New(env, mAudioPtr->generateSdp(eol, addr, port));
+}
+
+Napi::Value AudioWrapper::mid(const Napi::CallbackInfo &info)
+{
+    Napi::Env env = info.Env();
+    return Napi::String::New(env, mAudioPtr->mid());
+}
+
+void AudioWrapper::setDirection(const Napi::CallbackInfo &info)
+{
+    Napi::Env env = info.Env();
+    int length = info.Length();
+
+    if (length < 1 || !info[0].IsString())
+    {
+        Napi::TypeError::New(env, "We expect (String) as param").ThrowAsJavaScriptException();
+        return;
+    }
+
+    std::string dirAsStr = info[0].As<Napi::String>().ToString();
+    rtc::Description::Direction dir = strToDirection(dirAsStr);
+    mAudioPtr->setDirection(dir);
+}
+
+Napi::Value AudioWrapper::description(const Napi::CallbackInfo &info)
+{
+    Napi::Env env = info.Env();
+    return Napi::String::New(env, mAudioPtr->description());
+}
+
+void AudioWrapper::removeFormat(const Napi::CallbackInfo &info)
+{
+    Napi::Env env = info.Env();
+    int length = info.Length();
+
+    if (length < 1 || !info[0].IsString())
+    {
+        Napi::TypeError::New(env, "We expect (String) as param").ThrowAsJavaScriptException();
+        return;
+    }
+
+    std::string fmt = info[0].As<Napi::String>().ToString();
+
+    mAudioPtr->removeFormat(fmt);
+}
+
+void AudioWrapper::addSSRC(const Napi::CallbackInfo &info)
+{
+    Napi::Env env = info.Env();
+    int length = info.Length();
+
+    if (length < 1 || !info[0].IsNumber())
+    {
+        Napi::TypeError::New(env, "We expect (Number, String[optional], String[optional], String[optional]) as param").ThrowAsJavaScriptException();
+        return;
+    }
+
+    uint32_t ssrc = static_cast<uint32_t>(info[0].As<Napi::Number>().ToNumber());
+    std::optional<std::string> name;
+    std::optional<std::string> msid = std::nullopt;
+    std::optional<std::string> trackID = std::nullopt;
+
+    if (length > 1)
+    {
+        if (!info[1].IsString())
+        {
+            Napi::TypeError::New(env, "name as String expected").ThrowAsJavaScriptException();
+            return;
+        }
+        name = info[1].As<Napi::String>().ToString();
+    }
+
+    if (length > 2)
+    {
+        if (!info[2].IsString())
+        {
+            Napi::TypeError::New(env, "msid as String expected").ThrowAsJavaScriptException();
+            return;
+        }
+        msid = info[2].As<Napi::String>().ToString();
+    }
+
+    if (length > 3)
+    {
+        if (!info[3].IsString())
+        {
+            Napi::TypeError::New(env, "trackID as String expected").ThrowAsJavaScriptException();
+            return;
+        }
+        trackID = info[3].As<Napi::String>().ToString();
+    }
+
+    mAudioPtr->addSSRC(ssrc, name, msid, trackID);
+}
+
+void AudioWrapper::removeSSRC(const Napi::CallbackInfo &info)
+{
+    Napi::Env env = info.Env();
+    int length = info.Length();
+
+    if (length < 1 || !info[0].IsNumber())
+    {
+        Napi::TypeError::New(env, "We expect (Number) as param").ThrowAsJavaScriptException();
+        return;
+    }
+
+    uint32_t ssrc = static_cast<uint32_t>(info[0].As<Napi::Number>().ToNumber());
+
+    mAudioPtr->removeSSRC(ssrc);
+}
+
+void AudioWrapper::replaceSSRC(const Napi::CallbackInfo &info)
+{
+    Napi::Env env = info.Env();
+    int length = info.Length();
+
+    if (length < 2 || !info[0].IsNumber() || !info[1].IsNumber())
+    {
+        Napi::TypeError::New(env, "We expect (Number, Number, String[optional], String[optional], String[optional]) as param").ThrowAsJavaScriptException();
+        return;
+    }
+
+    uint32_t ssrc = static_cast<uint32_t>(info[0].As<Napi::Number>().ToNumber());
+    uint32_t oldSsrc = static_cast<uint32_t>(info[1].As<Napi::Number>().ToNumber());
+    std::optional<std::string> name;
+    std::optional<std::string> msid = std::nullopt;
+    std::optional<std::string> trackID = std::nullopt;
+
+    if (length > 2)
+    {
+        if (!info[2].IsString())
+        {
+            Napi::TypeError::New(env, "name as String expected").ThrowAsJavaScriptException();
+            return;
+        }
+        name = info[2].As<Napi::String>().ToString();
+    }
+
+    if (length > 3)
+    {
+        if (!info[3].IsString())
+        {
+            Napi::TypeError::New(env, "msid as String expected").ThrowAsJavaScriptException();
+            return;
+        }
+        msid = info[3].As<Napi::String>().ToString();
+    }
+
+    if (length > 4)
+    {
+        if (!info[4].IsString())
+        {
+            Napi::TypeError::New(env, "trackID as String expected").ThrowAsJavaScriptException();
+            return;
+        }
+        trackID = info[4].As<Napi::String>().ToString();
+    }
+
+    mAudioPtr->replaceSSRC(oldSsrc, ssrc, name, msid, trackID);
+}
+
+Napi::Value AudioWrapper::hasSSRC(const Napi::CallbackInfo &info)
+{
+    Napi::Env env = info.Env();
+    int length = info.Length();
+
+    if (length < 1 || !info[0].IsNumber())
+    {
+        Napi::TypeError::New(env, "We expect (Number) as param").ThrowAsJavaScriptException();
+        return env.Null();
+    }
+
+    uint32_t ssrc = static_cast<uint32_t>(info[0].As<Napi::Number>().ToNumber());
+
+    return Napi::Boolean::New(env, mAudioPtr->hasSSRC(ssrc));
+}
+
+Napi::Value AudioWrapper::getSSRCs(const Napi::CallbackInfo &info)
+{
+    Napi::Env env = info.Env();
+
+    auto list = mAudioPtr->getSSRCs();
+
+    Napi::Uint32Array napiArr = Napi::Uint32Array::New(env, list.size());
+    for (size_t i = 0; i < list.size(); i++)
+        napiArr[i] = list[i];
+
+    return napiArr;
+}
+
+Napi::Value AudioWrapper::getCNameForSsrc(const Napi::CallbackInfo &info)
+{
+    Napi::Env env = info.Env();
+    int length = info.Length();
+
+    if (length < 1 || !info[0].IsNumber())
+    {
+        Napi::TypeError::New(env, "We expect (Number) as param").ThrowAsJavaScriptException();
+        return env.Null();
+    }
+
+    uint32_t ssrc = static_cast<uint32_t>(info[0].As<Napi::Number>().ToNumber());
+
+    std::optional<std::string> name = mAudioPtr->getCNameForSsrc(ssrc);
+
+    if (!name.has_value())
+        return env.Null();
+
+    return Napi::String::New(env, name.value());
+}
+
+void AudioWrapper::setBitrate(const Napi::CallbackInfo &info)
+{
+    Napi::Env env = info.Env();
+    int length = info.Length();
+
+    if (length < 1 || !info[0].IsNumber())
+    {
+        Napi::TypeError::New(env, "We expect (Number) as param").ThrowAsJavaScriptException();
+        return;
+    }
+
+    int bitRate = static_cast<int>(info[0].As<Napi::Number>().ToNumber());
+
+    mAudioPtr->setBitrate(bitRate);
+}
+
+Napi::Value AudioWrapper::getBitrate(const Napi::CallbackInfo &info)
+{
+
+    return Napi::Number::New(info.Env(), mAudioPtr->getBitrate());
+}
+
+Napi::Value AudioWrapper::hasPayloadType(const Napi::CallbackInfo &info)
+{
+    Napi::Env env = info.Env();
+    int length = info.Length();
+
+    if (length < 1 || !info[0].IsNumber())
+    {
+        Napi::TypeError::New(env, "We expect (Number) as param").ThrowAsJavaScriptException();
+        return env.Null();
+    }
+
+    int payloadType = static_cast<int>(info[0].As<Napi::Number>().ToNumber());
+
+    return Napi::Boolean::New(env, mAudioPtr->hasPayloadType(payloadType));
+}
+
+void AudioWrapper::addRTXCodec(const Napi::CallbackInfo &info)
+{
+    Napi::Env env = info.Env();
+    int length = info.Length();
+
+    if (length < 3 || !info[0].IsNumber() || !info[1].IsNumber() || !info[2].IsNumber())
+    {
+        Napi::TypeError::New(env, "We expect (Number,Number,Number) as param").ThrowAsJavaScriptException();
+        return;
+    }
+
+    unsigned int payloadType = static_cast<unsigned int>(info[0].As<Napi::Number>().ToNumber());
+    unsigned int originalPayloadType = static_cast<unsigned int>(info[1].As<Napi::Number>().ToNumber());
+    unsigned int clockRate = static_cast<unsigned int>(info[2].As<Napi::Number>().ToNumber());
+
+    mAudioPtr->addRTXCodec(payloadType, originalPayloadType, clockRate);
+}
+
+void AudioWrapper::addRTPMap(const Napi::CallbackInfo &info)
+{
+    // mAudioPtr->addRTPMap()
+}
+
+void AudioWrapper::parseSdpLine(const Napi::CallbackInfo &info)
+{
+    Napi::Env env = info.Env();
+    int length = info.Length();
+
+    if (length < 1 || !info[0].IsString())
+    {
+        Napi::TypeError::New(env, "We expect (String) as param").ThrowAsJavaScriptException();
+        return;
+    }
+
+    std::string line = info[0].As<Napi::String>().ToString();
+
+    mAudioPtr->parseSdpLine(line);
 }

@@ -12,30 +12,29 @@ Napi::Object VideoWrapper::Init(Napi::Env env, Napi::Object exports)
         env,
         "Video",
         {
-            Napi::ObjectWrap<VideoWrapper>::InstanceMethod("addH264Codec", &VideoWrapper::addH264Codec),
-            Napi::ObjectWrap<VideoWrapper>::InstanceMethod("addVideoCodec", &VideoWrapper::addVideoCodec),
-            Napi::ObjectWrap<VideoWrapper>::InstanceMethod("addVP8Codec", &VideoWrapper::addVP8Codec),
-            Napi::ObjectWrap<VideoWrapper>::InstanceMethod("addVP9Codec", &VideoWrapper::addVP9Codec),
-
-            Napi::ObjectWrap<VideoWrapper>::InstanceMethod("direction", &VideoWrapper::direction),
-            Napi::ObjectWrap<VideoWrapper>::InstanceMethod("generateSdp", &VideoWrapper::generateSdp),
-            Napi::ObjectWrap<VideoWrapper>::InstanceMethod("mid", &VideoWrapper::mid),
-            Napi::ObjectWrap<VideoWrapper>::InstanceMethod("setDirection", &VideoWrapper::setDirection),
-
-            Napi::ObjectWrap<VideoWrapper>::InstanceMethod("description", &VideoWrapper::description),
-            Napi::ObjectWrap<VideoWrapper>::InstanceMethod("removeFormat", &VideoWrapper::removeFormat),
-            Napi::ObjectWrap<VideoWrapper>::InstanceMethod("addSSRC", &VideoWrapper::addSSRC),
-            Napi::ObjectWrap<VideoWrapper>::InstanceMethod("removeSSRC", &VideoWrapper::removeSSRC),
-            Napi::ObjectWrap<VideoWrapper>::InstanceMethod("replaceSSRC", &VideoWrapper::replaceSSRC),
-            Napi::ObjectWrap<VideoWrapper>::InstanceMethod("hasSSRC", &VideoWrapper::hasSSRC),
-            Napi::ObjectWrap<VideoWrapper>::InstanceMethod("getSSRCs", &VideoWrapper::getSSRCs),
-            Napi::ObjectWrap<VideoWrapper>::InstanceMethod("getCNameForSsrc", &VideoWrapper::getCNameForSsrc),
-            Napi::ObjectWrap<VideoWrapper>::InstanceMethod("setBitrate", &VideoWrapper::setBitrate),
-            Napi::ObjectWrap<VideoWrapper>::InstanceMethod("getBitrate", &VideoWrapper::getBitrate),
-            Napi::ObjectWrap<VideoWrapper>::InstanceMethod("hasPayloadType", &VideoWrapper::hasPayloadType),
-            Napi::ObjectWrap<VideoWrapper>::InstanceMethod("addRTXCodec", &VideoWrapper::addRTXCodec),
-            Napi::ObjectWrap<VideoWrapper>::InstanceMethod("addRTPMap", &VideoWrapper::addRTPMap),
-            Napi::ObjectWrap<VideoWrapper>::InstanceMethod("parseSdpLine", &VideoWrapper::parseSdpLine),
+            InstanceValue("media-type-video", Napi::Boolean::New(env, true)),
+            InstanceMethod("addH264Codec", &VideoWrapper::addH264Codec),
+            InstanceMethod("addVideoCodec", &VideoWrapper::addVideoCodec),
+            InstanceMethod("addVP8Codec", &VideoWrapper::addVP8Codec),
+            InstanceMethod("addVP9Codec", &VideoWrapper::addVP9Codec),
+            InstanceMethod("direction", &VideoWrapper::direction),
+            InstanceMethod("generateSdp", &VideoWrapper::generateSdp),
+            InstanceMethod("mid", &VideoWrapper::mid),
+            InstanceMethod("setDirection", &VideoWrapper::setDirection),
+            InstanceMethod("description", &VideoWrapper::description),
+            InstanceMethod("removeFormat", &VideoWrapper::removeFormat),
+            InstanceMethod("addSSRC", &VideoWrapper::addSSRC),
+            InstanceMethod("removeSSRC", &VideoWrapper::removeSSRC),
+            InstanceMethod("replaceSSRC", &VideoWrapper::replaceSSRC),
+            InstanceMethod("hasSSRC", &VideoWrapper::hasSSRC),
+            InstanceMethod("getSSRCs", &VideoWrapper::getSSRCs),
+            InstanceMethod("getCNameForSsrc", &VideoWrapper::getCNameForSsrc),
+            InstanceMethod("setBitrate", &VideoWrapper::setBitrate),
+            InstanceMethod("getBitrate", &VideoWrapper::getBitrate),
+            InstanceMethod("hasPayloadType", &VideoWrapper::hasPayloadType),
+            InstanceMethod("addRTXCodec", &VideoWrapper::addRTXCodec),
+            InstanceMethod("addRTPMap", &VideoWrapper::addRTPMap),
+            InstanceMethod("parseSdpLine", &VideoWrapper::parseSdpLine),
         });
 
     constructor = Napi::Persistent(func);
@@ -78,7 +77,7 @@ VideoWrapper::VideoWrapper(const Napi::CallbackInfo &info) : Napi::ObjectWrap<Vi
     }
 
     mVideoPtr = std::make_unique<rtc::Description::Video>(mid, dir);
-    
+
     instances.insert(this);
 }
 
@@ -144,7 +143,7 @@ void VideoWrapper::addH264Codec(const Napi::CallbackInfo &info)
         }
         profile = info[1].As<Napi::String>().ToString();
     }
-    
+
     mVideoPtr->addH264Codec(payloadType, profile);
 }
 
