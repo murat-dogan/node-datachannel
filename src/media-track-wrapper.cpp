@@ -27,17 +27,12 @@ Napi::Object TrackWrapper::Init(Napi::Env env, Napi::Object exports)
             InstanceMethod("sendMessageBinary", &TrackWrapper::sendMessageBinary),
             InstanceMethod("isOpen", &TrackWrapper::isOpen),
             InstanceMethod("isClosed", &TrackWrapper::isClosed),
-            InstanceMethod("availableAmount", &TrackWrapper::availableAmount),
-            InstanceMethod("bufferedAmount", &TrackWrapper::bufferedAmount),
             InstanceMethod("maxMessageSize", &TrackWrapper::maxMessageSize),
-            InstanceMethod("setBufferedAmountLowThreshold", &TrackWrapper::setBufferedAmountLowThreshold),
             InstanceMethod("requestKeyframe", &TrackWrapper::requestKeyframe),
             InstanceMethod("setMediaHandler", &TrackWrapper::setMediaHandler),
             InstanceMethod("onOpen", &TrackWrapper::onOpen),
             InstanceMethod("onClosed", &TrackWrapper::onClosed),
             InstanceMethod("onError", &TrackWrapper::onError),
-            InstanceMethod("onAvailable", &TrackWrapper::onAvailable),
-            InstanceMethod("onBufferedAmountLow", &TrackWrapper::onBufferedAmountLow),
             InstanceMethod("onMessage", &TrackWrapper::onMessage),
         });
 
@@ -71,8 +66,6 @@ void TrackWrapper::doClose()
             mOnOpenCallback.reset();
             mOnClosedCallback.reset();
             mOnErrorCallback.reset();
-            mOnAvailableCallback.reset();
-            mOnBufferedAmountLowCallback.reset();
             mOnMessageCallback.reset();
 
             mTrackPtr->close();
@@ -173,44 +166,6 @@ Napi::Value TrackWrapper::isClosed(const Napi::CallbackInfo &info)
     return Napi::Boolean::New(env, mTrackPtr->isClosed());
 }
 
-Napi::Value TrackWrapper::availableAmount(const Napi::CallbackInfo &info)
-{
-    Napi::Env env = info.Env();
-    if (!mTrackPtr)
-    {
-        return Napi::Number::New(info.Env(), 0);
-    }
-
-    try
-    {
-        return Napi::Number::New(info.Env(), mTrackPtr->availableAmount());
-    }
-    catch (std::exception &ex)
-    {
-        Napi::Error::New(env, std::string("libdatachannel error# ") + ex.what()).ThrowAsJavaScriptException();
-        return Napi::Number::New(info.Env(), 0);
-    }
-}
-
-Napi::Value TrackWrapper::bufferedAmount(const Napi::CallbackInfo &info)
-{
-    Napi::Env env = info.Env();
-    if (!mTrackPtr)
-    {
-        return Napi::Number::New(info.Env(), 0);
-    }
-
-    try
-    {
-        return Napi::Number::New(info.Env(), mTrackPtr->bufferedAmount());
-    }
-    catch (std::exception &ex)
-    {
-        Napi::Error::New(env, std::string("libdatachannel error# ") + ex.what()).ThrowAsJavaScriptException();
-        return Napi::Number::New(info.Env(), 0);
-    }
-}
-
 Napi::Value TrackWrapper::maxMessageSize(const Napi::CallbackInfo &info)
 {
     Napi::Env env = info.Env();
@@ -227,34 +182,6 @@ Napi::Value TrackWrapper::maxMessageSize(const Napi::CallbackInfo &info)
     {
         Napi::Error::New(env, std::string("libdatachannel error# ") + ex.what()).ThrowAsJavaScriptException();
         return Napi::Number::New(info.Env(), 0);
-    }
-}
-
-void TrackWrapper::setBufferedAmountLowThreshold(const Napi::CallbackInfo &info)
-{
-    if (!mTrackPtr)
-    {
-        Napi::Error::New(info.Env(), "It seems data-channel is destroyed!").ThrowAsJavaScriptException();
-        return;
-    }
-
-    Napi::Env env = info.Env();
-    int length = info.Length();
-
-    if (length < 1 || !info[0].IsNumber())
-    {
-        Napi::TypeError::New(env, "Number expected").ThrowAsJavaScriptException();
-        return;
-    }
-
-    try
-    {
-        mTrackPtr->setBufferedAmountLowThreshold(info[0].ToNumber().Uint32Value());
-    }
-    catch (std::exception &ex)
-    {
-        Napi::Error::New(env, std::string("libdatachannel error# ") + ex.what()).ThrowAsJavaScriptException();
-        return;
     }
 }
 
@@ -366,62 +293,6 @@ void TrackWrapper::onError(const Napi::CallbackInfo &info)
                 // This will run in main thread and needs to construct the
                 // arguments for the call
                 args = {Napi::String::New(env, error)};
-            }); });
-}
-
-void TrackWrapper::onAvailable(const Napi::CallbackInfo &info)
-{
-    Napi::Env env = info.Env();
-    int length = info.Length();
-
-    if (length < 1 || !info[0].IsFunction())
-    {
-        Napi::TypeError::New(env, "Function expected").ThrowAsJavaScriptException();
-        return;
-    }
-
-    // Callback
-    mOnAvailableCallback = std::make_unique<ThreadSafeCallback>(info[0].As<Napi::Function>());
-
-    mTrackPtr->onAvailable([&]()
-                           {
-        if (mOnAvailableCallback)
-            mOnAvailableCallback->call([this](Napi::Env env, std::vector<napi_value> &args) {
-                // Check the peer connection is not closed
-                if(instances.find(this) == instances.end())
-                    throw ThreadSafeCallback::CancelException();
-
-                // This will run in main thread and needs to construct the
-                // arguments for the call
-                args = {};
-            }); });
-}
-
-void TrackWrapper::onBufferedAmountLow(const Napi::CallbackInfo &info)
-{
-    Napi::Env env = info.Env();
-    int length = info.Length();
-
-    if (length < 1 || !info[0].IsFunction())
-    {
-        Napi::TypeError::New(env, "Function expected").ThrowAsJavaScriptException();
-        return;
-    }
-
-    // Callback
-    mOnBufferedAmountLowCallback = std::make_unique<ThreadSafeCallback>(info[0].As<Napi::Function>());
-
-    mTrackPtr->onBufferedAmountLow([&]()
-                                   {
-        if (mOnBufferedAmountLowCallback)
-            mOnBufferedAmountLowCallback->call([this](Napi::Env env, std::vector<napi_value> &args) {
-                // Check the peer connection is not closed
-                if(instances.find(this) == instances.end())
-                    throw ThreadSafeCallback::CancelException();
-
-                // This will run in main thread and needs to construct the
-                // arguments for the call
-                args = {};
             }); });
 }
 

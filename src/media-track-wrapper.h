@@ -28,10 +28,7 @@ public:
   Napi::Value sendMessageBinary(const Napi::CallbackInfo &info);
   Napi::Value isOpen(const Napi::CallbackInfo &info);
   Napi::Value isClosed(const Napi::CallbackInfo &info);
-  Napi::Value availableAmount(const Napi::CallbackInfo &info);
-  Napi::Value bufferedAmount(const Napi::CallbackInfo &info);
   Napi::Value maxMessageSize(const Napi::CallbackInfo &info);
-  void setBufferedAmountLowThreshold(const Napi::CallbackInfo &info);
   Napi::Value requestKeyframe(const Napi::CallbackInfo &info);
   void setMediaHandler(const Napi::CallbackInfo &info);
 
@@ -39,8 +36,6 @@ public:
   void onOpen(const Napi::CallbackInfo &info);
   void onClosed(const Napi::CallbackInfo &info);
   void onError(const Napi::CallbackInfo &info);
-  void onAvailable(const Napi::CallbackInfo &info);
-  void onBufferedAmountLow(const Napi::CallbackInfo &info);
   void onMessage(const Napi::CallbackInfo &info);
 
   // Close all existing track
@@ -57,8 +52,6 @@ private:
   std::unique_ptr<ThreadSafeCallback> mOnOpenCallback = nullptr;
   std::unique_ptr<ThreadSafeCallback> mOnClosedCallback = nullptr;
   std::unique_ptr<ThreadSafeCallback> mOnErrorCallback = nullptr;
-  std::unique_ptr<ThreadSafeCallback> mOnAvailableCallback = nullptr;
-  std::unique_ptr<ThreadSafeCallback> mOnBufferedAmountLowCallback = nullptr;
   std::unique_ptr<ThreadSafeCallback> mOnMessageCallback = nullptr;
 };
 
