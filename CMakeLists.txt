@@ -27,7 +27,7 @@ include(FetchContent)
 FetchContent_Declare(
     libdatachannel
     GIT_REPOSITORY https://github.com/paullouisageneau/libdatachannel.git
-    GIT_TAG "v0.16.0"
+    GIT_TAG "v0.16.2"
 )
 
 option(NO_MEDIA "Disable media transport support in libdatachannel" OFF)
