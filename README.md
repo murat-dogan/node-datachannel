@@ -76,6 +76,9 @@ setTimeout(() => {
     nodeDataChannel.cleanup();
 }, 10 * 1000);
 ```
+
+> Please check examples/media folder for media usage example
+
 ## Install
 
 Prebuilt binaries are available (Node Version >= 10);
