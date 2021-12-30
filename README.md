@@ -256,10 +256,6 @@ Send Message as binary
 
 Query data-channel
 
-**availableAmount: () => Number**
-
-Get available data amount
-
 **bufferedAmount: () => Number**
 
 Get current buffered amount level
@@ -283,10 +279,6 @@ Closed callback
 **onError: (cb: (err: string) => void) => void**
 
 Error callback
-
-**onAvailable: (cb: () => void) => void**
-
-Available callback
 
 **onBufferedAmountLow: (cb: () => void) => void**
 
