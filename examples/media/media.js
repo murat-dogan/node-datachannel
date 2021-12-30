@@ -19,15 +19,16 @@ peerConnection.onStateChange((state) => {
     console.log('State: ', state);
 });
 peerConnection.onGatheringStateChange((state) => {
-    console.log('GatheringState: ', state);
+    // console.log('GatheringState: ', state);
 
     if(state == 'complete'){
         let desc = peerConnection.localDescription();
-
+        console.log('');
+        console.log('## Please copy the offer below to the web page:');
         console.log(JSON.stringify(desc));
         console.log('\n\n');
-        console.log('Expect RTP video traffic on localhost:5000');
-        rl.question('Please copy/paste the answer provided by the browser: \n', (sdp) => {
+        console.log('## Expect RTP video traffic on localhost:5000');
+        rl.question('## Please copy/paste the answer provided by the browser: \n', (sdp) => {
             let sdpObj = JSON.parse(sdp);
             peerConnection.setRemoteDescription(sdpObj.sdp, sdpObj.type);
             console.log(track.isOpen())
