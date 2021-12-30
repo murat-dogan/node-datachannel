@@ -23,14 +23,12 @@ Napi::Object DataChannelWrapper::Init(Napi::Env env, Napi::Object exports)
             InstanceMethod("sendMessage", &DataChannelWrapper::sendMessage),
             InstanceMethod("sendMessageBinary", &DataChannelWrapper::sendMessageBinary),
             InstanceMethod("isOpen", &DataChannelWrapper::isOpen),
-            InstanceMethod("availableAmount", &DataChannelWrapper::availableAmount),
             InstanceMethod("bufferedAmount", &DataChannelWrapper::bufferedAmount),
             InstanceMethod("maxMessageSize", &DataChannelWrapper::maxMessageSize),
             InstanceMethod("setBufferedAmountLowThreshold", &DataChannelWrapper::setBufferedAmountLowThreshold),
             InstanceMethod("onOpen", &DataChannelWrapper::onOpen),
             InstanceMethod("onClosed", &DataChannelWrapper::onClosed),
             InstanceMethod("onError", &DataChannelWrapper::onError),
-            InstanceMethod("onAvailable", &DataChannelWrapper::onAvailable),
             InstanceMethod("onBufferedAmountLow", &DataChannelWrapper::onBufferedAmountLow),
             InstanceMethod("onMessage", &DataChannelWrapper::onMessage),
         });
@@ -65,7 +63,6 @@ void DataChannelWrapper::doClose()
             mOnOpenCallback.reset();
             mOnClosedCallback.reset();
             mOnErrorCallback.reset();
-            mOnAvailableCallback.reset();
             mOnBufferedAmountLowCallback.reset();
             mOnMessageCallback.reset();
 
@@ -170,25 +167,6 @@ Napi::Value DataChannelWrapper::isOpen(const Napi::CallbackInfo &info)
     {
         Napi::Error::New(env, std::string("libdatachannel error# ") + ex.what()).ThrowAsJavaScriptException();
         return Napi::Boolean::New(info.Env(), false);
-    }
-}
-
-Napi::Value DataChannelWrapper::availableAmount(const Napi::CallbackInfo &info)
-{
-    Napi::Env env = info.Env();
-    if (!mDataChannelPtr)
-    {
-        return Napi::Number::New(info.Env(), 0);
-    }
-
-    try
-    {
-        return Napi::Number::New(info.Env(), mDataChannelPtr->availableAmount());
-    }
-    catch (std::exception &ex)
-    {
-        Napi::Error::New(env, std::string("libdatachannel error# ") + ex.what()).ThrowAsJavaScriptException();
-        return Napi::Number::New(info.Env(), 0);
     }
 }
 
@@ -339,34 +317,6 @@ void DataChannelWrapper::onError(const Napi::CallbackInfo &info)
                 // This will run in main thread and needs to construct the
                 // arguments for the call
                 args = {Napi::String::New(env, error)};
-            }); });
-}
-
-void DataChannelWrapper::onAvailable(const Napi::CallbackInfo &info)
-{
-    Napi::Env env = info.Env();
-    int length = info.Length();
-
-    if (length < 1 || !info[0].IsFunction())
-    {
-        Napi::TypeError::New(env, "Function expected").ThrowAsJavaScriptException();
-        return;
-    }
-
-    // Callback
-    mOnAvailableCallback = std::make_unique<ThreadSafeCallback>(info[0].As<Napi::Function>());
-
-    mDataChannelPtr->onAvailable([&]()
-                                 {
-        if (mOnAvailableCallback)
-            mOnAvailableCallback->call([this](Napi::Env env, std::vector<napi_value> &args) {
-                // Check the peer connection is not closed
-                if(instances.find(this) == instances.end())
-                    throw ThreadSafeCallback::CancelException();
-
-                // This will run in main thread and needs to construct the
-                // arguments for the call
-                args = {};
             }); });
 }
 
