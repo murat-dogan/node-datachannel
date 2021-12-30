@@ -21,9 +21,13 @@ public:
 
   // Functions
   void close(const Napi::CallbackInfo &info);
+  void setLocalDescription(const Napi::CallbackInfo &info);
   void setRemoteDescription(const Napi::CallbackInfo &info);
+  Napi::Value localDescription(const Napi::CallbackInfo &info);
   void addRemoteCandidate(const Napi::CallbackInfo &info);
   Napi::Value createDataChannel(const Napi::CallbackInfo &info);
+  Napi::Value addTrack(const Napi::CallbackInfo &info);  
+  Napi::Value hasMedia(const Napi::CallbackInfo &info); 
 
   // Callbacks
   void onLocalDescription(const Napi::CallbackInfo &info);
@@ -31,6 +35,7 @@ public:
   void onStateChange(const Napi::CallbackInfo &info);
   void onGatheringStateChange(const Napi::CallbackInfo &info);
   void onDataChannel(const Napi::CallbackInfo &info);
+  void onTrack(const Napi::CallbackInfo &info);
 
   // Stats
   Napi::Value bytesSent(const Napi::CallbackInfo &info);
@@ -43,7 +48,7 @@ public:
 
 private:
   static Napi::FunctionReference constructor;
-  static std::unordered_set<PeerConnectionWrapper*> instances;
+  static std::unordered_set<PeerConnectionWrapper *> instances;
 
   void doClose();
 
@@ -56,6 +61,7 @@ private:
   std::unique_ptr<ThreadSafeCallback> mOnStateChangeCallback = nullptr;
   std::unique_ptr<ThreadSafeCallback> mOnGatheringStateChangeCallback = nullptr;
   std::unique_ptr<ThreadSafeCallback> mOnDataChannelCallback = nullptr;
+  std::unique_ptr<ThreadSafeCallback> mOnTrackCallback = nullptr;
 
   // Helpers
   std::string candidateTypeToString(const rtc::Candidate::Type &type);

@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.15)
 cmake_policy(SET CMP0091 NEW)
-project(node_datachannel VERSION 0.1.14)
+project(node_datachannel VERSION 0.2.0)
 
 include_directories(${CMAKE_JS_INC})
 
@@ -30,7 +30,7 @@ FetchContent_Declare(
     GIT_TAG "v0.16.0"
 )
 
-option(NO_MEDIA "Disable media transport support in libdatachannel" ON)
+option(NO_MEDIA "Disable media transport support in libdatachannel" OFF)
 option(NO_WEBSOCKET "Disable WebSocket support in libdatachannel" ON)
 
 FetchContent_GetProperties(libdatachannel)
@@ -42,6 +42,11 @@ endif()
 
 add_library(${PROJECT_NAME} SHARED
     src/rtc-wrapper.cpp
+    src/media-direction.cpp
+    src/media-rtcpreceivingsession-wrapper.cpp
+    src/media-track-wrapper.cpp
+    src/media-audio-wrapper.cpp
+    src/media-video-wrapper.cpp
     src/data-channel-wrapper.cpp
     src/peer-connection-wrapper.cpp
     src/thread-safe-callback.cpp
