@@ -1,6 +1,6 @@
 {
   "name": "node-datachannel",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "libdatachannel node bindings",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
@@ -34,7 +34,7 @@
       "url": "https://github.com/paullouisageneau"
     }
   ],
-  "license": "GPL-2.0-or-later",
+  "license": "LGPL",
   "gypfile": true,
   "bugs": {
     "url": "https://github.com/murat-dogan/node-datachannel/issues"
