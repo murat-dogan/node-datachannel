@@ -32,6 +32,7 @@ Napi::Object PeerConnectionWrapper::Init(Napi::Env env, Napi::Object exports)
             InstanceMethod("createDataChannel", &PeerConnectionWrapper::createDataChannel),
             InstanceMethod("addTrack", &PeerConnectionWrapper::addTrack),
             InstanceMethod("hasMedia", &PeerConnectionWrapper::hasMedia),
+            InstanceMethod("state", &PeerConnectionWrapper::state),
             InstanceMethod("signalingState", &PeerConnectionWrapper::signalingState),
             InstanceMethod("gatheringState", &PeerConnectionWrapper::gatheringState),
             InstanceMethod("onLocalDescription", &PeerConnectionWrapper::onLocalDescription),
@@ -887,6 +888,14 @@ Napi::Value PeerConnectionWrapper::hasMedia(const Napi::CallbackInfo &info)
 {
     Napi::Env env = info.Env();
     return Napi::Boolean::New(env, mRtcPeerConnPtr->hasMedia());
+}
+
+Napi::Value PeerConnectionWrapper::state(const Napi::CallbackInfo &info)
+{
+    Napi::Env env = info.Env();
+    std::ostringstream stream;
+    stream << mRtcPeerConnPtr->state();
+    return Napi::String::New(env, stream.str());
 }
 
 Napi::Value PeerConnectionWrapper::signalingState(const Napi::CallbackInfo &info)

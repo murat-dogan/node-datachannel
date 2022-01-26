@@ -26,10 +26,11 @@ public:
   Napi::Value localDescription(const Napi::CallbackInfo &info);
   void addRemoteCandidate(const Napi::CallbackInfo &info);
   Napi::Value createDataChannel(const Napi::CallbackInfo &info);
-  Napi::Value addTrack(const Napi::CallbackInfo &info);  
-  Napi::Value hasMedia(const Napi::CallbackInfo &info); 
-  Napi::Value signalingState(const Napi::CallbackInfo &info); 
-  Napi::Value gatheringState(const Napi::CallbackInfo &info); 
+  Napi::Value addTrack(const Napi::CallbackInfo &info);
+  Napi::Value hasMedia(const Napi::CallbackInfo &info);
+  Napi::Value state(const Napi::CallbackInfo &info);
+  Napi::Value signalingState(const Napi::CallbackInfo &info);
+  Napi::Value gatheringState(const Napi::CallbackInfo &info);
 
   // Callbacks
   void onLocalDescription(const Napi::CallbackInfo &info);
