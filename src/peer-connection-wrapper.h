@@ -36,6 +36,7 @@ public:
   void onLocalDescription(const Napi::CallbackInfo &info);
   void onLocalCandidate(const Napi::CallbackInfo &info);
   void onStateChange(const Napi::CallbackInfo &info);
+  void onSignalingStateChange(const Napi::CallbackInfo &info);
   void onGatheringStateChange(const Napi::CallbackInfo &info);
   void onDataChannel(const Napi::CallbackInfo &info);
   void onTrack(const Napi::CallbackInfo &info);
@@ -62,6 +63,7 @@ private:
   std::unique_ptr<ThreadSafeCallback> mOnLocalDescriptionCallback = nullptr;
   std::unique_ptr<ThreadSafeCallback> mOnLocalCandidateCallback = nullptr;
   std::unique_ptr<ThreadSafeCallback> mOnStateChangeCallback = nullptr;
+  std::unique_ptr<ThreadSafeCallback> mOnSignalingStateChangeCallback = nullptr;
   std::unique_ptr<ThreadSafeCallback> mOnGatheringStateChangeCallback = nullptr;
   std::unique_ptr<ThreadSafeCallback> mOnDataChannelCallback = nullptr;
   std::unique_ptr<ThreadSafeCallback> mOnTrackCallback = nullptr;

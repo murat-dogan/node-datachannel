@@ -211,6 +211,10 @@ Local Candidate Callback
 
 State Change Callback
 
+**onSignalingStateChange: (state: (sdp: string) => void) => void**
+
+Signaling State Change Callback
+
 **onGatheringStateChange: (state: (sdp: string) => void) => void**
 
 Gathering State Change Callback
