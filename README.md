@@ -180,6 +180,9 @@ export const enum ReliabilityType {
     Reliable = 0, Rexmit = 1, Timed = 2
 }
 ``` 
+**signalingState: () => string**
+
+AGet current signaling state
 
 **onLocalDescription: (cb: (sdp: string, type: DescriptionType) => void) => void**
 

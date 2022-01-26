@@ -32,6 +32,7 @@ Napi::Object PeerConnectionWrapper::Init(Napi::Env env, Napi::Object exports)
             InstanceMethod("createDataChannel", &PeerConnectionWrapper::createDataChannel),
             InstanceMethod("addTrack", &PeerConnectionWrapper::addTrack),
             InstanceMethod("hasMedia", &PeerConnectionWrapper::hasMedia),
+            InstanceMethod("signalingState", &PeerConnectionWrapper::signalingState),
             InstanceMethod("onLocalDescription", &PeerConnectionWrapper::onLocalDescription),
             InstanceMethod("onLocalCandidate", &PeerConnectionWrapper::onLocalCandidate),
             InstanceMethod("onStateChange", &PeerConnectionWrapper::onStateChange),
@@ -841,7 +842,7 @@ Napi::Value PeerConnectionWrapper::addTrack(const Napi::CallbackInfo &info)
             return instance;
         }
 
-          Napi::Error::New(env, std::string("Unknown media type")).ThrowAsJavaScriptException();
+        Napi::Error::New(env, std::string("Unknown media type")).ThrowAsJavaScriptException();
         return env.Null();
     }
     catch (std::exception &ex)
@@ -885,4 +886,12 @@ Napi::Value PeerConnectionWrapper::hasMedia(const Napi::CallbackInfo &info)
 {
     Napi::Env env = info.Env();
     return Napi::Boolean::New(env, mRtcPeerConnPtr->hasMedia());
+}
+
+Napi::Value PeerConnectionWrapper::signalingState(const Napi::CallbackInfo &info)
+{
+    Napi::Env env = info.Env();
+    std::ostringstream stream;
+    stream << mRtcPeerConnPtr->signalingState();
+    return Napi::String::New(env, stream.str());
 }
