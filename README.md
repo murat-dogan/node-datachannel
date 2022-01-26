@@ -182,7 +182,11 @@ export const enum ReliabilityType {
 ``` 
 **signalingState: () => string**
 
-AGet current signaling state
+Get current signaling state
+
+**gatheringState: () => string**
+
+Get current gathering state
 
 **onLocalDescription: (cb: (sdp: string, type: DescriptionType) => void) => void**
 

@@ -206,6 +206,7 @@ export class PeerConnection {
     addTrack: (media: Video | Audio) => Track;
     hasMedia: () => boolean;
     signalingState: () => string;
+    gatheringState: () => string;
     onLocalDescription: (cb: (sdp: string, type: DescriptionType) => void) => void;
     onLocalCandidate: (cb: (candidate: string, mid: string) => void) => void;
     onStateChange: (cb: (state: string) => void) => void;
