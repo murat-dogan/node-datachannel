@@ -133,7 +133,7 @@ TURN Server Example          : turn:USERNAME:PASSWORD@TURN_IP_OR_ADDRESS:PORT
 TURN Server Example (TCP)    : turn:USERNAME:PASSWORD@TURN_IP_OR_ADDRESS:PORT?transport=tcp
 TURN Server Example (TLS)    : turns:USERNAME:PASSWORD@TURN_IP_OR_ADDRESS:PORT
 
-``` 
+```
 
 **close: () => void**
 
@@ -179,7 +179,11 @@ export interface DataChannelInitConfig {
 export const enum ReliabilityType {
     Reliable = 0, Rexmit = 1, Timed = 2
 }
-``` 
+```
+**state: () => string**
+
+Get current state
+
 **signalingState: () => string**
 
 Get current signaling state
@@ -206,6 +210,10 @@ Local Candidate Callback
 **onStateChange: (cb: (state: string) => void) => void**
 
 State Change Callback
+
+**onSignalingStateChange: (state: (sdp: string) => void) => void**
+
+Signaling State Change Callback
 
 **onGatheringStateChange: (state: (sdp: string) => void) => void**
 
@@ -245,7 +253,7 @@ export interface SelectedCandidateInfo {
 
 **close: () => void**
 
-Close data channel 
+Close data channel
 
 **getLabel: () => string**
 

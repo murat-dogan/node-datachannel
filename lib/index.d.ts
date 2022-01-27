@@ -134,7 +134,7 @@ export class Video {
     addH264Codec: (payloadType: Number, profile?: string) => void;
     addVP8Codec: (payloadType: Number) => void;
     addVP9Codec: (payloadType: Number) => void;
-    
+
     direction: () => Direction;
     generateSdp: (eol: string, addr: string, port: string) => string;
     mid: () => string;
@@ -205,11 +205,13 @@ export class PeerConnection {
     createDataChannel: (label: string, config?: DataChannelInitConfig) => DataChannel;
     addTrack: (media: Video | Audio) => Track;
     hasMedia: () => boolean;
+    state: () => string;
     signalingState: () => string;
     gatheringState: () => string;
     onLocalDescription: (cb: (sdp: string, type: DescriptionType) => void) => void;
     onLocalCandidate: (cb: (candidate: string, mid: string) => void) => void;
     onStateChange: (cb: (state: string) => void) => void;
+    onSignalingStateChange: (state: (sdp: string) => void) => void;
     onGatheringStateChange: (state: (sdp: string) => void) => void;
     onDataChannel: (cb: (dc: DataChannel) => void) => void;
     onTrack: () => Track;
