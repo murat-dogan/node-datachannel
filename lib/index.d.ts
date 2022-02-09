@@ -90,7 +90,7 @@ export interface SelectedCandidateInfo {
 }
 
 // Must be same as rtc enum class Direction
-export enum Direction {
+export const enum Direction {
     SendOnly = 'SendOnly',
     RecvOnly = 'RecvOnly',
     SendRecv = 'SendRecv',
