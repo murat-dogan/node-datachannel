@@ -51,7 +51,7 @@ AudioWrapper::AudioWrapper(const Napi::CallbackInfo &info) : Napi::ObjectWrap<Au
     rtc::Description::Direction dir = rtc::Description::Direction::SendOnly;
 
     // optional
-    if (length > 1)
+    if (length > 0)
     {
         if (!info[0].IsString())
         {
@@ -62,7 +62,7 @@ AudioWrapper::AudioWrapper(const Napi::CallbackInfo &info) : Napi::ObjectWrap<Au
     }
 
     // ootional
-    if (length > 2)
+    if (length > 1)
     {
         if (!info[1].IsString())
         {
