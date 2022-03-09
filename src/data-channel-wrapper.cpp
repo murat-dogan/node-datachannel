@@ -20,6 +20,7 @@ Napi::Object DataChannelWrapper::Init(Napi::Env env, Napi::Object exports)
         {
             InstanceMethod("close", &DataChannelWrapper::close),
             InstanceMethod("getLabel", &DataChannelWrapper::getLabel),
+            InstanceMethod("getId", &DataChannelWrapper::getId),
             InstanceMethod("sendMessage", &DataChannelWrapper::sendMessage),
             InstanceMethod("sendMessageBinary", &DataChannelWrapper::sendMessageBinary),
             InstanceMethod("isOpen", &DataChannelWrapper::isOpen),
@@ -91,6 +92,17 @@ Napi::Value DataChannelWrapper::getLabel(const Napi::CallbackInfo &info)
     }
 
     return Napi::String::New(info.Env(), mDataChannelPtr->label());
+}
+
+Napi::Value DataChannelWrapper::getId(const Napi::CallbackInfo &info)
+{
+    if (!mDataChannelPtr)
+    {
+        Napi::Error::New(info.Env(), "It seems data-channel is destroyed!").ThrowAsJavaScriptException();
+        return info.Env().Null();
+    }
+
+    return Napi::Number::New(info.Env(), mDataChannelPtr->id());
 }
 
 Napi::Value DataChannelWrapper::sendMessage(const Napi::CallbackInfo &info)

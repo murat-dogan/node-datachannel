@@ -26,6 +26,8 @@ describe('PeerConnection Classes', () => {
         let peer = new nodeDataChannel.PeerConnection("Peer", { iceServers: ["stun:stun.l.google.com:19302"] });
         let dc = peer.createDataChannel('test');
         expect(dc).toBeDefined();
+        expect(dc.getId()).toBeDefined();
+        expect(dc.getLabel()).toBe('test');
         expect(dc.onOpen).toBeDefined();
         expect(dc.onMessage).toBeDefined();
 

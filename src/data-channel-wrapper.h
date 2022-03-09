@@ -23,6 +23,7 @@ public:
   // Functions
   void close(const Napi::CallbackInfo &info);
   Napi::Value getLabel(const Napi::CallbackInfo &info);
+  Napi::Value getId(const Napi::CallbackInfo &info);
   Napi::Value sendMessage(const Napi::CallbackInfo &info);
   Napi::Value sendMessageBinary(const Napi::CallbackInfo &info);
   Napi::Value isOpen(const Napi::CallbackInfo &info);
