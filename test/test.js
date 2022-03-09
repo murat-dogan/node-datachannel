@@ -185,7 +185,8 @@ describe('DataChannel streams', () => {
         expect(await clientResponsePromise).toBe("test message");
 
         clientChannel.close();
-        echoStream.destroy();
+        await new Promise((resolve) => echoStream.on('end', resolve));
+
         clientPeer.close();
         echoPeer.close();
     });
