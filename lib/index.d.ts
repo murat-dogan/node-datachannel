@@ -183,6 +183,7 @@ export class DataChannel {
     close: () => void;
     getLabel: () => string;
     getId: () => number;
+    getProtocol: () => string;
     sendMessage: (msg: string) => boolean;
     sendMessageBinary: (buffer: Buffer) => boolean;
     isOpen: () => boolean;
