@@ -50,6 +50,7 @@ jobs:
       - uses: ilammy/msvc-dev-cmd@v1
         with:
           arch: x86
+          toolset: 16 # Visual Studio 16 2019
       - name: Install OpenSSL
         run: choco install openssl --x86=true
       - name: Use Node.js ${{ matrix.node-version }}
