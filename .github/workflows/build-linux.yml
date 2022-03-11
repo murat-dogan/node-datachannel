@@ -45,6 +45,7 @@ jobs:
       - uses: actions/checkout@v2
       - name: Prepare Cross Compile
         run: |
+          sudo apt update
           sudo apt install -y g++-arm-linux-gnueabihf gcc-arm-linux-gnueabihf
           mkdir sysroot && cd sysroot
           wget https://commondatastorage.googleapis.com/chrome-linux-sysroot/toolchain/ef5c4f84bcafb7a3796d36bb1db7826317dde51c/debian_sid_arm_sysroot.tar.xz        
@@ -72,6 +73,7 @@ jobs:
       - uses: actions/checkout@v2
       - name: Prepare Cross Compile
         run: |
+          sudo apt update
           sudo apt install -y g++-aarch64-linux-gnu gcc-aarch64-linux-gnu
           mkdir sysroot && cd sysroot
           wget https://commondatastorage.googleapis.com/chrome-linux-sysroot/toolchain/953c2471bc7e71a788309f6c2d2003e8b703305d/debian_sid_arm64_sysroot.tar.xz        
