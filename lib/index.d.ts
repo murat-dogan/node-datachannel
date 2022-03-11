@@ -1,3 +1,5 @@
+import * as stream from 'stream';
+
 export as namespace NodeDataChannel;
 
 // Enum in d.ts is tricky
@@ -219,4 +221,12 @@ export class PeerConnection {
     bytesReceived: () => number;
     rtt: () => number;
     getSelectedCandidatePair: () => { local: SelectedCandidateInfo, remote: SelectedCandidateInfo } | null;
+}
+
+export class DataChannelStream extends stream.Duplex {
+    constructor(
+        rawChannel: DataChannel,
+        options?: Omit<stream.DuplexOptions, 'objectMode'>
+    );
+    get label(): string;
 }

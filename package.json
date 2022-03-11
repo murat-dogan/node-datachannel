@@ -57,6 +57,7 @@
     "prebuild-install"
   ],
   "dependencies": {
+    "@types/node": "^17.0.21",
     "prebuild-install": "^7.0.1"
   }
 }
