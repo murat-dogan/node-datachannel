@@ -56,20 +56,12 @@ TrackWrapper::~TrackWrapper()
 }
 
 void TrackWrapper::doClose()
-{
-    instances.erase(this);
-
+{    
     if (mTrackPtr)
     {
         try
-        {
-            mOnOpenCallback.reset();
-            mOnClosedCallback.reset();
-            mOnErrorCallback.reset();
-            mOnMessageCallback.reset();
-
-            mTrackPtr->close();
-            mTrackPtr.reset();
+        {            
+            mTrackPtr->close();            
         }
         catch (std::exception &ex)
         {
@@ -261,6 +253,14 @@ void TrackWrapper::onClosed(const Napi::CallbackInfo &info)
                 // Check the peer connection is not closed
                 if(instances.find(this) == instances.end())
                     throw ThreadSafeCallback::CancelException();
+
+                mOnOpenCallback.reset();
+                mOnClosedCallback.reset();
+                mOnErrorCallback.reset();
+                mOnMessageCallback.reset();
+
+                instances.erase(this);
+                mTrackPtr.reset();
 
                 // This will run in main thread and needs to construct the
                 // arguments for the call

@@ -66,6 +66,9 @@ peer2.onDataChannel((dc) => {
         console.log('Peer2 Received Msg:', msg);
     });
     dc2.sendMessage("Hello From Peer2");
+    dc2.onClosed(() => {
+        console.log('dc2 closed');
+     });
 });
 
 // DataChannel Options
@@ -84,6 +87,9 @@ dc1.onOpen(() => {
 });
 dc1.onMessage((msg) => {
     console.log('Peer1 Received Msg:', msg);
+});
+dc1.onClosed(() => {
+   console.log('dc1 closed');
 });
 
 setTimeout(() => {
