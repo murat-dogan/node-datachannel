@@ -50,14 +50,14 @@
     "jest": "^27.5.1",
     "nan": "^2.15.0",
     "napi-thread-safe-callback-cancellable": "^0.0.7",
-    "node-addon-api": "^4.2.0",
+    "node-addon-api": "^4.3.0",
     "prebuild": "^11.0.3"
   },
   "bundledDependencies": [
     "prebuild-install"
   ],
   "dependencies": {
-    "@types/node": "^17.0.21",
+    "@types/node": "^17.0.23",
     "prebuild-install": "^7.0.1"
   }
 }
