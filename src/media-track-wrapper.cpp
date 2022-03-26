@@ -56,12 +56,12 @@ TrackWrapper::~TrackWrapper()
 }
 
 void TrackWrapper::doClose()
-{    
+{
     if (mTrackPtr)
     {
         try
-        {            
-            mTrackPtr->close();            
+        {
+            mTrackPtr->close();
         }
         catch (std::exception &ex)
         {
@@ -69,6 +69,17 @@ void TrackWrapper::doClose()
             return;
         }
     }
+}
+
+void TrackWrapper::cleanCbsAndEraseInstance()
+{
+    mOnOpenCallback.reset();
+    mOnClosedCallback.reset();
+    mOnErrorCallback.reset();
+    mOnMessageCallback.reset();
+
+    instances.erase(this);
+    mTrackPtr.reset();
 }
 
 void TrackWrapper::close(const Napi::CallbackInfo &info)
@@ -254,18 +265,15 @@ void TrackWrapper::onClosed(const Napi::CallbackInfo &info)
                 if(instances.find(this) == instances.end())
                     throw ThreadSafeCallback::CancelException();
 
-                mOnOpenCallback.reset();
-                mOnClosedCallback.reset();
-                mOnErrorCallback.reset();
-                mOnMessageCallback.reset();
-
-                instances.erase(this);
-                mTrackPtr.reset();
+                cleanCbsAndEraseInstance();
 
                 // This will run in main thread and needs to construct the
                 // arguments for the call
                 args = {};
-            }); });
+            }); 
+            else {
+             cleanCbsAndEraseInstance();
+         } });
 }
 
 void TrackWrapper::onError(const Napi::CallbackInfo &info)

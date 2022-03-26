@@ -70,6 +70,18 @@ void DataChannelWrapper::doClose()
     }
 }
 
+void DataChannelWrapper::cleanCbsAndEraseInstance()
+{
+    mOnOpenCallback.reset();
+    mOnClosedCallback.reset();
+    mOnErrorCallback.reset();
+    mOnBufferedAmountLowCallback.reset();
+    mOnMessageCallback.reset();
+
+    instances.erase(this);
+    mDataChannelPtr.reset();
+}
+
 void DataChannelWrapper::close(const Napi::CallbackInfo &info)
 {
     doClose();
@@ -301,19 +313,15 @@ void DataChannelWrapper::onClosed(const Napi::CallbackInfo &info)
                 if(instances.find(this) == instances.end())
                     throw ThreadSafeCallback::CancelException();
 
-                mOnOpenCallback.reset();
-                mOnClosedCallback.reset();
-                mOnErrorCallback.reset();
-                mOnBufferedAmountLowCallback.reset();
-                mOnMessageCallback.reset();
-
-                instances.erase(this);
-                mDataChannelPtr.reset();
+                cleanCbsAndEraseInstance();
 
                 // This will run in main thread and needs to construct the
                 // arguments for the call
                 args = {};
-            }); });
+            });
+         else {
+             cleanCbsAndEraseInstance();
+         } });
 }
 
 void DataChannelWrapper::onError(const Napi::CallbackInfo &info)

@@ -45,6 +45,7 @@ private:
   static std::unordered_set<TrackWrapper *> instances;
 
   void doClose();
+  void cleanCbsAndEraseInstance();
 
   std::shared_ptr<rtc::Track> mTrackPtr = nullptr;
 
