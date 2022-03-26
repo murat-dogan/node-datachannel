@@ -55,6 +55,8 @@ private:
   static std::unordered_set<PeerConnectionWrapper *> instances;
 
   void doClose();
+  void cleanCbsAndEraseInstance();
+  bool mDoCloseFlag = false;
 
   std::string mPeerName;
   std::unique_ptr<rtc::PeerConnection> mRtcPeerConnPtr = nullptr;
