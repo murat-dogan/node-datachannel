@@ -398,7 +398,7 @@ void AudioWrapper::setBitrate(const Napi::CallbackInfo &info)
 Napi::Value AudioWrapper::getBitrate(const Napi::CallbackInfo &info)
 {
 
-    return Napi::Number::New(info.Env(), mAudioPtr->getBitrate());
+    return Napi::Number::New(info.Env(), mAudioPtr->bitrate());
 }
 
 Napi::Value AudioWrapper::hasPayloadType(const Napi::CallbackInfo &info)
@@ -432,7 +432,7 @@ void AudioWrapper::addRTXCodec(const Napi::CallbackInfo &info)
     unsigned int originalPayloadType = static_cast<unsigned int>(info[1].As<Napi::Number>().ToNumber());
     unsigned int clockRate = static_cast<unsigned int>(info[2].As<Napi::Number>().ToNumber());
 
-    mAudioPtr->addRTXCodec(payloadType, originalPayloadType, clockRate);
+    mAudioPtr->addRtxCodec(payloadType, originalPayloadType, clockRate);
 }
 
 void AudioWrapper::addRTPMap(const Napi::CallbackInfo &info)

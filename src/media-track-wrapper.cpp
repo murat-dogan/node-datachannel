@@ -45,8 +45,26 @@ Napi::Object TrackWrapper::Init(Napi::Env env, Napi::Object exports)
 
 TrackWrapper::TrackWrapper(const Napi::CallbackInfo &info) : Napi::ObjectWrap<TrackWrapper>(info)
 {
-    mTrackPtr = *(info[0].As<Napi::External<std::shared_ptr<rtc::Track>>>().Data());
+    mTrackPtr = *(info[0].As<Napi::External<std::shared_ptr<rtc::Track>>>().Data());    
 
+    mTrackPtr->onClosed([&]()
+                        {
+        if (mOnClosedCallback)
+            mOnClosedCallback->call([this](Napi::Env env, std::vector<napi_value> &args) {
+                // Check the peer connection is not closed
+                if(instances.find(this) == instances.end())
+                    throw ThreadSafeCallback::CancelException();
+
+                cleanCbsAndEraseInstance();
+
+                // This will run in main thread and needs to construct the
+                // arguments for the call
+                args = {};
+            }); 
+            else {
+             cleanCbsAndEraseInstance();
+         } });
+    
     instances.insert(this);
 }
 
@@ -57,19 +75,11 @@ TrackWrapper::~TrackWrapper()
 
 void TrackWrapper::doClose()
 {
-    instances.erase(this);
-
     if (mTrackPtr)
     {
         try
         {
-            mOnOpenCallback.reset();
-            mOnClosedCallback.reset();
-            mOnErrorCallback.reset();
-            mOnMessageCallback.reset();
-
             mTrackPtr->close();
-            mTrackPtr.reset();
         }
         catch (std::exception &ex)
         {
@@ -77,6 +87,17 @@ void TrackWrapper::doClose()
             return;
         }
     }
+}
+
+void TrackWrapper::cleanCbsAndEraseInstance()
+{
+    mOnOpenCallback.reset();
+    mOnClosedCallback.reset();
+    mOnErrorCallback.reset();
+    mOnMessageCallback.reset();
+
+    instances.erase(this);
+    mTrackPtr.reset();
 }
 
 void TrackWrapper::close(const Napi::CallbackInfo &info)
@@ -254,18 +275,7 @@ void TrackWrapper::onClosed(const Napi::CallbackInfo &info)
     // Callback
     mOnClosedCallback = std::make_unique<ThreadSafeCallback>(info[0].As<Napi::Function>());
 
-    mTrackPtr->onClosed([&]()
-                        {
-        if (mOnClosedCallback)
-            mOnClosedCallback->call([this](Napi::Env env, std::vector<napi_value> &args) {
-                // Check the peer connection is not closed
-                if(instances.find(this) == instances.end())
-                    throw ThreadSafeCallback::CancelException();
-
-                // This will run in main thread and needs to construct the
-                // arguments for the call
-                args = {};
-            }); });
+    // Object cb call moved to the constructor    
 }
 
 void TrackWrapper::onError(const Napi::CallbackInfo &info)
