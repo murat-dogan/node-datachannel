@@ -211,6 +211,27 @@ PeerConnectionWrapper::PeerConnectionWrapper(const Napi::CallbackInfo &info) : N
         return;
     }
 
+    mRtcPeerConnPtr->onStateChange([&](rtc::PeerConnection::State state) {
+        if (mOnStateChangeCallback)
+            mOnStateChangeCallback->call([this, state](Napi::Env env, std::vector<napi_value> &args) {
+                // Check the peer connection is not closed  
+                if(instances.find(this) == instances.end())
+                    throw ThreadSafeCallback::CancelException();
+
+                if(mDoCloseFlag && state == rtc::PeerConnection::State::Closed)
+                    cleanCbsAndEraseInstance();
+
+                // This will run in main thread and needs to construct the
+                // arguments for the call
+                std::ostringstream stream;
+                stream << state;
+                args = {Napi::String::New(env, stream.str())};
+            });
+        else {                 
+            if(mDoCloseFlag && state == rtc::PeerConnection::State::Closed)
+                cleanCbsAndEraseInstance();
+         } });
+
     instances.insert(this);
 }
 
@@ -606,26 +627,7 @@ void PeerConnectionWrapper::onStateChange(const Napi::CallbackInfo &info)
     // Callback
     mOnStateChangeCallback = std::make_unique<ThreadSafeCallback>(info[0].As<Napi::Function>());
 
-    mRtcPeerConnPtr->onStateChange([&](rtc::PeerConnection::State state) {
-        if (mOnStateChangeCallback)
-            mOnStateChangeCallback->call([this, state](Napi::Env env, std::vector<napi_value> &args) {
-                // Check the peer connection is not closed  
-                if(instances.find(this) == instances.end())
-                    throw ThreadSafeCallback::CancelException();
-
-                if(mDoCloseFlag && state == rtc::PeerConnection::State::Closed)
-                    cleanCbsAndEraseInstance();
-
-                // This will run in main thread and needs to construct the
-                // arguments for the call
-                std::ostringstream stream;
-                stream << state;
-                args = {Napi::String::New(env, stream.str())};
-            });
-            else {                 
-                if(mDoCloseFlag && state == rtc::PeerConnection::State::Closed)
-                    cleanCbsAndEraseInstance();
-         } });
+    // onState cb will be called from constructor    
 }
 
 void PeerConnectionWrapper::onSignalingStateChange(const Napi::CallbackInfo &info)
