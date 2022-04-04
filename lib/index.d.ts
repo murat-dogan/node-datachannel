@@ -197,7 +197,7 @@ export class DataChannel {
 export class PeerConnection {
     constructor(peerName: string, config: RtcConfig);
     close: () => void;
-    setLocalDescription: (type: DescriptionType) => void;
+    setLocalDescription: (type?: DescriptionType) => void;
     setRemoteDescription: (sdp: string, type: DescriptionType) => void;
     localDescription: () => { type: string, sdp: string };
     addRemoteCandidate: (candidate: string, mid: string) => void;
