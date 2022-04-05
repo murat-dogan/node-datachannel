@@ -165,7 +165,6 @@ export class Track {
     sendMessageBinary: (buffer: Buffer) => boolean;
     isOpen: () => boolean;
     isClosed: () => boolean;
-    availableAmount: () => Number;
     bufferedAmount: () => Number;
     maxMessageSize: () => Number;
     setBufferedAmountLowThreshold: (newSize: Number) => void;
@@ -174,9 +173,7 @@ export class Track {
     onOpen: (cb: () => void) => void;
     onClosed: (cb: () => void) => void;
     onError: (cb: (err: string) => void) => void;
-    onAvailable: (cb: () => void) => void;
-    onBufferedAmountLow: (cb: () => void) => void;
-    onMessage: (cb: (msg: string | Buffer) => void) => void;
+    onMessage: (cb: (msg: Buffer) => void) => void;
 }
 
 export class DataChannel {
@@ -187,14 +184,12 @@ export class DataChannel {
     sendMessage: (msg: string) => boolean;
     sendMessageBinary: (buffer: Buffer) => boolean;
     isOpen: () => boolean;
-    availableAmount: () => Number;
     bufferedAmount: () => Number;
     maxMessageSize: () => Number;
     setBufferedAmountLowThreshold: (newSize: Number) => void;
     onOpen: (cb: () => void) => void;
     onClosed: (cb: () => void) => void;
     onError: (cb: (err: string) => void) => void;
-    onAvailable: (cb: () => void) => void;
     onBufferedAmountLow: (cb: () => void) => void;
     onMessage: (cb: (msg: string | Buffer) => void) => void;
 }
@@ -218,7 +213,7 @@ export class PeerConnection {
     onSignalingStateChange: (state: (sdp: string) => void) => void;
     onGatheringStateChange: (state: (sdp: string) => void) => void;
     onDataChannel: (cb: (dc: DataChannel) => void) => void;
-    onTrack: () => Track;
+    onTrack: (cb: (track: Track) => void) => void;
     bytesSent: () => number;
     bytesReceived: () => number;
     rtt: () => number;
