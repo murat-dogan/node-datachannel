@@ -3,7 +3,7 @@ import * as stream from 'stream';
 export as namespace NodeDataChannel;
 
 // Enum in d.ts is tricky
-export type LogLevel = "Verbose" | "Debug" | "Info" | "Warning" | "Error" | "Fatal";
+export type LogLevel = 'Verbose' | 'Debug' | 'Info' | 'Warning' | 'Error' | 'Fatal';
 
 // SCTP Settings
 export interface SctpSettings {
@@ -34,7 +34,7 @@ export interface ProxyServer {
 export const enum RelayType {
     TurnUdp = 'TurnUdp',
     TurnTcp = 'TurnTcp',
-    TurnTls = 'TurnTls'
+    TurnTls = 'TurnTls',
 }
 
 export interface IceServer {
@@ -61,13 +61,13 @@ export const enum DescriptionType {
     Offer = 'Offer',
     Answer = 'Answer',
     Pranswer = 'Pranswer',
-    Rollback = 'Rollback'
+    Rollback = 'Rollback',
 }
 
 export const enum ReliabilityType {
     Reliable = 0,
     Rexmit = 1,
-    Timed = 2
+    Timed = 2,
 }
 
 export interface DataChannelInitConfig {
@@ -83,7 +83,7 @@ export interface DataChannelInitConfig {
         type?: ReliabilityType;
         unordered?: boolean;
         rexmit?: number;
-    }
+    };
 }
 
 export interface SelectedCandidateInfo {
@@ -99,7 +99,7 @@ export const enum Direction {
     RecvOnly = 'RecvOnly',
     SendRecv = 'SendRecv',
     Inactive = 'Inactive',
-    Unknown = 'Unknown'
+    Unknown = 'Unknown',
 }
 
 export class RtcpReceivingSession {
@@ -171,7 +171,7 @@ export class Track {
     maxMessageSize: () => number;
     setBufferedAmountLowThreshold: (newSize: number) => void;
     requestKeyframe: () => boolean;
-    setMediaHandler: (handler: RtcpReceivingSession) => void
+    setMediaHandler: (handler: RtcpReceivingSession) => void;
     onOpen: (cb: () => void) => void;
     onClosed: (cb: () => void) => void;
     onError: (cb: (err: string) => void) => void;
@@ -201,7 +201,7 @@ export class PeerConnection {
     close: () => void;
     setLocalDescription: (type?: DescriptionType) => void;
     setRemoteDescription: (sdp: string, type: DescriptionType) => void;
-    localDescription: () => { type: string, sdp: string };
+    localDescription: () => { type: string; sdp: string };
     addRemoteCandidate: (candidate: string, mid: string) => void;
     createDataChannel: (label: string, config?: DataChannelInitConfig) => DataChannel;
     addTrack: (media: Video | Audio) => Track;
@@ -219,13 +219,10 @@ export class PeerConnection {
     bytesSent: () => number;
     bytesReceived: () => number;
     rtt: () => number;
-    getSelectedCandidatePair: () => { local: SelectedCandidateInfo, remote: SelectedCandidateInfo } | null;
+    getSelectedCandidatePair: () => { local: SelectedCandidateInfo; remote: SelectedCandidateInfo } | null;
 }
 
 export class DataChannelStream extends stream.Duplex {
-    constructor(
-        rawChannel: DataChannel,
-        options?: Omit<stream.DuplexOptions, 'objectMode'>
-    );
+    constructor(rawChannel: DataChannel, options?: Omit<stream.DuplexOptions, 'objectMode'>);
     get label(): string;
 }
