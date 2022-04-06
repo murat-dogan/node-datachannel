@@ -3,7 +3,7 @@ import * as stream from 'stream';
 export as namespace NodeDataChannel;
 
 // Enum in d.ts is tricky
-export type LogLevel = "Verbose" | "Debug" | "Info" | "Warning" | "Error" | "Fatal";
+export type LogLevel = 'Verbose' | 'Debug' | 'Info' | 'Warning' | 'Error' | 'Fatal';
 
 // SCTP Settings
 export interface SctpSettings {
@@ -26,7 +26,7 @@ export type ProxyServerType = 'None' | 'Socks5' | 'Http';
 export interface ProxyServer {
     type: ProxyServerType;
     ip: string;
-    port: Number;
+    port: number;
     username?: string;
     password?: string;
 }
@@ -34,12 +34,12 @@ export interface ProxyServer {
 export const enum RelayType {
     TurnUdp = 'TurnUdp',
     TurnTcp = 'TurnTcp',
-    TurnTls = 'TurnTls'
+    TurnTls = 'TurnTls',
 }
 
 export interface IceServer {
     hostname: string;
-    port: Number;
+    port: number;
     username?: string;
     password?: string;
     relayType?: RelayType;
@@ -61,11 +61,13 @@ export const enum DescriptionType {
     Offer = 'Offer',
     Answer = 'Answer',
     Pranswer = 'Pranswer',
-    Rollback = 'Rollback'
+    Rollback = 'Rollback',
 }
 
 export const enum ReliabilityType {
-    Reliable = 0, Rexmit = 1, Timed = 2
+    Reliable = 0,
+    Rexmit = 1,
+    Timed = 2,
 }
 
 export interface DataChannelInitConfig {
@@ -81,7 +83,7 @@ export interface DataChannelInitConfig {
         type?: ReliabilityType;
         unordered?: boolean;
         rexmit?: number;
-    }
+    };
 }
 
 export interface SelectedCandidateInfo {
@@ -97,18 +99,18 @@ export const enum Direction {
     RecvOnly = 'RecvOnly',
     SendRecv = 'SendRecv',
     Inactive = 'Inactive',
-    Unknown = 'Unknown'
+    Unknown = 'Unknown',
 }
 
 export class RtcpReceivingSession {
-    requestBitrate: (bitRate: Number) => void;
+    requestBitrate: (bitRate: number) => void;
     requestKeyframe: () => boolean;
 }
 
 export class Audio {
     constructor(mid: string, dir: Direction);
-    addAudioCodec: (payloadType: Number, codec: string, profile?: string) => void;
-    addOpusCodec: (payloadType: Number, profile?: string) => string;
+    addAudioCodec: (payloadType: number, codec: string, profile?: string) => void;
+    addOpusCodec: (payloadType: number, profile?: string) => string;
 
     direction: () => Direction;
     generateSdp: (eol: string, addr: string, port: string) => string;
@@ -116,26 +118,26 @@ export class Audio {
     setDirection: (dir: Direction) => void;
     description: () => string;
     removeFormat: (fmt: string) => void;
-    addSSRC: (ssrc: Number, name?: string, msid?: string, trackID?: string) => void;
-    removeSSRC: (ssrc: Number) => void;
-    replaceSSRC: (oldSsrc: Number, ssrc: Number, name?: string, msid?: string, trackID?: string) => void;
-    hasSSRC: (ssrc: Number) => boolean;
-    getSSRCs: () => Number[];
-    getCNameForSsrc: (ssrc: Number) => string;
-    setBitrate: (bitRate: Number) => void;
-    getBitrate: () => Number;
-    hasPayloadType: (payloadType: Number) => boolean;
-    addRTXCodec: (payloadType: Number, originalPayloadType: Number, clockRate: Number) => void;
+    addSSRC: (ssrc: number, name?: string, msid?: string, trackID?: string) => void;
+    removeSSRC: (ssrc: number) => void;
+    replaceSSRC: (oldSsrc: number, ssrc: number, name?: string, msid?: string, trackID?: string) => void;
+    hasSSRC: (ssrc: number) => boolean;
+    getSSRCs: () => number[];
+    getCNameForSsrc: (ssrc: number) => string;
+    setBitrate: (bitRate: number) => void;
+    getBitrate: () => number;
+    hasPayloadType: (payloadType: number) => boolean;
+    addRTXCodec: (payloadType: number, originalPayloadType: number, clockRate: number) => void;
     addRTPMap: () => void;
     parseSdpLine: (line: string) => void;
 }
 
 export class Video {
     constructor(mid: string, dir: Direction);
-    addVideoCodec: (payloadType: Number, codec: string, profile?: string) => void;
-    addH264Codec: (payloadType: Number, profile?: string) => void;
-    addVP8Codec: (payloadType: Number) => void;
-    addVP9Codec: (payloadType: Number) => void;
+    addVideoCodec: (payloadType: number, codec: string, profile?: string) => void;
+    addH264Codec: (payloadType: number, profile?: string) => void;
+    addVP8Codec: (payloadType: number) => void;
+    addVP9Codec: (payloadType: number) => void;
 
     direction: () => Direction;
     generateSdp: (eol: string, addr: string, port: string) => string;
@@ -143,16 +145,16 @@ export class Video {
     setDirection: (dir: Direction) => void;
     description: () => string;
     removeFormat: (fmt: string) => void;
-    addSSRC: (ssrc: Number, name?: string, msid?: string, trackID?: string) => void;
-    removeSSRC: (ssrc: Number) => void;
-    replaceSSRC: (oldSsrc: Number, ssrc: Number, name?: string, msid?: string, trackID?: string) => void;
-    hasSSRC: (ssrc: Number) => boolean;
-    getSSRCs: () => Number[];
-    getCNameForSsrc: (ssrc: Number) => string;
-    setBitrate: (bitRate: Number) => void;
-    getBitrate: () => Number;
-    hasPayloadType: (payloadType: Number) => boolean;
-    addRTXCodec: (payloadType: Number, originalPayloadType: Number, clockRate: Number) => void;
+    addSSRC: (ssrc: number, name?: string, msid?: string, trackID?: string) => void;
+    removeSSRC: (ssrc: number) => void;
+    replaceSSRC: (oldSsrc: number, ssrc: number, name?: string, msid?: string, trackID?: string) => void;
+    hasSSRC: (ssrc: number) => boolean;
+    getSSRCs: () => number[];
+    getCNameForSsrc: (ssrc: number) => string;
+    setBitrate: (bitRate: number) => void;
+    getBitrate: () => number;
+    hasPayloadType: (payloadType: number) => boolean;
+    addRTXCodec: (payloadType: number, originalPayloadType: number, clockRate: number) => void;
     addRTPMap: () => void;
     parseSdpLine: (line: string) => void;
 }
@@ -165,11 +167,11 @@ export class Track {
     sendMessageBinary: (buffer: Buffer) => boolean;
     isOpen: () => boolean;
     isClosed: () => boolean;
-    bufferedAmount: () => Number;
-    maxMessageSize: () => Number;
-    setBufferedAmountLowThreshold: (newSize: Number) => void;
+    bufferedAmount: () => number;
+    maxMessageSize: () => number;
+    setBufferedAmountLowThreshold: (newSize: number) => void;
     requestKeyframe: () => boolean;
-    setMediaHandler: (handler: RtcpReceivingSession) => void
+    setMediaHandler: (handler: RtcpReceivingSession) => void;
     onOpen: (cb: () => void) => void;
     onClosed: (cb: () => void) => void;
     onError: (cb: (err: string) => void) => void;
@@ -184,9 +186,9 @@ export class DataChannel {
     sendMessage: (msg: string) => boolean;
     sendMessageBinary: (buffer: Buffer) => boolean;
     isOpen: () => boolean;
-    bufferedAmount: () => Number;
-    maxMessageSize: () => Number;
-    setBufferedAmountLowThreshold: (newSize: Number) => void;
+    bufferedAmount: () => number;
+    maxMessageSize: () => number;
+    setBufferedAmountLowThreshold: (newSize: number) => void;
     onOpen: (cb: () => void) => void;
     onClosed: (cb: () => void) => void;
     onError: (cb: (err: string) => void) => void;
@@ -197,9 +199,9 @@ export class DataChannel {
 export class PeerConnection {
     constructor(peerName: string, config: RtcConfig);
     close: () => void;
-    setLocalDescription: (type: DescriptionType) => void;
+    setLocalDescription: (type?: DescriptionType) => void;
     setRemoteDescription: (sdp: string, type: DescriptionType) => void;
-    localDescription: () => { type: string, sdp: string };
+    localDescription: () => { type: string; sdp: string };
     addRemoteCandidate: (candidate: string, mid: string) => void;
     createDataChannel: (label: string, config?: DataChannelInitConfig) => DataChannel;
     addTrack: (media: Video | Audio) => Track;
@@ -217,13 +219,10 @@ export class PeerConnection {
     bytesSent: () => number;
     bytesReceived: () => number;
     rtt: () => number;
-    getSelectedCandidatePair: () => { local: SelectedCandidateInfo, remote: SelectedCandidateInfo } | null;
+    getSelectedCandidatePair: () => { local: SelectedCandidateInfo; remote: SelectedCandidateInfo } | null;
 }
 
 export class DataChannelStream extends stream.Duplex {
-    constructor(
-        rawChannel: DataChannel,
-        options?: Omit<stream.DuplexOptions, 'objectMode'>
-    );
+    constructor(rawChannel: DataChannel, options?: Omit<stream.DuplexOptions, 'objectMode'>);
     get label(): string;
 }
