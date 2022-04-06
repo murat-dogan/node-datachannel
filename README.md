@@ -118,7 +118,7 @@ export const enum RelayType {
 
 export interface IceServer {
     hostname: string;
-    port: Number;
+    port: number;
     username?: string;
     password?: string;
     relayType?: RelayType;
@@ -271,15 +271,15 @@ Send Message as binary
 
 Query data-channel
 
-**bufferedAmount: () => Number**
+**bufferedAmount: () => number**
 
 Get current buffered amount level
 
-**maxMessageSize: () => Number**
+**maxMessageSize: () => number**
 
 Get max message size of the data-channel, that could be sent
 
-**setBufferedAmountLowThreshold: (newSize: Number) => void**
+**setBufferedAmountLowThreshold: (newSize: number) => void**
 
 Set buffer level of the `onBufferedAmountLow` callback
 
