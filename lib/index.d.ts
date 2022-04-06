@@ -65,7 +65,9 @@ export const enum DescriptionType {
 }
 
 export const enum ReliabilityType {
-    Reliable = 0, Rexmit = 1, Timed = 2
+    Reliable = 0,
+    Rexmit = 1,
+    Timed = 2
 }
 
 export interface DataChannelInitConfig {
