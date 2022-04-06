@@ -26,7 +26,7 @@ export type ProxyServerType = 'None' | 'Socks5' | 'Http';
 export interface ProxyServer {
     type: ProxyServerType;
     ip: string;
-    port: Number;
+    port: number;
     username?: string;
     password?: string;
 }
@@ -39,7 +39,7 @@ export const enum RelayType {
 
 export interface IceServer {
     hostname: string;
-    port: Number;
+    port: number;
     username?: string;
     password?: string;
     relayType?: RelayType;
@@ -101,14 +101,14 @@ export const enum Direction {
 }
 
 export class RtcpReceivingSession {
-    requestBitrate: (bitRate: Number) => void;
+    requestBitrate: (bitRate: number) => void;
     requestKeyframe: () => boolean;
 }
 
 export class Audio {
     constructor(mid: string, dir: Direction);
-    addAudioCodec: (payloadType: Number, codec: string, profile?: string) => void;
-    addOpusCodec: (payloadType: Number, profile?: string) => string;
+    addAudioCodec: (payloadType: number, codec: string, profile?: string) => void;
+    addOpusCodec: (payloadType: number, profile?: string) => string;
 
     direction: () => Direction;
     generateSdp: (eol: string, addr: string, port: string) => string;
@@ -116,26 +116,26 @@ export class Audio {
     setDirection: (dir: Direction) => void;
     description: () => string;
     removeFormat: (fmt: string) => void;
-    addSSRC: (ssrc: Number, name?: string, msid?: string, trackID?: string) => void;
-    removeSSRC: (ssrc: Number) => void;
-    replaceSSRC: (oldSsrc: Number, ssrc: Number, name?: string, msid?: string, trackID?: string) => void;
-    hasSSRC: (ssrc: Number) => boolean;
-    getSSRCs: () => Number[];
-    getCNameForSsrc: (ssrc: Number) => string;
-    setBitrate: (bitRate: Number) => void;
-    getBitrate: () => Number;
-    hasPayloadType: (payloadType: Number) => boolean;
-    addRTXCodec: (payloadType: Number, originalPayloadType: Number, clockRate: Number) => void;
+    addSSRC: (ssrc: number, name?: string, msid?: string, trackID?: string) => void;
+    removeSSRC: (ssrc: number) => void;
+    replaceSSRC: (oldSsrc: number, ssrc: number, name?: string, msid?: string, trackID?: string) => void;
+    hasSSRC: (ssrc: number) => boolean;
+    getSSRCs: () => number[];
+    getCNameForSsrc: (ssrc: number) => string;
+    setBitrate: (bitRate: number) => void;
+    getBitrate: () => number;
+    hasPayloadType: (payloadType: number) => boolean;
+    addRTXCodec: (payloadType: number, originalPayloadType: number, clockRate: number) => void;
     addRTPMap: () => void;
     parseSdpLine: (line: string) => void;
 }
 
 export class Video {
     constructor(mid: string, dir: Direction);
-    addVideoCodec: (payloadType: Number, codec: string, profile?: string) => void;
-    addH264Codec: (payloadType: Number, profile?: string) => void;
-    addVP8Codec: (payloadType: Number) => void;
-    addVP9Codec: (payloadType: Number) => void;
+    addVideoCodec: (payloadType: number, codec: string, profile?: string) => void;
+    addH264Codec: (payloadType: number, profile?: string) => void;
+    addVP8Codec: (payloadType: number) => void;
+    addVP9Codec: (payloadType: number) => void;
 
     direction: () => Direction;
     generateSdp: (eol: string, addr: string, port: string) => string;
@@ -143,16 +143,16 @@ export class Video {
     setDirection: (dir: Direction) => void;
     description: () => string;
     removeFormat: (fmt: string) => void;
-    addSSRC: (ssrc: Number, name?: string, msid?: string, trackID?: string) => void;
-    removeSSRC: (ssrc: Number) => void;
-    replaceSSRC: (oldSsrc: Number, ssrc: Number, name?: string, msid?: string, trackID?: string) => void;
-    hasSSRC: (ssrc: Number) => boolean;
-    getSSRCs: () => Number[];
-    getCNameForSsrc: (ssrc: Number) => string;
-    setBitrate: (bitRate: Number) => void;
-    getBitrate: () => Number;
-    hasPayloadType: (payloadType: Number) => boolean;
-    addRTXCodec: (payloadType: Number, originalPayloadType: Number, clockRate: Number) => void;
+    addSSRC: (ssrc: number, name?: string, msid?: string, trackID?: string) => void;
+    removeSSRC: (ssrc: number) => void;
+    replaceSSRC: (oldSsrc: number, ssrc: number, name?: string, msid?: string, trackID?: string) => void;
+    hasSSRC: (ssrc: number) => boolean;
+    getSSRCs: () => number[];
+    getCNameForSsrc: (ssrc: number) => string;
+    setBitrate: (bitRate: number) => void;
+    getBitrate: () => number;
+    hasPayloadType: (payloadType: number) => boolean;
+    addRTXCodec: (payloadType: number, originalPayloadType: number, clockRate: number) => void;
     addRTPMap: () => void;
     parseSdpLine: (line: string) => void;
 }
@@ -165,9 +165,9 @@ export class Track {
     sendMessageBinary: (buffer: Buffer) => boolean;
     isOpen: () => boolean;
     isClosed: () => boolean;
-    bufferedAmount: () => Number;
-    maxMessageSize: () => Number;
-    setBufferedAmountLowThreshold: (newSize: Number) => void;
+    bufferedAmount: () => number;
+    maxMessageSize: () => number;
+    setBufferedAmountLowThreshold: (newSize: number) => void;
     requestKeyframe: () => boolean;
     setMediaHandler: (handler: RtcpReceivingSession) => void
     onOpen: (cb: () => void) => void;
@@ -184,9 +184,9 @@ export class DataChannel {
     sendMessage: (msg: string) => boolean;
     sendMessageBinary: (buffer: Buffer) => boolean;
     isOpen: () => boolean;
-    bufferedAmount: () => Number;
-    maxMessageSize: () => Number;
-    setBufferedAmountLowThreshold: (newSize: Number) => void;
+    bufferedAmount: () => number;
+    maxMessageSize: () => number;
+    setBufferedAmountLowThreshold: (newSize: number) => void;
     onOpen: (cb: () => void) => void;
     onClosed: (cb: () => void) => void;
     onError: (cb: (err: string) => void) => void;
