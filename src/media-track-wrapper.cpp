@@ -333,6 +333,8 @@ void TrackWrapper::onMessage(const Napi::CallbackInfo &info)
                 Napi::Object payload = Napi::Object::New(env);
                 if (std::holds_alternative<std::string>(message))
                 {
+                    // Track will always send message as binary
+                    // So this code is not needed actually 
                     args = {Napi::String::New(env, std::get<std::string>(message))};
                 }
                 else
