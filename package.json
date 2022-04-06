@@ -15,6 +15,7 @@
     "build": "cmake-js build",
     "_prebuild": "prebuild --backend cmake-js",
     "clean": "cmake-js clean",
+    "lint": "eslint lib/**/*",
     "test": "jest"
   },
   "repository": {
@@ -46,18 +47,25 @@
   },
   "homepage": "https://github.com/murat-dogan/node-datachannel#readme",
   "devDependencies": {
+    "@types/node": "^17.0.23",
+    "@typescript-eslint/eslint-plugin": "^5.18.0",
+    "@typescript-eslint/parser": "^5.18.0",
     "cmake-js": "^6.3.0",
+    "eslint": "^8.12.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-prettier": "^4.0.0",
     "jest": "^27.5.1",
     "nan": "^2.15.0",
     "napi-thread-safe-callback-cancellable": "^0.0.7",
     "node-addon-api": "^4.3.0",
-    "prebuild": "^11.0.3"
+    "prebuild": "^11.0.3",
+    "prettier": "^2.6.2",
+    "typescript": "^4.6.3"
   },
   "bundledDependencies": [
     "prebuild-install"
   ],
   "dependencies": {
-    "@types/node": "^17.0.23",
     "prebuild-install": "^7.0.1"
   }
 }
