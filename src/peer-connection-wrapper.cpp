@@ -176,6 +176,14 @@ PeerConnectionWrapper::PeerConnectionWrapper(const Napi::CallbackInfo &info) : N
     if (config.Get("enableIceTcp").IsBoolean())
         rtcConfig.enableIceTcp = config.Get("enableIceTcp").As<Napi::Boolean>();
 
+    // enableIceUdpMux option
+    if (config.Get("enableIceUdpMux").IsBoolean())
+        rtcConfig.enableIceUdpMux = config.Get("enableIceUdpMux").As<Napi::Boolean>();
+
+    // disableAutoNegotiation option
+    if (config.Get("disableAutoNegotiation").IsBoolean())
+        rtcConfig.disableAutoNegotiation = config.Get("disableAutoNegotiation").As<Napi::Boolean>();
+
     // Max Message Size
     if (config.Get("maxMessageSize").IsNumber())
         rtcConfig.maxMessageSize = config.Get("maxMessageSize").As<Napi::Number>().Uint32Value();
@@ -214,7 +222,7 @@ PeerConnectionWrapper::PeerConnectionWrapper(const Napi::CallbackInfo &info) : N
     mRtcPeerConnPtr->onStateChange([&](rtc::PeerConnection::State state) {
         if (mOnStateChangeCallback)
             mOnStateChangeCallback->call([this, state](Napi::Env env, std::vector<napi_value> &args) {
-                // Check the peer connection is not closed  
+                // Check the peer connection is not closed
                 if(instances.find(this) == instances.end())
                     throw ThreadSafeCallback::CancelException();
 
@@ -227,7 +235,7 @@ PeerConnectionWrapper::PeerConnectionWrapper(const Napi::CallbackInfo &info) : N
                 stream << state;
                 args = {Napi::String::New(env, stream.str())};
             });
-        else {                 
+        else {
             if(mDoCloseFlag && state == rtc::PeerConnection::State::Closed)
                 cleanCbsAndEraseInstance();
          } });
@@ -627,7 +635,7 @@ void PeerConnectionWrapper::onStateChange(const Napi::CallbackInfo &info)
     // Callback
     mOnStateChangeCallback = std::make_unique<ThreadSafeCallback>(info[0].As<Napi::Function>());
 
-    // onState cb will be called from constructor    
+    // onState cb will be called from constructor
 }
 
 void PeerConnectionWrapper::onSignalingStateChange(const Napi::CallbackInfo &info)
