@@ -162,6 +162,7 @@ export class Video {
 export class Track {
     direction: () => Direction;
     mid: () => string;
+    type: () => string;
     close: () => void;
     sendMessage: (msg: string) => boolean;
     sendMessageBinary: (buffer: Buffer) => boolean;
