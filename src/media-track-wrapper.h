@@ -23,6 +23,7 @@ public:
   // Functions
   Napi::Value direction(const Napi::CallbackInfo &info);
   Napi::Value mid(const Napi::CallbackInfo &info);
+  Napi::Value type(const Napi::CallbackInfo &info);
   void close(const Napi::CallbackInfo &info);
   Napi::Value sendMessage(const Napi::CallbackInfo &info);
   Napi::Value sendMessageBinary(const Napi::CallbackInfo &info);
