@@ -22,6 +22,7 @@ Napi::Object TrackWrapper::Init(Napi::Env env, Napi::Object exports)
         {
             InstanceMethod("direction", &TrackWrapper::direction),
             InstanceMethod("mid", &TrackWrapper::mid),
+            InstanceMethod("type", &TrackWrapper::type),
             InstanceMethod("close", &TrackWrapper::close),
             InstanceMethod("sendMessage", &TrackWrapper::sendMessage),
             InstanceMethod("sendMessageBinary", &TrackWrapper::sendMessageBinary),
@@ -115,6 +116,12 @@ Napi::Value TrackWrapper::mid(const Napi::CallbackInfo &info)
 {
     Napi::Env env = info.Env();
     return Napi::String::New(env, mTrackPtr->mid());
+}
+
+Napi::Value TrackWrapper::type(const Napi::CallbackInfo &info)
+{
+    Napi::Env env = info.Env();
+    return Napi::String::New(env, mTrackPtr->description().type());
 }
 
 Napi::Value TrackWrapper::sendMessage(const Napi::CallbackInfo &info)
