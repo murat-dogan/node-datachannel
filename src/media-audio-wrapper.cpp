@@ -157,15 +157,15 @@ Napi::Value AudioWrapper::generateSdp(const Napi::CallbackInfo &info)
     Napi::Env env = info.Env();
     int length = info.Length();
 
-    if (length < 3 || !info[0].IsString() || !info[1].IsString() || !info[2].IsString())
+    if (length < 3 || !info[0].IsString() || !info[1].IsString() || !info[2].IsNumber())
     {
-        Napi::TypeError::New(env, "We expect (String, String, String) as param").ThrowAsJavaScriptException();
+        Napi::TypeError::New(env, "We expect (String, String, Number) as param").ThrowAsJavaScriptException();
         return Napi::String::New(env, "");
     }
 
     std::string eol = info[0].As<Napi::String>().ToString();
     std::string addr = info[1].As<Napi::String>().ToString();
-    std::string port = info[2].As<Napi::String>().ToString();
+    uint16_t port = info[2].As<Napi::Number>().Uint32Value();
 
     return Napi::String::New(env, mAudioPtr->generateSdp(eol, addr, port));
 }

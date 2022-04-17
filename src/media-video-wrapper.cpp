@@ -190,15 +190,15 @@ Napi::Value VideoWrapper::generateSdp(const Napi::CallbackInfo &info)
     Napi::Env env = info.Env();
     int length = info.Length();
 
-    if (length < 3 || !info[0].IsString() || !info[1].IsString() || !info[2].IsString())
+    if (length < 3 || !info[0].IsString() || !info[1].IsString() || !info[2].IsNumber())
     {
-        Napi::TypeError::New(env, "We expect (String, String, String) as param").ThrowAsJavaScriptException();
+        Napi::TypeError::New(env, "We expect (String, String, Number) as param").ThrowAsJavaScriptException();
         return Napi::String::New(env, "");
     }
 
     std::string eol = info[0].As<Napi::String>().ToString();
     std::string addr = info[1].As<Napi::String>().ToString();
-    std::string port = info[2].As<Napi::String>().ToString();
+    uint16_t port = info[2].As<Napi::Number>().Uint32Value();
 
     return Napi::String::New(env, mVideoPtr->generateSdp(eol, addr, port));
 }
@@ -431,7 +431,7 @@ void VideoWrapper::setBitrate(const Napi::CallbackInfo &info)
 Napi::Value VideoWrapper::getBitrate(const Napi::CallbackInfo &info)
 {
 
-    return Napi::Number::New(info.Env(), mVideoPtr->getBitrate());
+    return Napi::Number::New(info.Env(), mVideoPtr->bitrate());
 }
 
 Napi::Value VideoWrapper::hasPayloadType(const Napi::CallbackInfo &info)
@@ -465,7 +465,7 @@ void VideoWrapper::addRTXCodec(const Napi::CallbackInfo &info)
     unsigned int originalPayloadType = static_cast<unsigned int>(info[1].As<Napi::Number>().ToNumber());
     unsigned int clockRate = static_cast<unsigned int>(info[2].As<Napi::Number>().ToNumber());
 
-    mVideoPtr->addRTXCodec(payloadType, originalPayloadType, clockRate);
+    mVideoPtr->addRtxCodec(payloadType, originalPayloadType, clockRate);
 }
 
 void VideoWrapper::addRTPMap(const Napi::CallbackInfo &info)

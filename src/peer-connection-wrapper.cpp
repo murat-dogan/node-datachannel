@@ -147,10 +147,6 @@ PeerConnectionWrapper::PeerConnectionWrapper(const Napi::CallbackInfo &info) : N
         std::string strType = proxyServer.Get("type").As<Napi::String>().ToString();
         rtc::ProxyServer::Type type = rtc::ProxyServer::Type::Http;
 
-        if (strType == "None")
-            type = rtc::ProxyServer::Type::None;
-        if (strType == "Http")
-            type = rtc::ProxyServer::Type::Http;
         if (strType == "Socks5")
             type = rtc::ProxyServer::Type::Socks5;
 
