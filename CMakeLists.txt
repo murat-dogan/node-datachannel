@@ -5,7 +5,7 @@ project(node_datachannel VERSION 0.2.4)
 # Workaround for https://github.com/murat-dogan/node-datachannel/issues/65
 if( NODE_RUNTIMEVERSION VERSION_GREATER_EQUAL "17.0.0")
     add_compile_definitions(OPENSSL_API_COMPAT=0x10100001L)
-    add_compile_definitions(OPENSSL_CONFIGURED_API=0x30000000L)    
+    add_compile_definitions(OPENSSL_CONFIGURED_API=0x30000000L)
 endif()
 
 include_directories(${CMAKE_JS_INC})
@@ -33,7 +33,7 @@ include(FetchContent)
 FetchContent_Declare(
     libdatachannel
     GIT_REPOSITORY https://github.com/paullouisageneau/libdatachannel.git
-    GIT_TAG "v0.17.0"
+    GIT_TAG "v0.17.1"
 )
 
 option(NO_MEDIA "Disable media transport support in libdatachannel" OFF)
