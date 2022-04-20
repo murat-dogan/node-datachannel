@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const nodeDataChannel = require('../lib/index');
 
 describe('Module Definition', () => {
@@ -12,9 +13,8 @@ describe('Module Definition', () => {
 });
 
 describe('PeerConnection Classes', () => {
-
     test('Create PeerConnection', () => {
-        let peer = new nodeDataChannel.PeerConnection("Peer", { iceServers: ["stun:stun.l.google.com:19302"] });
+        let peer = new nodeDataChannel.PeerConnection('Peer', { iceServers: ['stun:stun.l.google.com:19302'] });
         expect(peer).toBeDefined();
         expect(peer.onStateChange).toBeDefined();
         expect(peer.createDataChannel).toBeDefined();
@@ -23,7 +23,7 @@ describe('PeerConnection Classes', () => {
     });
 
     test('Create Data Channel', () => {
-        let peer = new nodeDataChannel.PeerConnection("Peer", { iceServers: ["stun:stun.l.google.com:19302"] });
+        let peer = new nodeDataChannel.PeerConnection('Peer', { iceServers: ['stun:stun.l.google.com:19302'] });
         let dc = peer.createDataChannel('test', { protocol: 'test-protocol' });
         expect(dc).toBeDefined();
         expect(dc.getId()).toBeDefined();
@@ -37,13 +37,12 @@ describe('PeerConnection Classes', () => {
     });
 });
 
-
 describe('P2P', () => {
     // Default is 5000 ms but we need more
     jest.setTimeout(30000);
 
-    let peer1 = new nodeDataChannel.PeerConnection("Peer1", { iceServers: ["stun:stun.l.google.com:19302"] });
-    let peer2 = new nodeDataChannel.PeerConnection("Peer2", { iceServers: ["stun:stun.l.google.com:19302"] });
+    let peer1 = new nodeDataChannel.PeerConnection('Peer1', { iceServers: ['stun:stun.l.google.com:19302'] });
+    let peer2 = new nodeDataChannel.PeerConnection('Peer2', { iceServers: ['stun:stun.l.google.com:19302'] });
     let dc1 = null;
     let dc2 = null;
 
@@ -91,13 +90,13 @@ describe('P2P', () => {
         dc2.onMessage((msg) => {
             p2DCMessageMock(msg);
         });
-        dc2.sendMessage("Hello From Peer2");
+        dc2.sendMessage('Hello From Peer2');
     });
 
-    dc1 = peer1.createDataChannel("test-p2p");
+    dc1 = peer1.createDataChannel('test-p2p');
     dc1.onOpen(() => {
         p1DCMock();
-        dc1.sendMessage("Hello From Peer1");
+        dc1.sendMessage('Hello From Peer1');
     });
     dc1.onMessage((msg) => {
         p1DCMessageMock(msg);
@@ -110,7 +109,7 @@ describe('P2P', () => {
             peer1.close();
             peer2.close();
 
-            // Fee memory 
+            // Fee memory
             dc1 = null;
             dc2 = null;
             peer1 = null;
@@ -138,15 +137,14 @@ describe('P2P', () => {
             // DataChannel
             expect(p1DCMock.mock.calls.length).toBe(1);
             expect(p1DCMessageMock.mock.calls.length).toBe(1);
-            expect(p1DCMessageMock.mock.calls[0][0]).toEqual("Hello From Peer2");
+            expect(p1DCMessageMock.mock.calls[0][0]).toEqual('Hello From Peer2');
             expect(p2DCMock.mock.calls.length).toBe(1);
 
             expect(p2DCMessageMock.mock.calls.length).toBe(1);
-            expect(p2DCMessageMock.mock.calls[0][0]).toEqual("Hello From Peer1");
+            expect(p2DCMessageMock.mock.calls[0][0]).toEqual('Hello From Peer1');
 
             done();
         }, 12 * 1000);
-
     });
 });
 
@@ -161,14 +159,11 @@ function waitForGathering(peer) {
 }
 
 describe('DataChannel streams', () => {
-
     test('can build an echo pipeline', async () => {
-        let clientPeer = new nodeDataChannel.PeerConnection("Client", { iceServers: [] });
-        let echoPeer = new nodeDataChannel.PeerConnection("Client", { iceServers: [] });
+        let clientPeer = new nodeDataChannel.PeerConnection('Client', { iceServers: [] });
+        let echoPeer = new nodeDataChannel.PeerConnection('Client', { iceServers: [] });
 
-        const echoStream = new nodeDataChannel.DataChannelStream(
-            echoPeer.createDataChannel("echo-channel")
-        );
+        const echoStream = new nodeDataChannel.DataChannelStream(echoPeer.createDataChannel('echo-channel'));
         echoStream.pipe(echoStream); // Echo all received data back to the client
 
         await waitForGathering(echoPeer);
@@ -183,9 +178,9 @@ describe('DataChannel streams', () => {
         const clientChannel = await new Promise((resolve) => clientPeer.onDataChannel(resolve));
 
         const clientResponsePromise = new Promise((resolve) => clientChannel.onMessage(resolve));
-        clientChannel.sendMessage("test message");
+        clientChannel.sendMessage('test message');
 
-        expect(await clientResponsePromise).toBe("test message");
+        expect(await clientResponsePromise).toBe('test message');
 
         clientPeer.close();
         echoPeer.close();
