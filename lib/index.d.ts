@@ -22,7 +22,7 @@ export function cleanup(): void;
 export function setSctpSettings(settings: SctpSettings): void;
 
 // Proxy Server
-export type ProxyServerType = 'None' | 'Socks5' | 'Http';
+export type ProxyServerType = 'Socks5' | 'Http';
 export interface ProxyServer {
     type: ProxyServerType;
     ip: string;
@@ -113,7 +113,7 @@ export class Audio {
     addOpusCodec: (payloadType: number, profile?: string) => string;
 
     direction: () => Direction;
-    generateSdp: (eol: string, addr: string, port: string) => string;
+    generateSdp: (eol: string, addr: string, port: number) => string;
     mid: () => string;
     setDirection: (dir: Direction) => void;
     description: () => string;
@@ -140,7 +140,7 @@ export class Video {
     addVP9Codec: (payloadType: number) => void;
 
     direction: () => Direction;
-    generateSdp: (eol: string, addr: string, port: string) => string;
+    generateSdp: (eol: string, addr: string, port: number) => string;
     mid: () => string;
     setDirection: (dir: Direction) => void;
     description: () => string;
