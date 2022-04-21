@@ -355,6 +355,11 @@ Napi::Value PeerConnectionWrapper::localDescription(const Napi::CallbackInfo &in
     Napi::Env env = info.Env();
     std::optional<rtc::Description> desc = mRtcPeerConnPtr->localDescription();
 
+    // Return JS null if no description
+    if(!desc.has_value()) {
+        return env.Null();
+    }
+
     Napi::Object obj = Napi::Object::New(env);
     obj.Set("type", desc->typeString());
     obj.Set("sdp", desc.value());
