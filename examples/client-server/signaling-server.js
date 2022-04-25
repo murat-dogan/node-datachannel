@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 const WebSocket = require('ws');
 
 const clients = {};
@@ -5,7 +6,7 @@ const clients = {};
 const wss = new WebSocket.Server({ port: 8000 });
 
 wss.on('connection', (ws, req) => {
-    const id = req.url.replace('/', '')
+    const id = req.url.replace('/', '');
     console.log(`New Connection from ${id}`);
 
     clients[id] = ws;
@@ -15,12 +16,10 @@ wss.on('connection', (ws, req) => {
         let peerWs = clients[peerId];
 
         console.log(`Message from ${id} to ${peerId} : ${buffer}`);
-        if (!peerWs)
-            return console.error(`Can not find peer with ID ${peerId}`);
+        if (!peerWs) return console.error(`Can not find peer with ID ${peerId}`);
 
         msg.id = id;
         peerWs.send(JSON.stringify(msg));
-
     });
 
     ws.on('close', () => {
@@ -28,4 +27,3 @@ wss.on('connection', (ws, req) => {
         delete clients[id];
     });
 });
-

@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 const nodeDataChannel = require('../../lib/index');
-const readline = require("readline");
+const readline = require('readline');
 var dgram = require('dgram');
 
 var client = dgram.createSocket('udp4');
@@ -7,7 +8,7 @@ var client = dgram.createSocket('udp4');
 // Read Line Interface
 const rl = readline.createInterface({
     input: process.stdin,
-    output: process.stdout
+    output: process.stdout,
 });
 
 // Init Logger
@@ -21,7 +22,7 @@ peerConnection.onStateChange((state) => {
 peerConnection.onGatheringStateChange((state) => {
     // console.log('GatheringState: ', state);
 
-    if(state == 'complete'){
+    if (state == 'complete') {
         let desc = peerConnection.localDescription();
         console.log('');
         console.log('## Please copy the offer below to the web page:');
@@ -31,14 +32,13 @@ peerConnection.onGatheringStateChange((state) => {
         rl.question('## Please copy/paste the answer provided by the browser: \n', (sdp) => {
             let sdpObj = JSON.parse(sdp);
             peerConnection.setRemoteDescription(sdpObj.sdp, sdpObj.type);
-            console.log(track.isOpen())
+            console.log(track.isOpen());
             rl.close();
-    
         });
     }
 });
 
-let video = new nodeDataChannel.Video('video','RecvOnly');
+let video = new nodeDataChannel.Video('video', 'RecvOnly');
 video.addH264Codec(96);
 video.setBitrate(3000);
 
@@ -46,9 +46,9 @@ let track = peerConnection.addTrack(video);
 let session = new nodeDataChannel.RtcpReceivingSession();
 
 track.setMediaHandler(session);
-track.onMessage((msg)=>{
-    client.send(msg,5000,'127.0.0.1',(err,n)=>{
-        if(err) console.log(err,n);
+track.onMessage((msg) => {
+    client.send(msg, 5000, '127.0.0.1', (err, n) => {
+        if (err) console.log(err, n);
     });
 });
 

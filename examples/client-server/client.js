@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 const nodeDataChannel = require('../../lib/index');
 const WebSocket = require('ws');
-const readline = require("readline");
+const readline = require('readline');
 
 // Init Logger
 nodeDataChannel.initLogger('Error');
@@ -12,9 +13,9 @@ const pcMap = {};
 const id = randomId(4);
 
 // Signaling Server
-const WS_URL = process.env.WS_URL || "ws://localhost:8000"
+const WS_URL = process.env.WS_URL || 'ws://localhost:8000';
 const ws = new WebSocket(WS_URL + '/' + id, {
-    perMessageDeflate: false
+    perMessageDeflate: false,
 });
 
 console.log(`The local ID is: ${id}`);
@@ -52,7 +53,7 @@ function readUserInput() {
     // Read Line Interface
     const rl = readline.createInterface({
         input: process.stdin,
-        output: process.stdout
+        output: process.stdout,
     });
 
     rl.question('Enter a remote ID to send an offer:\n', (peerId) => {

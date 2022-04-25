@@ -1,8 +1,9 @@
-const yargs = require('yargs/yargs')
-const { hideBin } = require('yargs/helpers')
+/* eslint-disable @typescript-eslint/no-var-requires */
+const yargs = require('yargs/yargs');
+const { hideBin } = require('yargs/helpers');
 const nodeDataChannel = require('../../lib/index');
 const WebSocket = require('ws');
-const readline = require("readline");
+const readline = require('readline');
 
 // Init Logger
 nodeDataChannel.initLogger('Debug');
@@ -26,38 +27,36 @@ const argv = yargs(hideBin(process.argv))
     .option('disableSend', {
         type: 'boolean',
         description: 'Disable Send',
-        default: false
+        default: false,
     })
     .option('wsUrl', {
         type: 'string',
         description: 'Web Socket URL',
-        default: 'ws://localhost:8000'
+        default: 'ws://localhost:8000',
     })
     .option('dataChannelCount', {
         type: 'number',
         description: 'Data Channel Count To Create',
-        default: 1
-    })
-    .argv;
+        default: 1,
+    }).argv;
 
 // Disable Send
-const disableSend = argv.disableSend
+const disableSend = argv.disableSend;
 if (disableSend) console.log('Send Disabled!');
 
 // Signaling Server
 const wsUrl = process.env.WS_URL || argv.wsUrl;
-console.log(wsUrl)
+console.log(wsUrl);
 const dataChannelCount = argv.dataChannelCount;
 
 // Read Line Interface
 const rl = readline.createInterface({
     input: process.stdin,
-    output: process.stdout
+    output: process.stdout,
 });
 
-
 const ws = new WebSocket(wsUrl + '/' + id, {
-    perMessageDeflate: false
+    perMessageDeflate: false,
 });
 
 console.log(`The local ID is: ${id}`);
@@ -104,7 +103,7 @@ function readUserInput() {
                 let dcArrItem = {
                     dc: null,
                     bytesSent: 0,
-                    bytesReceived: 0
+                    bytesReceived: 0,
                 };
                 console.log('Creating DataChannel with label "test-' + i + '"');
                 dcArrItem.dc = pcMap[peerId].createDataChannel('test-' + i);
@@ -112,16 +111,16 @@ function readUserInput() {
                 dcArrItem.dc.setBufferedAmountLowThreshold(BUFFER_SIZE);
                 dcArrItem.dc.onOpen(() => {
                     while (!disableSend && dcArrItem.dc.bufferedAmount() <= BUFFER_SIZE) {
-                        dcArrItem.dc.sendMessage(msgToSend)
-                        dcArrItem.bytesSent += msgToSend.length;;
-                    };
+                        dcArrItem.dc.sendMessage(msgToSend);
+                        dcArrItem.bytesSent += msgToSend.length;
+                    }
                 });
 
                 dcArrItem.dc.onBufferedAmountLow(() => {
                     while (!disableSend && dcArrItem.dc.bufferedAmount() <= BUFFER_SIZE) {
-                        dcArrItem.dc.sendMessage(msgToSend)
-                        dcArrItem.bytesSent += msgToSend.length;;
-                    };
+                        dcArrItem.dc.sendMessage(msgToSend);
+                        dcArrItem.bytesSent += msgToSend.length;
+                    }
                 });
 
                 dcArrItem.dc.onMessage((msg) => {
@@ -131,23 +130,36 @@ function readUserInput() {
                 dcArr.push(dcArrItem);
             }
 
-
             // Report
             let i = 0;
             setInterval(() => {
                 let totalBytesSent = 0;
                 let totalBytesReceived = 0;
                 for (let j = 0; j < dcArr.length; j++) {
-                    console.log(`${j == 0 ? i + '#' : ''} DC-${j + 1} Sent: ${byte2KB(dcArr[j].bytesSent)} KB/s / Received: ${byte2KB(dcArr[j].bytesReceived)} KB/s / SendBufferAmount: ${dcArr[j].dc.bufferedAmount()} / DataChannelOpen: ${dcArr[j].dc.isOpen()}`);
+                    console.log(
+                        `${j == 0 ? i + '#' : ''} DC-${j + 1} Sent: ${byte2KB(
+                            dcArr[j].bytesSent,
+                        )} KB/s / Received: ${byte2KB(dcArr[j].bytesReceived)} KB/s / SendBufferAmount: ${dcArr[
+                            j
+                        ].dc.bufferedAmount()} / DataChannelOpen: ${dcArr[j].dc.isOpen()}`,
+                    );
                     totalBytesSent += dcArr[j].bytesSent;
                     totalBytesReceived += dcArr[j].bytesReceived;
                     dcArr[j].bytesSent = 0;
                     dcArr[j].bytesReceived = 0;
                 }
-                console.log(`Total Sent: ${byte2KB(totalBytesSent)}  KB/s / Total Received: ${byte2KB(totalBytesReceived)}  KB/s`);
+                console.log(
+                    `Total Sent: ${byte2KB(totalBytesSent)}  KB/s / Total Received: ${byte2KB(
+                        totalBytesReceived,
+                    )}  KB/s`,
+                );
 
                 if (i % 5 == 0) {
-                    console.log(`Stats# Sent: ${byte2MB(pcMap[peerId].bytesSent())} MB / Received: ${byte2MB(pcMap[peerId].bytesReceived())} MB / rtt: ${pcMap[peerId].rtt()} ms`);
+                    console.log(
+                        `Stats# Sent: ${byte2MB(pcMap[peerId].bytesSent())} MB / Received: ${byte2MB(
+                            pcMap[peerId].bytesReceived(),
+                        )} MB / rtt: ${pcMap[peerId].rtt()} ms`,
+                    );
                     console.log(`Selected Candidates# ${JSON.stringify(pcMap[peerId].getSelectedCandidatePair())}`);
                     console.log(``);
                 }
@@ -179,15 +191,14 @@ function createPeerConnection(peerId) {
         let msgToSend = randomId(MESSAGE_SIZE);
 
         while (!disableSend && dc.bufferedAmount() <= BUFFER_SIZE) {
-            dc.sendMessage(msgToSend)
-        };
+            dc.sendMessage(msgToSend);
+        }
 
         dc.onBufferedAmountLow(() => {
             while (!disableSend && dc.bufferedAmount() <= BUFFER_SIZE) {
-                dc.sendMessage(msgToSend)
-            };
+                dc.sendMessage(msgToSend);
+            }
         });
-
 
         dc.onMessage((msg) => {
             // bytesReceived += msg.length;
@@ -208,9 +219,9 @@ function randomId(length) {
 }
 
 function byte2KB(bytes) {
-    return `${Math.round(bytes / 1000)}`
+    return `${Math.round(bytes / 1000)}`;
 }
 
 function byte2MB(bytes) {
-    return `${Math.round(bytes / (1000 * 1000))}`
+    return `${Math.round(bytes / (1000 * 1000))}`;
 }
