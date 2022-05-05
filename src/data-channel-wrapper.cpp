@@ -46,24 +46,6 @@ DataChannelWrapper::DataChannelWrapper(const Napi::CallbackInfo &info) : Napi::O
 {
     mDataChannelPtr = *(info[0].As<Napi::External<std::shared_ptr<rtc::DataChannel>>>().Data());
 
-    mDataChannelPtr->onClosed([&]()
-                              {
-        if (mOnClosedCallback)
-            mOnClosedCallback->call([this](Napi::Env env, std::vector<napi_value> &args) {
-                // Check the peer connection is not closed
-                if(instances.find(this) == instances.end())
-                    throw ThreadSafeCallback::CancelException();
-
-                cleanCbsAndEraseInstance();
-
-                // This will run in main thread and needs to construct the
-                // arguments for the call
-                args = {};
-            });
-         else {
-             cleanCbsAndEraseInstance();
-         } });
-
     instances.insert(this);
 }
 
@@ -79,6 +61,7 @@ void DataChannelWrapper::doClose()
         try
         {
             mDataChannelPtr->close();
+            mDataChannelPtr.reset();
         }
         catch (std::exception &ex)
         {
@@ -86,10 +69,7 @@ void DataChannelWrapper::doClose()
             return;
         }
     }
-}
 
-void DataChannelWrapper::cleanCbsAndEraseInstance()
-{
     mOnOpenCallback.reset();
     mOnClosedCallback.reset();
     mOnErrorCallback.reset();
@@ -97,7 +77,6 @@ void DataChannelWrapper::cleanCbsAndEraseInstance()
     mOnMessageCallback.reset();
 
     instances.erase(this);
-    mDataChannelPtr.reset();
 }
 
 void DataChannelWrapper::close(const Napi::CallbackInfo &info)
@@ -301,11 +280,10 @@ void DataChannelWrapper::onOpen(const Napi::CallbackInfo &info)
     // Callback
     mOnOpenCallback = std::make_unique<ThreadSafeCallback>(info[0].As<Napi::Function>());
 
-    mDataChannelPtr->onOpen([&]()
-                            {
+    mDataChannelPtr->onOpen([&]() {
         if (mOnOpenCallback)
             mOnOpenCallback->call([this](Napi::Env env, std::vector<napi_value> &args) {
-                // Check the peer connection is not closed
+                // Check the data channel is not closed
                 if(instances.find(this) == instances.end())
                     throw ThreadSafeCallback::CancelException();
 
@@ -335,7 +313,15 @@ void DataChannelWrapper::onClosed(const Napi::CallbackInfo &info)
     // Callback
     mOnClosedCallback = std::make_unique<ThreadSafeCallback>(info[0].As<Napi::Function>());
 
-    // Object cb call moved to the constructor
+    mDataChannelPtr->onClosed([&]() {
+        if (mOnClosedCallback)
+            mOnClosedCallback->call([this](Napi::Env env, std::vector<napi_value> &args) {
+                // Do not check if the data channel has been closed here
+
+                // This will run in main thread and needs to construct the
+                // arguments for the call
+                args = {};
+            }); });
 }
 
 void DataChannelWrapper::onError(const Napi::CallbackInfo &info)
@@ -358,11 +344,10 @@ void DataChannelWrapper::onError(const Napi::CallbackInfo &info)
     // Callback
     mOnErrorCallback = std::make_unique<ThreadSafeCallback>(info[0].As<Napi::Function>());
 
-    mDataChannelPtr->onError([&](const std::string &error)
-                             {
+    mDataChannelPtr->onError([&](const std::string &error) {
         if (mOnErrorCallback)
             mOnErrorCallback->call([this, error](Napi::Env env, std::vector<napi_value> &args) {
-                // Check the peer connection is not closed
+                // Check the data channel is not closed
                 if(instances.find(this) == instances.end())
                     throw ThreadSafeCallback::CancelException();
 
@@ -392,11 +377,10 @@ void DataChannelWrapper::onBufferedAmountLow(const Napi::CallbackInfo &info)
     // Callback
     mOnBufferedAmountLowCallback = std::make_unique<ThreadSafeCallback>(info[0].As<Napi::Function>());
 
-    mDataChannelPtr->onBufferedAmountLow([&]()
-                                         {
+    mDataChannelPtr->onBufferedAmountLow([&]() {
         if (mOnBufferedAmountLowCallback)
             mOnBufferedAmountLowCallback->call([this](Napi::Env env, std::vector<napi_value> &args) {
-                // Check the peer connection is not closed
+                // Check the data channel is not closed
                 if(instances.find(this) == instances.end())
                     throw ThreadSafeCallback::CancelException();
 
@@ -426,11 +410,10 @@ void DataChannelWrapper::onMessage(const Napi::CallbackInfo &info)
     // Callback
     mOnMessageCallback = std::make_unique<ThreadSafeCallback>(info[0].As<Napi::Function>());
 
-    mDataChannelPtr->onMessage([&](const std::variant<rtc::binary, std::string> &message)
-                               {
+    mDataChannelPtr->onMessage([&](const std::variant<rtc::binary, std::string> &message) {
         if (mOnMessageCallback)
             mOnMessageCallback->call([this, message](Napi::Env env, std::vector<napi_value> &args) {
-                // Check the peer connection is not closed
+                // Check the data channel is not closed
                 if(instances.find(this) == instances.end())
                     throw ThreadSafeCallback::CancelException();
 

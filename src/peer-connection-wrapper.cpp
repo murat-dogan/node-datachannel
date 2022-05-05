@@ -215,27 +215,6 @@ PeerConnectionWrapper::PeerConnectionWrapper(const Napi::CallbackInfo &info) : N
         return;
     }
 
-    mRtcPeerConnPtr->onStateChange([&](rtc::PeerConnection::State state) {
-        if (mOnStateChangeCallback)
-            mOnStateChangeCallback->call([this, state](Napi::Env env, std::vector<napi_value> &args) {
-                // Check the peer connection is not closed
-                if(instances.find(this) == instances.end())
-                    throw ThreadSafeCallback::CancelException();
-
-                if(mDoCloseFlag && state == rtc::PeerConnection::State::Closed)
-                    cleanCbsAndEraseInstance();
-
-                // This will run in main thread and needs to construct the
-                // arguments for the call
-                std::ostringstream stream;
-                stream << state;
-                args = {Napi::String::New(env, stream.str())};
-            });
-        else {
-            if(mDoCloseFlag && state == rtc::PeerConnection::State::Closed)
-                cleanCbsAndEraseInstance();
-         } });
-
     instances.insert(this);
 }
 
@@ -246,14 +225,11 @@ PeerConnectionWrapper::~PeerConnectionWrapper()
 
 void PeerConnectionWrapper::doClose()
 {
-    if (mRtcPeerConnPtr && !mDoCloseFlag)
+    if (mRtcPeerConnPtr)
     {
         try
         {
-            mDoCloseFlag = true;
             mRtcPeerConnPtr->close();
-
-            // Resetting in cleanCbsAndEraseInstance causes a deadlock
             mRtcPeerConnPtr.reset();
         }
         catch (std::exception &ex)
@@ -262,10 +238,7 @@ void PeerConnectionWrapper::doClose()
             return;
         }
     }
-}
 
-void PeerConnectionWrapper::cleanCbsAndEraseInstance()
-{
     mOnLocalDescriptionCallback.reset();
     mOnLocalCandidateCallback.reset();
     mOnStateChangeCallback.reset();
@@ -274,8 +247,6 @@ void PeerConnectionWrapper::cleanCbsAndEraseInstance()
     mOnTrackCallback.reset();
 
     instances.erase(this);
-
-    mDoCloseFlag = false;
 }
 
 void PeerConnectionWrapper::close(const Napi::CallbackInfo &info)
@@ -636,7 +607,19 @@ void PeerConnectionWrapper::onStateChange(const Napi::CallbackInfo &info)
     // Callback
     mOnStateChangeCallback = std::make_unique<ThreadSafeCallback>(info[0].As<Napi::Function>());
 
-    // onState cb will be called from constructor
+    mRtcPeerConnPtr->onStateChange([&](rtc::PeerConnection::State state) {
+        if (mOnStateChangeCallback)
+            mOnStateChangeCallback->call([this, state](Napi::Env env, std::vector<napi_value> &args) {
+                // Check the peer connection is not closed but still allow a call for State::Closed
+                if(state != rtc::PeerConnection::State::Closed && instances.find(this) == instances.end())
+                    throw ThreadSafeCallback::CancelException();
+
+                // This will run in main thread and needs to construct the
+                // arguments for the call
+                std::ostringstream stream;
+                stream << state;
+                args = {Napi::String::New(env, stream.str())};
+            }); });
 }
 
 void PeerConnectionWrapper::onSignalingStateChange(const Napi::CallbackInfo &info)
