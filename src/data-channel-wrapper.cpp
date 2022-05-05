@@ -344,9 +344,9 @@ void DataChannelWrapper::onError(const Napi::CallbackInfo &info)
     // Callback
     mOnErrorCallback = std::make_unique<ThreadSafeCallback>(info[0].As<Napi::Function>());
 
-    mDataChannelPtr->onError([&](const std::string &error) {
+    mDataChannelPtr->onError([&](std::string error) {
         if (mOnErrorCallback)
-            mOnErrorCallback->call([this, error](Napi::Env env, std::vector<napi_value> &args) {
+            mOnErrorCallback->call([this, error = std::move(error)](Napi::Env env, std::vector<napi_value> &args) {
                 // Check the data channel is not closed
                 if(instances.find(this) == instances.end())
                     throw ThreadSafeCallback::CancelException();
@@ -410,9 +410,9 @@ void DataChannelWrapper::onMessage(const Napi::CallbackInfo &info)
     // Callback
     mOnMessageCallback = std::make_unique<ThreadSafeCallback>(info[0].As<Napi::Function>());
 
-    mDataChannelPtr->onMessage([&](const std::variant<rtc::binary, std::string> &message) {
+    mDataChannelPtr->onMessage([&](std::variant<rtc::binary, std::string> message) {
         if (mOnMessageCallback)
-            mOnMessageCallback->call([this, message](Napi::Env env, std::vector<napi_value> &args) {
+            mOnMessageCallback->call([this, message = std::move(message)](Napi::Env env, std::vector<napi_value> &args) {
                 // Check the data channel is not closed
                 if(instances.find(this) == instances.end())
                     throw ThreadSafeCallback::CancelException();

@@ -372,9 +372,9 @@ void TrackWrapper::onMessage(const Napi::CallbackInfo &info)
     // Callback
     mOnMessageCallback = std::make_unique<ThreadSafeCallback>(info[0].As<Napi::Function>());
 
-    mTrackPtr->onMessage([&](const std::variant<rtc::binary, std::string> &message) {
+    mTrackPtr->onMessage([&](std::variant<rtc::binary, std::string> message) {
         if (mOnMessageCallback)
-            mOnMessageCallback->call([this, message](Napi::Env env, std::vector<napi_value> &args) {
+            mOnMessageCallback->call([this, message = std::move(message)](Napi::Env env, std::vector<napi_value> &args) {
                 // Check the track is not closed
                 if(instances.find(this) == instances.end())
                     throw ThreadSafeCallback::CancelException();
