@@ -48,24 +48,6 @@ TrackWrapper::TrackWrapper(const Napi::CallbackInfo &info) : Napi::ObjectWrap<Tr
 {
     mTrackPtr = *(info[0].As<Napi::External<std::shared_ptr<rtc::Track>>>().Data());
 
-    mTrackPtr->onClosed([&]()
-                        {
-        if (mOnClosedCallback)
-            mOnClosedCallback->call([this](Napi::Env env, std::vector<napi_value> &args) {
-                // Check the peer connection is not closed
-                if(instances.find(this) == instances.end())
-                    throw ThreadSafeCallback::CancelException();
-
-                cleanCbsAndEraseInstance();
-
-                // This will run in main thread and needs to construct the
-                // arguments for the call
-                args = {};
-            });
-            else {
-             cleanCbsAndEraseInstance();
-         } });
-
     instances.insert(this);
 }
 
@@ -81,24 +63,21 @@ void TrackWrapper::doClose()
         try
         {
             mTrackPtr->close();
+            mTrackPtr.reset();
         }
         catch (std::exception &ex)
         {
-            std::cout << std::string("libdatachannel error while closing track# ") + ex.what() << std::endl;
+            std::cout << std::string("libdatachannel error while closing track: ") + ex.what() << std::endl;
             return;
         }
     }
-}
 
-void TrackWrapper::cleanCbsAndEraseInstance()
-{
     mOnOpenCallback.reset();
     mOnClosedCallback.reset();
     mOnErrorCallback.reset();
     mOnMessageCallback.reset();
 
     instances.erase(this);
-    mTrackPtr.reset();
 }
 
 void TrackWrapper::close(const Napi::CallbackInfo &info)
@@ -296,11 +275,10 @@ void TrackWrapper::onOpen(const Napi::CallbackInfo &info)
     // Callback
     mOnOpenCallback = std::make_unique<ThreadSafeCallback>(info[0].As<Napi::Function>());
 
-    mTrackPtr->onOpen([&]()
-                      {
+    mTrackPtr->onOpen([&]() {
         if (mOnOpenCallback)
             mOnOpenCallback->call([this](Napi::Env env, std::vector<napi_value> &args) {
-                // Check the peer connection is not closed
+                // Check the track is not closed
                 if(instances.find(this) == instances.end())
                     throw ThreadSafeCallback::CancelException();
 
@@ -330,7 +308,15 @@ void TrackWrapper::onClosed(const Napi::CallbackInfo &info)
     // Callback
     mOnClosedCallback = std::make_unique<ThreadSafeCallback>(info[0].As<Napi::Function>());
 
-    // Object cb call moved to the constructor
+    mTrackPtr->onClosed([&]() {
+        if (mOnClosedCallback)
+            mOnClosedCallback->call([this](Napi::Env env, std::vector<napi_value> &args) {
+                // Do not check if the data channel has been closed here
+
+                // This will run in main thread and needs to construct the
+                // arguments for the call
+                args = {};
+            }); });
 }
 
 void TrackWrapper::onError(const Napi::CallbackInfo &info)
@@ -353,11 +339,10 @@ void TrackWrapper::onError(const Napi::CallbackInfo &info)
     // Callback
     mOnErrorCallback = std::make_unique<ThreadSafeCallback>(info[0].As<Napi::Function>());
 
-    mTrackPtr->onError([&](const std::string &error)
-                       {
+    mTrackPtr->onError([&](const std::string &error) {
         if (mOnErrorCallback)
             mOnErrorCallback->call([this, error](Napi::Env env, std::vector<napi_value> &args) {
-                // Check the peer connection is not closed
+                // Check the track is not closed
                 if(instances.find(this) == instances.end())
                     throw ThreadSafeCallback::CancelException();
 
@@ -387,11 +372,10 @@ void TrackWrapper::onMessage(const Napi::CallbackInfo &info)
     // Callback
     mOnMessageCallback = std::make_unique<ThreadSafeCallback>(info[0].As<Napi::Function>());
 
-    mTrackPtr->onMessage([&](const std::variant<rtc::binary, std::string> &message)
-                         {
+    mTrackPtr->onMessage([&](const std::variant<rtc::binary, std::string> &message) {
         if (mOnMessageCallback)
             mOnMessageCallback->call([this, message](Napi::Env env, std::vector<napi_value> &args) {
-                // Check the peer connection is not closed
+                // Check the track is not closed
                 if(instances.find(this) == instances.end())
                     throw ThreadSafeCallback::CancelException();
 
