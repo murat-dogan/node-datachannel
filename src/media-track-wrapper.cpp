@@ -381,16 +381,10 @@ void TrackWrapper::onMessage(const Napi::CallbackInfo &info)
 
                 // This will run in main thread and needs to construct the
                 // arguments for the call
-                Napi::Object payload = Napi::Object::New(env);
-                if (std::holds_alternative<std::string>(message))
+                if (std::holds_alternative<rtc::binary>(message)) // Track will always receive messages as binary
                 {
-                    // Track will always send message as binary
-                    // So this code is not needed actually
-                    args = {Napi::String::New(env, std::get<std::string>(message))};
-                }
-                else
-                {
-                    args = {Napi::Buffer<std::byte>::Copy(env, std::get<rtc::binary>(message).data(), std::get<rtc::binary>(message).size())};
+                    auto bin = std::get<rtc::binary>(std::move(message));
+                    args = {Napi::Buffer<std::byte>::Copy(env, bin.data(), bin.size())};
                 }
             }); });
 }

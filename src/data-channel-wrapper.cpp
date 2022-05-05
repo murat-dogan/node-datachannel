@@ -419,14 +419,14 @@ void DataChannelWrapper::onMessage(const Napi::CallbackInfo &info)
 
                 // This will run in main thread and needs to construct the
                 // arguments for the call
-                Napi::Object payload = Napi::Object::New(env);
                 if (std::holds_alternative<std::string>(message))
                 {
                     args = {Napi::String::New(env, std::get<std::string>(message))};
                 }
                 else
                 {
-                    args = {Napi::Buffer<std::byte>::Copy(env, std::get<rtc::binary>(message).data(), std::get<rtc::binary>(message).size())};
+                    auto bin = std::get<rtc::binary>(std::move(message));
+                    args = {Napi::Buffer<std::byte>::Copy(env, bin.data(), bin.size())};
                 }
             }); });
 }
