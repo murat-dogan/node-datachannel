@@ -46,7 +46,7 @@ Napi::Object TrackWrapper::Init(Napi::Env env, Napi::Object exports)
 
 TrackWrapper::TrackWrapper(const Napi::CallbackInfo &info) : Napi::ObjectWrap<TrackWrapper>(info)
 {
-    mTrackPtr = *(info[0].As<Napi::External<std::shared_ptr<rtc::Track>>>().Data());    
+    mTrackPtr = *(info[0].As<Napi::External<std::shared_ptr<rtc::Track>>>().Data());
 
     mTrackPtr->onClosed([&]()
                         {
@@ -61,11 +61,11 @@ TrackWrapper::TrackWrapper(const Napi::CallbackInfo &info) : Napi::ObjectWrap<Tr
                 // This will run in main thread and needs to construct the
                 // arguments for the call
                 args = {};
-            }); 
+            });
             else {
              cleanCbsAndEraseInstance();
          } });
-    
+
     instances.insert(this);
 }
 
@@ -108,18 +108,36 @@ void TrackWrapper::close(const Napi::CallbackInfo &info)
 
 Napi::Value TrackWrapper::direction(const Napi::CallbackInfo &info)
 {
+    if (!mTrackPtr)
+    {
+        Napi::Error::New(info.Env(), "direction() called on destroyed track").ThrowAsJavaScriptException();
+        return info.Env().Null();
+    }
+
     Napi::Env env = info.Env();
     return Napi::String::New(env, directionToStr(mTrackPtr->direction()));
 }
 
 Napi::Value TrackWrapper::mid(const Napi::CallbackInfo &info)
 {
+    if (!mTrackPtr)
+    {
+        Napi::Error::New(info.Env(), "mid() called on destroyed track").ThrowAsJavaScriptException();
+        return info.Env().Null();
+    }
+
     Napi::Env env = info.Env();
     return Napi::String::New(env, mTrackPtr->mid());
 }
 
 Napi::Value TrackWrapper::type(const Napi::CallbackInfo &info)
 {
+    if (!mTrackPtr)
+    {
+        Napi::Error::New(info.Env(), "type() called on destroyed track").ThrowAsJavaScriptException();
+        return info.Env().Null();
+    }
+
     Napi::Env env = info.Env();
     return Napi::String::New(env, mTrackPtr->description().type());
 }
@@ -128,7 +146,7 @@ Napi::Value TrackWrapper::sendMessage(const Napi::CallbackInfo &info)
 {
     if (!mTrackPtr)
     {
-        Napi::Error::New(info.Env(), "It seems track is destroyed!").ThrowAsJavaScriptException();
+        Napi::Error::New(info.Env(), "sendMessage() called on destroyed track").ThrowAsJavaScriptException();
         return info.Env().Null();
     }
 
@@ -157,7 +175,7 @@ Napi::Value TrackWrapper::sendMessageBinary(const Napi::CallbackInfo &info)
 {
     if (!mTrackPtr)
     {
-        Napi::Error::New(info.Env(), "It seems track is destroyed!").ThrowAsJavaScriptException();
+        Napi::Error::New(info.Env(), "sendMessageBinary() called on destroyed track").ThrowAsJavaScriptException();
         return info.Env().Null();
     }
 
@@ -185,12 +203,24 @@ Napi::Value TrackWrapper::sendMessageBinary(const Napi::CallbackInfo &info)
 Napi::Value TrackWrapper::isOpen(const Napi::CallbackInfo &info)
 {
     Napi::Env env = info.Env();
+
+    if (!mTrackPtr)
+    {
+        return Napi::Boolean::New(env, false);
+    }
+
     return Napi::Boolean::New(env, mTrackPtr->isOpen());
 }
 
 Napi::Value TrackWrapper::isClosed(const Napi::CallbackInfo &info)
 {
     Napi::Env env = info.Env();
+
+    if (!mTrackPtr)
+    {
+        return Napi::Boolean::New(env, true);
+    }
+
     return Napi::Boolean::New(env, mTrackPtr->isClosed());
 }
 
@@ -215,6 +245,12 @@ Napi::Value TrackWrapper::maxMessageSize(const Napi::CallbackInfo &info)
 
 Napi::Value TrackWrapper::requestKeyframe(const Napi::CallbackInfo &info)
 {
+    if (!mTrackPtr)
+    {
+        Napi::Error::New(info.Env(), "requestKeyframe() called on destroyed track").ThrowAsJavaScriptException();
+        return info.Env().Null();
+    }
+
     Napi::Env env = info.Env();
     return Napi::Boolean::New(env, mTrackPtr->requestKeyframe());
 }
@@ -223,7 +259,7 @@ void TrackWrapper::setMediaHandler(const Napi::CallbackInfo &info)
 {
     if (!mTrackPtr)
     {
-        Napi::Error::New(info.Env(), "It seems track is destroyed!").ThrowAsJavaScriptException();
+        Napi::Error::New(info.Env(), "setMediaHandler() called on destroyed track").ThrowAsJavaScriptException();
         return;
     }
 
@@ -242,6 +278,12 @@ void TrackWrapper::setMediaHandler(const Napi::CallbackInfo &info)
 
 void TrackWrapper::onOpen(const Napi::CallbackInfo &info)
 {
+    if (!mTrackPtr)
+    {
+        Napi::Error::New(info.Env(), "onOpen() called on destroyed track").ThrowAsJavaScriptException();
+        return;
+    }
+
     Napi::Env env = info.Env();
     int length = info.Length();
 
@@ -270,6 +312,12 @@ void TrackWrapper::onOpen(const Napi::CallbackInfo &info)
 
 void TrackWrapper::onClosed(const Napi::CallbackInfo &info)
 {
+    if (!mTrackPtr)
+    {
+        Napi::Error::New(info.Env(), "onClosed() called on destroyed track").ThrowAsJavaScriptException();
+        return;
+    }
+
     Napi::Env env = info.Env();
     int length = info.Length();
 
@@ -282,11 +330,17 @@ void TrackWrapper::onClosed(const Napi::CallbackInfo &info)
     // Callback
     mOnClosedCallback = std::make_unique<ThreadSafeCallback>(info[0].As<Napi::Function>());
 
-    // Object cb call moved to the constructor    
+    // Object cb call moved to the constructor
 }
 
 void TrackWrapper::onError(const Napi::CallbackInfo &info)
 {
+    if (!mTrackPtr)
+    {
+        Napi::Error::New(info.Env(), "onError() called on destroyed track").ThrowAsJavaScriptException();
+        return;
+    }
+
     Napi::Env env = info.Env();
     int length = info.Length();
 
@@ -315,6 +369,12 @@ void TrackWrapper::onError(const Napi::CallbackInfo &info)
 
 void TrackWrapper::onMessage(const Napi::CallbackInfo &info)
 {
+    if (!mTrackPtr)
+    {
+        Napi::Error::New(info.Env(), "onMessage() called on destroyed track").ThrowAsJavaScriptException();
+        return;
+    }
+
     Napi::Env env = info.Env();
     int length = info.Length();
 
@@ -341,7 +401,7 @@ void TrackWrapper::onMessage(const Napi::CallbackInfo &info)
                 if (std::holds_alternative<std::string>(message))
                 {
                     // Track will always send message as binary
-                    // So this code is not needed actually 
+                    // So this code is not needed actually
                     args = {Napi::String::New(env, std::get<std::string>(message))};
                 }
                 else

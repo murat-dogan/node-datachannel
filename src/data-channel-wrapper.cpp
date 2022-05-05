@@ -44,10 +44,10 @@ Napi::Object DataChannelWrapper::Init(Napi::Env env, Napi::Object exports)
 
 DataChannelWrapper::DataChannelWrapper(const Napi::CallbackInfo &info) : Napi::ObjectWrap<DataChannelWrapper>(info)
 {
-    mDataChannelPtr = *(info[0].As<Napi::External<std::shared_ptr<rtc::DataChannel>>>().Data());    
+    mDataChannelPtr = *(info[0].As<Napi::External<std::shared_ptr<rtc::DataChannel>>>().Data());
 
     mDataChannelPtr->onClosed([&]()
-                              {                                  
+                              {
         if (mOnClosedCallback)
             mOnClosedCallback->call([this](Napi::Env env, std::vector<napi_value> &args) {
                 // Check the peer connection is not closed
@@ -63,7 +63,7 @@ DataChannelWrapper::DataChannelWrapper(const Napi::CallbackInfo &info) : Napi::O
          else {
              cleanCbsAndEraseInstance();
          } });
-    
+
     instances.insert(this);
 }
 
@@ -109,7 +109,7 @@ Napi::Value DataChannelWrapper::getLabel(const Napi::CallbackInfo &info)
 {
     if (!mDataChannelPtr)
     {
-        Napi::Error::New(info.Env(), "It seems data-channel is destroyed!").ThrowAsJavaScriptException();
+        Napi::Error::New(info.Env(), "getLabel() called on destroyed channel").ThrowAsJavaScriptException();
         return info.Env().Null();
     }
 
@@ -120,7 +120,7 @@ Napi::Value DataChannelWrapper::getId(const Napi::CallbackInfo &info)
 {
     if (!mDataChannelPtr)
     {
-        Napi::Error::New(info.Env(), "It seems data-channel is destroyed!").ThrowAsJavaScriptException();
+        Napi::Error::New(info.Env(), "getId() called on destroyed channel").ThrowAsJavaScriptException();
         return info.Env().Null();
     }
 
@@ -131,7 +131,7 @@ Napi::Value DataChannelWrapper::getProtocol(const Napi::CallbackInfo &info)
 {
     if (!mDataChannelPtr)
     {
-        Napi::Error::New(info.Env(), "It seems data-channel is destroyed!").ThrowAsJavaScriptException();
+        Napi::Error::New(info.Env(), "getProtocol() called on destroyed channel").ThrowAsJavaScriptException();
         return info.Env().Null();
     }
 
@@ -142,7 +142,7 @@ Napi::Value DataChannelWrapper::sendMessage(const Napi::CallbackInfo &info)
 {
     if (!mDataChannelPtr)
     {
-        Napi::Error::New(info.Env(), "It seems data-channel is destroyed!").ThrowAsJavaScriptException();
+        Napi::Error::New(info.Env(), "sendMessage() called on destroyed channel").ThrowAsJavaScriptException();
         return info.Env().Null();
     }
 
@@ -171,7 +171,7 @@ Napi::Value DataChannelWrapper::sendMessageBinary(const Napi::CallbackInfo &info
 {
     if (!mDataChannelPtr)
     {
-        Napi::Error::New(info.Env(), "It seems data-channel is destroyed!").ThrowAsJavaScriptException();
+        Napi::Error::New(info.Env(), "sendMessagBinary() called on destroyed channel").ThrowAsJavaScriptException();
         return info.Env().Null();
     }
 
@@ -257,7 +257,7 @@ void DataChannelWrapper::setBufferedAmountLowThreshold(const Napi::CallbackInfo 
 {
     if (!mDataChannelPtr)
     {
-        Napi::Error::New(info.Env(), "It seems data-channel is destroyed!").ThrowAsJavaScriptException();
+        Napi::Error::New(info.Env(), "setBufferedAmountLowThreshold() called on destroyed channel").ThrowAsJavaScriptException();
         return;
     }
 
@@ -283,6 +283,12 @@ void DataChannelWrapper::setBufferedAmountLowThreshold(const Napi::CallbackInfo 
 
 void DataChannelWrapper::onOpen(const Napi::CallbackInfo &info)
 {
+    if (!mDataChannelPtr)
+    {
+        Napi::Error::New(info.Env(), "onOpen() called on destroyed channel").ThrowAsJavaScriptException();
+        return;
+    }
+
     Napi::Env env = info.Env();
     int length = info.Length();
 
@@ -311,6 +317,12 @@ void DataChannelWrapper::onOpen(const Napi::CallbackInfo &info)
 
 void DataChannelWrapper::onClosed(const Napi::CallbackInfo &info)
 {
+    if (!mDataChannelPtr)
+    {
+        Napi::Error::New(info.Env(), "onClosed() called on destroyed channel").ThrowAsJavaScriptException();
+        return;
+    }
+
     Napi::Env env = info.Env();
     int length = info.Length();
 
@@ -323,11 +335,17 @@ void DataChannelWrapper::onClosed(const Napi::CallbackInfo &info)
     // Callback
     mOnClosedCallback = std::make_unique<ThreadSafeCallback>(info[0].As<Napi::Function>());
 
-    // Object cb call moved to the constructor    
+    // Object cb call moved to the constructor
 }
 
 void DataChannelWrapper::onError(const Napi::CallbackInfo &info)
 {
+    if (!mDataChannelPtr)
+    {
+        Napi::Error::New(info.Env(), "onError() called on destroyed channel").ThrowAsJavaScriptException();
+        return;
+    }
+
     Napi::Env env = info.Env();
     int length = info.Length();
 
@@ -356,6 +374,12 @@ void DataChannelWrapper::onError(const Napi::CallbackInfo &info)
 
 void DataChannelWrapper::onBufferedAmountLow(const Napi::CallbackInfo &info)
 {
+    if (!mDataChannelPtr)
+    {
+        Napi::Error::New(info.Env(), "onBufferedAmountLow() called on destroyed channel").ThrowAsJavaScriptException();
+        return;
+    }
+
     Napi::Env env = info.Env();
     int length = info.Length();
 
@@ -384,6 +408,12 @@ void DataChannelWrapper::onBufferedAmountLow(const Napi::CallbackInfo &info)
 
 void DataChannelWrapper::onMessage(const Napi::CallbackInfo &info)
 {
+    if (!mDataChannelPtr)
+    {
+        Napi::Error::New(info.Env(), "onMessage() called on destroyed channel").ThrowAsJavaScriptException();
+        return;
+    }
+
     Napi::Env env = info.Env();
     int length = info.Length();
 
