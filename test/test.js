@@ -108,15 +108,6 @@ describe('P2P', () => {
             dc2.close();
             peer1.close();
             peer2.close();
-
-            // Fee memory
-            dc1 = null;
-            dc2 = null;
-            peer1 = null;
-            peer2 = null;
-
-            // Cleanup Threads
-            nodeDataChannel.cleanup();
         }, 10 * 1000);
 
         setTimeout(() => {
@@ -186,4 +177,9 @@ describe('DataChannel streams', () => {
         clientPeer.close();
         echoPeer.close();
     });
+});
+
+afterAll(() => {
+    // Properly cleanup so Jest does not complain about asynchronous operations that weren't stopped.
+    nodeDataChannel.cleanup();
 });
