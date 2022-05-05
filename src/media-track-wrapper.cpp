@@ -67,7 +67,7 @@ void TrackWrapper::doClose()
         }
         catch (std::exception &ex)
         {
-            std::cout << std::string("libdatachannel error while closing track: ") + ex.what() << std::endl;
+            std::cerr << std::string("libdatachannel error while closing track: ") + ex.what() << std::endl;
             return;
         }
     }
@@ -145,7 +145,7 @@ Napi::Value TrackWrapper::sendMessage(const Napi::CallbackInfo &info)
     }
     catch (std::exception &ex)
     {
-        Napi::Error::New(env, std::string("libdatachannel error while sending track msg# ") + ex.what()).ThrowAsJavaScriptException();
+        Napi::Error::New(env, std::string("libdatachannel error while sending track message: ") + ex.what()).ThrowAsJavaScriptException();
         return Napi::Boolean::New(info.Env(), false);
     }
 }
@@ -174,7 +174,7 @@ Napi::Value TrackWrapper::sendMessageBinary(const Napi::CallbackInfo &info)
     }
     catch (std::exception &ex)
     {
-        Napi::Error::New(env, std::string("libdatachannel error while sending track msg# ") + ex.what()).ThrowAsJavaScriptException();
+        Napi::Error::New(env, std::string("libdatachannel error while sending track message: ") + ex.what()).ThrowAsJavaScriptException();
         return Napi::Boolean::New(info.Env(), false);
     }
 }
@@ -206,6 +206,7 @@ Napi::Value TrackWrapper::isClosed(const Napi::CallbackInfo &info)
 Napi::Value TrackWrapper::maxMessageSize(const Napi::CallbackInfo &info)
 {
     Napi::Env env = info.Env();
+
     if (!mTrackPtr)
     {
         return Napi::Number::New(info.Env(), 0);
@@ -217,7 +218,7 @@ Napi::Value TrackWrapper::maxMessageSize(const Napi::CallbackInfo &info)
     }
     catch (std::exception &ex)
     {
-        Napi::Error::New(env, std::string("libdatachannel error# ") + ex.what()).ThrowAsJavaScriptException();
+        Napi::Error::New(env, std::string("libdatachannel error: ") + ex.what()).ThrowAsJavaScriptException();
         return Napi::Number::New(info.Env(), 0);
     }
 }
@@ -247,7 +248,7 @@ void TrackWrapper::setMediaHandler(const Napi::CallbackInfo &info)
 
     if (length < 1 || !info[0].IsObject())
     {
-        Napi::TypeError::New(env, "Mediahandler class instance expected").ThrowAsJavaScriptException();
+        Napi::TypeError::New(env, "MediaHandler class instance expected").ThrowAsJavaScriptException();
         return;
     }
 
