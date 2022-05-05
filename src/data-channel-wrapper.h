@@ -46,7 +46,6 @@ private:
   static std::unordered_set<DataChannelWrapper*> instances;
 
   void doClose();
-  void cleanCbsAndEraseInstance();
 
   std::string mLabel;
   std::shared_ptr<rtc::DataChannel> mDataChannelPtr = nullptr;
