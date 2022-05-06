@@ -67,7 +67,7 @@ void TrackWrapper::doClose()
         }
         catch (std::exception &ex)
         {
-            std::cout << std::string("libdatachannel error while closing track: ") + ex.what() << std::endl;
+            std::cerr << std::string("libdatachannel error while closing track: ") + ex.what() << std::endl;
             return;
         }
     }
@@ -145,7 +145,7 @@ Napi::Value TrackWrapper::sendMessage(const Napi::CallbackInfo &info)
     }
     catch (std::exception &ex)
     {
-        Napi::Error::New(env, std::string("libdatachannel error while sending track msg# ") + ex.what()).ThrowAsJavaScriptException();
+        Napi::Error::New(env, std::string("libdatachannel error while sending track message: ") + ex.what()).ThrowAsJavaScriptException();
         return Napi::Boolean::New(info.Env(), false);
     }
 }
@@ -174,7 +174,7 @@ Napi::Value TrackWrapper::sendMessageBinary(const Napi::CallbackInfo &info)
     }
     catch (std::exception &ex)
     {
-        Napi::Error::New(env, std::string("libdatachannel error while sending track msg# ") + ex.what()).ThrowAsJavaScriptException();
+        Napi::Error::New(env, std::string("libdatachannel error while sending track message: ") + ex.what()).ThrowAsJavaScriptException();
         return Napi::Boolean::New(info.Env(), false);
     }
 }
@@ -206,6 +206,7 @@ Napi::Value TrackWrapper::isClosed(const Napi::CallbackInfo &info)
 Napi::Value TrackWrapper::maxMessageSize(const Napi::CallbackInfo &info)
 {
     Napi::Env env = info.Env();
+
     if (!mTrackPtr)
     {
         return Napi::Number::New(info.Env(), 0);
@@ -217,7 +218,7 @@ Napi::Value TrackWrapper::maxMessageSize(const Napi::CallbackInfo &info)
     }
     catch (std::exception &ex)
     {
-        Napi::Error::New(env, std::string("libdatachannel error# ") + ex.what()).ThrowAsJavaScriptException();
+        Napi::Error::New(env, std::string("libdatachannel error: ") + ex.what()).ThrowAsJavaScriptException();
         return Napi::Number::New(info.Env(), 0);
     }
 }
@@ -247,7 +248,7 @@ void TrackWrapper::setMediaHandler(const Napi::CallbackInfo &info)
 
     if (length < 1 || !info[0].IsObject())
     {
-        Napi::TypeError::New(env, "Mediahandler class instance expected").ThrowAsJavaScriptException();
+        Napi::TypeError::New(env, "MediaHandler class instance expected").ThrowAsJavaScriptException();
         return;
     }
 
@@ -372,25 +373,19 @@ void TrackWrapper::onMessage(const Napi::CallbackInfo &info)
     // Callback
     mOnMessageCallback = std::make_unique<ThreadSafeCallback>(info[0].As<Napi::Function>());
 
-    mTrackPtr->onMessage([&](const std::variant<rtc::binary, std::string> &message) {
+    mTrackPtr->onMessage([&](std::variant<rtc::binary, std::string> message) {
         if (mOnMessageCallback)
-            mOnMessageCallback->call([this, message](Napi::Env env, std::vector<napi_value> &args) {
+            mOnMessageCallback->call([this, message = std::move(message)](Napi::Env env, std::vector<napi_value> &args) {
                 // Check the track is not closed
                 if(instances.find(this) == instances.end())
                     throw ThreadSafeCallback::CancelException();
 
                 // This will run in main thread and needs to construct the
                 // arguments for the call
-                Napi::Object payload = Napi::Object::New(env);
-                if (std::holds_alternative<std::string>(message))
+                if (std::holds_alternative<rtc::binary>(message)) // Track will always receive messages as binary
                 {
-                    // Track will always send message as binary
-                    // So this code is not needed actually
-                    args = {Napi::String::New(env, std::get<std::string>(message))};
-                }
-                else
-                {
-                    args = {Napi::Buffer<std::byte>::Copy(env, std::get<rtc::binary>(message).data(), std::get<rtc::binary>(message).size())};
+                    auto bin = std::get<rtc::binary>(std::move(message));
+                    args = {Napi::Buffer<std::byte>::Copy(env, bin.data(), bin.size())};
                 }
             }); });
 }

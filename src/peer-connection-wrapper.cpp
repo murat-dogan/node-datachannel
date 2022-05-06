@@ -63,7 +63,7 @@ PeerConnectionWrapper::PeerConnectionWrapper(const Napi::CallbackInfo &info) : N
     // We expect (String, Object, Function) as param
     if (length < 2 || !info[0].IsString() || !info[1].IsObject())
     {
-        Napi::TypeError::New(env, "Peer Name (String) & Configuration (Object) expected").ThrowAsJavaScriptException();
+        Napi::TypeError::New(env, "Peer Name (String) and Configuration (Object) expected").ThrowAsJavaScriptException();
         return;
     }
 
@@ -211,7 +211,7 @@ PeerConnectionWrapper::PeerConnectionWrapper(const Napi::CallbackInfo &info) : N
     }
     catch (std::exception &ex)
     {
-        Napi::Error::New(env, std::string("libdatachannel error while creating peerConnection# ") + ex.what()).ThrowAsJavaScriptException();
+        Napi::Error::New(env, std::string("libdatachannel error while creating peer connection: ") + ex.what()).ThrowAsJavaScriptException();
         return;
     }
 
@@ -234,7 +234,7 @@ void PeerConnectionWrapper::doClose()
         }
         catch (std::exception &ex)
         {
-            std::cout << std::string("libdatachannel error while closing peerConnection# ") + ex.what() << std::endl;
+            std::cerr << std::string("libdatachannel error while closing peer connection: ") + ex.what() << std::endl;
             return;
         }
     }
@@ -257,13 +257,13 @@ void PeerConnectionWrapper::close(const Napi::CallbackInfo &info)
 void PeerConnectionWrapper::setLocalDescription(const Napi::CallbackInfo &info)
 {
     Napi::Env env = info.Env();
+    int length = info.Length();
+
     if (!mRtcPeerConnPtr)
     {
-        Napi::Error::New(info.Env(), "It seems peer-connection is closed").ThrowAsJavaScriptException();
+        Napi::Error::New(env, "setLocalDescription() called on destroyed peer connection").ThrowAsJavaScriptException();
         return;
     }
-
-    int length = info.Length();
 
     rtc::Description::Type type = rtc::Description::Type::Unspec;
 
@@ -293,13 +293,14 @@ void PeerConnectionWrapper::setLocalDescription(const Napi::CallbackInfo &info)
 void PeerConnectionWrapper::setRemoteDescription(const Napi::CallbackInfo &info)
 {
     Napi::Env env = info.Env();
+    int length = info.Length();
+
     if (!mRtcPeerConnPtr)
     {
-        Napi::Error::New(info.Env(), "It seems peer-connection is closed").ThrowAsJavaScriptException();
+        Napi::Error::New(env, "setRemoteDescription() called on destroyed peer connection").ThrowAsJavaScriptException();
         return;
     }
 
-    int length = info.Length();
     if (length < 2 || !info[0].IsString() || !info[1].IsString())
     {
         Napi::TypeError::New(info.Env(), "String,String expected").ThrowAsJavaScriptException();
@@ -316,7 +317,7 @@ void PeerConnectionWrapper::setRemoteDescription(const Napi::CallbackInfo &info)
     }
     catch (std::exception &ex)
     {
-        Napi::Error::New(env, std::string("libdatachannel error while adding remote decsription # ") + ex.what()).ThrowAsJavaScriptException();
+        Napi::Error::New(env, std::string("libdatachannel error while adding remote description: ") + ex.what()).ThrowAsJavaScriptException();
         return;
     }
 }
@@ -324,10 +325,11 @@ void PeerConnectionWrapper::setRemoteDescription(const Napi::CallbackInfo &info)
 Napi::Value PeerConnectionWrapper::localDescription(const Napi::CallbackInfo &info)
 {
     Napi::Env env = info.Env();
-    std::optional<rtc::Description> desc = mRtcPeerConnPtr->localDescription();
+
+    std::optional<rtc::Description> desc = mRtcPeerConnPtr ? mRtcPeerConnPtr->localDescription() : std::nullopt;
 
     // Return JS null if no description
-    if(!desc.has_value()) {
+    if (!desc.has_value()) {
         return env.Null();
     }
 
@@ -340,16 +342,17 @@ Napi::Value PeerConnectionWrapper::localDescription(const Napi::CallbackInfo &in
 void PeerConnectionWrapper::addRemoteCandidate(const Napi::CallbackInfo &info)
 {
     Napi::Env env = info.Env();
+    int length = info.Length();
+
     if (!mRtcPeerConnPtr)
     {
-        Napi::Error::New(info.Env(), "It seems peer-connection is closed").ThrowAsJavaScriptException();
+        Napi::Error::New(env, "addRemoteCandidate() called on destroyed peer connection").ThrowAsJavaScriptException();
         return;
     }
 
-    int length = info.Length();
     if (length < 2 || !info[0].IsString() || !info[1].IsString())
     {
-        Napi::TypeError::New(info.Env(), "String,String expected").ThrowAsJavaScriptException();
+        Napi::TypeError::New(info.Env(), "String, String expected").ThrowAsJavaScriptException();
         return;
     }
 
@@ -361,21 +364,21 @@ void PeerConnectionWrapper::addRemoteCandidate(const Napi::CallbackInfo &info)
     }
     catch (std::exception &ex)
     {
-        Napi::Error::New(env, std::string("libdatachannel error while adding remote candidate# ") + ex.what()).ThrowAsJavaScriptException();
+        Napi::Error::New(env, std::string("libdatachannel error while adding remote candidate: ") + ex.what()).ThrowAsJavaScriptException();
         return;
     }
 }
 
 Napi::Value PeerConnectionWrapper::createDataChannel(const Napi::CallbackInfo &info)
 {
-    if (!mRtcPeerConnPtr)
-    {
-        Napi::Error::New(info.Env(), "It seems peer-connection is closed").ThrowAsJavaScriptException();
-        return info.Env().Null();
-    }
-
     Napi::Env env = info.Env();
     int length = info.Length();
+
+    if (!mRtcPeerConnPtr)
+    {
+        Napi::Error::New(env, "createDataChannel() called on destroyed peer connection").ThrowAsJavaScriptException();
+        return info.Env().Null();
+    }
 
     if (length < 1 || !info[0].IsString())
     {
@@ -530,7 +533,7 @@ Napi::Value PeerConnectionWrapper::createDataChannel(const Napi::CallbackInfo &i
     }
     catch (std::exception &ex)
     {
-        Napi::Error::New(env, std::string("libdatachannel error while creating datachannel# ") + ex.what()).ThrowAsJavaScriptException();
+        Napi::Error::New(env, std::string("libdatachannel error while creating datachannel: ") + ex.what()).ThrowAsJavaScriptException();
         return info.Env().Null();
     }
 }
@@ -539,6 +542,12 @@ void PeerConnectionWrapper::onLocalDescription(const Napi::CallbackInfo &info)
 {
     Napi::Env env = info.Env();
     int length = info.Length();
+
+    if (!mRtcPeerConnPtr)
+    {
+        Napi::Error::New(env, "onLocalDescription() called on destroyed peer connection").ThrowAsJavaScriptException();
+        return;
+    }
 
     if (length < 1 || !info[0].IsFunction())
     {
@@ -549,9 +558,9 @@ void PeerConnectionWrapper::onLocalDescription(const Napi::CallbackInfo &info)
     // Callback
     mOnLocalDescriptionCallback = std::make_unique<ThreadSafeCallback>(info[0].As<Napi::Function>());
 
-    mRtcPeerConnPtr->onLocalDescription([&](const rtc::Description &sdp) {
+    mRtcPeerConnPtr->onLocalDescription([&](rtc::Description sdp) {
         if (mOnLocalDescriptionCallback)
-            mOnLocalDescriptionCallback->call([this, sdp](Napi::Env env, std::vector<napi_value> &args) {
+            mOnLocalDescriptionCallback->call([this, sdp = std::move(sdp)](Napi::Env env, std::vector<napi_value> &args) {
                 // Check the peer connection is not closed
                 if(instances.find(this) == instances.end())
                     throw ThreadSafeCallback::CancelException();
@@ -569,6 +578,12 @@ void PeerConnectionWrapper::onLocalCandidate(const Napi::CallbackInfo &info)
     Napi::Env env = info.Env();
     int length = info.Length();
 
+    if (!mRtcPeerConnPtr)
+    {
+        Napi::Error::New(env, "onLocalCandidate() called on destroyed peer connection").ThrowAsJavaScriptException();
+        return;
+    }
+
     if (length < 1 || !info[0].IsFunction())
     {
         Napi::TypeError::New(env, "Function expected").ThrowAsJavaScriptException();
@@ -578,9 +593,9 @@ void PeerConnectionWrapper::onLocalCandidate(const Napi::CallbackInfo &info)
     // Callback
     mOnLocalCandidateCallback = std::make_unique<ThreadSafeCallback>(info[0].As<Napi::Function>());
 
-    mRtcPeerConnPtr->onLocalCandidate([&](const rtc::Candidate &candidate) {
+    mRtcPeerConnPtr->onLocalCandidate([&](rtc::Candidate cand) {
         if (mOnLocalCandidateCallback)
-            mOnLocalCandidateCallback->call([this, candidate](Napi::Env env, std::vector<napi_value> &args) {
+            mOnLocalCandidateCallback->call([this, cand = std::move(cand)](Napi::Env env, std::vector<napi_value> &args) {
                  // Check the peer connection is not closed
                 if(instances.find(this) == instances.end())
                     throw ThreadSafeCallback::CancelException();
@@ -588,8 +603,8 @@ void PeerConnectionWrapper::onLocalCandidate(const Napi::CallbackInfo &info)
                 // This will run in main thread and needs to construct the
                 // arguments for the call
                 args = {
-                    Napi::String::New(env, std::string(candidate)),
-                    Napi::String::New(env, candidate.mid())};
+                    Napi::String::New(env, std::string(cand)),
+                    Napi::String::New(env, cand.mid())};
             }); });
 }
 
@@ -597,6 +612,12 @@ void PeerConnectionWrapper::onStateChange(const Napi::CallbackInfo &info)
 {
     Napi::Env env = info.Env();
     int length = info.Length();
+
+    if (!mRtcPeerConnPtr)
+    {
+        Napi::Error::New(env, "onStateChange() called on destroyed peer connection").ThrowAsJavaScriptException();
+        return;
+    }
 
     if (length < 1 || !info[0].IsFunction())
     {
@@ -627,6 +648,12 @@ void PeerConnectionWrapper::onSignalingStateChange(const Napi::CallbackInfo &inf
     Napi::Env env = info.Env();
     int length = info.Length();
 
+    if (!mRtcPeerConnPtr)
+    {
+        Napi::Error::New(env, "onSignalingStateChange() called on destroyed peer connection").ThrowAsJavaScriptException();
+        return;
+    }
+
     if (length < 1 || !info[0].IsFunction())
     {
         Napi::TypeError::New(env, "Function expected").ThrowAsJavaScriptException();
@@ -655,6 +682,12 @@ void PeerConnectionWrapper::onGatheringStateChange(const Napi::CallbackInfo &inf
 {
     Napi::Env env = info.Env();
     int length = info.Length();
+
+    if (!mRtcPeerConnPtr)
+    {
+        Napi::Error::New(env, "onGatheringStateChange() called on destroyed peer connection").ThrowAsJavaScriptException();
+        return;
+    }
 
     if (length < 1 || !info[0].IsFunction())
     {
@@ -685,6 +718,12 @@ void PeerConnectionWrapper::onDataChannel(const Napi::CallbackInfo &info)
     Napi::Env env = info.Env();
     int length = info.Length();
 
+    if (!mRtcPeerConnPtr)
+    {
+        Napi::Error::New(env, "onDataChannel() called on destroyed peer connection").ThrowAsJavaScriptException();
+        return;
+    }
+
     if (length < 1 || !info[0].IsFunction())
     {
         Napi::TypeError::New(env, "Function expected").ThrowAsJavaScriptException();
@@ -713,6 +752,7 @@ void PeerConnectionWrapper::onDataChannel(const Napi::CallbackInfo &info)
 Napi::Value PeerConnectionWrapper::bytesSent(const Napi::CallbackInfo &info)
 {
     Napi::Env env = info.Env();
+
     if (!mRtcPeerConnPtr)
     {
         return Napi::Number::New(info.Env(), 0);
@@ -724,7 +764,7 @@ Napi::Value PeerConnectionWrapper::bytesSent(const Napi::CallbackInfo &info)
     }
     catch (std::exception &ex)
     {
-        Napi::Error::New(env, std::string("libdatachannel error# ") + ex.what()).ThrowAsJavaScriptException();
+        Napi::Error::New(env, std::string("libdatachannel error: ") + ex.what()).ThrowAsJavaScriptException();
         return Napi::Number::New(info.Env(), 0);
     }
 }
@@ -732,6 +772,7 @@ Napi::Value PeerConnectionWrapper::bytesSent(const Napi::CallbackInfo &info)
 Napi::Value PeerConnectionWrapper::bytesReceived(const Napi::CallbackInfo &info)
 {
     Napi::Env env = info.Env();
+
     if (!mRtcPeerConnPtr)
     {
         return Napi::Number::New(info.Env(), 0);
@@ -743,7 +784,7 @@ Napi::Value PeerConnectionWrapper::bytesReceived(const Napi::CallbackInfo &info)
     }
     catch (std::exception &ex)
     {
-        Napi::Error::New(env, std::string("libdatachannel error# ") + ex.what()).ThrowAsJavaScriptException();
+        Napi::Error::New(env, std::string("libdatachannel error: ") + ex.what()).ThrowAsJavaScriptException();
         return Napi::Number::New(info.Env(), 0);
     }
 }
@@ -751,6 +792,7 @@ Napi::Value PeerConnectionWrapper::bytesReceived(const Napi::CallbackInfo &info)
 Napi::Value PeerConnectionWrapper::rtt(const Napi::CallbackInfo &info)
 {
     Napi::Env env = info.Env();
+
     if (!mRtcPeerConnPtr)
     {
         return Napi::Number::New(info.Env(), 0);
@@ -762,7 +804,7 @@ Napi::Value PeerConnectionWrapper::rtt(const Napi::CallbackInfo &info)
     }
     catch (std::exception &ex)
     {
-        Napi::Error::New(env, std::string("libdatachannel error# ") + ex.what()).ThrowAsJavaScriptException();
+        Napi::Error::New(env, std::string("libdatachannel error: ") + ex.what()).ThrowAsJavaScriptException();
         return Napi::Number::New(info.Env(), -1);
     }
 }
@@ -770,16 +812,17 @@ Napi::Value PeerConnectionWrapper::rtt(const Napi::CallbackInfo &info)
 Napi::Value PeerConnectionWrapper::getSelectedCandidatePair(const Napi::CallbackInfo &info)
 {
     Napi::Env env = info.Env();
+
     if (!mRtcPeerConnPtr)
     {
-        return Napi::Number::New(info.Env(), 0);
+        return env.Null();
     }
 
     try
     {
         rtc::Candidate local, remote;
         if (!mRtcPeerConnPtr->getSelectedCandidatePair(&local, &remote))
-            return info.Env().Null();
+            return env.Null();
 
         Napi::Object retvalue = Napi::Object::New(env);
         Napi::Object localObj = Napi::Object::New(env);
@@ -802,7 +845,7 @@ Napi::Value PeerConnectionWrapper::getSelectedCandidatePair(const Napi::Callback
     }
     catch (std::exception &ex)
     {
-        Napi::Error::New(env, std::string("libdatachannel error# ") + ex.what()).ThrowAsJavaScriptException();
+        Napi::Error::New(env, std::string("libdatachannel error: ") + ex.what()).ThrowAsJavaScriptException();
         return Napi::Number::New(info.Env(), -1);
     }
 }
@@ -850,7 +893,7 @@ Napi::Value PeerConnectionWrapper::addTrack(const Napi::CallbackInfo &info)
 
     if (!mRtcPeerConnPtr)
     {
-        Napi::Error::New(info.Env(), "It seems peer-connection is closed").ThrowAsJavaScriptException();
+        Napi::Error::New(env, "addTrack() called on destroyed peer connection").ThrowAsJavaScriptException();
         return env.Null();
     }
 
@@ -884,7 +927,7 @@ Napi::Value PeerConnectionWrapper::addTrack(const Napi::CallbackInfo &info)
     }
     catch (std::exception &ex)
     {
-        Napi::Error::New(env, std::string("libdatachannel error# ") + ex.what()).ThrowAsJavaScriptException();
+        Napi::Error::New(env, std::string("libdatachannel error: ") + ex.what()).ThrowAsJavaScriptException();
         return env.Null();
     }
 }
@@ -893,6 +936,12 @@ void PeerConnectionWrapper::onTrack(const Napi::CallbackInfo &info)
 {
     Napi::Env env = info.Env();
     int length = info.Length();
+
+    if (!mRtcPeerConnPtr)
+    {
+        Napi::Error::New(env, "onGatheringStateChange() called on destroyed peer connection").ThrowAsJavaScriptException();
+        return;
+    }
 
     if (length < 1 || !info[0].IsFunction())
     {
@@ -903,8 +952,7 @@ void PeerConnectionWrapper::onTrack(const Napi::CallbackInfo &info)
     // Callback
     mOnTrackCallback = std::make_unique<ThreadSafeCallback>(info[0].As<Napi::Function>());
 
-    mRtcPeerConnPtr->onTrack([&](std::shared_ptr<rtc::Track> track)
-                             {
+    mRtcPeerConnPtr->onTrack([&](std::shared_ptr<rtc::Track> track) {
         if (mOnTrackCallback)
             mOnTrackCallback->call([this, track](Napi::Env env, std::vector<napi_value> &args) {
                 // Check the peer connection is not closed
@@ -922,14 +970,14 @@ void PeerConnectionWrapper::onTrack(const Napi::CallbackInfo &info)
 Napi::Value PeerConnectionWrapper::hasMedia(const Napi::CallbackInfo &info)
 {
     Napi::Env env = info.Env();
-    return Napi::Boolean::New(env, mRtcPeerConnPtr->hasMedia());
+    return Napi::Boolean::New(env, mRtcPeerConnPtr ? mRtcPeerConnPtr->hasMedia() : false);
 }
 
 Napi::Value PeerConnectionWrapper::state(const Napi::CallbackInfo &info)
 {
     Napi::Env env = info.Env();
     std::ostringstream stream;
-    stream << mRtcPeerConnPtr->state();
+    stream << (mRtcPeerConnPtr ? mRtcPeerConnPtr->state() : rtc::PeerConnection::State::Closed);
     return Napi::String::New(env, stream.str());
 }
 
@@ -937,7 +985,7 @@ Napi::Value PeerConnectionWrapper::signalingState(const Napi::CallbackInfo &info
 {
     Napi::Env env = info.Env();
     std::ostringstream stream;
-    stream << mRtcPeerConnPtr->signalingState();
+    stream << (mRtcPeerConnPtr ? mRtcPeerConnPtr->signalingState() : rtc::PeerConnection::SignalingState::Stable);
     return Napi::String::New(env, stream.str());
 }
 
@@ -945,6 +993,6 @@ Napi::Value PeerConnectionWrapper::gatheringState(const Napi::CallbackInfo &info
 {
     Napi::Env env = info.Env();
     std::ostringstream stream;
-    stream << mRtcPeerConnPtr->gatheringState();
+    stream << (mRtcPeerConnPtr ? mRtcPeerConnPtr->gatheringState() : rtc::PeerConnection::GatheringState::Complete);
     return Napi::String::New(env, stream.str());
 }
