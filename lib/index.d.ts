@@ -53,6 +53,7 @@ export interface RtcConfig {
     portRangeBegin?: number;
     portRangeEnd?: number;
     maxMessageSize?: number;
+    mtu?: number;
     iceTransportPolicy?: TransportPolicy;
 }
 
