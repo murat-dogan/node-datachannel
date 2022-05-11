@@ -182,7 +182,11 @@ PeerConnectionWrapper::PeerConnectionWrapper(const Napi::CallbackInfo &info) : N
 
     // Max Message Size
     if (config.Get("maxMessageSize").IsNumber())
-        rtcConfig.maxMessageSize = config.Get("maxMessageSize").As<Napi::Number>().Uint32Value();
+        rtcConfig.maxMessageSize = config.Get("maxMessageSize").As<Napi::Number>().Int32Value();
+
+    // MTU
+    if (config.Get("mtu").IsNumber())
+        rtcConfig.mtu = config.Get("mtu").As<Napi::Number>().Int32Value();
 
     // ICE transport policy
     if (!config.Get("iceTransportPolicy").IsUndefined())

@@ -104,9 +104,11 @@ export interface RtcConfig {
     iceServers: (string | IceServer)[];
     proxyServer?: ProxyServer;
     enableIceTcp?: boolean;
+    enableIceUdpMux?: boolean;
     portRangeBegin?: number;
     portRangeEnd?: number;
     maxMessageSize?: number;
+    mtu?: number;
     iceTransportPolicy?: TransportPolicy;
 }
 
