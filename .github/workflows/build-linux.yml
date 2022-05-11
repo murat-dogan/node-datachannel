@@ -2,7 +2,7 @@ name: Build - Linux
 
 on:
   workflow_dispatch:
-  create:
+  push:
     tags:
       - v*
 

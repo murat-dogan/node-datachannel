@@ -2,7 +2,7 @@ name: Build - Win
 
 on:
   workflow_dispatch:
-  create:
+  push:
     tags:
       - v*
 
