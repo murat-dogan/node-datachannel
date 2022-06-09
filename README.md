@@ -20,7 +20,6 @@ npm install node-datachannel
 
 ## Supported Platforms
 
-
 |          | Linux-x64 | Linux-armv7 | Linux-arm64 | Windows-x86 | Windows-x64 | Mac |
 |----------|:---------:|:-----------:|:-----------:|:-----------:|:-----------:|:---:|
 | Node V10 |     +     |      +      |      +      |      +      |      +      |  +  |
@@ -33,6 +32,7 @@ npm install node-datachannel
 | Node V17 |     +     |      +      |      +      |      +      |      +      |  +  |
 
 ## Example Usage
+
 ```js
 const nodeDataChannel = require('node-datachannel');
 
@@ -93,27 +93,26 @@ setTimeout(() => {
 }, 10 * 1000);
 ```
 
-### Test
+## Test
 ```sh
 npm run test                  # Unit tests
 node test/connectivity.js     # Connectivity
 ```
 
 
-### Build
+## Build
 
 Please check [here](/BULDING.md)
 
-### Examples
+## Examples
 
 Please check [examples](/examples/) folder
 
-### API Docs
+## API Docs
 
 Please check [docs](/API.md) page
 
 ## Thanks
-
 
 Thanks to [Streamr](https://streamr.network/) for supporting this project by being a Sponsor!
 
