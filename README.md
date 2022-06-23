@@ -20,16 +20,19 @@ npm install node-datachannel
 
 ## Supported Platforms
 
-|          | Linux-x64 | Linux-armv7 | Linux-arm64 | Windows-x86 | Windows-x64 | Mac |
-|----------|:---------:|:-----------:|:-----------:|:-----------:|:-----------:|:---:|
-| Node V10 |     +     |      +      |      +      |      +      |      +      |  +  |
-| Node V11 |     +     |      +      |      +      |      +      |      +      |  +  |
-| Node V12 |     +     |      +      |      +      |      +      |      +      |  +  |
-| Node V13 |     +     |      +      |      +      |      +      |      +      |  +  |
-| Node V14 |     +     |      +      |      +      |      +      |      +      |  +  |
-| Node V15 |     +     |      +      |      +      |      +      |      +      |  +  |
-| Node V16 |     +     |      +      |      +      |      +      |      +      |  +  |
-| Node V17 |     +     |      +      |      +      |      +      |      +      |  +  |
+|          | Linux-x64 | Linux-armv7 | Linux-arm64(1)   | Windows-x86 | Windows-x64 | Mac |
+|----------|:---------:|:-----------:|:----------------:|:-----------:|:-----------:|:---:|
+| Node V10 |     +     |      +      |      +           |      +      |      +      |  +  |
+| Node V11 |     +     |      +      |      +           |      +      |      +      |  +  |
+| Node V12 |     +     |      +      |      +           |      +      |      +      |  +  |
+| Node V13 |     +     |      +      |      +           |      +      |      +      |  +  |
+| Node V14 |     +     |      +      |      +           |      +      |      +      |  +  |
+| Node V15 |     +     |      +      |      +           |      +      |      +      |  +  |
+| Node V16 |     +     |      +      |      +           |      +      |      +      |  +  |
+| Node V17 |     +     |      +      |      +           |      +      |      +      |  +  |
+
+1) Please note that; For arm64 platform we need OpenSSL to be installed locally.
+
 
 ## Example Usage
 
