@@ -81,7 +81,8 @@ set(LINK_LIBRARIES
 )
 
 if(APPLE)
-  ###
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -arch x86_64 -arch arm64 ")
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_LINK_FLAGS} -arch x86_64 -arch arm64 ")
 elseif(UNIX)
     list(APPEND LINK_LIBRARIES -static-libgcc -static-libstdc++)
 endif()
