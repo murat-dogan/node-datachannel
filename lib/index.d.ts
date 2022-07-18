@@ -50,6 +50,8 @@ export interface RtcConfig {
     iceServers: (string | IceServer)[];
     proxyServer?: ProxyServer;
     enableIceTcp?: boolean;
+    enableIceUdpMux?: boolean;
+    disableAutoNegotiation?: boolean;
     portRangeBegin?: number;
     portRangeEnd?: number;
     maxMessageSize?: number;
