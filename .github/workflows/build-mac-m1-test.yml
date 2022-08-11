@@ -2,9 +2,6 @@ name: Build - Mac M1
 
 on:
   workflow_dispatch:
-  push:
-    tags:
-      - v*
 
 env:
   ACTIONS_ALLOW_UNSECURE_COMMANDS: true
