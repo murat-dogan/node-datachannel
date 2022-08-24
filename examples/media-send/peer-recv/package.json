@@ -1,0 +1,20 @@
+{
+  "name": "test",
+  "version": "0.1.0",
+  "private": true,
+  "author": "Caner",
+  "email": "5658514@qq.com",
+  "scripts": {
+    "dev": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "lint": "vue-cli-service lint"
+  },
+  "dependencies": {
+    "socket.io-client": "^4.4.1",
+    "vue": "^2.6.11"
+  },
+  "devDependencies": {
+    "@vue/cli-service": "~4.5.0",
+    "vue-template-compiler": "^2.6.11"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "name": "client",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "author": "Caner",
+  "email": "5658514@qq.com",
+  "scripts": {
+    "build": "pkg . -t node14-linux-x64 --out-path=dist/",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "bin": "./index.js",
+  "pkg": {
+    "scripts": "lib/*.js"
+  },
+  "license": "ISC",
+  "dependencies": {
+    "node-datachannel": "^0.3.4",
+    "socket.io-client": "^4.4.1"
+  }
+}
