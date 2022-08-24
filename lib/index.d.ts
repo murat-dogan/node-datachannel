@@ -50,6 +50,8 @@ export interface RtcConfig {
     iceServers: (string | IceServer)[];
     proxyServer?: ProxyServer;
     enableIceTcp?: boolean;
+    enableIceUdpMux?: boolean;
+    disableAutoNegotiation?: boolean;
     portRangeBegin?: number;
     portRangeEnd?: number;
     maxMessageSize?: number;
@@ -57,12 +59,13 @@ export interface RtcConfig {
     iceTransportPolicy?: TransportPolicy;
 }
 
+// Lowercase to match the description type string from libdatachannel
 export const enum DescriptionType {
-    Unspec = 'Unspec',
-    Offer = 'Offer',
-    Answer = 'Answer',
-    Pranswer = 'Pranswer',
-    Rollback = 'Rollback',
+    Unspec = 'unspec',
+    Offer = 'offer',
+    Answer = 'answer',
+    Pranswer = 'pranswer',
+    Rollback = 'rollback',
 }
 
 export const enum ReliabilityType {

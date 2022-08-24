@@ -1,0 +1,36 @@
+name: Build - Linux-Arm64
+
+on:
+  workflow_dispatch:
+
+env:
+  ACTIONS_ALLOW_UNSECURE_COMMANDS: true
+
+jobs:
+  build-linux-arm64:
+    runs-on: ubuntu-20.04
+
+    strategy:
+      matrix:
+        node-version: [12.x, 13.x, 14.x, 15.x, 16.x, 17.x]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Prepare Cross Compile
+        run: |
+          sudo apt update
+          sudo apt install -y g++-aarch64-linux-gnu gcc-aarch64-linux-gnu
+          mkdir sysroot && cd sysroot
+          wget https://commondatastorage.googleapis.com/chrome-linux-sysroot/toolchain/953c2471bc7e71a788309f6c2d2003e8b703305d/debian_sid_arm64_sysroot.tar.xz        
+          tar xf debian_sid_arm64_sysroot.tar.xz
+          echo "ARM64_SYSROOT=$(pwd)" >> $GITHUB_ENV
+          ls -l
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Build & Upload
+        run: |
+          npm install --ignore-scripts
+          node_modules/.bin/prebuild --backend cmake-js --arch arm64 --upload -u ${{ secrets.GITHUB_TOKEN }} -- --CDCMAKE_TOOLCHAIN_FILE:FILEPATH=./cmake/toolchain/arm64.cmake
+        env:
+          CI: true

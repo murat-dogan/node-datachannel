@@ -4,6 +4,7 @@
 #include "media-video-wrapper.h"
 #include "media-audio-wrapper.h"
 
+#include <cctype>
 #include <sstream>
 
 Napi::FunctionReference PeerConnectionWrapper::constructor;
@@ -281,13 +282,17 @@ void PeerConnectionWrapper::setLocalDescription(const Napi::CallbackInfo &info)
         }
         std::string typeStr = info[0].As<Napi::String>().ToString();
 
-        if (typeStr == "Answer")
+        // Accept uppercase first letter for backward compatibility
+        if(typeStr.size() > 0)
+            typeStr[0] = std::tolower(typeStr[0]);
+
+        if (typeStr == "answer")
             type = rtc::Description::Type::Answer;
-        if (typeStr == "Offer")
+        else if (typeStr == "offer")
             type = rtc::Description::Type::Offer;
-        if (typeStr == "Pranswer")
+        else if (typeStr == "pranswer")
             type = rtc::Description::Type::Pranswer;
-        if (typeStr == "Rollback")
+        else if (typeStr == "rollback")
             type = rtc::Description::Type::Rollback;
     }
 

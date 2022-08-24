@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.15)
 cmake_policy(SET CMP0091 NEW)
-project(node_datachannel VERSION 0.3.2)
+project(node_datachannel VERSION 0.3.6)
 
 # Workaround for https://github.com/murat-dogan/node-datachannel/issues/65
 if( NODE_RUNTIMEVERSION VERSION_GREATER_EQUAL "17.0.0")
@@ -17,13 +17,18 @@ if(WIN32)
     set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 endif()
 
-# Got linker error for arm64
-# /usr/lib/gcc-cross/aarch64-linux-gnu/9/../../../../aarch64-linux-gnu/bin/ld: ../sysroot/usr/lib/aarch64-linux-gnu/libcrypto.a(sha1-armv8.o): relocation R_AARCH64_PREL64 against symbol `OPENSSL_armcap_P' which may bind externally can not be used when making a shared object; recompile with -fPIC
-# ../sysroot/usr/lib/aarch64-linux-gnu/libcrypto.a(sha1-armv8.o): in function `sha1_block_armv8':
-# (.text+0x1240): dangerous relocation: unsupported relocation
-if(NOT ${NODE_ARCH} STREQUAL "arm64")
-  set(OPENSSL_USE_STATIC_LIBS TRUE)
-  find_package(OpenSSL REQUIRED)
+if(APPLE)
+    set(OPENSSL_USE_STATIC_LIBS TRUE)
+    find_package(OpenSSL REQUIRED)
+elseif(UNIX)
+    # Got linker error for arm64
+    # /usr/lib/gcc-cross/aarch64-linux-gnu/9/../../../../aarch64-linux-gnu/bin/ld: ../sysroot/usr/lib/aarch64-linux-gnu/libcrypto.a(sha1-armv8.o): relocation R_AARCH64_PREL64 against symbol `OPENSSL_armcap_P' which may bind externally can not be used when making a shared object; recompile with -fPIC
+    # ../sysroot/usr/lib/aarch64-linux-gnu/libcrypto.a(sha1-armv8.o): in function `sha1_block_armv8':
+    # (.text+0x1240): dangerous relocation: unsupported relocation
+    if(NOT ${NODE_ARCH} STREQUAL "arm64")
+        set(OPENSSL_USE_STATIC_LIBS TRUE)
+        find_package(OpenSSL REQUIRED)
+    endif()
 endif()
 
 
@@ -33,7 +38,7 @@ include(FetchContent)
 FetchContent_Declare(
     libdatachannel
     GIT_REPOSITORY https://github.com/paullouisageneau/libdatachannel.git
-    GIT_TAG "v0.17.3"
+    GIT_TAG "v0.17.9"
 )
 
 option(NO_MEDIA "Disable media transport support in libdatachannel" OFF)
@@ -81,7 +86,7 @@ set(LINK_LIBRARIES
 )
 
 if(APPLE)
-  ###
+    #
 elseif(UNIX)
     list(APPEND LINK_LIBRARIES -static-libgcc -static-libstdc++)
 endif()
