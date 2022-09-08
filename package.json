@@ -13,6 +13,7 @@
     "install": "prebuild-install || (npm install --ignore-scripts && npm run _prebuild)",
     "install-nice": "npm run clean && cmake-js build --CDUSE_NICE=1",
     "build": "cmake-js build",
+    "build:debug": "cmake-js build -D",
     "_prebuild": "prebuild --backend cmake-js",
     "clean": "cmake-js clean",
     "lint": "eslint lib/**/* test/**/*",
