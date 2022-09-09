@@ -73,7 +73,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_BINARY_DIR}/_deps/libdatachannel-src/include
 )
 
-if( NODE_RUNTIMEVERSION VERSION_LESS "13.0.0")
+if( NODE_RUNTIMEVERSION VERSION_LESS "16.0.0")
     # For compatibility with Node.js 12
     # This should be removed along with the napi-thread-safe-callback-cancellable dependency when dropping support at end-of-life
     target_compile_definitions(${PROJECT_NAME} PRIVATE -DLEGACY_NAPI_THREAD_SAFE_CALLBACK)    
