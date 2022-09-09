@@ -19,6 +19,8 @@ public:
   PeerConnectionWrapper(const Napi::CallbackInfo &info);
   ~PeerConnectionWrapper();
 
+  void destroy(const Napi::CallbackInfo &info);
+
   // Functions
   void close(const Napi::CallbackInfo &info);
   void setLocalDescription(const Napi::CallbackInfo &info);
@@ -47,14 +49,19 @@ public:
   Napi::Value rtt(const Napi::CallbackInfo &info);
   Napi::Value getSelectedCandidatePair(const Napi::CallbackInfo &info);
 
-  // Close all existing DataChannels
+  // Close all existing Peer Connections
   static void CloseAll();
+
+  // Reset all Callbacks for existing Peer Connections
+  static void ResetCallbacksAll();
 
 private:
   static Napi::FunctionReference constructor;
   static std::unordered_set<PeerConnectionWrapper *> instances;
 
   void doClose();
+  void doDestroy();
+  void resetCallbacks();
 
   std::string mPeerName;
   std::unique_ptr<rtc::PeerConnection> mRtcPeerConnPtr = nullptr;
