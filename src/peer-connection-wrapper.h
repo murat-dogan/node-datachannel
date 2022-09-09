@@ -61,7 +61,7 @@ private:
 
   void doClose();
   void doDestroy();
-  void resetCallbacks();
+  void doResetCallbacks();
 
   std::string mPeerName;
   std::unique_ptr<rtc::PeerConnection> mRtcPeerConnPtr = nullptr;

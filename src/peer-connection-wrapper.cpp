@@ -21,7 +21,7 @@ void PeerConnectionWrapper::ResetCallbacksAll()
 {
     auto copy(instances);
     for (auto inst : copy)
-        inst->resetCallbacks();
+        inst->doResetCallbacks();
 }
 
 Napi::Object PeerConnectionWrapper::Init(Napi::Env env, Napi::Object exports)
@@ -261,10 +261,10 @@ void PeerConnectionWrapper::close(const Napi::CallbackInfo &info)
 void PeerConnectionWrapper::doDestroy()
 {
     doClose();
-    resetCallbacks();
+    doResetCallbacks();
 }
 
-void PeerConnectionWrapper::resetCallbacks()
+void PeerConnectionWrapper::doResetCallbacks()
 {  
     mOnLocalDescriptionCallback.reset();
     mOnLocalCandidateCallback.reset();
