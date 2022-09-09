@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.15)
 cmake_policy(SET CMP0091 NEW)
-project(node_datachannel VERSION 0.3.6)
+project(node_datachannel VERSION 0.4.0)
 
 # Workaround for https://github.com/murat-dogan/node-datachannel/issues/65
 if( NODE_RUNTIMEVERSION VERSION_GREATER_EQUAL "17.0.0")
@@ -38,7 +38,7 @@ include(FetchContent)
 FetchContent_Declare(
     libdatachannel
     GIT_REPOSITORY https://github.com/paullouisageneau/libdatachannel.git
-    GIT_TAG "v0.17.9"
+    GIT_TAG "v0.17.10"
 )
 
 option(NO_MEDIA "Disable media transport support in libdatachannel" OFF)
@@ -73,9 +73,12 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_BINARY_DIR}/_deps/libdatachannel-src/include
 )
 
-# For compatibility with Node.js 12
-# This should be removed along with the napi-thread-safe-callback-cancellable dependency when dropping support at end-of-life
-target_compile_definitions(${PROJECT_NAME} PRIVATE -DLEGACY_NAPI_THREAD_SAFE_CALLBACK)
+if( NODE_RUNTIMEVERSION VERSION_LESS "13.0.0")
+    # For compatibility with Node.js 12
+    # This should be removed along with the napi-thread-safe-callback-cancellable dependency when dropping support at end-of-life
+    target_compile_definitions(${PROJECT_NAME} PRIVATE -DLEGACY_NAPI_THREAD_SAFE_CALLBACK)    
+endif()
+
 target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_SOURCE_DIR}/node_modules/napi-thread-safe-callback-cancellable
 )

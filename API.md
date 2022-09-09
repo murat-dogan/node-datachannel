@@ -49,6 +49,10 @@ TURN Server Example (TLS)    : turns:USERNAME:PASSWORD@TURN_IP_OR_ADDRESS:PORT
 
 Close Peer Connection
 
+**destroy: () => void**
+
+Close Peer Connection & Clear all callbacks
+
 **setRemoteDescription: (sdp: string, type: DescriptionType) => void**
 
 Set Remote Description

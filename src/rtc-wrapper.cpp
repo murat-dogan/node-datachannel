@@ -82,7 +82,10 @@ void RtcWrapper::cleanup(const Napi::CallbackInfo &info)
         const auto timeout = std::chrono::seconds(10);
         if(rtc::Cleanup().wait_for(std::chrono::seconds(timeout)) == std::future_status::timeout)
             throw std::runtime_error("cleanup timeout (possible deadlock)");
-    }
+        
+        // Clear Callbacks    
+        PeerConnectionWrapper::ResetCallbacksAll();
+    }        
     catch (std::exception &ex)
     {
         Napi::Error::New(env, std::string("libdatachannel error# ") + ex.what()).ThrowAsJavaScriptException();
