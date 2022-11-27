@@ -61,7 +61,23 @@ void RtcWrapper::initLogger(const Napi::CallbackInfo &info)
 
     try
     {
-        rtc::InitLogger(logLevel);
+        if (length < 2)
+        {
+            rtc::InitLogger(logLevel);
+        }
+        else
+        {
+            logCallback = std::make_unique<ThreadSafeCallback>(info[1].As<Napi::Function>());
+            rtc::InitLogger(logLevel, [&](rtc::LogLevel level, std::string message) {
+                if (logCallback)
+                    logCallback->call([level, message = std::move(message)](Napi::Env env, std::vector<napi_value> &args) {
+                        // This will run in main thread and needs to construct the
+                        // arguments for the call
+                        args = {Napi::Number::New(env, static_cast<int>(level)), Napi::String::New(env, message)};
+                    });
+            });
+        }
+
     }
     catch (std::exception &ex)
     {
@@ -85,6 +101,8 @@ void RtcWrapper::cleanup(const Napi::CallbackInfo &info)
         
         // Clear Callbacks    
         PeerConnectionWrapper::ResetCallbacksAll();
+
+        if (logCallback) logCallback.reset();
     }        
     catch (std::exception &ex)
     {

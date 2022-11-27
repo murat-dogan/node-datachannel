@@ -17,7 +17,7 @@ export interface SctpSettings {
 
 // Functions
 export function preload(): void;
-export function initLogger(level: LogLevel): void;
+export function initLogger(level: LogLevel, callback?: (level: number, message: string) => void): void;
 export function cleanup(): void;
 export function setSctpSettings(settings: SctpSettings): void;
 
