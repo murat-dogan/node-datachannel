@@ -67,6 +67,11 @@ void RtcWrapper::initLogger(const Napi::CallbackInfo &info)
         }
         else
         {
+            if (!info[1].IsFunction())
+            {
+                Napi::TypeError::New(env, "Function expected").ThrowAsJavaScriptException();
+                return;
+            }
             logCallback = std::make_unique<ThreadSafeCallback>(info[1].As<Napi::Function>());
             rtc::InitLogger(logLevel, [&](rtc::LogLevel level, std::string message) {
                 if (logCallback)
