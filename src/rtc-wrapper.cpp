@@ -78,7 +78,21 @@ void RtcWrapper::initLogger(const Napi::CallbackInfo &info)
                     logCallback->call([level, message = std::move(message)](Napi::Env env, std::vector<napi_value> &args) {
                         // This will run in main thread and needs to construct the
                         // arguments for the call
-                        args = {Napi::Number::New(env, static_cast<int>(level)), Napi::String::New(env, message)};
+
+                        std::string logLevel;
+                        if (level == rtc::LogLevel::Verbose)
+                            logLevel = "Verbos";
+                        if (level == rtc::LogLevel::Debug)
+                            logLevel = "Debug";
+                        if (level == rtc::LogLevel::Info)
+                            logLevel = "Info";
+                        if (level == rtc::LogLevel::Warning)
+                            logLevel = "Warning";
+                        if (level == rtc::LogLevel::Error)
+                            logLevel = "Error";
+                        if (level == rtc::LogLevel::Fatal)
+                            logLevel = "Fatal";
+                        args = {Napi::String::New(env, logLevel), Napi::String::New(env, message)};
                     });
             });
         }
