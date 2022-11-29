@@ -81,7 +81,7 @@ void RtcWrapper::initLogger(const Napi::CallbackInfo &info)
 
                         std::string logLevel;
                         if (level == rtc::LogLevel::Verbose)
-                            logLevel = "Verbos";
+                            logLevel = "Verbose";
                         if (level == rtc::LogLevel::Debug)
                             logLevel = "Debug";
                         if (level == rtc::LogLevel::Info)
