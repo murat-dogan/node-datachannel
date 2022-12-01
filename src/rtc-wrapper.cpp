@@ -61,7 +61,42 @@ void RtcWrapper::initLogger(const Napi::CallbackInfo &info)
 
     try
     {
-        rtc::InitLogger(logLevel);
+        if (length < 2)
+        {
+            rtc::InitLogger(logLevel);
+        }
+        else
+        {
+            if (!info[1].IsFunction())
+            {
+                Napi::TypeError::New(env, "Function expected").ThrowAsJavaScriptException();
+                return;
+            }
+            logCallback = std::make_unique<ThreadSafeCallback>(info[1].As<Napi::Function>());
+            rtc::InitLogger(logLevel, [&](rtc::LogLevel level, std::string message) {
+                if (logCallback)
+                    logCallback->call([level, message = std::move(message)](Napi::Env env, std::vector<napi_value> &args) {
+                        // This will run in main thread and needs to construct the
+                        // arguments for the call
+
+                        std::string logLevel;
+                        if (level == rtc::LogLevel::Verbose)
+                            logLevel = "Verbose";
+                        if (level == rtc::LogLevel::Debug)
+                            logLevel = "Debug";
+                        if (level == rtc::LogLevel::Info)
+                            logLevel = "Info";
+                        if (level == rtc::LogLevel::Warning)
+                            logLevel = "Warning";
+                        if (level == rtc::LogLevel::Error)
+                            logLevel = "Error";
+                        if (level == rtc::LogLevel::Fatal)
+                            logLevel = "Fatal";
+                        args = {Napi::String::New(env, logLevel), Napi::String::New(env, message)};
+                    });
+            });
+        }
+
     }
     catch (std::exception &ex)
     {
@@ -85,6 +120,8 @@ void RtcWrapper::cleanup(const Napi::CallbackInfo &info)
         
         // Clear Callbacks    
         PeerConnectionWrapper::ResetCallbacksAll();
+
+        if (logCallback) logCallback.reset();
     }        
     catch (std::exception &ex)
     {
