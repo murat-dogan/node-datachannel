@@ -46,9 +46,11 @@ export interface IceServer {
 }
 
 export type TransportPolicy = 'all' | 'relay';
+
 export interface RtcConfig {
     iceServers: (string | IceServer)[];
     proxyServer?: ProxyServer;
+    bindAddress?: string;
     enableIceTcp?: boolean;
     enableIceUdpMux?: boolean;
     disableAutoNegotiation?: boolean;
