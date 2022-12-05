@@ -171,6 +171,10 @@ PeerConnectionWrapper::PeerConnectionWrapper(const Napi::CallbackInfo &info) : N
         rtcConfig.proxyServer = rtc::ProxyServer(type, ip, port, username, password);
     }
 
+    // bind address, libjuice only
+    if(config.Get("bindAddress").IsString())
+        rtcConfig.bindAddress = config.Get("bindAddress").As<Napi::String>().ToString();
+
     // Port Ranges
     if (config.Get("portRangeBegin").IsNumber())
         rtcConfig.portRangeBegin = config.Get("portRangeBegin").As<Napi::Number>().Uint32Value();
@@ -265,7 +269,7 @@ void PeerConnectionWrapper::doDestroy()
 }
 
 void PeerConnectionWrapper::doResetCallbacks()
-{  
+{
     mOnLocalDescriptionCallback.reset();
     mOnLocalCandidateCallback.reset();
     mOnStateChangeCallback.reset();
@@ -661,7 +665,7 @@ void PeerConnectionWrapper::onStateChange(const Napi::CallbackInfo &info)
 
     mRtcPeerConnPtr->onStateChange([&](rtc::PeerConnection::State state) {
         if (mOnStateChangeCallback)
-            mOnStateChangeCallback->call([this, state](Napi::Env env, std::vector<napi_value> &args) {                
+            mOnStateChangeCallback->call([this, state](Napi::Env env, std::vector<napi_value> &args) {
                 if(instances.find(this) == instances.end())
                     throw ThreadSafeCallback::CancelException();
 

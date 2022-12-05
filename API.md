@@ -11,6 +11,7 @@ let pc = new PeerConnection(peerName[,options])
 export interface RtcConfig {
     iceServers: (string | IceServer)[];
     proxyServer?: ProxyServer;
+    bindAddress?: string;
     enableIceTcp?: boolean;
     enableIceUdpMux?: boolean;
     portRangeBegin?: number;
