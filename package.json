@@ -41,7 +41,7 @@
       "url": "https://github.com/paullouisageneau"
     }
   ],
-  "license": "LGPL",
+  "license": "MPL 2.0",
   "gypfile": true,
   "bugs": {
     "url": "https://github.com/murat-dogan/node-datachannel/issues"
