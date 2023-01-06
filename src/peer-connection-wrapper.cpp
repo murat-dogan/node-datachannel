@@ -520,7 +520,7 @@ Napi::Value PeerConnectionWrapper::createDataChannel(const Napi::CallbackInfo &i
                     init.reliability.rexmit = reliability.Get("rexmit").As<Napi::Number>();
                     break;
                 case 2:
-                    init.reliability.rexmit = std::chrono::milliseconds(reliability.Get("rexmit").As<Napi::Number>());
+                    init.reliability.rexmit = std::chrono::milliseconds((int)reliability.Get("rexmit").As<Napi::Number>().ToNumber());
                     break;
                 }
             }
