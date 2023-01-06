@@ -103,7 +103,7 @@ Napi::Value DataChannelWrapper::getId(const Napi::CallbackInfo &info)
         return info.Env().Null();
     }
 
-    return Napi::Number::New(info.Env(), mDataChannelPtr->id().value());
+    return Napi::Number::New(info.Env(), mDataChannelPtr->id().value_or(-1));
 }
 
 Napi::Value DataChannelWrapper::getProtocol(const Napi::CallbackInfo &info)
