@@ -517,7 +517,7 @@ Napi::Value PeerConnectionWrapper::createDataChannel(const Napi::CallbackInfo &i
                 switch (reliability.Get("type").As<Napi::Number>().Uint32Value())
                 {
                 case 1:
-                    init.reliability.rexmit = reliability.Get("rexmit").As<Napi::Number>().Uint32Value();
+                    init.reliability.rexmit = static_cast<int>(reliability.Get("rexmit").As<Napi::Number>().ToNumber());
                     break;
                 case 2:
                     init.reliability.rexmit = std::chrono::milliseconds(reliability.Get("rexmit").As<Napi::Number>().Uint32Value());
