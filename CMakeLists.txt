@@ -17,6 +17,10 @@ if(WIN32)
     set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 endif()
 
+if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Android")
+    set(CMAKE_C_FLAGS "-Wno-error=unused-but-set-variable -Wno-error=strict-prototypes")
+endif()
+
 # Got linker error for arm64
 # /usr/lib/gcc-cross/aarch64-linux-gnu/9/../../../../aarch64-linux-gnu/bin/ld: ../sysroot/usr/lib/aarch64-linux-gnu/libcrypto.a(sha1-armv8.o): relocation R_AARCH64_PREL64 against symbol `OPENSSL_armcap_P' which may bind externally can not be used when making a shared object; recompile with -fPIC
 # ../sysroot/usr/lib/aarch64-linux-gnu/libcrypto.a(sha1-armv8.o): in function `sha1_block_armv8':
@@ -85,6 +89,8 @@ set(LINK_LIBRARIES
 
 if(APPLE)
     #
+elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL "Android")
+    list(APPEND LINK_LIBRARIES -static-libgcc)
 elseif(UNIX)
     list(APPEND LINK_LIBRARIES -static-libgcc -static-libstdc++)
 endif()
