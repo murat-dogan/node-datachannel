@@ -3,9 +3,9 @@ cmake_policy(SET CMP0091 NEW)
 project(node_datachannel VERSION 0.4.2)
 
 # Workaround for https://github.com/murat-dogan/node-datachannel/issues/65
-if( NODE_RUNTIMEVERSION VERSION_GREATER_EQUAL "17.0.0")
+if( NODE_RUNTIMEVERSION VERSION_GREATER "17.0.0" AND NODE_RUNTIMEVERSION VERSION_LESS "18.0.0" )
     add_compile_definitions(OPENSSL_API_COMPAT=0x10100001L)
-#     add_compile_definitions(OPENSSL_CONFIGURED_API=0x30000000L)
+    add_compile_definitions(OPENSSL_CONFIGURED_API=0x30000000L)
 endif()
 
 include_directories(${CMAKE_JS_INC})
