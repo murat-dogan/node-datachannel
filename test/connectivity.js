@@ -11,6 +11,7 @@ let dc2 = null;
 // export interface RtcConfig {
 //     iceServers: string[];
 //     proxyServer?: ProxyServer;
+//     bindAddress?: string;
 //     enableIceTcp?: boolean;
 //     portRangeBegin?: number;
 //     portRangeEnd?: number;

@@ -17,7 +17,7 @@ export interface SctpSettings {
 
 // Functions
 export function preload(): void;
-export function initLogger(level: LogLevel): void;
+export function initLogger(level: LogLevel, callback?: (level: LogLevel, message: string) => void): void;
 export function cleanup(): void;
 export function setSctpSettings(settings: SctpSettings): void;
 
@@ -46,9 +46,11 @@ export interface IceServer {
 }
 
 export type TransportPolicy = 'all' | 'relay';
+
 export interface RtcConfig {
     iceServers: (string | IceServer)[];
     proxyServer?: ProxyServer;
+    bindAddress?: string;
     enableIceTcp?: boolean;
     enableIceUdpMux?: boolean;
     disableAutoNegotiation?: boolean;
@@ -204,6 +206,7 @@ export class DataChannel {
 export class PeerConnection {
     constructor(peerName: string, config: RtcConfig);
     close(): void;
+    destroy(): void;
     setLocalDescription(type?: DescriptionType): void;
     setRemoteDescription(sdp: string, type: DescriptionType): void;
     localDescription(): { type: string; sdp: string } | null;

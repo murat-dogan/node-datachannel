@@ -17,6 +17,13 @@ void PeerConnectionWrapper::CloseAll()
         inst->doClose();
 }
 
+void PeerConnectionWrapper::ResetCallbacksAll()
+{
+    auto copy(instances);
+    for (auto inst : copy)
+        inst->doResetCallbacks();
+}
+
 Napi::Object PeerConnectionWrapper::Init(Napi::Env env, Napi::Object exports)
 {
     Napi::HandleScope scope(env);
@@ -26,6 +33,7 @@ Napi::Object PeerConnectionWrapper::Init(Napi::Env env, Napi::Object exports)
         "PeerConnection",
         {
             InstanceMethod("close", &PeerConnectionWrapper::close),
+            InstanceMethod("destroy", &PeerConnectionWrapper::destroy),
             InstanceMethod("setLocalDescription", &PeerConnectionWrapper::setLocalDescription),
             InstanceMethod("setRemoteDescription", &PeerConnectionWrapper::setRemoteDescription),
             InstanceMethod("localDescription", &PeerConnectionWrapper::localDescription),
@@ -163,6 +171,10 @@ PeerConnectionWrapper::PeerConnectionWrapper(const Napi::CallbackInfo &info) : N
         rtcConfig.proxyServer = rtc::ProxyServer(type, ip, port, username, password);
     }
 
+    // bind address, libjuice only
+    if(config.Get("bindAddress").IsString())
+        rtcConfig.bindAddress = config.Get("bindAddress").As<Napi::String>().ToString();
+
     // Port Ranges
     if (config.Get("portRangeBegin").IsNumber())
         rtcConfig.portRangeBegin = config.Get("portRangeBegin").As<Napi::Number>().Uint32Value();
@@ -225,7 +237,7 @@ PeerConnectionWrapper::PeerConnectionWrapper(const Napi::CallbackInfo &info) : N
 
 PeerConnectionWrapper::~PeerConnectionWrapper()
 {
-    doClose();
+    doDestroy();
 }
 
 void PeerConnectionWrapper::doClose()
@@ -243,7 +255,21 @@ void PeerConnectionWrapper::doClose()
             return;
         }
     }
+}
 
+void PeerConnectionWrapper::close(const Napi::CallbackInfo &info)
+{
+    doClose();
+}
+
+void PeerConnectionWrapper::doDestroy()
+{
+    doClose();
+    doResetCallbacks();
+}
+
+void PeerConnectionWrapper::doResetCallbacks()
+{
     mOnLocalDescriptionCallback.reset();
     mOnLocalCandidateCallback.reset();
     mOnStateChangeCallback.reset();
@@ -254,9 +280,9 @@ void PeerConnectionWrapper::doClose()
     instances.erase(this);
 }
 
-void PeerConnectionWrapper::close(const Napi::CallbackInfo &info)
+void PeerConnectionWrapper::destroy(const Napi::CallbackInfo &info)
 {
-    doClose();
+    doDestroy();
 }
 
 void PeerConnectionWrapper::setLocalDescription(const Napi::CallbackInfo &info)
@@ -491,10 +517,10 @@ Napi::Value PeerConnectionWrapper::createDataChannel(const Napi::CallbackInfo &i
                 switch (reliability.Get("type").As<Napi::Number>().Uint32Value())
                 {
                 case 1:
-                    init.reliability.rexmit = reliability.Get("rexmit").As<Napi::Number>();
+                    init.reliability.rexmit = static_cast<int>(reliability.Get("rexmit").As<Napi::Number>().ToNumber());
                     break;
                 case 2:
-                    init.reliability.rexmit = std::chrono::milliseconds(reliability.Get("rexmit").As<Napi::Number>());
+                    init.reliability.rexmit = std::chrono::milliseconds(reliability.Get("rexmit").As<Napi::Number>().Uint32Value());
                     break;
                 }
             }
@@ -640,8 +666,7 @@ void PeerConnectionWrapper::onStateChange(const Napi::CallbackInfo &info)
     mRtcPeerConnPtr->onStateChange([&](rtc::PeerConnection::State state) {
         if (mOnStateChangeCallback)
             mOnStateChangeCallback->call([this, state](Napi::Env env, std::vector<napi_value> &args) {
-                // Check the peer connection is not closed but still allow a call for State::Closed
-                if(state != rtc::PeerConnection::State::Closed && instances.find(this) == instances.end())
+                if(instances.find(this) == instances.end())
                     throw ThreadSafeCallback::CancelException();
 
                 // This will run in main thread and needs to construct the

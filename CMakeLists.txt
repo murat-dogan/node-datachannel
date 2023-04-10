@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 3.15)
 cmake_policy(SET CMP0091 NEW)
-project(node_datachannel VERSION 0.3.6)
+project(node_datachannel VERSION 0.4.2)
 
 # Workaround for https://github.com/murat-dogan/node-datachannel/issues/65
-if( NODE_RUNTIMEVERSION VERSION_GREATER_EQUAL "17.0.0")
+if( NODE_RUNTIMEVERSION VERSION_GREATER "17.0.0" AND NODE_RUNTIMEVERSION VERSION_LESS "18.0.0" )
     add_compile_definitions(OPENSSL_API_COMPAT=0x10100001L)
     add_compile_definitions(OPENSSL_CONFIGURED_API=0x30000000L)
 endif()
@@ -17,18 +17,17 @@ if(WIN32)
     set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 endif()
 
-if(APPLE)
+if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Android")
+    set(CMAKE_C_FLAGS "-Wno-error=unused-but-set-variable -Wno-error=strict-prototypes")
+endif()
+
+# Got linker error for arm64
+# /usr/lib/gcc-cross/aarch64-linux-gnu/9/../../../../aarch64-linux-gnu/bin/ld: ../sysroot/usr/lib/aarch64-linux-gnu/libcrypto.a(sha1-armv8.o): relocation R_AARCH64_PREL64 against symbol `OPENSSL_armcap_P' which may bind externally can not be used when making a shared object; recompile with -fPIC
+# ../sysroot/usr/lib/aarch64-linux-gnu/libcrypto.a(sha1-armv8.o): in function `sha1_block_armv8':
+# (.text+0x1240): dangerous relocation: unsupported relocation
+if(NOT ${NODE_ARCH} STREQUAL "arm64")
     set(OPENSSL_USE_STATIC_LIBS TRUE)
     find_package(OpenSSL REQUIRED)
-elseif(UNIX)
-    # Got linker error for arm64
-    # /usr/lib/gcc-cross/aarch64-linux-gnu/9/../../../../aarch64-linux-gnu/bin/ld: ../sysroot/usr/lib/aarch64-linux-gnu/libcrypto.a(sha1-armv8.o): relocation R_AARCH64_PREL64 against symbol `OPENSSL_armcap_P' which may bind externally can not be used when making a shared object; recompile with -fPIC
-    # ../sysroot/usr/lib/aarch64-linux-gnu/libcrypto.a(sha1-armv8.o): in function `sha1_block_armv8':
-    # (.text+0x1240): dangerous relocation: unsupported relocation
-    if(NOT ${NODE_ARCH} STREQUAL "arm64")
-        set(OPENSSL_USE_STATIC_LIBS TRUE)
-        find_package(OpenSSL REQUIRED)
-    endif()
 endif()
 
 
@@ -38,7 +37,7 @@ include(FetchContent)
 FetchContent_Declare(
     libdatachannel
     GIT_REPOSITORY https://github.com/paullouisageneau/libdatachannel.git
-    GIT_TAG "v0.17.9"
+    GIT_TAG "v0.18.2"
 )
 
 option(NO_MEDIA "Disable media transport support in libdatachannel" OFF)
@@ -73,9 +72,12 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_BINARY_DIR}/_deps/libdatachannel-src/include
 )
 
-# For compatibility with Node.js 12
-# This should be removed along with the napi-thread-safe-callback-cancellable dependency when dropping support at end-of-life
-target_compile_definitions(${PROJECT_NAME} PRIVATE -DLEGACY_NAPI_THREAD_SAFE_CALLBACK)
+if( NODE_RUNTIMEVERSION VERSION_LESS "16.0.0")
+    # For compatibility with Node.js 12
+    # This should be removed along with the napi-thread-safe-callback-cancellable dependency when dropping support at end-of-life
+    target_compile_definitions(${PROJECT_NAME} PRIVATE -DLEGACY_NAPI_THREAD_SAFE_CALLBACK)
+endif()
+
 target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_SOURCE_DIR}/node_modules/napi-thread-safe-callback-cancellable
 )
@@ -87,6 +89,8 @@ set(LINK_LIBRARIES
 
 if(APPLE)
     #
+elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL "Android")
+    list(APPEND LINK_LIBRARIES -static-libgcc)
 elseif(UNIX)
     list(APPEND LINK_LIBRARIES -static-libgcc -static-libstdc++)
 endif()
