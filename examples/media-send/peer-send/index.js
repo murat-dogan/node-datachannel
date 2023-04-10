@@ -69,6 +69,7 @@ class CarServer {
         this.audioUDP = null
         this.videoTrack = null
         this.audioTrack = null
+        process.exit(1)
     }
 
     // start video
@@ -136,6 +137,7 @@ class CarServer {
 
         } catch (error) {
             console.log('startVideoAudio:', error)
+            this.onLeved()
         }
     }
 
