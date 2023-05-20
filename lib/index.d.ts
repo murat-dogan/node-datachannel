@@ -234,3 +234,73 @@ export class DataChannelStream extends stream.Duplex {
     constructor(rawChannel: DataChannel, options?: Omit<stream.DuplexOptions, 'objectMode'>);
     get label(): string;
 }
+
+type BinaryType = 'arraybuffer' | 'blob';
+
+interface RTCDataChannelEventMap {
+    bufferedamountlow: Event;
+    close: Event;
+    closing: Event;
+    error: Event;
+    message: MessageEvent;
+    open: Event;
+}
+
+interface RTCDataChannel extends EventTarget {
+    binaryType: BinaryType;
+    readonly bufferedAmount: number;
+    bufferedAmountLowThreshold: number;
+    readonly id: number | null;
+    readonly label: string;
+    readonly maxPacketLifeTime: number | null;
+    readonly maxRetransmits: number | null;
+    readonly negotiated: boolean;
+    onbufferedamountlow: ((this: RTCDataChannel, ev: Event) => any) | null;
+    onclose: ((this: RTCDataChannel, ev: Event) => any) | null;
+    onclosing: ((this: RTCDataChannel, ev: Event) => any) | null;
+    onerror: ((this: RTCDataChannel, ev: Event) => any) | null;
+    onmessage: ((this: RTCDataChannel, ev: MessageEvent) => any) | null;
+    onopen: ((this: RTCDataChannel, ev: Event) => any) | null;
+    readonly ordered: boolean;
+    readonly protocol: string;
+    readonly readyState: RTCDataChannelState;
+    close(): void;
+    send(data: string): void;
+    send(data: Blob): void;
+    send(data: ArrayBuffer): void;
+    send(data: ArrayBufferView): void;
+    addEventListener<K extends keyof RTCDataChannelEventMap>(
+        type: K,
+        listener: (this: RTCDataChannel, ev: RTCDataChannelEventMap[K]) => any,
+        options?: boolean | AddEventListenerOptions,
+    ): void;
+    addEventListener(
+        type: string,
+        listener: EventListenerOrEventListenerObject,
+        options?: boolean | AddEventListenerOptions,
+    ): void;
+    removeEventListener<K extends keyof RTCDataChannelEventMap>(
+        type: K,
+        listener: (this: RTCDataChannel, ev: RTCDataChannelEventMap[K]) => any,
+        options?: boolean | EventListenerOptions,
+    ): void;
+    removeEventListener(
+        type: string,
+        listener: EventListenerOrEventListenerObject,
+        options?: boolean | EventListenerOptions,
+    ): void;
+}
+
+declare const RTCDataChannel: {
+    prototype: RTCDataChannel;
+    new (): RTCDataChannel;
+};
+
+interface RTCDataChannelEvent extends Event {
+    readonly channel: RTCDataChannel;
+}
+
+declare const RTCDataChannelEvent: {
+    prototype: RTCDataChannelEvent;
+    new (type: string, eventInitDict: RTCDataChannelEventInit): RTCDataChannelEvent;
+};
