@@ -498,3 +498,139 @@ interface RTCDtlsFingerprint {
 }
 
 type EpochTimeStamp = number;
+
+interface RTCPeerConnectionEventMap {
+    connectionstatechange: Event;
+    datachannel: RTCDataChannelEvent;
+    icecandidate: RTCPeerConnectionIceEvent;
+    icecandidateerror: Event;
+    iceconnectionstatechange: Event;
+    icegatheringstatechange: Event;
+    negotiationneeded: Event;
+    signalingstatechange: Event;
+    track: RTCTrackEvent;
+}
+
+/** A WebRTC connection between the local computer and a remote peer. It provides methods to connect to a remote peer, maintain and monitor the connection, and close the connection once it's no longer needed. */
+interface RTCPeerConnection extends EventTarget {
+    readonly canTrickleIceCandidates: boolean | null;
+    readonly connectionState: RTCPeerConnectionState;
+    readonly currentLocalDescription: RTCSessionDescription | null;
+    readonly currentRemoteDescription: RTCSessionDescription | null;
+    readonly iceConnectionState: RTCIceConnectionState;
+    readonly iceGatheringState: RTCIceGatheringState;
+    readonly localDescription: RTCSessionDescription | null;
+    onconnectionstatechange: ((this: RTCPeerConnection, ev: Event) => any) | null;
+    ondatachannel: ((this: RTCPeerConnection, ev: RTCDataChannelEvent) => any) | null;
+    onicecandidate: ((this: RTCPeerConnection, ev: RTCPeerConnectionIceEvent) => any) | null;
+    onicecandidateerror: ((this: RTCPeerConnection, ev: Event) => any) | null;
+    oniceconnectionstatechange: ((this: RTCPeerConnection, ev: Event) => any) | null;
+    onicegatheringstatechange: ((this: RTCPeerConnection, ev: Event) => any) | null;
+    onnegotiationneeded: ((this: RTCPeerConnection, ev: Event) => any) | null;
+    onsignalingstatechange: ((this: RTCPeerConnection, ev: Event) => any) | null;
+    ontrack: ((this: RTCPeerConnection, ev: RTCTrackEvent) => any) | null;
+    readonly pendingLocalDescription: RTCSessionDescription | null;
+    readonly pendingRemoteDescription: RTCSessionDescription | null;
+    readonly remoteDescription: RTCSessionDescription | null;
+    readonly sctp: RTCSctpTransport | null;
+    readonly signalingState: RTCSignalingState;
+    addIceCandidate(candidate?: RTCIceCandidateInit): Promise<void>;
+    addTrack(track: MediaStreamTrack, ...streams: MediaStream[]): RTCRtpSender;
+    addTransceiver(trackOrKind: MediaStreamTrack | string, init?: RTCRtpTransceiverInit): RTCRtpTransceiver;
+    close(): void;
+    createAnswer(options?: RTCAnswerOptions): Promise<RTCSessionDescriptionInit>;
+    createDataChannel(label: string, dataChannelDict?: RTCDataChannelInit): RTCDataChannel;
+    createOffer(options?: RTCOfferOptions): Promise<RTCSessionDescriptionInit>;
+    getConfiguration(): RTCConfiguration;
+    getReceivers(): RTCRtpReceiver[];
+    getSenders(): RTCRtpSender[];
+    getStats(selector?: MediaStreamTrack | null): Promise<RTCStatsReport>;
+    getTransceivers(): RTCRtpTransceiver[];
+    removeTrack(sender: RTCRtpSender): void;
+    restartIce(): void;
+    setConfiguration(configuration?: RTCConfiguration): void;
+    setLocalDescription(description?: RTCLocalSessionDescriptionInit): Promise<void>;
+    setRemoteDescription(description: RTCSessionDescriptionInit): Promise<void>;
+    addEventListener<K extends keyof RTCPeerConnectionEventMap>(
+        type: K,
+        listener: (this: RTCPeerConnection, ev: RTCPeerConnectionEventMap[K]) => any,
+        options?: boolean | AddEventListenerOptions,
+    ): void;
+    addEventListener(
+        type: string,
+        listener: EventListenerOrEventListenerObject,
+        options?: boolean | AddEventListenerOptions,
+    ): void;
+    removeEventListener<K extends keyof RTCPeerConnectionEventMap>(
+        type: K,
+        listener: (this: RTCPeerConnection, ev: RTCPeerConnectionEventMap[K]) => any,
+        options?: boolean | EventListenerOptions,
+    ): void;
+    removeEventListener(
+        type: string,
+        listener: EventListenerOrEventListenerObject,
+        options?: boolean | EventListenerOptions,
+    ): void;
+}
+
+declare const RTCPeerConnection: {
+    prototype: RTCPeerConnection;
+    new (configuration?: RTCConfiguration): RTCPeerConnection;
+    generateCertificate(keygenAlgorithm: AlgorithmIdentifier): Promise<RTCCertificate>;
+};
+
+interface RTCPeerConnectionIceErrorEvent extends Event {
+    readonly address: string | null;
+    readonly errorCode: number;
+    readonly errorText: string;
+    readonly port: number | null;
+    readonly url: string;
+}
+
+declare const RTCPeerConnectionIceErrorEvent: {
+    prototype: RTCPeerConnectionIceErrorEvent;
+    new (type: string, eventInitDict: RTCPeerConnectionIceErrorEventInit): RTCPeerConnectionIceErrorEvent;
+};
+
+/** Events that occurs in relation to ICE candidates with the target, usually an RTCPeerConnection. Only one event is of this type: icecandidate. */
+interface RTCPeerConnectionIceEvent extends Event {
+    readonly candidate: RTCIceCandidate | null;
+}
+
+declare const RTCPeerConnectionIceEvent: {
+    prototype: RTCPeerConnectionIceEvent;
+    new (type: string, eventInitDict?: RTCPeerConnectionIceEventInit): RTCPeerConnectionIceEvent;
+};
+
+interface RTCConfiguration {
+    bundlePolicy?: RTCBundlePolicy;
+    certificates?: RTCCertificate[];
+    iceCandidatePoolSize?: number;
+    iceServers?: RTCIceServer[];
+    iceTransportPolicy?: RTCIceTransportPolicy;
+    rtcpMuxPolicy?: RTCRtcpMuxPolicy;
+}
+
+type RTCPeerConnectionState = 'closed' | 'connected' | 'connecting' | 'disconnected' | 'failed' | 'new';
+
+type RTCIceConnectionState = 'checking' | 'closed' | 'completed' | 'connected' | 'disconnected' | 'failed' | 'new';
+
+type RTCIceGatheringState = 'complete' | 'gathering' | 'new';
+
+type RTCSignalingState =
+    | 'closed'
+    | 'have-local-offer'
+    | 'have-local-pranswer'
+    | 'have-remote-offer'
+    | 'have-remote-pranswer'
+    | 'stable';
+
+interface RTCSessionDescriptionInit {
+    sdp?: string;
+    type: RTCSdpType;
+}
+
+interface RTCLocalSessionDescriptionInit {
+    sdp?: string;
+    type?: RTCSdpType;
+}
