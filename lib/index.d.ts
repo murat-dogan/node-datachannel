@@ -481,3 +481,20 @@ type RTCIceTransportPolicy = 'all' | 'relay';
 type RTCIceTransportState = 'checking' | 'closed' | 'completed' | 'connected' | 'disconnected' | 'failed' | 'new';
 
 type RTCIceGathererState = 'complete' | 'gathering' | 'new';
+
+interface RTCCertificate {
+    readonly expires: EpochTimeStamp;
+    getFingerprints(): RTCDtlsFingerprint[];
+}
+
+declare const RTCCertificate: {
+    prototype: RTCCertificate;
+    new (): RTCCertificate;
+};
+
+interface RTCDtlsFingerprint {
+    algorithm?: string;
+    value?: string;
+}
+
+type EpochTimeStamp = number;
