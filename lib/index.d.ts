@@ -304,3 +304,39 @@ declare const RTCDataChannelEvent: {
     prototype: RTCDataChannelEvent;
     new (type: string, eventInitDict: RTCDataChannelEventInit): RTCDataChannelEvent;
 };
+
+/** The RTCIceCandidate interface—part of the WebRTC API—represents a candidate Internet Connectivity Establishment (ICE) configuration which may be used to establish an RTCPeerConnection. */
+interface RTCIceCandidate {
+    readonly address: string | null;
+    readonly candidate: string;
+    readonly component: RTCIceComponent | null;
+    readonly foundation: string | null;
+    readonly port: number | null;
+    readonly priority: number | null;
+    readonly protocol: RTCIceProtocol | null;
+    readonly relatedAddress: string | null;
+    readonly relatedPort: number | null;
+    readonly sdpMLineIndex: number | null;
+    readonly sdpMid: string | null;
+    readonly tcpType: RTCIceTcpCandidateType | null;
+    readonly type: RTCIceCandidateType | null;
+    readonly usernameFragment: string | null;
+    toJSON(): RTCIceCandidateInit;
+}
+
+interface RTCIceCandidateInit {
+    candidate?: string;
+    sdpMLineIndex?: number | null;
+    sdpMid?: string | null;
+    usernameFragment?: string | null;
+}
+
+type RTCIceCandidateType = 'host' | 'prflx' | 'relay' | 'srflx';
+type RTCIceTcpCandidateType = 'active' | 'passive' | 'so';
+type RTCIceProtocol = 'tcp' | 'udp';
+type RTCIceComponent = 'rtcp' | 'rtp';
+
+declare const RTCIceCandidate: {
+    prototype: RTCIceCandidate;
+    new (candidateInitDict?: RTCIceCandidateInit): RTCIceCandidate;
+};
