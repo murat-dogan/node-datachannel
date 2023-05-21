@@ -349,3 +349,130 @@ interface RTCSessionDescription {
 }
 
 type RTCSdpType = 'answer' | 'offer' | 'pranswer' | 'rollback';
+
+interface RTCSctpTransportEventMap {
+    statechange: Event;
+}
+
+interface RTCSctpTransport extends EventTarget {
+    readonly maxChannels: number | null;
+    readonly maxMessageSize: number;
+    onstatechange: ((this: RTCSctpTransport, ev: Event) => any) | null;
+    readonly state: RTCSctpTransportState;
+    readonly transport: RTCDtlsTransport;
+    addEventListener<K extends keyof RTCSctpTransportEventMap>(
+        type: K,
+        listener: (this: RTCSctpTransport, ev: RTCSctpTransportEventMap[K]) => any,
+        options?: boolean | AddEventListenerOptions,
+    ): void;
+    addEventListener(
+        type: string,
+        listener: EventListenerOrEventListenerObject,
+        options?: boolean | AddEventListenerOptions,
+    ): void;
+    removeEventListener<K extends keyof RTCSctpTransportEventMap>(
+        type: K,
+        listener: (this: RTCSctpTransport, ev: RTCSctpTransportEventMap[K]) => any,
+        options?: boolean | EventListenerOptions,
+    ): void;
+    removeEventListener(
+        type: string,
+        listener: EventListenerOrEventListenerObject,
+        options?: boolean | EventListenerOptions,
+    ): void;
+}
+
+declare const RTCSctpTransport: {
+    prototype: RTCSctpTransport;
+    new (): RTCSctpTransport;
+};
+
+type RTCSctpTransportState = 'closed' | 'connected' | 'connecting';
+
+interface RTCDtlsTransportEventMap {
+    error: Event;
+    statechange: Event;
+}
+
+interface RTCDtlsTransport extends EventTarget {
+    readonly iceTransport: RTCIceTransport;
+    onerror: ((this: RTCDtlsTransport, ev: Event) => any) | null;
+    onstatechange: ((this: RTCDtlsTransport, ev: Event) => any) | null;
+    readonly state: RTCDtlsTransportState;
+    getRemoteCertificates(): ArrayBuffer[];
+    addEventListener<K extends keyof RTCDtlsTransportEventMap>(
+        type: K,
+        listener: (this: RTCDtlsTransport, ev: RTCDtlsTransportEventMap[K]) => any,
+        options?: boolean | AddEventListenerOptions,
+    ): void;
+    addEventListener(
+        type: string,
+        listener: EventListenerOrEventListenerObject,
+        options?: boolean | AddEventListenerOptions,
+    ): void;
+    removeEventListener<K extends keyof RTCDtlsTransportEventMap>(
+        type: K,
+        listener: (this: RTCDtlsTransport, ev: RTCDtlsTransportEventMap[K]) => any,
+        options?: boolean | EventListenerOptions,
+    ): void;
+    removeEventListener(
+        type: string,
+        listener: EventListenerOrEventListenerObject,
+        options?: boolean | EventListenerOptions,
+    ): void;
+}
+
+type RTCDtlsTransportState = 'closed' | 'connected' | 'connecting' | 'failed' | 'new';
+
+declare const RTCDtlsTransport: {
+    prototype: RTCDtlsTransport;
+    new (): RTCDtlsTransport;
+};
+
+interface RTCIceTransportEventMap {
+    gatheringstatechange: Event;
+    statechange: Event;
+}
+
+/** Provides access to information about the ICE transport layer over which the data is being sent and received. */
+interface RTCIceTransport extends EventTarget {
+    readonly gatheringState: RTCIceGathererState;
+    readonly component: RTCIceComponent;
+    readonly role: RTCIceRole;
+    ongatheringstatechange: ((this: RTCIceTransport, ev: Event) => any) | null;
+    onstatechange: ((this: RTCIceTransport, ev: Event) => any) | null;
+    readonly state: RTCIceTransportState;
+    addEventListener<K extends keyof RTCIceTransportEventMap>(
+        type: K,
+        listener: (this: RTCIceTransport, ev: RTCIceTransportEventMap[K]) => any,
+        options?: boolean | AddEventListenerOptions,
+    ): void;
+    addEventListener(
+        type: string,
+        listener: EventListenerOrEventListenerObject,
+        options?: boolean | AddEventListenerOptions,
+    ): void;
+    removeEventListener<K extends keyof RTCIceTransportEventMap>(
+        type: K,
+        listener: (this: RTCIceTransport, ev: RTCIceTransportEventMap[K]) => any,
+        options?: boolean | EventListenerOptions,
+    ): void;
+    removeEventListener(
+        type: string,
+        listener: EventListenerOrEventListenerObject,
+        options?: boolean | EventListenerOptions,
+    ): void;
+}
+
+declare const RTCIceTransport: {
+    prototype: RTCIceTransport;
+    new (): RTCIceTransport;
+};
+
+type RTCIceComponent = 'RTP' | 'RTSP';
+type RTCIceRole = 'controlling' | 'controlled';
+
+type RTCIceTransportPolicy = 'all' | 'relay';
+type RTCIceTransportState = 'checking' | 'closed' | 'completed' | 'connected' | 'disconnected' | 'failed' | 'new';
+
+type RTCIceGathererState = 'complete' | 'gathering' | 'new';
