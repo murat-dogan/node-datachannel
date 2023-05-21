@@ -9,7 +9,7 @@ export default class RTCDataChannel extends EventTarget {
         super();
     }
 
-    #_binaryType = 'blob';
+    #binaryType = 'blob';
 
     set binaryType(type) {
         if (type !== 'blob' && type !== 'arraybuffer') {
@@ -18,57 +18,57 @@ export default class RTCDataChannel extends EventTarget {
                 'TypeMismatchError',
             );
         }
-        this.#_binaryType = type;
+        this.#binaryType = type;
     }
     get binaryType() {
-        return this.#_binaryType;
+        return this.#binaryType;
     }
 
-    #_bufferedAmount = 0;
+    #bufferedAmount = 0;
 
     get bufferedAmount() {
-        return this.#_bufferedAmount;
+        return this.#bufferedAmount;
     }
 
-    #_bufferedAmountLowThreshold = 0;
+    #bufferedAmountLowThreshold = 0;
 
     get bufferedAmountLowThreshold() {
-        return this.#_bufferedAmountLowThreshold;
+        return this.#bufferedAmountLowThreshold;
     }
 
     set bufferedAmountLowThreshold(value) {
         const number = Number(value) || 0;
-        this.#_bufferedAmountLowThreshold = number;
+        this.#bufferedAmountLowThreshold = number;
     }
 
-    #_id = 0;
+    #id = 0;
 
     get id() {
-        return this.#_id;
+        return this.#id;
     }
 
-    #_label = 0;
+    #label = 0;
 
     get label() {
-        return this.#_label;
+        return this.#label;
     }
 
-    #_maxPacketLifeTime = 0;
+    #maxPacketLifeTime = 0;
 
     get maxPacketLifeTime() {
-        return this.#_maxPacketLifeTime;
+        return this.#maxPacketLifeTime;
     }
 
-    #_maxRetransmits = 0;
+    #maxRetransmits = 0;
 
     get maxRetransmits() {
-        return this.#_maxRetransmits;
+        return this.#maxRetransmits;
     }
 
-    #_negotiated = 0;
+    #negotiated = 0;
 
     get negotiated() {
-        return this.#_negotiated;
+        return this.#negotiated;
     }
 
     // needs to be called with .bind(this)
@@ -79,27 +79,27 @@ export default class RTCDataChannel extends EventTarget {
     onmessage = noop;
     onopen = noop;
 
-    #_ordered = 0;
+    #ordered = 0;
 
     get ordered() {
-        return this.#_ordered;
+        return this.#ordered;
     }
 
-    #_protocol = 0;
+    #protocol = 0;
 
     get protocol() {
-        return this.#_protocol;
+        return this.#protocol;
     }
 
     // connecting, open, closing, or closed
-    #_readyState = 0;
+    #readyState = 0;
 
     get readyState() {
-        return this.#_readyState;
+        return this.#readyState;
     }
 
     send(data) {
-        if (this.#_readyState !== 'open') {
+        if (this.#readyState !== 'open') {
             throw new DOMException(
                 "Failed to execute 'send' on 'RTCDataChannel': RTCDataChannel.readyState is not 'open'",
                 'InvalidStateError',

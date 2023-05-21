@@ -1,91 +1,89 @@
 export default class RTCIceCandidate {
     constructor(init = {}) {}
 
-    #_address = null;
+    #address = null;
 
     get address() {
-        return this.#_address;
+        return this.#address;
     }
 
-    #_candidate = null;
+    #candidate = null;
 
     get candidate() {
-        return this.#_candidate;
+        return this.#candidate;
     }
 
-    #_component = null;
+    #component = null;
 
     get component() {
-        return this.#_component;
+        return this.#component;
     }
 
-    #_foundation = null;
+    #foundation = null;
 
     get foundation() {
-        return this.#_foundation;
+        return this.#foundation;
     }
 
-    #_port = null;
+    #port = null;
 
     get port() {
-        return this.#_port;
+        return this.#port;
     }
 
-    #_priority = null;
+    #priority = null;
 
     get priority() {
-        return this.#_priority;
+        return this.#priority;
     }
 
-    #_protocol = null;
+    #protocol = null;
 
     get protocol() {
-        return this.#_protocol;
+        return this.#protocol;
     }
 
-    #_relatedAddress = null;
+    #relatedAddress = null;
 
     get relatedAddress() {
-        return this.#_relatedAddress;
+        return this.#relatedAddress;
     }
 
-    #_relatedPort = null;
+    #relatedPort = null;
 
     get relatedPort() {
-        return this.#_relatedPort;
+        return this.#relatedPort;
     }
 
-    #_sdpMLineIndex = null;
+    #sdpMLineIndex = null;
 
     get sdpMLineIndex() {
-        return this.#_sdpMLineIndex;
+        return this.#sdpMLineIndex;
     }
 
-    #_sdpMid = null;
+    #sdpMid = null;
 
     get sdpMid() {
-        return this.#_sdpMid;
+        return this.#sdpMid;
     }
 
-    #_tcpType = null;
+    #tcpType = null;
 
     get tcpType() {
-        return this.#_tcpType;
+        return this.#tcpType;
     }
 
-    #_type = null;
+    #type = null;
 
     get type() {
-        return this.#_type;
+        return this.#type;
     }
 
-    #_usernameFragment = null;
+    #usernameFragment = null;
 
     get usernameFragment() {
-        return this.#_usernameFragment;
+        return this.#usernameFragment;
     }
-
-    #_ = null;
 
     toJSON() {
         return {
