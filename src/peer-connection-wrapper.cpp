@@ -193,6 +193,10 @@ PeerConnectionWrapper::PeerConnectionWrapper(const Napi::CallbackInfo &info) : N
     if (config.Get("disableAutoNegotiation").IsBoolean())
         rtcConfig.disableAutoNegotiation = config.Get("disableAutoNegotiation").As<Napi::Boolean>();
 
+    // forceMediaTransport option
+    if (config.Get("forceMediaTransport").IsBoolean())
+        rtcConfig.forceMediaTransport = config.Get("forceMediaTransport").As<Napi::Boolean>();
+
     // Max Message Size
     if (config.Get("maxMessageSize").IsNumber())
         rtcConfig.maxMessageSize = config.Get("maxMessageSize").As<Napi::Number>().Int32Value();
