@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.15)
 cmake_policy(SET CMP0091 NEW)
-project(node_datachannel VERSION 0.4.2)
+project(node_datachannel VERSION 0.4.3)
 
 # Workaround for https://github.com/murat-dogan/node-datachannel/issues/65
 if( NODE_RUNTIMEVERSION VERSION_GREATER "17.0.0" AND NODE_RUNTIMEVERSION VERSION_LESS "18.0.0" )
