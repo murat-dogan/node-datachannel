@@ -4,6 +4,10 @@
   "description": "libdatachannel node bindings",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
+  "type": "module",
+  "engines": {
+    "node": ">=15"
+  },
   "directories": {
     "lib": "lib",
     "test": "test"
@@ -67,6 +71,10 @@
     "prebuild-install"
   ],
   "dependencies": {
+    "node-domexception": "^1.0.0",
     "prebuild-install": "^7.0.1"
-  }
+  },
+  "bundleDependencies": [
+    "prebuild-install"
+  ]
 }
