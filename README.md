@@ -32,6 +32,7 @@ npm install node-datachannel
 | Node V17 |     +     |      +      |      +           |      +      |      +      |       +        |
 | Node V18 |     +     |      +      |      +           |      +      |      +      |       +        |
 | Node V19 |     +     |      +      |      +           |      +      |      +      |       +        |
+| Node V20 |     +     |      +      |      +           |      +      |      +      |       +        |
 
 1) Please note that; For Linux-arm64 platform we need OpenSSL to be installed locally.
 
