@@ -11,7 +11,8 @@
   "_from": "node-datachannel@latest",
   "scripts": {
     "install": "prebuild-install || (npm install --ignore-scripts --production=false && npm run _prebuild)",
-    "install-nice": "npm run clean && cmake-js build --CDUSE_NICE=1",
+    "install-nice": "npm run clean && npm install --ignore-scripts --production=false && cmake-js build --CDUSE_NICE=1",
+    "install-gnu-tls": "npm run clean && npm install --ignore-scripts --production=false && cmake-js build --CDUSE_GNUTLS=1",
     "build": "cmake-js build",
     "build:debug": "cmake-js build -D",
     "_prebuild": "prebuild --backend cmake-js",

@@ -14,6 +14,10 @@
 
 Other Options
 ```sh
-> npm run install -- -DUSE_GNUTLS=1  # Use GnuTLS instead of OpenSSL (Default False)
-> npm run install -- -DUSE_NICE=1    # Use libnice instead of libjuice (Default False)
+# Use GnuTLS instead of OpenSSL (Default False)
+> npm run install-gnu-tls
+
+# Use libnice instead of libjuice (Default False)
+# libnice-dev packet should be installed. (eg. sudo apt install libnice-dev)
+> npm run install-nice
 ```
