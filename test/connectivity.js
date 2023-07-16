@@ -95,8 +95,8 @@ dc1.onClosed(() => {
 });
 
 setTimeout(() => {
-    dc1.close();
-    dc2.close();
+    if (dc1) dc1.close();
+    if (dc2) dc2.close();
     peer1.close();
     peer2.close();
     nodeDataChannel.cleanup();
