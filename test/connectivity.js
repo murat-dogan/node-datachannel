@@ -1,5 +1,4 @@
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const nodeDataChannel = require('../lib/index');
+import nodeDataChannel from '../lib/index.js';
 
 nodeDataChannel.initLogger('Debug');
 nodeDataChannel.preload();
