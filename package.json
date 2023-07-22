@@ -22,7 +22,8 @@
     "_prebuild": "prebuild --backend cmake-js",
     "clean": "cmake-js clean",
     "lint": "eslint lib/**/* test/**/*",
-    "test": "NODE_OPTIONS=--experimental-vm-modules jest"
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest",
+    "wpt-test":"node test/wpt.js"
   },
   "repository": {
     "type": "git",
@@ -60,6 +61,7 @@
     "eslint-config-prettier": "^8.8.0",
     "eslint-plugin-prettier": "^5.0.0",
     "jest": "^29.6.1",
+    "jsdom": "^22.1.0",
     "nan": "^2.15.0",
     "napi-thread-safe-callback-cancellable": "^0.0.7",
     "node-addon-api": "^4.3.0",
