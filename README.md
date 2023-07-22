@@ -1,6 +1,6 @@
 # Easy to use WebRTC data channels and media transport
 
-![Build CI](https://github.com/murat-dogan/node-datachannel/workflows/Build%20CI/badge.svg)
+![Linux CI Build](https://github.com/murat-dogan/node-datachannel/workflows/Build%20-%20Linux/badge.svg) ![Windows CI Build](https://github.com/murat-dogan/node-datachannel/workflows/Build%20-%20Win/badge.svg) ![Mac x64 CI Build](https://github.com/murat-dogan/node-datachannel/workflows/Build%20-%20Mac%20x64/badge.svg) ![Mac M1 CI Build](https://github.com/murat-dogan/node-datachannel/workflows/Build%20-%20Mac%20M1/badge.svg)
 
 - Easy to use
 - Lightweight
@@ -32,6 +32,7 @@ npm install node-datachannel
 | Node V17 |     +     |      +      |      +           |      +      |      +      |       +        |
 | Node V18 |     +     |      +      |      +           |      +      |      +      |       +        |
 | Node V19 |     +     |      +      |      +           |      +      |      +      |       +        |
+| Node V20 |     +     |      +      |      +           |      +      |      +      |       +        |
 
 1) Please note that; For Linux-arm64 platform we need OpenSSL to be installed locally.
 

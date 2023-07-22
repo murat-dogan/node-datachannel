@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.15)
 cmake_policy(SET CMP0091 NEW)
-project(node_datachannel VERSION 0.4.2)
+project(node_datachannel VERSION 0.4.3)
 
 # Workaround for https://github.com/murat-dogan/node-datachannel/issues/65
 if( NODE_RUNTIMEVERSION VERSION_GREATER "17.0.0" AND NODE_RUNTIMEVERSION VERSION_LESS "18.0.0" )
@@ -37,7 +37,7 @@ include(FetchContent)
 FetchContent_Declare(
     libdatachannel
     GIT_REPOSITORY https://github.com/paullouisageneau/libdatachannel.git
-    GIT_TAG "v0.18.2"
+    GIT_TAG "v0.18.5"
 )
 
 option(NO_MEDIA "Disable media transport support in libdatachannel" OFF)

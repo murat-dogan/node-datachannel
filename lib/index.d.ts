@@ -54,6 +54,7 @@ export interface RtcConfig {
     enableIceTcp?: boolean;
     enableIceUdpMux?: boolean;
     disableAutoNegotiation?: boolean;
+    forceMediaTransport?: boolean;
     portRangeBegin?: number;
     portRangeEnd?: number;
     maxMessageSize?: number;
