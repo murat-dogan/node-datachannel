@@ -1,4 +1,10 @@
 // @ts-check
+
+const componentMap = {
+    1: 'rtp',
+    2: 'rtcp',
+};
+
 /**
  * @class
  * @implements {RTCIceCandidate}
@@ -7,21 +13,44 @@ export default class {
     /**
      * @param  {RTCIceCandidateInit} init={}
      */
-    constructor(init = {}) {
-        if (init.candidate == null) {
-            throw new DOMException('candidate must be specified');
+    constructor({ candidate, sdpMLineIndex, sdpMid, usernameFragment } = {}) {
+        if (sdpMLineIndex == null && sdpMid == null) {
+            throw new TypeError("Failed to construct 'RTCIceCandidate': sdpMid and sdpMLineIndex are both null.");
         }
+        this.#candidate = candidate;
+        this.#sdpMLineIndex = sdpMLineIndex ?? null;
+        this.#sdpMid = sdpMid ?? null;
+        this.#usernameFragment = usernameFragment ?? null;
 
-        this.#candidate = init.candidate;
-        this.#sdpMLineIndex = init.sdpMLineIndex ?? null;
-        this.#sdpMid = init.sdpMid ?? null;
-        this.#usernameFragment = init.usernameFragment ?? null;
+        if (candidate && candidate.indexOf('candidate:') !== -1) {
+            const interest = candidate.slice(candidate.indexOf('candidate:') + 10);
+
+            /** @type {any[]} split */
+            const [foundation, componentID, protocol, priority, ip, port, type, ...rest] = interest.split(' ');
+
+            this.#foundation = foundation;
+            this.#component = componentMap[componentID];
+
+            this.#protocol = protocol;
+            this.#priority = Number(priority);
+            this.#address = ip;
+            this.#port = Number(port);
+            this.#type = type;
+
+            if (type !== 'host') {
+                const raddrIndex = rest.indexOf('raddr');
+                if (raddrIndex !== -1) this.#relatedAddress = rest[raddrIndex + 1];
+
+                const rportIndex = rest.indexOf('rport');
+                if (rportIndex !== -1) this.#relatedPort = Number(rest[rportIndex + 1]);
+            }
+        }
     }
 
-    #address = null;
+    #address;
 
     get address() {
-        return this.#address;
+        return this.#address ?? null;
     }
 
     #candidate;
@@ -36,28 +65,29 @@ export default class {
         return this.#component;
     }
 
-    #foundation = null;
+    #foundation;
 
     get foundation() {
-        return this.#foundation;
+        return this.#foundation ?? null;
     }
 
-    #port = null;
+    #port;
 
     get port() {
-        return this.#port;
+        return this.#port ?? null;
     }
 
-    #priority = null;
+    #priority;
 
     get priority() {
-        return this.#priority;
+        return this.#priority ?? null;
     }
 
-    #protocol = null;
+    /** @type {RTCIceProtocol} */
+    #protocol;
 
     get protocol() {
-        return this.#protocol;
+        return this.#protocol ?? null;
     }
 
     #relatedAddress = null;
@@ -66,10 +96,10 @@ export default class {
         return this.#relatedAddress;
     }
 
-    #relatedPort = null;
+    #relatedPort;
 
     get relatedPort() {
-        return this.#relatedPort;
+        return this.#relatedPort ?? null;
     }
 
     #sdpMLineIndex;
@@ -90,10 +120,11 @@ export default class {
         return this.#tcpType;
     }
 
-    #type = null;
+    /** @type {RTCIceCandidateType} */
+    #type;
 
     get type() {
-        return this.#type;
+        return this.#type ?? null;
     }
 
     #usernameFragment;
@@ -104,10 +135,10 @@ export default class {
 
     toJSON() {
         return {
-            candidate: this.candidate,
-            sdpMLineIndex: this.sdpMLineIndex,
-            sdpMid: this.sdpMid,
-            usernameFragment: this.usernameFragment,
+            candidate: this.#candidate,
+            sdpMLineIndex: this.#sdpMLineIndex,
+            sdpMid: this.#sdpMid,
+            usernameFragment: this.#usernameFragment,
         };
     }
 }
