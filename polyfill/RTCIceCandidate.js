@@ -1,5 +1,4 @@
 // @ts-check
-import DOMException from 'node-domexception';
 /**
  * @class
  * @implements {RTCIceCandidate}

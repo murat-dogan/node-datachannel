@@ -1,5 +1,4 @@
 // @ts-check
-import DOMException from 'node-domexception';
 import { text2arr } from 'uint8-util';
 // DOMException has existed for quite a while, but was only exposed in node 17 and above, this is a hack to get it early in engines 10 or above tho we only support since node 15 for event target
 
