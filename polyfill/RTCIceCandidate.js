@@ -1,5 +1,23 @@
-export default class RTCIceCandidate {
-    constructor(init = {}) {}
+// @ts-check
+import DOMException from 'node-domexception';
+/**
+ * @class
+ * @implements {RTCIceCandidate}
+ */
+export default class {
+    /**
+     * @param  {RTCIceCandidateInit} init={}
+     */
+    constructor(init = {}) {
+        if (init.candidate == null) {
+            throw new DOMException('candidate must be specified');
+        }
+
+        this.#candidate = init.candidate;
+        this.#sdpMLineIndex = init.sdpMLineIndex ?? null;
+        this.#sdpMid = init.sdpMid ?? null;
+        this.#usernameFragment = init.usernameFragment ?? null;
+    }
 
     #address = null;
 
@@ -7,10 +25,10 @@ export default class RTCIceCandidate {
         return this.#address;
     }
 
-    #candidate = null;
+    #candidate;
 
     get candidate() {
-        return this.#candidate;
+        return this.#candidate || '';
     }
 
     #component = null;
@@ -55,13 +73,13 @@ export default class RTCIceCandidate {
         return this.#relatedPort;
     }
 
-    #sdpMLineIndex = null;
+    #sdpMLineIndex;
 
     get sdpMLineIndex() {
         return this.#sdpMLineIndex;
     }
 
-    #sdpMid = null;
+    #sdpMid;
 
     get sdpMid() {
         return this.#sdpMid;
@@ -79,7 +97,7 @@ export default class RTCIceCandidate {
         return this.#type;
     }
 
-    #usernameFragment = null;
+    #usernameFragment;
 
     get usernameFragment() {
         return this.#usernameFragment;
