@@ -3,7 +3,17 @@
   "version": "0.4.3",
   "description": "libdatachannel node bindings",
   "type": "module",
-  "exports": "./lib/index.js",
+  "exports": {
+    ".": {
+      "import": "./lib/index.js"
+    },
+    "./polyfill": {
+      "import": "./polyfill/polyfill.js"
+    },
+    "./ponyfill": {
+      "import": "./polyfill/ponyfill.js"
+    }
+  },
   "typings": "lib/index.d.ts",
   "engines": {
     "node": ">=12.0.0"
