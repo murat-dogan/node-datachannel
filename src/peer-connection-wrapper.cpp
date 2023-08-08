@@ -37,6 +37,7 @@ Napi::Object PeerConnectionWrapper::Init(Napi::Env env, Napi::Object exports)
             InstanceMethod("setLocalDescription", &PeerConnectionWrapper::setLocalDescription),
             InstanceMethod("setRemoteDescription", &PeerConnectionWrapper::setRemoteDescription),
             InstanceMethod("localDescription", &PeerConnectionWrapper::localDescription),
+            InstanceMethod("remoteDescription", &PeerConnectionWrapper::remoteDescription),
             InstanceMethod("addRemoteCandidate", &PeerConnectionWrapper::addRemoteCandidate),
             InstanceMethod("createDataChannel", &PeerConnectionWrapper::createDataChannel),
             InstanceMethod("addTrack", &PeerConnectionWrapper::addTrack),
@@ -366,6 +367,23 @@ Napi::Value PeerConnectionWrapper::localDescription(const Napi::CallbackInfo &in
     Napi::Env env = info.Env();
 
     std::optional<rtc::Description> desc = mRtcPeerConnPtr ? mRtcPeerConnPtr->localDescription() : std::nullopt;
+
+    // Return JS null if no description
+    if (!desc.has_value()) {
+        return env.Null();
+    }
+
+    Napi::Object obj = Napi::Object::New(env);
+    obj.Set("type", desc->typeString());
+    obj.Set("sdp", desc.value());
+    return obj;
+}
+
+Napi::Value PeerConnectionWrapper::remoteDescription(const Napi::CallbackInfo &info)
+{
+    Napi::Env env = info.Env();
+
+    std::optional<rtc::Description> desc = mRtcPeerConnPtr ? mRtcPeerConnPtr->remoteDescription() : std::nullopt;
 
     // Return JS null if no description
     if (!desc.has_value()) {
