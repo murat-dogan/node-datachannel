@@ -1,16 +1,62 @@
-export default class RTCIceCandidate {
-    constructor(init = {}) {}
+// @ts-check
 
-    #address = null;
+const componentMap = {
+    1: 'rtp',
+    2: 'rtcp',
+};
 
-    get address() {
-        return this.#address;
+/**
+ * @class
+ * @implements {RTCIceCandidate}
+ */
+export default class {
+    /**
+     * @param  {RTCIceCandidateInit} init={}
+     */
+    constructor({ candidate, sdpMLineIndex, sdpMid, usernameFragment } = {}) {
+        if (sdpMLineIndex == null && sdpMid == null) {
+            throw new TypeError("Failed to construct 'RTCIceCandidate': sdpMid and sdpMLineIndex are both null.");
+        }
+        this.#candidate = candidate;
+        this.#sdpMLineIndex = sdpMLineIndex ?? null;
+        this.#sdpMid = sdpMid ?? null;
+        this.#usernameFragment = usernameFragment ?? null;
+
+        if (candidate && candidate.indexOf('candidate:') !== -1) {
+            const interest = candidate.slice(candidate.indexOf('candidate:') + 10);
+
+            /** @type {any[]} split */
+            const [foundation, componentID, protocol, priority, ip, port, type, ...rest] = interest.split(' ');
+
+            this.#foundation = foundation;
+            this.#component = componentMap[componentID];
+
+            this.#protocol = protocol;
+            this.#priority = Number(priority);
+            this.#address = ip;
+            this.#port = Number(port);
+            this.#type = type;
+
+            if (type !== 'host') {
+                const raddrIndex = rest.indexOf('raddr');
+                if (raddrIndex !== -1) this.#relatedAddress = rest[raddrIndex + 1];
+
+                const rportIndex = rest.indexOf('rport');
+                if (rportIndex !== -1) this.#relatedPort = Number(rest[rportIndex + 1]);
+            }
+        }
     }
 
-    #candidate = null;
+    #address;
+
+    get address() {
+        return this.#address ?? null;
+    }
+
+    #candidate;
 
     get candidate() {
-        return this.#candidate;
+        return this.#candidate || '';
     }
 
     #component = null;
@@ -19,28 +65,29 @@ export default class RTCIceCandidate {
         return this.#component;
     }
 
-    #foundation = null;
+    #foundation;
 
     get foundation() {
-        return this.#foundation;
+        return this.#foundation ?? null;
     }
 
-    #port = null;
+    #port;
 
     get port() {
-        return this.#port;
+        return this.#port ?? null;
     }
 
-    #priority = null;
+    #priority;
 
     get priority() {
-        return this.#priority;
+        return this.#priority ?? null;
     }
 
-    #protocol = null;
+    /** @type {RTCIceProtocol} */
+    #protocol;
 
     get protocol() {
-        return this.#protocol;
+        return this.#protocol ?? null;
     }
 
     #relatedAddress = null;
@@ -49,19 +96,19 @@ export default class RTCIceCandidate {
         return this.#relatedAddress;
     }
 
-    #relatedPort = null;
+    #relatedPort;
 
     get relatedPort() {
-        return this.#relatedPort;
+        return this.#relatedPort ?? null;
     }
 
-    #sdpMLineIndex = null;
+    #sdpMLineIndex;
 
     get sdpMLineIndex() {
         return this.#sdpMLineIndex;
     }
 
-    #sdpMid = null;
+    #sdpMid;
 
     get sdpMid() {
         return this.#sdpMid;
@@ -73,13 +120,14 @@ export default class RTCIceCandidate {
         return this.#tcpType;
     }
 
-    #type = null;
+    /** @type {RTCIceCandidateType} */
+    #type;
 
     get type() {
-        return this.#type;
+        return this.#type ?? null;
     }
 
-    #usernameFragment = null;
+    #usernameFragment;
 
     get usernameFragment() {
         return this.#usernameFragment;
@@ -87,10 +135,10 @@ export default class RTCIceCandidate {
 
     toJSON() {
         return {
-            candidate: this.candidate,
-            sdpMLineIndex: this.sdpMLineIndex,
-            sdpMid: this.sdpMid,
-            usernameFragment: this.usernameFragment,
+            candidate: this.#candidate,
+            sdpMLineIndex: this.#sdpMLineIndex,
+            sdpMid: this.#sdpMid,
+            usernameFragment: this.#usernameFragment,
         };
     }
 }

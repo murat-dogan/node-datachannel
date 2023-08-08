@@ -3,7 +3,17 @@
   "version": "0.4.3",
   "description": "libdatachannel node bindings",
   "type": "module",
-  "exports": "./lib/index.js",
+  "exports": {
+    ".": {
+      "import": "./lib/index.js"
+    },
+    "./polyfill": {
+      "import": "./polyfill/polyfill.js"
+    },
+    "./ponyfill": {
+      "import": "./polyfill/ponyfill.js"
+    }
+  },
   "typings": "lib/index.d.ts",
   "engines": {
     "node": ">=12.0.0"
@@ -70,7 +80,9 @@
     "typescript": "^4.6.3"
   },
   "dependencies": {
-    "prebuild-install": "^7.1.1"
+    "p-defer": "^4.0.0",
+    "prebuild-install": "^7.1.1",
+    "uint8-util": "^2.2.2"
   },
   "bundleDependencies": [
     "prebuild-install"
