@@ -210,7 +210,8 @@ export class PeerConnection {
     destroy(): void;
     setLocalDescription(type?: DescriptionType): void;
     setRemoteDescription(sdp: string, type: DescriptionType): void;
-    localDescription(): RTCSessionDescription | null;
+    localDescription(): { type: string; sdp: string } | null;
+    remoteDescription(): { type: string; sdp: string } | null;
     addRemoteCandidate(candidate: string, mid: string): void;
     createDataChannel(label: string, config?: DataChannelInitConfig): DataChannel;
     addTrack(media: Video | Audio): Track;
