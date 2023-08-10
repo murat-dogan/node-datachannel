@@ -2,9 +2,9 @@ name: Build - Win
 
 on:
   workflow_dispatch:
-  push:
-    tags:
-      - v*
+  # push:
+  #   tags:
+  #     - v*
 
 env:
   ACTIONS_ALLOW_UNSECURE_COMMANDS: true
