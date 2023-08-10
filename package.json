@@ -1,90 +1,85 @@
 {
-  "name": "node-datachannel",
-  "version": "0.4.3",
-  "description": "libdatachannel node bindings",
-  "type": "module",
-  "exports": {
-    ".": {
-      "import": "./lib/index.js"
+    "name": "node-datachannel",
+    "version": "0.4.4-dev",
+    "description": "libdatachannel node bindings",
+    "type": "module",
+    "exports": {
+        ".": {
+            "import": "./lib/index.js"
+        },
+        "./polyfill": {
+            "import": "./polyfill/index.js"
+        }
     },
-    "./polyfill": {
-      "import": "./polyfill/polyfill.js"
+    "typings": "lib/index.d.ts",
+    "engines": {
+        "node": ">=12.0.0"
     },
-    "./ponyfill": {
-      "import": "./polyfill/ponyfill.js"
-    }
-  },
-  "typings": "lib/index.d.ts",
-  "engines": {
-    "node": ">=12.0.0"
-  },
-  "directories": {
-    "lib": "lib",
-    "test": "test"
-  },
-  "_from": "node-datachannel@latest",
-  "scripts": {
-    "install": "prebuild-install || (npm install --ignore-scripts --production=false && npm run _prebuild)",
-    "install-nice": "npm run clean && npm install --ignore-scripts --production=false && cmake-js build --CDUSE_NICE=1",
-    "install-gnu-tls": "npm run clean && npm install --ignore-scripts --production=false && cmake-js build --CDUSE_GNUTLS=1",
-    "build": "cmake-js build",
-    "build:debug": "cmake-js build -D",
-    "_prebuild": "prebuild --backend cmake-js",
-    "clean": "cmake-js clean",
-    "lint": "eslint lib/**/* test/**/*",
-    "test": "NODE_OPTIONS=--experimental-vm-modules jest",
-    "wpt-test": "node test/wpt.js"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/murat-dogan/node-datachannel.git"
-  },
-  "keywords": [
-    "libdatachannel",
-    "webrtc",
-    "p2p",
-    "peer-to-peer",
-    "datachannel",
-    "data channel"
-  ],
-  "contributors": [
-    {
-      "name": "Murat Doğan",
-      "url": "https://github.com/murat-dogan"
+    "directories": {
+        "lib": "lib",
+        "test": "test"
     },
-    {
-      "name": "Paul-Louis Ageneau",
-      "url": "https://github.com/paullouisageneau"
-    }
-  ],
-  "license": "MPL 2.0",
-  "bugs": {
-    "url": "https://github.com/murat-dogan/node-datachannel/issues"
-  },
-  "homepage": "https://github.com/murat-dogan/node-datachannel#readme",
-  "devDependencies": {
-    "@types/node": "^20.4.4",
-    "@typescript-eslint/eslint-plugin": "^6.1.0",
-    "@typescript-eslint/parser": "^6.1.0",
-    "cmake-js": "^7.2.1",
-    "eslint": "^8.45.0",
-    "eslint-config-prettier": "^8.8.0",
-    "eslint-plugin-prettier": "^5.0.0",
-    "jest": "^29.6.1",
-    "jsdom": "^22.1.0",
-    "nan": "^2.17.0",
-    "napi-thread-safe-callback-cancellable": "^0.0.7",
-    "node-addon-api": "^7.0.0",
-    "prebuild": "^11.0.4",
-    "prettier": "^3.0.0",
-    "typescript": "^4.6.3"
-  },
-  "dependencies": {
-    "p-defer": "^4.0.0",
-    "prebuild-install": "^7.1.1",
-    "uint8-util": "^2.2.2"
-  },
-  "bundleDependencies": [
-    "prebuild-install"
-  ]
+    "_from": "node-datachannel@latest",
+    "scripts": {
+        "install": "prebuild-install || (npm install --ignore-scripts --production=false && npm run _prebuild)",
+        "install-nice": "npm run clean && npm install --ignore-scripts --production=false && cmake-js build --CDUSE_NICE=1",
+        "install-gnu-tls": "npm run clean && npm install --ignore-scripts --production=false && cmake-js build --CDUSE_GNUTLS=1",
+        "build": "cmake-js build",
+        "build:debug": "cmake-js build -D",
+        "_prebuild": "prebuild --backend cmake-js",
+        "clean": "cmake-js clean",
+        "lint": "eslint lib/**/* test/**/*",
+        "test": "NODE_OPTIONS=--experimental-vm-modules jest",
+        "wpt-test": "node test/wpt.js"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/murat-dogan/node-datachannel.git"
+    },
+    "keywords": [
+        "libdatachannel",
+        "webrtc",
+        "p2p",
+        "peer-to-peer",
+        "datachannel",
+        "data channel"
+    ],
+    "contributors": [
+        {
+            "name": "Murat Doğan",
+            "url": "https://github.com/murat-dogan"
+        },
+        {
+            "name": "Paul-Louis Ageneau",
+            "url": "https://github.com/paullouisageneau"
+        }
+    ],
+    "license": "MPL 2.0",
+    "bugs": {
+        "url": "https://github.com/murat-dogan/node-datachannel/issues"
+    },
+    "homepage": "https://github.com/murat-dogan/node-datachannel#readme",
+    "devDependencies": {
+        "@types/node": "^20.4.4",
+        "@typescript-eslint/eslint-plugin": "^6.1.0",
+        "@typescript-eslint/parser": "^6.1.0",
+        "cmake-js": "^7.2.1",
+        "eslint": "^8.45.0",
+        "eslint-config-prettier": "^8.8.0",
+        "eslint-plugin-prettier": "^5.0.0",
+        "jest": "^29.6.1",
+        "jsdom": "^22.1.0",
+        "nan": "^2.17.0",
+        "napi-thread-safe-callback-cancellable": "^0.0.7",
+        "node-addon-api": "^7.0.0",
+        "prebuild": "^11.0.4",
+        "prettier": "^3.0.0",
+        "typescript": "^4.6.3"
+    },
+    "dependencies": {
+        "prebuild-install": "^7.1.1"
+    },
+    "bundleDependencies": [
+        "prebuild-install"
+    ]
 }
