@@ -1,76 +1,79 @@
-// @ts-check
-import defer from 'p-defer';
-import NDC from '../lib/index.js';
+import NodeDataChannel from '../lib/index.js';
 import RTCSessionDescription from './RTCSessionDescription.js';
 import RTCDataChannel from './RTCDataChannel.js';
 import RTCIceCandidate from './RTCIceCandidate.js';
-import { DataChannelEvent, PeerConnectionIceEvent } from './Events.js';
+import { RTCDataChannelEvent, RTCPeerConnectionIceEvent } from './Events.js';
+import DOMException from './DOMException.js';
 
-const noop = (e) => e;
-
-/**
- * @class
- * @implements {RTCPeerConnection}
- */
-export default class extends EventTarget {
+export default class _RTCPeerConnection extends EventTarget {
     #peerConnection;
     #localOffer;
     #localAnswer;
     #dataChannels;
     #config;
-    /**
-     * @param  {RTCConfiguration} init
-     */
-    constructor(init) {
+    #canTrickleIceCandidates;
+    #sctp;
+
+    // needs to be called with .bind(this)
+    onconnectionstatechange = createEmptyFunction();
+    ondatachannel = createEmptyFunction();
+    onicecandidate = createEmptyFunction();
+    onicecandidateerror = createEmptyFunction();
+    oniceconnectionstatechange = createEmptyFunction();
+    onicegatheringstatechange = createEmptyFunction();
+    onnegotiationneeded = createEmptyFunction();
+    onsignalingstatechange = createEmptyFunction();
+    ontrack = createEmptyFunction();
+
+    constructor(init = {}) {
         super();
 
         this.#config = init;
-        this.#localOffer = defer();
-        this.#localAnswer = defer();
+        this.#localOffer = createDeferredPromise();
+        this.#localAnswer = createDeferredPromise();
         this.#dataChannels = new Set();
+        this.#canTrickleIceCandidates = null;
+        this.#sctp = null;
 
-        const iceServers = init.iceServers ?? [];
+        const iceServers = init?.iceServers ?? [];
 
-        this.#peerConnection = new NDC.PeerConnection(`peer-${Math.random()}`, {
+        this.#peerConnection = new NodeDataChannel.PeerConnection(init?.peerIdentity || `peer-${getRandomString(7)}`, {
             iceServers: iceServers
                 .map((server) => {
-                    const urls = (Array.isArray(server.urls) ? server.urls : [server.urls]).map((str) => new URL(str));
+                    const urls = Array.isArray(server.urls) ? server.urls : [server.urls];
 
                     return urls.map((url) => {
-                        /** @type {import('../lib/index.js').IceServer} */
-                        const iceServer = {
-                            hostname: url.hostname,
-                            port: parseInt(url.port, 10),
-                            username: server.username,
-                            password: server.credential,
-                            // relayType - how to specify?
-                        };
-
-                        return iceServer;
+                        if (server.username && server.credential) {
+                            const [protocol, rest] = url.split(/:(.*)/);
+                            return `${protocol}:${server.username}:${server.credential}@${rest}`;
+                        }
+                        return url;
                     });
                 })
                 .flat(),
             iceTransportPolicy: init?.iceTransportPolicy,
         });
 
+        // forward peerConnection events
         this.#peerConnection.onStateChange(() => {
             this.dispatchEvent(new Event('connectionstatechange'));
+            // FIX ME: this is not correct
+            this.dispatchEvent(new Event('iceconnectionstatechange'));
         });
+
         this.#peerConnection.onSignalingStateChange(() => {
             this.dispatchEvent(new Event('signalingstatechange'));
         });
+
         this.#peerConnection.onGatheringStateChange(() => {
             this.dispatchEvent(new Event('icegatheringstatechange'));
         });
-        this.#peerConnection.onDataChannel((channel) => {
-            this.dispatchEvent(new DataChannelEvent(new RTCDataChannel(channel)));
-        });
 
-        // forward events to properties
-        this.addEventListener('connectionstatechange', this.onconnectionstatechange);
-        this.addEventListener('signalingstatechange', this.onsignalingstatechange);
-        this.addEventListener('icegatheringstatechange', this.onicegatheringstatechange);
-        this.addEventListener('datachannel', this.ondatachannel);
+        this.#peerConnection.onDataChannel((channel) => {
+            const dataChannel = new RTCDataChannel(channel);
+            this.#dataChannels.add(dataChannel);
+            this.dispatchEvent(new RTCDataChannelEvent(dataChannel));
+        });
 
         this.#peerConnection.onLocalDescription((sdp, type) => {
             if (type === 'offer') {
@@ -82,19 +85,34 @@ export default class extends EventTarget {
             }
         });
 
-        this.#peerConnection.onLocalCandidate((candidate, mid) => {
-            if (mid === 'unspec') {
-                this.#localAnswer.reject(new Error(`Invalid description type ${mid}`));
+        this.#peerConnection.onLocalCandidate((candidate, sdpMid) => {
+            if (sdpMid === 'unspec') {
+                this.#localAnswer.reject(new Error(`Invalid description type ${sdpMid}`));
                 return;
             }
 
-            const event = new PeerConnectionIceEvent(new RTCIceCandidate({ candidate }));
-
+            const event = new RTCPeerConnectionIceEvent(new RTCIceCandidate({ candidate, sdpMid }));
             this.onicecandidate(event);
+        });
+
+        // forward events to properties
+        this.addEventListener('connectionstatechange', () => {
+            this.onconnectionstatechange();
+        });
+        this.addEventListener('signalingstatechange', () => {
+            this.onsignalingstatechange();
+        });
+        this.addEventListener('iceconnectionstatechange', () => {
+            this.oniceconnectionstatechange();
+        });
+        this.addEventListener('icegatheringstatechange', () => {
+            this.onicegatheringstatechange();
+        });
+        this.addEventListener('datachannel', (dc) => {
+            this.ondatachannel(dc);
         });
     }
 
-    #canTrickleIceCandidates = null;
     get canTrickleIceCandidates() {
         return this.#canTrickleIceCandidates;
     }
@@ -103,16 +121,8 @@ export default class extends EventTarget {
         return this.#peerConnection.state();
     }
 
-    get currentLocalDescription() {
-        return this.#peerConnection.localDescription();
-    }
-
-    get currentRemoteDescription() {
-        // not exposed by node-datachannel
-        return toSessionDescription(null);
-    }
-
     get iceConnectionState() {
+        // FIX ME: this is not correct
         return this.#peerConnection.state();
     }
 
@@ -120,24 +130,30 @@ export default class extends EventTarget {
         return this.#peerConnection.gatheringState();
     }
 
+    get currentLocalDescription() {
+        return new RTCSessionDescription(this.#peerConnection.localDescription());
+    }
+
+    get currentRemoteDescription() {
+        return new RTCSessionDescription(this.#peerConnection.remoteDescription());
+    }
+
     get localDescription() {
-        return this.#peerConnection.localDescription();
+        return new RTCSessionDescription(this.#peerConnection.localDescription());
     }
 
     get pendingLocalDescription() {
-        return this.#peerConnection.localDescription();
+        return new RTCSessionDescription(this.#peerConnection.localDescription());
     }
 
     get pendingRemoteDescription() {
-        // not exposed by node-datachannel
-        return toSessionDescription(null);
+        return new RTCSessionDescription(this.#peerConnection.remoteDescription());
     }
 
     get remoteDescription() {
-        // not exposed by node-datachannel
-        return toSessionDescription(null);
+        return new RTCSessionDescription(this.#peerConnection.remoteDescription());
     }
-    #sctp = null;
+
     get sctp() {
         return this.#sctp;
     }
@@ -146,31 +162,26 @@ export default class extends EventTarget {
         return this.#peerConnection.signalingState();
     }
 
-    onconnectionstatechange = noop;
-    ondatachannel = noop;
-    onicecandidate = noop;
-    onicecandidateerror = noop;
-    oniceconnectionstatechange = noop;
-    onicegatheringstatechange = noop;
-    onnegotiationneeded = noop;
-    onsignalingstatechange = noop;
-    ontrack = noop;
-
-    static generateCertificate() {}
+    static generateCertificate(keygenAlgorithm) {
+        throw new DOMException('Not implemented');
+    }
 
     async addIceCandidate(candidate) {
         if (candidate == null || candidate.candidate == null) {
-            throw new Error('Candidate invalid');
+            throw new DOMException('Candidate invalid');
         }
 
         this.#peerConnection.addRemoteCandidate(candidate.candidate, candidate.sdpMid ?? '0');
     }
+
     addTrack(track, ...streams) {
-        throw new Error('Not implemented');
+        throw new DOMException('Not implemented');
     }
+
     addTransceiver(trackOrKind, init) {
-        throw new Error('Not implemented');
+        throw new DOMException('Not implemented');
     }
+
     close() {
         // close all channels before shutting down
         this.#dataChannels.forEach((channel) => {
@@ -178,12 +189,13 @@ export default class extends EventTarget {
         });
 
         this.#peerConnection.close();
-        this.#peerConnection.destroy();
     }
+
     createAnswer() {
-        return this.#localAnswer.promise;
+        return this.#localAnswer;
     }
-    createDataChannel(label, opts) {
+
+    createDataChannel(label, opts = {}) {
         const channel = this.#peerConnection.createDataChannel(label, opts);
         const dataChannel = new RTCDataChannel(channel, opts);
 
@@ -195,36 +207,104 @@ export default class extends EventTarget {
 
         return dataChannel;
     }
+
     createOffer() {
-        return this.#localOffer.promise;
+        return this.#localOffer;
     }
+
     getConfiguration() {
         return this.#config;
     }
+
     getReceivers() {
-        throw new Error('Not implemented');
+        throw new DOMException('Not implemented');
     }
+
     getSenders() {
-        throw new Error('Not implemented');
+        throw new DOMException('Not implemented');
     }
-    async getStats() {
-        throw new Error('Not implemented');
+
+    getStats() {
+        return new Promise((resolve) => {
+            let report = new Map();
+            let cp = this.#peerConnection.getSelectedCandidatePair();
+            let bytesSent = this.#peerConnection.bytesSent();
+            let bytesReceived = this.#peerConnection.bytesReceived();
+            let rtt = this.#peerConnection.rtt();
+
+            let localIdRs = getRandomString(8);
+            let localId = 'RTCIceCandidate_' + localIdRs;
+            report.set(localId, {
+                id: localId,
+                type: 'localcandidate',
+                timestamp: Date.now(),
+                candidateType: cp.local.type,
+                ip: cp.local.address,
+                port: cp.local.port,
+            });
+
+            let remoteIdRs = getRandomString(8);
+            let remoteId = 'RTCIceCandidate_' + remoteIdRs;
+            report.set(remoteId, {
+                id: remoteId,
+                type: 'remotecandidate',
+                timestamp: Date.now(),
+                candidateType: cp.remote.type,
+                ip: cp.remote.address,
+                port: cp.remote.port,
+            });
+
+            let candidateId = 'RTCIceCandidatePair_' + localIdRs + '_' + remoteIdRs;
+            report.set(candidateId, {
+                id: candidateId,
+                type: 'candidate-pair',
+                timestamp: Date.now(),
+                localCandidateId: localId,
+                remoteCandidateId: remoteId,
+                state: 'succeeded',
+                nominated: true,
+                writable: true,
+                bytesSent: bytesSent,
+                bytesReceived: bytesReceived,
+                totalRoundTripTime: rtt,
+                currentRoundTripTime: rtt,
+            });
+
+            let transportId = 'RTCTransport_0_1';
+            report.set(transportId, {
+                id: transportId,
+                timestamp: Date.now(),
+                type: 'transport',
+                bytesSent: bytesSent,
+                bytesReceived: bytesReceived,
+                dtlsState: 'connected',
+                selectedCandidatePairId: candidateId,
+                selectedCandidatePairChanges: 1,
+            });
+
+            return resolve(report);
+        });
     }
+
     getTransceivers() {
-        throw new Error('Not implemented');
+        return []; // throw new DOMException('Not implemented');
     }
+
     removeTrack() {
-        throw new Error('Not implemented');
+        throw new DOMException('Not implemented');
     }
+
     restartIce() {
-        throw new Error('Not implemented');
+        throw new DOMException('Not implemented');
     }
+
     setConfiguration(config) {
         this.#config = config;
     }
+
     async setLocalDescription(description) {
         if (description == null || description.type == null) {
-            throw new Error('Local description type must be set');
+            throw new DOMException('Local description type must be set');
         }
 
         if (description.type !== 'offer') {
@@ -233,22 +313,37 @@ export default class extends EventTarget {
         }
         this.#peerConnection.setLocalDescription(description.type);
     }
+
     async setRemoteDescription(description) {
         if (description.sdp == null) {
-            throw new Error('Remote SDP must be set');
+            throw new DOMException('Remote SDP must be set');
         }
 
         this.#peerConnection.setRemoteDescription(description.sdp, description.type);
     }
 }
 
-function toSessionDescription(description) {
-    if (description == null) {
-        return null;
-    }
+function createDeferredPromise() {
+    let resolve, reject;
 
-    return new RTCSessionDescription({
-        sdp: description.sdp,
-        type: description.type,
+    let promise = new Promise(function (_resolve, _reject) {
+        resolve = _resolve;
+        reject = _reject;
     });
+
+    promise.resolve = resolve;
+    promise.reject = reject;
+    return promise;
+}
+
+function createEmptyFunction() {
+    return () => {
+        /** */
+    };
+}
+
+function getRandomString(length) {
+    return Math.random()
+        .toString(36)
+        .substring(2, 2 + length);
 }

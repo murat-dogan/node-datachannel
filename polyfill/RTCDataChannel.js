@@ -1,37 +1,47 @@
-// @ts-check
-import { text2arr } from 'uint8-util';
-// DOMException has existed for quite a while, but was only exposed in node 17 and above, this is a hack to get it early in engines 10 or above tho we only support since node 15 for event target
+import DOMException from './DOMException.js';
 
-// eslint-disable-next-line @typescript-eslint/no-empty-function
-const noop = () => {};
-/**
- * @class
- * @implements {RTCDataChannel}
- */
-export default class extends EventTarget {
-    /**
-     * @param {import("../lib/index.d.ts").DataChannel} dataChannel
-     * @param {any} opts
-     */
+export default class _RTCDataChannel extends EventTarget {
+    #dataChannel;
+    #readyState;
+    #bufferedAmountLowThreshold;
+    #binaryType;
+    #maxPacketLifeTime;
+    #maxRetransmits;
+    #negotiated;
+    #ordered;
+
+    // needs to be called with .bind(this)
+    onbufferedamountlow = createEmptyFunction();
+    onclose = createEmptyFunction();
+    onclosing = createEmptyFunction();
+    onerror = createEmptyFunction();
+    onmessage = createEmptyFunction();
+    onopen = createEmptyFunction();
+
     constructor(dataChannel, opts = {}) {
         super();
 
         this.#dataChannel = dataChannel;
-        this.#readyState = 'connecting';
-        this.#bufferedAmountLowThreshold = 0;
-
         this.#binaryType = 'arraybuffer';
+        this.#readyState = this.#dataChannel.isOpen() ? 'open' : 'connecting';
+        this.#bufferedAmountLowThreshold = 0;
+        this.#maxPacketLifeTime = opts.maxPacketLifeTime ?? null;
+        this.#maxRetransmits = opts.maxRetransmits ?? null;
+        this.#negotiated = opts.negotiated ?? false;
+        this.#ordered = opts.ordered ?? true;
 
+        // forward dataChannel events
         this.#dataChannel.onOpen(() => {
             this.#readyState = 'open';
             this.dispatchEvent(new Event('open'));
         });
+
         this.#dataChannel.onClosed(() => {
             this.#readyState = 'closed';
             this.dispatchEvent(new Event('close'));
         });
-        this.#dataChannel.onError((/** @type {string | undefined} */ msg) => {
-            this.#readyState = 'closed';
+
+        this.#dataChannel.onError((msg) => {
             this.dispatchEvent(
                 new RTCErrorEvent('error', {
                     error: new RTCError(
@@ -43,34 +53,39 @@ export default class extends EventTarget {
                 }),
             );
         });
+
         this.#dataChannel.onBufferedAmountLow(() => {
             this.dispatchEvent(new Event('bufferedamountlow'));
         });
-        this.#dataChannel.onMessage((/** @type {string | Uint8Array} */ data) => {
+
+        this.#dataChannel.onMessage((data) => {
             if (typeof data === 'string') {
-                data = text2arr(data);
+                data = Buffer.from(data);
             }
 
             this.dispatchEvent(new MessageEvent('message', { data }));
         });
 
         // forward events to properties
-        this.addEventListener('message', this.onmessage);
-        this.addEventListener('bufferedamountlow', this.onbufferedamountlow);
-        this.addEventListener('error', this.onerror);
-        this.addEventListener('close', this.onclose);
-        this.addEventListener('closing', this.onclosing);
-        this.addEventListener('open', this.onopen);
-
-        this.#maxPacketLifeTime = opts.maxPacketLifeTime ?? null;
-        this.#maxRetransmits = opts.maxRetransmits ?? null;
-        this.#negotiated = opts.negotiated ?? false;
-        this.#ordered = opts.ordered ?? true;
+        this.addEventListener('message', (msg) => {
+            this.onmessage(msg);
+        });
+        this.addEventListener('bufferedamountlow', () => {
+            this.onbufferedamountlow();
+        });
+        this.addEventListener('error', (msg) => {
+            this.onerror(msg);
+        });
+        this.addEventListener('close', () => {
+            this.onclose();
+        });
+        this.addEventListener('closing', () => {
+            this.onclosing();
+        });
+        this.addEventListener('open', () => {
+            this.onopen();
+        });
     }
-
-    #dataChannel;
-    /** @type {BinaryType} */
-    #binaryType = 'blob';
 
     set binaryType(type) {
         if (type !== 'blob' && type !== 'arraybuffer') {
@@ -81,6 +96,7 @@ export default class extends EventTarget {
         }
         this.#binaryType = type;
     }
+
     get binaryType() {
         return this.#binaryType;
     }
@@ -88,8 +104,6 @@ export default class extends EventTarget {
     get bufferedAmount() {
         return this.#dataChannel.bufferedAmount();
     }
-
-    #bufferedAmountLowThreshold = 0;
 
     get bufferedAmountLowThreshold() {
         return this.#bufferedAmountLowThreshold;
@@ -109,33 +123,17 @@ export default class extends EventTarget {
         return this.#dataChannel.getLabel();
     }
 
-    #maxPacketLifeTime = 0;
-
     get maxPacketLifeTime() {
         return this.#maxPacketLifeTime;
     }
-
-    #maxRetransmits = 0;
 
     get maxRetransmits() {
         return this.#maxRetransmits;
     }
 
-    #negotiated = false;
-
     get negotiated() {
         return this.#negotiated;
     }
-
-    // needs to be called with .bind(this)
-    onbufferedamountlow = noop;
-    onclose = noop;
-    onclosing = noop;
-    onerror = noop;
-    onmessage = noop;
-    onopen = noop;
-
-    #ordered = false;
 
     get ordered() {
         return this.#ordered;
@@ -144,10 +142,6 @@ export default class extends EventTarget {
     get protocol() {
         return this.#dataChannel.getProtocol();
     }
-
-    // connecting, open, closing, or closed
-    /** @type {RTCDataChannelState} */
-    #readyState = 'connecting';
 
     get readyState() {
         return this.#readyState;
@@ -179,4 +173,10 @@ export default class extends EventTarget {
 
         this.#dataChannel.close();
     }
+}
+
+function createEmptyFunction() {
+    return () => {
+        /** */
+    };
 }

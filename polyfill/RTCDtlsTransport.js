@@ -1,25 +1,29 @@
-// eslint-disable-next-line @typescript-eslint/no-empty-function
-const noop = () => {};
+export default class _RTCDtlsTransport extends EventTarget {
+    #iceTransport = null;
+    #state = null;
 
-export default class RTCDtlsTransport extends EventTarget {
+    onerror = createEmptyFunction();
+    onstatechange = createEmptyFunction();
+
     constructor() {
         super();
     }
-
-    #iceTransport = null;
 
     get iceTransport() {
         return this.#iceTransport;
     }
 
-    #state = null;
-
     get state() {
         return this.#state;
     }
 
-    onerror = noop;
-    onstatechange = noop;
+    getRemoteCertificates() {
+        /** */
+    }
+}
 
-    getRemoteCertificates() {}
+function createEmptyFunction() {
+    return () => {
+        /** */
+    };
 }
