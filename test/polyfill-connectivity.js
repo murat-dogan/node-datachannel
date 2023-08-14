@@ -15,6 +15,9 @@ let peer1 = new polyfill.RTCPeerConnection({
 peer1.onconnectionstatechange = () => {
     console.log('Peer1 State:', peer1.connectionState);
 };
+peer1.oniceconnectionstatechange = () => {
+    console.log('Peer1 IceState:', peer1.iceConnectionState);
+};
 peer1.onicegatheringstatechange = () => {
     console.log('Peer1 GatheringState:', peer1.iceGatheringState);
 };
@@ -31,6 +34,9 @@ let peer2 = new polyfill.RTCPeerConnection({
 // Set Callbacks
 peer2.onconnectionstatechange = () => {
     console.log('Peer2 State:', peer2.connectionState);
+};
+peer2.oniceconnectionstatechange = () => {
+    console.log('Peer2 IceState:', peer2.iceConnectionState);
 };
 peer2.onicegatheringstatechange = () => {
     console.log('Peer2 GatheringState:', peer2.iceGatheringState);

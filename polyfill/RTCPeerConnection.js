@@ -57,7 +57,9 @@ export default class _RTCPeerConnection extends EventTarget {
         // forward peerConnection events
         this.#peerConnection.onStateChange(() => {
             this.dispatchEvent(new Event('connectionstatechange'));
-            // FIX ME: this is not correct
+        });
+
+        this.#peerConnection.onIceStateChange(() => {
             this.dispatchEvent(new Event('iceconnectionstatechange'));
         });
 
@@ -122,8 +124,7 @@ export default class _RTCPeerConnection extends EventTarget {
     }
 
     get iceConnectionState() {
-        // FIX ME: this is not correct
-        return this.#peerConnection.state();
+        return this.#peerConnection.iceState();
     }
 
     get iceGatheringState() {
