@@ -217,11 +217,13 @@ export class PeerConnection {
     addTrack(media: Video | Audio): Track;
     hasMedia(): boolean;
     state(): RTCPeerConnectionState;
+    iceState(): RTCIceConnectionState;
     signalingState(): RTCSignalingState;
     gatheringState(): RTCIceGatheringState;
     onLocalDescription(cb: (sdp: string, type: DescriptionType) => void): void;
     onLocalCandidate(cb: (candidate: string, mid: string) => void): void;
     onStateChange(cb: (state: string) => void): void;
+    onIceStateChange(cb: (state: string) => void): void;
     onSignalingStateChange(cb: (state: string) => void): void;
     onGatheringStateChange(cb: (state: string) => void): void;
     onDataChannel(cb: (dc: DataChannel) => void): void;
