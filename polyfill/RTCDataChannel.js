@@ -58,8 +58,8 @@ export default class _RTCDataChannel extends EventTarget {
         });
 
         this.#dataChannel.onMessage((data) => {
-            if (typeof data === 'string') {
-                data = Buffer.from(data);
+            if (ArrayBuffer.isView(data)) {
+                data = data.buffer;
             }
 
             this.dispatchEvent(new MessageEvent('message', { data }));
