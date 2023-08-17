@@ -1,4 +1,4 @@
-import DOMException from './DOMException.js';
+import DOMException from 'node-domexception';
 
 export default class _RTCDataChannel extends EventTarget {
     #dataChannel;
