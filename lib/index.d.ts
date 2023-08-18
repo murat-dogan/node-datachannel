@@ -180,6 +180,7 @@ export class Track {
     setBufferedAmountLowThreshold(newSize: number): void;
     requestKeyframe(): boolean;
     setMediaHandler(handler: RtcpReceivingSession): void;
+    getMediaHandler(): RtcpReceivingSession;
     onOpen(cb: () => void): void;
     onClosed(cb: () => void): void;
     onError(cb: (err: string) => void): void;
