@@ -31,6 +31,7 @@ Napi::Object TrackWrapper::Init(Napi::Env env, Napi::Object exports)
             InstanceMethod("maxMessageSize", &TrackWrapper::maxMessageSize),
             InstanceMethod("requestKeyframe", &TrackWrapper::requestKeyframe),
             InstanceMethod("setMediaHandler", &TrackWrapper::setMediaHandler),
+            InstanceMethod("getMediaHandler", &TrackWrapper::getMediaHandler),
             InstanceMethod("onOpen", &TrackWrapper::onOpen),
             InstanceMethod("onClosed", &TrackWrapper::onClosed),
             InstanceMethod("onError", &TrackWrapper::onError),
