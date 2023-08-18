@@ -256,6 +256,20 @@ void TrackWrapper::setMediaHandler(const Napi::CallbackInfo &info)
     mTrackPtr->setMediaHandler(handler->getSessionInstance());
 }
 
+Napi::Value TrackWrapper::getMediaHandler(const Napi::CallbackInfo &info)
+{
+    if (!mTrackPtr)
+    {
+        Napi::Error::New(info.Env(), "getMediaHandler() called on destroyed track").ThrowAsJavaScriptException();
+        return info.Env().Null();
+    }
+
+    Napi::Env env = info.Env();
+    std::shared_ptr<rtc::Track> newTrack = mTrackPtr->getMediaHandler();
+    auto instance = TrackWrapper::constructor.New({Napi::External<std::shared_ptr<rtc::Track>>::New(env, &newTrack)});
+    return instance;
+}
+
 void TrackWrapper::onOpen(const Napi::CallbackInfo &info)
 {
     if (!mTrackPtr)

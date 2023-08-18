@@ -32,6 +32,7 @@ public:
   Napi::Value maxMessageSize(const Napi::CallbackInfo &info);
   Napi::Value requestKeyframe(const Napi::CallbackInfo &info);
   void setMediaHandler(const Napi::CallbackInfo &info);
+  Napi::Value getMediaHandler(const Napi::CallbackInfo &info);
 
   // Callbacks
   void onOpen(const Napi::CallbackInfo &info);
