@@ -3,7 +3,7 @@ import RTCSessionDescription from './RTCSessionDescription.js';
 import RTCDataChannel from './RTCDataChannel.js';
 import RTCIceCandidate from './RTCIceCandidate.js';
 import { RTCDataChannelEvent, RTCPeerConnectionIceEvent } from './Events.js';
-import DOMException from './DOMException.js';
+import DOMException from 'node-domexception';
 
 export default class _RTCPeerConnection extends EventTarget {
     #peerConnection;
@@ -14,16 +14,15 @@ export default class _RTCPeerConnection extends EventTarget {
     #canTrickleIceCandidates;
     #sctp;
 
-    // needs to be called with .bind(this)
-    onconnectionstatechange = createEmptyFunction();
-    ondatachannel = createEmptyFunction();
-    onicecandidate = createEmptyFunction();
-    onicecandidateerror = createEmptyFunction();
-    oniceconnectionstatechange = createEmptyFunction();
-    onicegatheringstatechange = createEmptyFunction();
-    onnegotiationneeded = createEmptyFunction();
-    onsignalingstatechange = createEmptyFunction();
-    ontrack = createEmptyFunction();
+    onconnectionstatechange;
+    ondatachannel;
+    onicecandidate;
+    onicecandidateerror;
+    oniceconnectionstatechange;
+    onicegatheringstatechange;
+    onnegotiationneeded;
+    onsignalingstatechange;
+    ontrack;
 
     constructor(init = {}) {
         super();
@@ -93,25 +92,27 @@ export default class _RTCPeerConnection extends EventTarget {
                 return;
             }
 
-            const event = new RTCPeerConnectionIceEvent(new RTCIceCandidate({ candidate, sdpMid }));
-            this.onicecandidate(event);
+            this.dispatchEvent(new RTCPeerConnectionIceEvent(new RTCIceCandidate({ candidate, sdpMid })));
         });
 
         // forward events to properties
-        this.addEventListener('connectionstatechange', () => {
-            this.onconnectionstatechange();
+        this.addEventListener('connectionstatechange', (e) => {
+            this.onconnectionstatechange?.(e);
         });
-        this.addEventListener('signalingstatechange', () => {
-            this.onsignalingstatechange();
+        this.addEventListener('signalingstatechange', (e) => {
+            this.onsignalingstatechange?.(e);
         });
-        this.addEventListener('iceconnectionstatechange', () => {
-            this.oniceconnectionstatechange();
+        this.addEventListener('iceconnectionstatechange', (e) => {
+            this.oniceconnectionstatechange?.(e);
         });
-        this.addEventListener('icegatheringstatechange', () => {
-            this.onicegatheringstatechange();
+        this.addEventListener('icegatheringstatechange', (e) => {
+            this.onicegatheringstatechange?.(e);
         });
-        this.addEventListener('datachannel', (dc) => {
-            this.ondatachannel(dc);
+        this.addEventListener('datachannel', (e) => {
+            this.ondatachannel?.(e);
+        });
+        this.addEventListener('icecandidate', (e) => {
+            this.onicecandidate?.(e);
         });
     }
 
@@ -335,12 +336,6 @@ function createDeferredPromise() {
     promise.resolve = resolve;
     promise.reject = reject;
     return promise;
-}
-
-function createEmptyFunction() {
-    return () => {
-        /** */
-    };
 }
 
 function getRandomString(length) {

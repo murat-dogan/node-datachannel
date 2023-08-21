@@ -1,4 +1,4 @@
-import DOMException from './DOMException.js';
+import DOMException from 'node-domexception';
 
 export default class _RTCDataChannel extends EventTarget {
     #dataChannel;
@@ -10,13 +10,12 @@ export default class _RTCDataChannel extends EventTarget {
     #negotiated;
     #ordered;
 
-    // needs to be called with .bind(this)
-    onbufferedamountlow = createEmptyFunction();
-    onclose = createEmptyFunction();
-    onclosing = createEmptyFunction();
-    onerror = createEmptyFunction();
-    onmessage = createEmptyFunction();
-    onopen = createEmptyFunction();
+    onbufferedamountlow;
+    onclose;
+    onclosing;
+    onerror;
+    onmessage;
+    onopen;
 
     constructor(dataChannel, opts = {}) {
         super();
@@ -59,31 +58,31 @@ export default class _RTCDataChannel extends EventTarget {
         });
 
         this.#dataChannel.onMessage((data) => {
-            if (typeof data === 'string') {
-                data = Buffer.from(data);
+            if (ArrayBuffer.isView(data)) {
+                data = data.buffer;
             }
 
             this.dispatchEvent(new MessageEvent('message', { data }));
         });
 
         // forward events to properties
-        this.addEventListener('message', (msg) => {
-            this.onmessage(msg);
+        this.addEventListener('message', (e) => {
+            this.onmessage?.(e);
         });
-        this.addEventListener('bufferedamountlow', () => {
-            this.onbufferedamountlow();
+        this.addEventListener('bufferedamountlow', (e) => {
+            this.onbufferedamountlow?.(e);
         });
-        this.addEventListener('error', (msg) => {
-            this.onerror(msg);
+        this.addEventListener('error', (e) => {
+            this.onerror?.(e);
         });
-        this.addEventListener('close', () => {
-            this.onclose();
+        this.addEventListener('close', (e) => {
+            this.onclose?.(e);
         });
-        this.addEventListener('closing', () => {
-            this.onclosing();
+        this.addEventListener('closing', (e) => {
+            this.onclosing?.(e);
         });
-        this.addEventListener('open', () => {
-            this.onopen();
+        this.addEventListener('open', (e) => {
+            this.onopen?.(e);
         });
     }
 
@@ -173,10 +172,4 @@ export default class _RTCDataChannel extends EventTarget {
 
         this.#dataChannel.close();
     }
-}
-
-function createEmptyFunction() {
-    return () => {
-        /** */
-    };
 }
