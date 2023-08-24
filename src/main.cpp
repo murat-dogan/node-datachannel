@@ -10,10 +10,10 @@
 Napi::Object InitAll(Napi::Env env, Napi::Object exports)
 {
     RtcWrapper::Init(env, exports);
-    RtcpReceivingSessionWrapper::Init(env,exports);
-    TrackWrapper::Init(env,exports);
-    VideoWrapper::Init(env,exports);
-    AudioWrapper::Init(env,exports);
+    RtcpReceivingSessionWrapper::Init(env, exports);
+    TrackWrapper::Init(env, exports);
+    VideoWrapper::Init(env, exports);
+    AudioWrapper::Init(env, exports);
     DataChannelWrapper::Init(env, exports);
     PeerConnectionWrapper::Init(env, exports);
     return exports;
