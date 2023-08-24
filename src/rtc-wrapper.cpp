@@ -3,6 +3,8 @@
 #include "data-channel-wrapper.h"
 #include "media-track-wrapper.h"
 
+#include "plog/Log.h"
+
 #include <chrono>
 #include <future>
 
@@ -20,6 +22,7 @@ Napi::Object RtcWrapper::Init(Napi::Env env, Napi::Object exports)
 
 void RtcWrapper::preload(const Napi::CallbackInfo &info)
 {
+    PLOG_DEBUG << "preload() called";
     Napi::Env env = info.Env();
     try
     {
@@ -73,7 +76,8 @@ void RtcWrapper::initLogger(const Napi::CallbackInfo &info)
                 return;
             }
             logCallback = std::make_unique<ThreadSafeCallback>(info[1].As<Napi::Function>());
-            rtc::InitLogger(logLevel, [&](rtc::LogLevel level, std::string message) {
+            rtc::InitLogger(logLevel, [&](rtc::LogLevel level, std::string message)
+                            {
                 if (logCallback)
                     logCallback->call([level, message = std::move(message)](Napi::Env env, std::vector<napi_value> &args) {
                         // This will run in main thread and needs to construct the
@@ -93,10 +97,8 @@ void RtcWrapper::initLogger(const Napi::CallbackInfo &info)
                         if (level == rtc::LogLevel::Fatal)
                             logLevel = "Fatal";
                         args = {Napi::String::New(env, logLevel), Napi::String::New(env, message)};
-                    });
-            });
+                    }); });
         }
-
     }
     catch (std::exception &ex)
     {
@@ -107,6 +109,7 @@ void RtcWrapper::initLogger(const Napi::CallbackInfo &info)
 
 void RtcWrapper::cleanup(const Napi::CallbackInfo &info)
 {
+    PLOG_DEBUG << "cleanup() called";
     Napi::Env env = info.Env();
     try
     {
@@ -115,14 +118,15 @@ void RtcWrapper::cleanup(const Napi::CallbackInfo &info)
         TrackWrapper::CloseAll();
 
         const auto timeout = std::chrono::seconds(10);
-        if(rtc::Cleanup().wait_for(std::chrono::seconds(timeout)) == std::future_status::timeout)
+        if (rtc::Cleanup().wait_for(std::chrono::seconds(timeout)) == std::future_status::timeout)
             throw std::runtime_error("cleanup timeout (possible deadlock)");
-        
-        // Clear Callbacks    
+
+        // Clear Callbacks
         PeerConnectionWrapper::ResetCallbacksAll();
 
-        if (logCallback) logCallback.reset();
-    }        
+        if (logCallback)
+            logCallback.reset();
+    }
     catch (std::exception &ex)
     {
         Napi::Error::New(env, std::string("libdatachannel error# ") + ex.what()).ThrowAsJavaScriptException();
@@ -132,6 +136,7 @@ void RtcWrapper::cleanup(const Napi::CallbackInfo &info)
 
 void RtcWrapper::setSctpSettings(const Napi::CallbackInfo &info)
 {
+    PLOG_DEBUG << "setSctpSettings() called";
     Napi::Env env = info.Env();
     int length = info.Length();
 
