@@ -308,7 +308,7 @@ void DataChannelWrapper::onOpen(const Napi::CallbackInfo &info)
             mOnOpenCallback->call([this](Napi::Env env, std::vector<napi_value> &args) {
                 PLOG_DEBUG << "mOnOpenCallback call(1)";
                 // Check the data channel is not closed
-                if(instances.find(this) == instances.end())
+                if(instances.find(this) == instances.end() || !env)
                     throw ThreadSafeCallback::CancelException();
 
                 // This will run in main thread and needs to construct the
@@ -381,7 +381,7 @@ void DataChannelWrapper::onError(const Napi::CallbackInfo &info)
             mOnErrorCallback->call([this, error = std::move(error)](Napi::Env env, std::vector<napi_value> &args) {
                 PLOG_DEBUG << "mOnErrorCallback call(1)";
                 // Check the data channel is not closed
-                if(instances.find(this) == instances.end())
+                if(instances.find(this) == instances.end() || !env)
                     throw ThreadSafeCallback::CancelException();
 
                 // This will run in main thread and needs to construct the
@@ -419,7 +419,7 @@ void DataChannelWrapper::onBufferedAmountLow(const Napi::CallbackInfo &info)
             mOnBufferedAmountLowCallback->call([this](Napi::Env env, std::vector<napi_value> &args) {
                 PLOG_DEBUG << "mOnBufferedAmountLowCallback call(1)";
                 // Check the data channel is not closed
-                if(instances.find(this) == instances.end())
+                if(instances.find(this) == instances.end() || !env)
                     throw ThreadSafeCallback::CancelException();
 
                 // This will run in main thread and needs to construct the
@@ -457,7 +457,7 @@ void DataChannelWrapper::onMessage(const Napi::CallbackInfo &info)
             mOnMessageCallback->call([this, message = std::move(message)](Napi::Env env, std::vector<napi_value> &args) {
                 PLOG_DEBUG << "mOnMessageCallback call(1)";
                 // Check the data channel is not closed
-                if(instances.find(this) == instances.end())
+                if(instances.find(this) == instances.end() || !env)
                     throw ThreadSafeCallback::CancelException();
 
                 // This will run in main thread and needs to construct the
