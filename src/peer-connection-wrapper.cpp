@@ -626,7 +626,7 @@ void PeerConnectionWrapper::onLocalDescription(const Napi::CallbackInfo &info)
             mOnLocalDescriptionCallback->call([this, sdp = std::move(sdp)](Napi::Env env, std::vector<napi_value> &args) {
                 PLOG_DEBUG << "mOnLocalDescriptionCallback call(1)";
                 // Check the peer connection is not closed
-                if(instances.find(this) == instances.end() || !env)
+                if(instances.find(this) == instances.end())
                     throw ThreadSafeCallback::CancelException();
 
                 // This will run in main thread and needs to construct the
@@ -666,7 +666,7 @@ void PeerConnectionWrapper::onLocalCandidate(const Napi::CallbackInfo &info)
             mOnLocalCandidateCallback->call([this, cand = std::move(cand)](Napi::Env env, std::vector<napi_value> &args) {
                 PLOG_DEBUG << "mOnLocalCandidateCallback call(1)";
                  // Check the peer connection is not closed
-                if(instances.find(this) == instances.end() || !env)
+                if(instances.find(this) == instances.end())
                     throw ThreadSafeCallback::CancelException();
 
                 // This will run in main thread and needs to construct the
@@ -705,8 +705,7 @@ void PeerConnectionWrapper::onStateChange(const Napi::CallbackInfo &info)
         if (mOnStateChangeCallback)
             mOnStateChangeCallback->call([this, state](Napi::Env env, std::vector<napi_value> &args) {
                 PLOG_DEBUG << "mOnStateChangeCallback call(1)";
-                // if env is gone this could mean cb fn has changed. See issue#176
-                if(instances.find(this) == instances.end() || !env)
+                if(instances.find(this) == instances.end())
                     throw ThreadSafeCallback::CancelException();
 
                 // This will run in main thread and needs to construct the
@@ -746,7 +745,7 @@ void PeerConnectionWrapper::onSignalingStateChange(const Napi::CallbackInfo &inf
             mOnSignalingStateChangeCallback->call([this, state](Napi::Env env, std::vector<napi_value> &args) {
                 PLOG_DEBUG << "mOnSignalingStateChangeCallback call(1)";
                 // Check the peer connection is not closed
-                if(instances.find(this) == instances.end() || !env)
+                if(instances.find(this) == instances.end())
                     throw ThreadSafeCallback::CancelException();
 
                 // This will run in main thread and needs to construct the
@@ -786,7 +785,7 @@ void PeerConnectionWrapper::onGatheringStateChange(const Napi::CallbackInfo &inf
             mOnGatheringStateChangeCallback->call([this, state](Napi::Env env, std::vector<napi_value> &args) {
                 PLOG_DEBUG << "mOnGatheringStateChangeCallback call(1)";
                 // Check the peer connection is not closed
-                if(instances.find(this) == instances.end() || !env)
+                if(instances.find(this) == instances.end())
                     throw ThreadSafeCallback::CancelException();
 
                 // This will run in main thread and needs to construct the
@@ -826,7 +825,7 @@ void PeerConnectionWrapper::onDataChannel(const Napi::CallbackInfo &info)
             mOnDataChannelCallback->call([this, dc](Napi::Env env, std::vector<napi_value> &args) {
                 PLOG_DEBUG << "mOnDataChannelCallback call(1)";
                 // Check the peer connection is not closed
-                if(instances.find(this) == instances.end() || !env)
+                if(instances.find(this) == instances.end())
                     throw ThreadSafeCallback::CancelException();
 
                 // This will run in main thread and needs to construct the
@@ -1054,7 +1053,7 @@ void PeerConnectionWrapper::onTrack(const Napi::CallbackInfo &info)
         if (mOnTrackCallback)
             mOnTrackCallback->call([this, track](Napi::Env env, std::vector<napi_value> &args) {
                 // Check the peer connection is not closed
-                if(instances.find(this) == instances.end() || !env)
+                if(instances.find(this) == instances.end())
                     throw ThreadSafeCallback::CancelException();
 
                 // This will run in main thread and needs to construct the
