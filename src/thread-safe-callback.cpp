@@ -1,5 +1,7 @@
 #include "thread-safe-callback.h"
 
+#include <stdexcept>
+
 #ifdef LEGACY_NAPI_THREAD_SAFE_CALLBACK
 
 // Nothing to do
