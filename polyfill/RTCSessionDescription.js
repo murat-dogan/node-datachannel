@@ -16,8 +16,8 @@ export default class _RTCSessionDescription {
         //     throw new DOMException('Type and sdp properties are required.');
         // }
 
-        this.#type = init?.type;
-        this.#sdp = init?.sdp;
+        this.#type = init ? init.type : null;
+        this.#sdp = init ? init.sdp : null;
     }
 
     get type() {

@@ -1,4 +1,6 @@
 import DOMException from 'node-domexception';
+import { MessageEvent } from './Events.js';
+import './event-target-polyfill.js';
 
 export default class _RTCDataChannel extends EventTarget {
     #dataChannel;
@@ -24,10 +26,10 @@ export default class _RTCDataChannel extends EventTarget {
         this.#binaryType = 'arraybuffer';
         this.#readyState = this.#dataChannel.isOpen() ? 'open' : 'connecting';
         this.#bufferedAmountLowThreshold = 0;
-        this.#maxPacketLifeTime = opts.maxPacketLifeTime ?? null;
-        this.#maxRetransmits = opts.maxRetransmits ?? null;
-        this.#negotiated = opts.negotiated ?? false;
-        this.#ordered = opts.ordered ?? true;
+        this.#maxPacketLifeTime = opts.maxPacketLifeTime || null;
+        this.#maxRetransmits = opts.maxRetransmits || null;
+        this.#negotiated = opts.negotiated || false;
+        this.#ordered = opts.ordered || true;
 
         // forward dataChannel events
         this.#dataChannel.onOpen(() => {
@@ -67,22 +69,22 @@ export default class _RTCDataChannel extends EventTarget {
 
         // forward events to properties
         this.addEventListener('message', (e) => {
-            this.onmessage?.(e);
+            if (this.onmessage) this.onmessage(e);
         });
         this.addEventListener('bufferedamountlow', (e) => {
-            this.onbufferedamountlow?.(e);
+            if (this.onbufferedamountlow) this.onbufferedamountlow(e);
         });
         this.addEventListener('error', (e) => {
-            this.onerror?.(e);
+            if (this.onerror) this.onerror(e);
         });
         this.addEventListener('close', (e) => {
-            this.onclose?.(e);
+            if (this.onclose) this.onclose(e);
         });
         this.addEventListener('closing', (e) => {
-            this.onclosing?.(e);
+            if (this.onclosing) this.onclosing(e);
         });
         this.addEventListener('open', (e) => {
-            this.onopen?.(e);
+            if (this.onopen) this.onopen(e);
         });
     }
 

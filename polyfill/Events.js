@@ -1,3 +1,5 @@
+import './event-target-polyfill.js';
+
 export class RTCPeerConnectionIceEvent extends Event {
     #candidate;
 
@@ -23,5 +25,19 @@ export class RTCDataChannelEvent extends Event {
 
     get channel() {
         return this.#channel;
+    }
+}
+
+export class MessageEvent extends Event {
+    #data;
+
+    constructor(type, options = {}) {
+        super('message');
+
+        this.#data = options.data;
+    }
+
+    get data() {
+        return this.#data;
     }
 }

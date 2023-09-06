@@ -27,9 +27,9 @@ export default class _RTCIceCandidate {
         }
 
         this.#candidate = candidate;
-        this.#sdpMLineIndex = sdpMLineIndex ?? null;
-        this.#sdpMid = sdpMid ?? null;
-        this.#usernameFragment = usernameFragment ?? null;
+        this.#sdpMLineIndex = sdpMLineIndex || null;
+        this.#sdpMid = sdpMid || null;
+        this.#usernameFragment = usernameFragment || null;
 
         if (candidate) {
             const fields = candidate.split(' ');

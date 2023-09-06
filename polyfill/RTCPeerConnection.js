@@ -4,6 +4,7 @@ import RTCDataChannel from './RTCDataChannel.js';
 import RTCIceCandidate from './RTCIceCandidate.js';
 import { RTCDataChannelEvent, RTCPeerConnectionIceEvent } from './Events.js';
 import DOMException from 'node-domexception';
+import './event-target-polyfill.js';
 
 export default class _RTCPeerConnection extends EventTarget {
     #peerConnection;
@@ -34,24 +35,27 @@ export default class _RTCPeerConnection extends EventTarget {
         this.#canTrickleIceCandidates = null;
         this.#sctp = null;
 
-        const iceServers = init?.iceServers ?? [];
+        const iceServers = init ? init.iceServers : [];
 
-        this.#peerConnection = new NodeDataChannel.PeerConnection(init?.peerIdentity || `peer-${getRandomString(7)}`, {
-            iceServers: iceServers
-                .map((server) => {
-                    const urls = Array.isArray(server.urls) ? server.urls : [server.urls];
+        this.#peerConnection = new NodeDataChannel.PeerConnection(
+            init && init.peerIdentity ? init.peerIdentity : `peer-${getRandomString(7)}`,
+            {
+                iceServers: iceServers
+                    .map((server) => {
+                        const urls = Array.isArray(server.urls) ? server.urls : [server.urls];
 
-                    return urls.map((url) => {
-                        if (server.username && server.credential) {
-                            const [protocol, rest] = url.split(/:(.*)/);
-                            return `${protocol}:${server.username}:${server.credential}@${rest}`;
-                        }
-                        return url;
-                    });
-                })
-                .flat(),
-            iceTransportPolicy: init?.iceTransportPolicy,
-        });
+                        return urls.map((url) => {
+                            if (server.username && server.credential) {
+                                const [protocol, rest] = url.split(/:(.*)/);
+                                return `${protocol}:${server.username}:${server.credential}@${rest}`;
+                            }
+                            return url;
+                        });
+                    })
+                    .flat(),
+                iceTransportPolicy: init ? init.iceTransportPolicy : undefined,
+            },
+        );
 
         // forward peerConnection events
         this.#peerConnection.onStateChange(() => {
@@ -97,22 +101,22 @@ export default class _RTCPeerConnection extends EventTarget {
 
         // forward events to properties
         this.addEventListener('connectionstatechange', (e) => {
-            this.onconnectionstatechange?.(e);
+            if (this.onconnectionstatechange) this.onconnectionstatechange(e);
         });
         this.addEventListener('signalingstatechange', (e) => {
-            this.onsignalingstatechange?.(e);
+            if (this.onsignalingstatechange) this.onsignalingstatechange(e);
         });
         this.addEventListener('iceconnectionstatechange', (e) => {
-            this.oniceconnectionstatechange?.(e);
+            if (this.oniceconnectionstatechange) this.oniceconnectionstatechange(e);
         });
         this.addEventListener('icegatheringstatechange', (e) => {
-            this.onicegatheringstatechange?.(e);
+            if (this.onicegatheringstatechange) this.onicegatheringstatechange(e);
         });
         this.addEventListener('datachannel', (e) => {
-            this.ondatachannel?.(e);
+            if (this.ondatachannel) this.ondatachannel(e);
         });
         this.addEventListener('icecandidate', (e) => {
-            this.onicecandidate?.(e);
+            if (this.onicecandidate) this.onicecandidate(e);
         });
     }
 
@@ -173,7 +177,7 @@ export default class _RTCPeerConnection extends EventTarget {
             throw new DOMException('Candidate invalid');
         }
 
-        this.#peerConnection.addRemoteCandidate(candidate.candidate, candidate.sdpMid ?? '0');
+        this.#peerConnection.addRemoteCandidate(candidate.candidate, candidate.sdpMid || '0');
     }
 
     addTrack(track, ...streams) {
