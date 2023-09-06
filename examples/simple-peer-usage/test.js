@@ -1,11 +1,11 @@
 import Peer from 'simple-peer';
-import ndc from '../../polyfill/index.js';
+import nodeDatachannelPolyfill from '../../polyfill/index.js';
 import nodeDataChannel from '../../lib/index.js';
 
 nodeDataChannel.initLogger('Info');
 
-var peer1 = new Peer({ initiator: true, wrtc: ndc });
-var peer2 = new Peer({ wrtc: ndc });
+var peer1 = new Peer({ initiator: true, wrtc: nodeDatachannelPolyfill });
+var peer2 = new Peer({ wrtc: nodeDatachannelPolyfill });
 
 peer1.on('signal', (data) => {
     // when peer1 has signaling data, give it to peer2 somehow
