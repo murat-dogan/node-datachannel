@@ -23,11 +23,17 @@ Other Options
 ```
 
 ## Building with Docker
-```sh
-# cd into node-datachannel root directory
 
+`cd` into `node-datachannel` root directory
+
+```sh
 # Build Docker image from Dockerfile
-> docker build -t node-datachannel-dev .
+# You can choose Ubuntu and Node major versions by changing UBUNTU_VERSION and NODE_MAJOR
+> docker build \
+    -t node-datachannel-dev \
+    --build-arg UBUNTU_VERSION=20.04 \
+    --build-arg NODE_MAJOR=18 \
+    .
 
 # Run Docker container and mount node-datachannel root directory as a volume to the container
 > docker run -it --rm --name node-datachannel-dev-container -v ${PWD}:/home/node-datachannel node-datachannel-dev /bin/bash
