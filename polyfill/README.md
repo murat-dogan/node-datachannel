@@ -8,6 +8,10 @@ WebRTC polyfills to be used for libraries like `simple-peer`.
 
 ## Example Usage
 
+> For a native usage example please check test folder.
+
+`simple-peer` usage example
+
 ```js
 import Peer from 'simple-peer';
 import nodeDatachannelPolyfill from 'node-datachannel/polyfill';

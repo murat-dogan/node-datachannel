@@ -71,7 +71,6 @@ dc1.onclose = () => {
 peer1
     .createOffer({})
     .then((desc) => {
-        // peer1.setLocalDescription(desc);
         peer2.setRemoteDescription(desc);
     })
     .catch((err) => console.error(err));
@@ -79,7 +78,6 @@ peer1
 peer2
     .createAnswer({})
     .then((answerDesc) => {
-        // peer2.setLocalDescription(answerDesc);
         peer1.setRemoteDescription(answerDesc);
     })
     .catch((err) => console.error("Couldn't create answer", err));
