@@ -66,9 +66,11 @@ add_library(${PROJECT_NAME} SHARED
 set_target_properties(${PROJECT_NAME} PROPERTIES CXX_STANDARD 17)
 set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "" SUFFIX ".node")
 
+# add_subdirectory(${CMAKE_BINARY_DIR}/_deps/libdatachannel-src/deps/plog EXCLUDE_FROM_ALL)
 target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_SOURCE_DIR}/node_modules/node-addon-api
     ${CMAKE_BINARY_DIR}/_deps/libdatachannel-src/include
+    ${CMAKE_BINARY_DIR}/_deps/libdatachannel-src/deps/plog
 )
 
 if(NODE_RUNTIMEVERSION VERSION_LESS "16.0.0")
@@ -84,6 +86,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 set(LINK_LIBRARIES
     ${CMAKE_JS_LIB}
     datachannel-static
+    plog::plog
 )
 
 if(APPLE)

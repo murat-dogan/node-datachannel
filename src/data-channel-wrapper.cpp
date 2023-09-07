@@ -1,10 +1,13 @@
 #include "data-channel-wrapper.h"
 
+#include "plog/Log.h"
+
 Napi::FunctionReference DataChannelWrapper::constructor;
 std::unordered_set<DataChannelWrapper *> DataChannelWrapper::instances;
 
 void DataChannelWrapper::CloseAll()
 {
+    PLOG_DEBUG << "CloseAll() called";
     auto copy(instances);
     for (auto inst : copy)
         inst->doClose();
@@ -44,20 +47,24 @@ Napi::Object DataChannelWrapper::Init(Napi::Env env, Napi::Object exports)
 
 DataChannelWrapper::DataChannelWrapper(const Napi::CallbackInfo &info) : Napi::ObjectWrap<DataChannelWrapper>(info)
 {
+    PLOG_DEBUG << "Constructor called";
     mDataChannelPtr = *(info[0].As<Napi::External<std::shared_ptr<rtc::DataChannel>>>().Data());
-
+    PLOG_DEBUG << "Data Channel created";
     instances.insert(this);
 }
 
 DataChannelWrapper::~DataChannelWrapper()
 {
+    PLOG_DEBUG << "Destructor called";
     doClose();
 }
 
 void DataChannelWrapper::doClose()
 {
+    PLOG_DEBUG << "doClose() called";
     if (mDataChannelPtr)
     {
+        PLOG_DEBUG << "Closing...";
         try
         {
             mDataChannelPtr->close();
@@ -81,11 +88,13 @@ void DataChannelWrapper::doClose()
 
 void DataChannelWrapper::close(const Napi::CallbackInfo &info)
 {
+    PLOG_DEBUG << "close() called";
     doClose();
 }
 
 Napi::Value DataChannelWrapper::getLabel(const Napi::CallbackInfo &info)
 {
+    PLOG_DEBUG << "getLabel() called";
     if (!mDataChannelPtr)
     {
         Napi::Error::New(info.Env(), "getLabel() called on destroyed channel").ThrowAsJavaScriptException();
@@ -97,6 +106,7 @@ Napi::Value DataChannelWrapper::getLabel(const Napi::CallbackInfo &info)
 
 Napi::Value DataChannelWrapper::getId(const Napi::CallbackInfo &info)
 {
+    PLOG_DEBUG << "getId() called";
     if (!mDataChannelPtr)
     {
         Napi::Error::New(info.Env(), "getId() called on destroyed channel").ThrowAsJavaScriptException();
@@ -108,6 +118,7 @@ Napi::Value DataChannelWrapper::getId(const Napi::CallbackInfo &info)
 
 Napi::Value DataChannelWrapper::getProtocol(const Napi::CallbackInfo &info)
 {
+    PLOG_DEBUG << "getProtocol() called";
     if (!mDataChannelPtr)
     {
         Napi::Error::New(info.Env(), "getProtocol() called on destroyed channel").ThrowAsJavaScriptException();
@@ -119,6 +130,7 @@ Napi::Value DataChannelWrapper::getProtocol(const Napi::CallbackInfo &info)
 
 Napi::Value DataChannelWrapper::sendMessage(const Napi::CallbackInfo &info)
 {
+    PLOG_DEBUG << "sendMessage() called";
     if (!mDataChannelPtr)
     {
         Napi::Error::New(info.Env(), "sendMessage() called on destroyed channel").ThrowAsJavaScriptException();
@@ -148,6 +160,7 @@ Napi::Value DataChannelWrapper::sendMessage(const Napi::CallbackInfo &info)
 
 Napi::Value DataChannelWrapper::sendMessageBinary(const Napi::CallbackInfo &info)
 {
+    PLOG_DEBUG << "sendMessageBinary() called";
     if (!mDataChannelPtr)
     {
         Napi::Error::New(info.Env(), "sendMessagBinary() called on destroyed channel").ThrowAsJavaScriptException();
@@ -177,6 +190,7 @@ Napi::Value DataChannelWrapper::sendMessageBinary(const Napi::CallbackInfo &info
 
 Napi::Value DataChannelWrapper::isOpen(const Napi::CallbackInfo &info)
 {
+    PLOG_DEBUG << "isOpen() called";
     Napi::Env env = info.Env();
 
     if (!mDataChannelPtr)
@@ -197,6 +211,7 @@ Napi::Value DataChannelWrapper::isOpen(const Napi::CallbackInfo &info)
 
 Napi::Value DataChannelWrapper::bufferedAmount(const Napi::CallbackInfo &info)
 {
+    PLOG_DEBUG << "bufferedAmount() called";
     Napi::Env env = info.Env();
 
     if (!mDataChannelPtr)
@@ -217,6 +232,7 @@ Napi::Value DataChannelWrapper::bufferedAmount(const Napi::CallbackInfo &info)
 
 Napi::Value DataChannelWrapper::maxMessageSize(const Napi::CallbackInfo &info)
 {
+    PLOG_DEBUG << "maxMessageSize() called";
     Napi::Env env = info.Env();
 
     if (!mDataChannelPtr)
@@ -237,6 +253,7 @@ Napi::Value DataChannelWrapper::maxMessageSize(const Napi::CallbackInfo &info)
 
 void DataChannelWrapper::setBufferedAmountLowThreshold(const Napi::CallbackInfo &info)
 {
+    PLOG_DEBUG << "setBufferedAmountLowThreshold() called";
     if (!mDataChannelPtr)
     {
         Napi::Error::New(info.Env(), "setBufferedAmountLowThreshold() called on destroyed channel").ThrowAsJavaScriptException();
@@ -265,6 +282,7 @@ void DataChannelWrapper::setBufferedAmountLowThreshold(const Napi::CallbackInfo 
 
 void DataChannelWrapper::onOpen(const Napi::CallbackInfo &info)
 {
+    PLOG_DEBUG << "onOpen() called";
     if (!mDataChannelPtr)
     {
         Napi::Error::New(info.Env(), "onOpen() called on destroyed channel").ThrowAsJavaScriptException();
@@ -283,9 +301,12 @@ void DataChannelWrapper::onOpen(const Napi::CallbackInfo &info)
     // Callback
     mOnOpenCallback = std::make_unique<ThreadSafeCallback>(info[0].As<Napi::Function>());
 
-    mDataChannelPtr->onOpen([&]() {
+    mDataChannelPtr->onOpen([&]()
+                            {
+        PLOG_DEBUG << "onOpen cb received from rtc";
         if (mOnOpenCallback)
             mOnOpenCallback->call([this](Napi::Env env, std::vector<napi_value> &args) {
+                PLOG_DEBUG << "mOnOpenCallback call(1)";
                 // Check the data channel is not closed
                 if(instances.find(this) == instances.end())
                     throw ThreadSafeCallback::CancelException();
@@ -293,11 +314,13 @@ void DataChannelWrapper::onOpen(const Napi::CallbackInfo &info)
                 // This will run in main thread and needs to construct the
                 // arguments for the call
                 args = {};
+                PLOG_DEBUG << "mOnOpenCallback call(2)";
             }); });
 }
 
 void DataChannelWrapper::onClosed(const Napi::CallbackInfo &info)
 {
+    PLOG_DEBUG << "onClosed() called";
     if (!mDataChannelPtr)
     {
         Napi::Error::New(info.Env(), "onClosed() called on destroyed channel").ThrowAsJavaScriptException();
@@ -316,9 +339,12 @@ void DataChannelWrapper::onClosed(const Napi::CallbackInfo &info)
     // Callback
     mOnClosedCallback = std::make_unique<ThreadSafeCallback>(info[0].As<Napi::Function>());
 
-    mDataChannelPtr->onClosed([&]() {
+    mDataChannelPtr->onClosed([&]()
+                              {
+        PLOG_DEBUG << "onClosed cb received from rtc";
         if (mOnClosedCallback)
             mOnClosedCallback->call([this](Napi::Env env, std::vector<napi_value> &args) {
+                PLOG_DEBUG << "mOnClosedCallback call";
                 // Do not check if the data channel has been closed here
 
                 // This will run in main thread and needs to construct the
@@ -329,6 +355,7 @@ void DataChannelWrapper::onClosed(const Napi::CallbackInfo &info)
 
 void DataChannelWrapper::onError(const Napi::CallbackInfo &info)
 {
+    PLOG_DEBUG << "onError() called";
     if (!mDataChannelPtr)
     {
         Napi::Error::New(info.Env(), "onError() called on destroyed channel").ThrowAsJavaScriptException();
@@ -347,9 +374,12 @@ void DataChannelWrapper::onError(const Napi::CallbackInfo &info)
     // Callback
     mOnErrorCallback = std::make_unique<ThreadSafeCallback>(info[0].As<Napi::Function>());
 
-    mDataChannelPtr->onError([&](std::string error) {
+    mDataChannelPtr->onError([&](std::string error)
+                             {
+        PLOG_DEBUG << "onError cb received from rtc";
         if (mOnErrorCallback)
             mOnErrorCallback->call([this, error = std::move(error)](Napi::Env env, std::vector<napi_value> &args) {
+                PLOG_DEBUG << "mOnErrorCallback call(1)";
                 // Check the data channel is not closed
                 if(instances.find(this) == instances.end())
                     throw ThreadSafeCallback::CancelException();
@@ -357,11 +387,13 @@ void DataChannelWrapper::onError(const Napi::CallbackInfo &info)
                 // This will run in main thread and needs to construct the
                 // arguments for the call
                 args = {Napi::String::New(env, error)};
+                PLOG_DEBUG << "mOnErrorCallback call(2)";
             }); });
 }
 
 void DataChannelWrapper::onBufferedAmountLow(const Napi::CallbackInfo &info)
 {
+    PLOG_DEBUG << "onBufferedAmountLow() called";
     if (!mDataChannelPtr)
     {
         Napi::Error::New(info.Env(), "onBufferedAmountLow() called on destroyed channel").ThrowAsJavaScriptException();
@@ -380,9 +412,12 @@ void DataChannelWrapper::onBufferedAmountLow(const Napi::CallbackInfo &info)
     // Callback
     mOnBufferedAmountLowCallback = std::make_unique<ThreadSafeCallback>(info[0].As<Napi::Function>());
 
-    mDataChannelPtr->onBufferedAmountLow([&]() {
+    mDataChannelPtr->onBufferedAmountLow([&]()
+                                         {
+        PLOG_DEBUG << "onBufferedAmountLow cb received from rtc";
         if (mOnBufferedAmountLowCallback)
             mOnBufferedAmountLowCallback->call([this](Napi::Env env, std::vector<napi_value> &args) {
+                PLOG_DEBUG << "mOnBufferedAmountLowCallback call(1)";
                 // Check the data channel is not closed
                 if(instances.find(this) == instances.end())
                     throw ThreadSafeCallback::CancelException();
@@ -390,11 +425,13 @@ void DataChannelWrapper::onBufferedAmountLow(const Napi::CallbackInfo &info)
                 // This will run in main thread and needs to construct the
                 // arguments for the call
                 args = {};
+                PLOG_DEBUG << "mOnBufferedAmountLowCallback call(2)";
             }); });
 }
 
 void DataChannelWrapper::onMessage(const Napi::CallbackInfo &info)
 {
+    PLOG_DEBUG << "onMessage() called";
     if (!mDataChannelPtr)
     {
         Napi::Error::New(info.Env(), "onMessage() called on destroyed channel").ThrowAsJavaScriptException();
@@ -413,9 +450,12 @@ void DataChannelWrapper::onMessage(const Napi::CallbackInfo &info)
     // Callback
     mOnMessageCallback = std::make_unique<ThreadSafeCallback>(info[0].As<Napi::Function>());
 
-    mDataChannelPtr->onMessage([&](std::variant<rtc::binary, std::string> message) {
+    mDataChannelPtr->onMessage([&](std::variant<rtc::binary, std::string> message)
+                               {
+        PLOG_DEBUG << "onMessage cb received from rtc";
         if (mOnMessageCallback)
             mOnMessageCallback->call([this, message = std::move(message)](Napi::Env env, std::vector<napi_value> &args) {
+                PLOG_DEBUG << "mOnMessageCallback call(1)";
                 // Check the data channel is not closed
                 if(instances.find(this) == instances.end())
                     throw ThreadSafeCallback::CancelException();
@@ -431,5 +471,6 @@ void DataChannelWrapper::onMessage(const Napi::CallbackInfo &info)
                     auto bin = std::get<rtc::binary>(std::move(message));
                     args = {Napi::Buffer<std::byte>::Copy(env, bin.data(), bin.size())};
                 }
+                PLOG_DEBUG << "mOnMessageCallback call(2)";
             }); });
 }
