@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
-const WebSocket = require('ws');
+import WebSocket from 'ws';
 
 const clients = {};
 

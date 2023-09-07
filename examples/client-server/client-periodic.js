@@ -1,10 +1,9 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
-const nodeDataChannel = require('../../lib/index');
-const WebSocket = require('ws');
-const readline = require('readline');
+import WebSocket from 'ws';
+import readline from 'readline';
+import nodeDataChannel from '../../lib/index.js';
 
 // Init Logger
-nodeDataChannel.initLogger('Debug');
+nodeDataChannel.initLogger('Info');
 
 // PeerConnection Map
 const pcMap = {};
@@ -43,7 +42,7 @@ ws.on('error', (err) => {
 });
 
 ws.on('message', (msgStr) => {
-    msg = JSON.parse(msgStr);
+    let msg = JSON.parse(msgStr);
     switch (msg.type) {
         case 'offer':
             createPeerConnection(msg.id);
