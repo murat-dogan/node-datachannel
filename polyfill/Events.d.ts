@@ -7,3 +7,11 @@ export class RTCPeerConnectionIceEvent extends Event {
 export class RTCDataChannelEvent extends Event {
     readonly channel: RTCDataChannel | null;
 }
+
+export class MessageEvent extends Event {
+    readonly data: any;
+    readonly origin: string;
+    readonly lastEventId: string;
+    readonly source: 'Window' | 'MessagePort' | 'ServiceWorker' | null;
+    readonly ports: MessagePort[];
+}
