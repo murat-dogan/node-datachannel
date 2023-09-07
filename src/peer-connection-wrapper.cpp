@@ -773,41 +773,6 @@ void PeerConnectionWrapper::onIceStateChange(const Napi::CallbackInfo &info)
             }); });
 }
 
-void PeerConnectionWrapper::onIceStateChange(const Napi::CallbackInfo &info)
-{
-    Napi::Env env = info.Env();
-    int length = info.Length();
-
-    if (!mRtcPeerConnPtr)
-    {
-        Napi::Error::New(env, "onIceStateChange() called on destroyed peer connection").ThrowAsJavaScriptException();
-        return;
-    }
-
-    if (length < 1 || !info[0].IsFunction())
-    {
-        Napi::TypeError::New(env, "Function expected").ThrowAsJavaScriptException();
-        return;
-    }
-
-    // Callback
-    mOnIceStateChangeCallback = std::make_unique<ThreadSafeCallback>(info[0].As<Napi::Function>());
-
-    mRtcPeerConnPtr->onIceStateChange([&](rtc::PeerConnection::IceState state)
-                                      {
-        if (mOnIceStateChangeCallback)
-            mOnIceStateChangeCallback->call([this, state](Napi::Env env, std::vector<napi_value> &args) {
-                if(instances.find(this) == instances.end())
-                    throw ThreadSafeCallback::CancelException();
-
-                // This will run in main thread and needs to construct the
-                // arguments for the call
-                std::ostringstream stream;
-                stream << state;
-                args = {Napi::String::New(env, stream.str())};
-            }); });
-}
-
 void PeerConnectionWrapper::onSignalingStateChange(const Napi::CallbackInfo &info)
 {
     PLOG_DEBUG << "onSignalingStateChange() called";
