@@ -740,6 +740,7 @@ void PeerConnectionWrapper::onStateChange(const Napi::CallbackInfo &info)
 
 void PeerConnectionWrapper::onIceStateChange(const Napi::CallbackInfo &info)
 {
+    PLOG_DEBUG << "onIceStateChange() called";
     Napi::Env env = info.Env();
     int length = info.Length();
 
@@ -760,8 +761,10 @@ void PeerConnectionWrapper::onIceStateChange(const Napi::CallbackInfo &info)
 
     mRtcPeerConnPtr->onIceStateChange([&](rtc::PeerConnection::IceState state)
                                       {
+        PLOG_DEBUG << "onIceStateChange cb received from rtc";
         if (mOnIceStateChangeCallback)
             mOnIceStateChangeCallback->call([this, state](Napi::Env env, std::vector<napi_value> &args) {
+                PLOG_DEBUG << "mOnIceStateChangeCallback call(1)";
                 if(instances.find(this) == instances.end())
                     throw ThreadSafeCallback::CancelException();
 
@@ -770,6 +773,7 @@ void PeerConnectionWrapper::onIceStateChange(const Napi::CallbackInfo &info)
                 std::ostringstream stream;
                 stream << state;
                 args = {Napi::String::New(env, stream.str())};
+                PLOG_DEBUG << "mOnIceStateChangeCallback call(2)";
             }); });
 }
 
@@ -1138,6 +1142,7 @@ Napi::Value PeerConnectionWrapper::state(const Napi::CallbackInfo &info)
 
 Napi::Value PeerConnectionWrapper::iceState(const Napi::CallbackInfo &info)
 {
+    PLOG_DEBUG << "iceState() called";
     Napi::Env env = info.Env();
     std::ostringstream stream;
     stream << (mRtcPeerConnPtr ? mRtcPeerConnPtr->iceState() : rtc::PeerConnection::IceState::Closed);
