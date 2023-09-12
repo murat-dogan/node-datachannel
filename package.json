@@ -1,73 +1,77 @@
 {
-  "name": "node-datachannel",
-  "version": "0.4.4-dev",
-  "description": "libdatachannel node bindings",
-  "main": "lib/index.js",
-  "typings": "lib/index.d.ts",
-  "directories": {
-    "lib": "lib",
-    "test": "test"
-  },
-  "_from": "node-datachannel@latest",
-  "scripts": {
-    "install": "prebuild-install || (npm install --ignore-scripts --production=false && npm run _prebuild)",
-    "install-nice": "npm run clean && npm install --ignore-scripts --production=false && cmake-js build --CDUSE_NICE=1",
-    "install-gnu-tls": "npm run clean && npm install --ignore-scripts --production=false && cmake-js build --CDUSE_GNUTLS=1",
-    "build": "cmake-js build",
-    "build:debug": "cmake-js build -D",
-    "_prebuild": "prebuild --backend cmake-js",
-    "clean": "cmake-js clean",
-    "lint": "eslint lib/**/* test/**/*",
-    "test": "jest"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/murat-dogan/node-datachannel.git"
-  },
-  "keywords": [
-    "libdatachannel",
-    "webrtc",
-    "p2p",
-    "peer-to-peer",
-    "datachannel",
-    "data channel"
-  ],
-  "contributors": [
-    {
-      "name": "Murat Doğan",
-      "url": "https://github.com/murat-dogan"
+    "name": "node-datachannel",
+    "version": "0.4.4-dev",
+    "description": "libdatachannel node bindings",
+    "main": "lib/index.js",
+    "typings": "lib/index.d.ts",
+    "directories": {
+        "lib": "lib",
+        "test": "test"
     },
-    {
-      "name": "Paul-Louis Ageneau",
-      "url": "https://github.com/paullouisageneau"
+    "_from": "node-datachannel@latest",
+    "scripts": {
+        "install": "prebuild-install -r napi || (npm install --ignore-scripts --production=false && npm run _prebuild)",
+        "install-nice": "npm run clean && npm install --ignore-scripts --production=false && cmake-js build --CDUSE_NICE=1",
+        "install-gnu-tls": "npm run clean && npm install --ignore-scripts --production=false && cmake-js build --CDUSE_GNUTLS=1",
+        "build": "cmake-js build",
+        "build:debug": "cmake-js build -D",
+        "_prebuild": "prebuild -r napi --backend cmake-js",
+        "clean": "cmake-js clean",
+        "lint": "eslint lib/**/* test/**/*",
+        "test": "jest"
+    },
+    "binary": {
+        "napi_versions": [
+            8
+        ]
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/murat-dogan/node-datachannel.git"
+    },
+    "keywords": [
+        "libdatachannel",
+        "webrtc",
+        "p2p",
+        "peer-to-peer",
+        "datachannel",
+        "data channel"
+    ],
+    "contributors": [
+        {
+            "name": "Murat Doğan",
+            "url": "https://github.com/murat-dogan"
+        },
+        {
+            "name": "Paul-Louis Ageneau",
+            "url": "https://github.com/paullouisageneau"
+        }
+    ],
+    "license": "MPL 2.0",
+    "gypfile": true,
+    "bugs": {
+        "url": "https://github.com/murat-dogan/node-datachannel/issues"
+    },
+    "homepage": "https://github.com/murat-dogan/node-datachannel#readme",
+    "devDependencies": {
+        "@types/node": "^17.0.23",
+        "@typescript-eslint/eslint-plugin": "^5.18.0",
+        "@typescript-eslint/parser": "^5.18.0",
+        "cmake-js": "^6.3.0",
+        "eslint": "^8.12.0",
+        "eslint-config-prettier": "^8.5.0",
+        "eslint-plugin-prettier": "^4.0.0",
+        "jest": "^27.5.1",
+        "napi-thread-safe-callback-cancellable": "^0.0.7",
+        "node-addon-api": "^4.3.0",
+        "prebuild": "^11.0.3",
+        "prettier": "^2.6.2",
+        "typescript": "^4.6.3"
+    },
+    "bundledDependencies": [
+        "prebuild-install"
+    ],
+    "dependencies": {
+        "prebuild-install": "^7.0.1"
     }
-  ],
-  "license": "MPL 2.0",
-  "gypfile": true,
-  "bugs": {
-    "url": "https://github.com/murat-dogan/node-datachannel/issues"
-  },
-  "homepage": "https://github.com/murat-dogan/node-datachannel#readme",
-  "devDependencies": {
-    "@types/node": "^17.0.23",
-    "@typescript-eslint/eslint-plugin": "^5.18.0",
-    "@typescript-eslint/parser": "^5.18.0",
-    "cmake-js": "^6.3.0",
-    "eslint": "^8.12.0",
-    "eslint-config-prettier": "^8.5.0",
-    "eslint-plugin-prettier": "^4.0.0",
-    "jest": "^27.5.1",
-    "nan": "^2.15.0",
-    "napi-thread-safe-callback-cancellable": "^0.0.7",
-    "node-addon-api": "^4.3.0",
-    "prebuild": "^11.0.3",
-    "prettier": "^2.6.2",
-    "typescript": "^4.6.3"
-  },
-  "bundledDependencies": [
-    "prebuild-install"
-  ],
-  "dependencies": {
-    "prebuild-install": "^7.0.1"
-  }
 }
