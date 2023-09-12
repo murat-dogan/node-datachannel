@@ -14,7 +14,7 @@ jobs:
     runs-on: macos-11
     strategy:
       matrix:
-        node-version: [10.x, 11.x, 12.x, 13.x, 14.x, 15.x, 16.x, 17.x, 18.x, 19.x, 20.x]
+        node-version: [12.x]
 
     steps:
       - uses: actions/checkout@v3
@@ -30,7 +30,7 @@ jobs:
       - name: Build
         run: |
           npm install --ignore-scripts
-          node_modules/.bin/prebuild --backend cmake-js --arch arm64 --upload -u ${{ secrets.GITHUB_TOKEN }} -- --CDCMAKE_OSX_ARCHITECTURES="arm64"
+          node_modules/.bin/prebuild -r napi --backend cmake-js --arch arm64 --upload -u ${{ secrets.GITHUB_TOKEN }} -- --CDCMAKE_OSX_ARCHITECTURES="arm64"
         env:
           CI: true
           OPENSSL_ROOT_DIR: /tmp/opt/R/arm64
