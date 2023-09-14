@@ -25,6 +25,9 @@
             8
         ]
     },
+    "engines": {
+        "node": ">=16.0.0"
+    },
     "repository": {
         "type": "git",
         "url": "git+https://github.com/murat-dogan/node-datachannel.git"
@@ -55,17 +58,16 @@
     "homepage": "https://github.com/murat-dogan/node-datachannel#readme",
     "devDependencies": {
         "@types/node": "^17.0.23",
-        "@typescript-eslint/eslint-plugin": "^5.18.0",
-        "@typescript-eslint/parser": "^5.18.0",
-        "cmake-js": "^6.3.0",
-        "eslint": "^8.12.0",
-        "eslint-config-prettier": "^8.5.0",
-        "eslint-plugin-prettier": "^4.0.0",
+        "@typescript-eslint/eslint-plugin": "^5.62.0",
+        "@typescript-eslint/parser": "^5.62.0",
+        "cmake-js": "^6.3.2",
+        "eslint": "^8.49.0",
+        "eslint-config-prettier": "^8.10.0",
+        "eslint-plugin-prettier": "^4.2.1",
         "jest": "^27.5.1",
-        "napi-thread-safe-callback-cancellable": "^0.0.7",
-        "node-addon-api": "^4.3.0",
-        "prebuild": "^11.0.3",
-        "prettier": "^2.6.2",
+        "node-addon-api": "^7.0.0",
+        "prebuild": "^11.0.4",
+        "prettier": "^2.8.8",
         "typescript": "^4.6.3"
     },
     "bundledDependencies": [
