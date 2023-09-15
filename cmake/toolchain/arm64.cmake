@@ -13,6 +13,5 @@ set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
 set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
 set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
 
-# remove -fPIC
-set(CMAKE_C_FLAGS "-march=armv8-a -Wno-error=format-truncation" CACHE STRING "Compiler Flags")
+set(CMAKE_C_FLAGS "-march=armv8-a -fPIC -Wno-error=format-truncation" CACHE STRING "Compiler Flags")
 set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS}" CACHE STRING "Compiler Flags")
