@@ -1,6 +1,6 @@
 # WebRTC Polyfills
 
-> This part is ongoing work and is considered to be in the beta phase.
+> This part is ongoing work and is considered to be in beta phase.
 
 > Any feedback and contributions are welcomed.
 
