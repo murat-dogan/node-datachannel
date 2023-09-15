@@ -1,5 +1,3 @@
-import './event-target-polyfill.js';
-
 export default class _RTCDtlsTransport extends EventTarget {
     #iceTransport = null;
     #state = null;

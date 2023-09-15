@@ -83,6 +83,7 @@
         "prebuild-install"
     ],
     "dependencies": {
+        "node-domexception": "^2.0.1",
         "prebuild-install": "^7.0.1"
     }
 }

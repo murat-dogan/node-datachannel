@@ -1,5 +1,3 @@
-import './event-target-polyfill.js';
-
 export default class _RTCIceTransport extends EventTarget {
     #component = null;
     #gatheringState = null;

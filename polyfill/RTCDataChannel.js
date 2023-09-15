@@ -1,6 +1,4 @@
 import DOMException from 'node-domexception';
-import { MessageEvent } from './Events.js';
-import './event-target-polyfill.js';
 
 export default class _RTCDataChannel extends EventTarget {
     #dataChannel;
