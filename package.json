@@ -57,7 +57,7 @@
     },
     "homepage": "https://github.com/murat-dogan/node-datachannel#readme",
     "devDependencies": {
-        "@types/node": "^17.0.23",
+        "@types/node": "^20.6.1",
         "@typescript-eslint/eslint-plugin": "^5.62.0",
         "@typescript-eslint/parser": "^5.62.0",
         "cmake-js": "^6.3.2",
