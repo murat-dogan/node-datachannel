@@ -41,7 +41,7 @@ Please check [electron demo](/examples/electron-demo)
 ## Example Usage
 
 ```js
-const nodeDataChannel = require('node-datachannel');
+import nodeDataChannel from 'node-datachannel';
 
 // Log Level
 nodeDataChannel.initLogger('Debug');
