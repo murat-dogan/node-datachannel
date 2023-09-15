@@ -1,12 +1,17 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
+// createRequire is native in node version >= 12
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
+
+// yargs down not supports ES Modules
 const yargs = require('yargs/yargs');
 const { hideBin } = require('yargs/helpers');
-const nodeDataChannel = require('../../lib/index');
-const WebSocket = require('ws');
-const readline = require('readline');
+
+import WebSocket from 'ws';
+import readline from 'readline';
+import nodeDataChannel from '../../lib/index.js';
 
 // Init Logger
-nodeDataChannel.initLogger('Debug');
+nodeDataChannel.initLogger('Info');
 
 // PeerConnection Map
 const pcMap = {};
@@ -72,7 +77,7 @@ ws.on('error', (err) => {
 });
 
 ws.on('message', (msgStr) => {
-    msg = JSON.parse(msgStr);
+    let msg = JSON.parse(msgStr);
     switch (msg.type) {
         case 'offer':
             createPeerConnection(msg.id);

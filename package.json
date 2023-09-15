@@ -2,8 +2,19 @@
     "name": "node-datachannel",
     "version": "0.5.0-dev",
     "description": "libdatachannel node bindings",
-    "main": "lib/index.js",
+    "type": "module",
+    "exports": {
+        ".": {
+            "import": "./lib/index.js"
+        },
+        "./polyfill": {
+            "import": "./polyfill/index.js"
+        }
+    },
     "typings": "lib/index.d.ts",
+    "engines": {
+        "node": ">=16.0.0"
+    },
     "directories": {
         "lib": "lib",
         "test": "test"
@@ -18,15 +29,13 @@
         "_prebuild": "prebuild -r napi --backend cmake-js",
         "clean": "cmake-js clean",
         "lint": "eslint lib/**/* test/**/*",
-        "test": "jest"
+        "test": "jest",
+        "wpt-test": "node test/wpt.js"
     },
     "binary": {
         "napi_versions": [
             8
         ]
-    },
-    "engines": {
-        "node": ">=16.0.0"
     },
     "repository": {
         "type": "git",
@@ -74,6 +83,7 @@
         "prebuild-install"
     ],
     "dependencies": {
+        "node-domexception": "^2.0.1",
         "prebuild-install": "^7.0.1"
     }
 }

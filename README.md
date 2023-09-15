@@ -104,6 +104,10 @@ setTimeout(() => {
 }, 10 * 1000);
 ```
 
+## WebRTC Polyfills
+
+Please check [here](/polyfill)
+
 ## Test
 
 ```sh

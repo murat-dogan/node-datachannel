@@ -1,7 +1,6 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
-const nodeDataChannel = require('../../lib/index');
-const readline = require('readline');
-var dgram = require('dgram');
+import readline from 'readline';
+import nodeDataChannel from '../../lib/index.js';
+import dgram from 'dgram';
 
 var client = dgram.createSocket('udp4');
 

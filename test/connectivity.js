@@ -1,5 +1,4 @@
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const nodeDataChannel = require('../lib/index');
+import nodeDataChannel from '../lib/index.js';
 
 nodeDataChannel.initLogger('Debug');
 nodeDataChannel.preload();
@@ -32,6 +31,9 @@ let peer1 = new nodeDataChannel.PeerConnection('Peer1', { iceServers: ['stun:stu
 peer1.onStateChange((state) => {
     console.log('Peer1 State:', state);
 });
+peer1.onIceStateChange((state) => {
+    console.log('Peer1 IceState:', state);
+});
 peer1.onGatheringStateChange((state) => {
     console.log('Peer1 GatheringState:', state);
 });
@@ -49,6 +51,9 @@ let peer2 = new nodeDataChannel.PeerConnection('Peer2', { iceServers: ['stun:stu
 // Set Callbacks
 peer2.onStateChange((state) => {
     console.log('Peer2 State:', state);
+});
+peer2.onIceStateChange((state) => {
+    console.log('Peer2 IceState:', state);
 });
 peer2.onGatheringStateChange((state) => {
     console.log('Peer2 GatheringState:', state);

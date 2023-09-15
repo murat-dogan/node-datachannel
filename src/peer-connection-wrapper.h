@@ -26,11 +26,13 @@ public:
   void setLocalDescription(const Napi::CallbackInfo &info);
   void setRemoteDescription(const Napi::CallbackInfo &info);
   Napi::Value localDescription(const Napi::CallbackInfo &info);
+  Napi::Value remoteDescription(const Napi::CallbackInfo &info);
   void addRemoteCandidate(const Napi::CallbackInfo &info);
   Napi::Value createDataChannel(const Napi::CallbackInfo &info);
   Napi::Value addTrack(const Napi::CallbackInfo &info);
   Napi::Value hasMedia(const Napi::CallbackInfo &info);
   Napi::Value state(const Napi::CallbackInfo &info);
+  Napi::Value iceState(const Napi::CallbackInfo &info);
   Napi::Value signalingState(const Napi::CallbackInfo &info);
   Napi::Value gatheringState(const Napi::CallbackInfo &info);
 
@@ -38,6 +40,7 @@ public:
   void onLocalDescription(const Napi::CallbackInfo &info);
   void onLocalCandidate(const Napi::CallbackInfo &info);
   void onStateChange(const Napi::CallbackInfo &info);
+  void onIceStateChange(const Napi::CallbackInfo &info);
   void onSignalingStateChange(const Napi::CallbackInfo &info);
   void onGatheringStateChange(const Napi::CallbackInfo &info);
   void onDataChannel(const Napi::CallbackInfo &info);
@@ -70,6 +73,7 @@ private:
   std::unique_ptr<ThreadSafeCallback> mOnLocalDescriptionCallback = nullptr;
   std::unique_ptr<ThreadSafeCallback> mOnLocalCandidateCallback = nullptr;
   std::unique_ptr<ThreadSafeCallback> mOnStateChangeCallback = nullptr;
+  std::unique_ptr<ThreadSafeCallback> mOnIceStateChangeCallback = nullptr;
   std::unique_ptr<ThreadSafeCallback> mOnSignalingStateChangeCallback = nullptr;
   std::unique_ptr<ThreadSafeCallback> mOnGatheringStateChangeCallback = nullptr;
   std::unique_ptr<ThreadSafeCallback> mOnDataChannelCallback = nullptr;
