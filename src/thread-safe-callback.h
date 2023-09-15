@@ -1,12 +1,6 @@
 #ifndef THREAD_SAFE_CALLBACK_H
 #define THREAD_SAFE_CALLBACK_H
 
-#ifdef LEGACY_NAPI_THREAD_SAFE_CALLBACK
-
-#include "napi-thread-safe-callback.hpp"
-
-#else
-
 #include <napi.h>
 
 #include <vector>
@@ -24,14 +18,14 @@ public:
     ThreadSafeCallback(const ThreadSafeCallback &) = delete;
     ThreadSafeCallback(ThreadSafeCallback &&) = delete;
 
-    ThreadSafeCallback& operator=(const ThreadSafeCallback &) = delete;
-    ThreadSafeCallback& operator=(ThreadSafeCallback &&) = delete;
+    ThreadSafeCallback &operator=(const ThreadSafeCallback &) = delete;
+    ThreadSafeCallback &operator=(ThreadSafeCallback &&) = delete;
 
     void call(arg_func_t argFunc);
 
     class CancelException : public std::exception
     {
-        const char* what() const throw();
+        const char *what() const throw();
     };
 
 private:
@@ -51,7 +45,4 @@ private:
     tsfn_t tsfn;
 };
 
-#endif // LEGACY_NAPI_THREAD_SAFE_CALLBACK
-
 #endif // THREAD_SAFE_CALLBACK_H
-

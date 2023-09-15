@@ -22,6 +22,8 @@ npm install node-datachannel
 
 |          | Linux-x64 | Linux-armv7 | Linux-arm64(1) | Windows-x86 | Windows-x64 | Mac (M1 + x64) |
 | -------- | :-------: | :---------: | :------------: | :---------: | :---------: | :------------: |
+| Node V10 |     +     |      +      |       +        |      +      |      +      |       +        |
+| Node V11 |     +     |      +      |       +        |      +      |      +      |       +        |
 | Node V12 |     +     |      +      |       +        |      +      |      +      |       +        |
 | Node V13 |     +     |      +      |       +        |      +      |      +      |       +        |
 | Node V14 |     +     |      +      |       +        |      +      |      +      |       +        |
@@ -33,6 +35,12 @@ npm install node-datachannel
 | Node V20 |     +     |      +      |       +        |      +      |      +      |       +        |
 
 1. Please note that; For Linux-arm64 platform we need OpenSSL to be installed locally.
+
+## Electron
+
+`node-datachannel` supports Electron.
+
+Please check [electron demo](/examples/electron-demo)
 
 ## Example Usage
 

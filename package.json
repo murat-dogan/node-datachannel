@@ -13,7 +13,7 @@
     },
     "typings": "lib/index.d.ts",
     "engines": {
-        "node": ">=12.0.0"
+        "node": ">=16.0.0"
     },
     "directories": {
         "lib": "lib",
@@ -21,16 +21,21 @@
     },
     "_from": "node-datachannel@latest",
     "scripts": {
-        "install": "prebuild-install || (npm install --ignore-scripts --production=false && npm run _prebuild)",
+        "install": "prebuild-install -r napi || (npm install --ignore-scripts --production=false && npm run _prebuild)",
         "install-nice": "npm run clean && npm install --ignore-scripts --production=false && cmake-js build --CDUSE_NICE=1",
         "install-gnu-tls": "npm run clean && npm install --ignore-scripts --production=false && cmake-js build --CDUSE_GNUTLS=1",
         "build": "cmake-js build",
         "build:debug": "cmake-js build -D",
-        "_prebuild": "prebuild --backend cmake-js",
+        "_prebuild": "prebuild -r napi --backend cmake-js",
         "clean": "cmake-js clean",
         "lint": "eslint lib/**/* test/**/*",
-        "test": "NODE_OPTIONS=--experimental-vm-modules jest",
+        "test": "jest",
         "wpt-test": "node test/wpt.js"
+    },
+    "binary": {
+        "napi_versions": [
+            8
+        ]
     },
     "repository": {
         "type": "git",
@@ -55,33 +60,29 @@
         }
     ],
     "license": "MPL 2.0",
+    "gypfile": true,
     "bugs": {
         "url": "https://github.com/murat-dogan/node-datachannel/issues"
     },
     "homepage": "https://github.com/murat-dogan/node-datachannel#readme",
     "devDependencies": {
-        "@types/node": "^17.0.23",
-        "@typescript-eslint/eslint-plugin": "^5.18.0",
-        "@typescript-eslint/parser": "^5.18.0",
-        "cmake-js": "^6.3.0",
-        "eslint": "^8.12.0",
-        "eslint-config-prettier": "^8.5.0",
-        "eslint-plugin-prettier": "^4.0.0",
+        "@types/node": "^20.6.1",
+        "@typescript-eslint/eslint-plugin": "^5.62.0",
+        "@typescript-eslint/parser": "^5.62.0",
+        "cmake-js": "^6.3.2",
+        "eslint": "^8.49.0",
+        "eslint-config-prettier": "^8.10.0",
+        "eslint-plugin-prettier": "^4.2.1",
         "jest": "^27.5.1",
-        "jsdom": "^19.0.0",
-        "nan": "^2.15.0",
-        "napi-thread-safe-callback-cancellable": "^0.0.7",
-        "node-addon-api": "^4.3.0",
-        "prebuild": "^11.0.3",
-        "prettier": "^2.6.2",
+        "node-addon-api": "^7.0.0",
+        "prebuild": "^11.0.4",
+        "prettier": "^2.8.8",
         "typescript": "^4.6.3"
     },
-    "dependencies": {
-        "event-target-polyfill": "^0.0.3",
-        "node-domexception": "^1.0.0",
-        "prebuild-install": "^7.1.1"
-    },
-    "bundleDependencies": [
+    "bundledDependencies": [
         "prebuild-install"
-    ]
+    ],
+    "dependencies": {
+        "prebuild-install": "^7.0.1"
+    }
 }

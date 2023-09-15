@@ -14,7 +14,7 @@ jobs:
     runs-on: windows-2019
     strategy:
       matrix:
-        node-version: [12.x, 13.x, 14.x, 15.x, 16.x, 17.x, 18.x, 19.x, 20.x]
+        node-version: [16.x]
 
     steps:
       - uses: actions/checkout@v2
@@ -34,7 +34,7 @@ jobs:
       #   env:
       #     CI: true
       - name: Upload
-        run: node_modules/.bin/prebuild --upload -u ${{ secrets.GITHUB_TOKEN }}
+        run: node_modules/.bin/prebuild -r napi --upload -u ${{ secrets.GITHUB_TOKEN }}
         env:
           CI: true
 
@@ -42,7 +42,7 @@ jobs:
     runs-on: windows-2019
     strategy:
       matrix:
-        node_version: [12.x, 13.x, 14.x, 15.x, 16.x, 17.x, 18.x, 19.x, 20.x]
+        node_version: [16.x]
         node_arch:
           - x86
     steps:
@@ -51,7 +51,10 @@ jobs:
         with:
           arch: x86
       - name: Install OpenSSL
-        run: choco install openssl --x86=true
+      # openssl v3.1.1 [Approved]
+      # openssl package files install completed. Performing other installation steps.
+      # ERROR: 32-bit installation is not supported for openssl
+        run: choco install openssl --x86=true --version=1.1.1.2100
       - name: Use Node.js ${{ matrix.node_version }}
         uses: aminya/setup-node@x86
         with:
@@ -66,6 +69,6 @@ jobs:
       #   env:
       #     CI: true
       - name: Upload
-        run: node_modules/.bin/prebuild --upload -u ${{ secrets.GITHUB_TOKEN }}
+        run: node_modules/.bin/prebuild -r napi --upload -u ${{ secrets.GITHUB_TOKEN }}
         env:
           CI: true

@@ -1,12 +1,11 @@
 cmake_minimum_required(VERSION 3.15)
 cmake_policy(SET CMP0091 NEW)
+cmake_policy(SET CMP0042 NEW)
+
 project(node_datachannel VERSION 0.5.0)
 
-# Workaround for https://github.com/murat-dogan/node-datachannel/issues/65
-if(NODE_RUNTIMEVERSION VERSION_GREATER "17.0.0" AND NODE_RUNTIMEVERSION VERSION_LESS "18.0.0")
-    add_compile_definitions(OPENSSL_API_COMPAT=0x10100001L)
-    add_compile_definitions(OPENSSL_CONFIGURED_API=0x30000000L)
-endif()
+# -Dnapi_build_version=8
+add_definitions(-DNAPI_VERSION=8)
 
 include_directories(${CMAKE_JS_INC})
 
@@ -66,21 +65,10 @@ add_library(${PROJECT_NAME} SHARED
 set_target_properties(${PROJECT_NAME} PROPERTIES CXX_STANDARD 17)
 set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "" SUFFIX ".node")
 
-# add_subdirectory(${CMAKE_BINARY_DIR}/_deps/libdatachannel-src/deps/plog EXCLUDE_FROM_ALL)
 target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_SOURCE_DIR}/node_modules/node-addon-api
     ${CMAKE_BINARY_DIR}/_deps/libdatachannel-src/include
     ${CMAKE_BINARY_DIR}/_deps/libdatachannel-src/deps/plog
-)
-
-if(NODE_RUNTIMEVERSION VERSION_LESS "16.0.0")
-    # For compatibility with Node.js 12
-    # This should be removed along with the napi-thread-safe-callback-cancellable dependency when dropping support at end-of-life
-    target_compile_definitions(${PROJECT_NAME} PRIVATE -DLEGACY_NAPI_THREAD_SAFE_CALLBACK)
-endif()
-
-target_include_directories(${PROJECT_NAME} PRIVATE
-    ${CMAKE_SOURCE_DIR}/node_modules/napi-thread-safe-callback-cancellable
 )
 
 set(LINK_LIBRARIES

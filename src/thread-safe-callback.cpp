@@ -2,12 +2,6 @@
 
 #include <stdexcept>
 
-#ifdef LEGACY_NAPI_THREAD_SAFE_CALLBACK
-
-// Nothing to do
-
-#else
-
 const char *ThreadSafeCallback::CancelException::what() const throw()
 {
     return "ThreadSafeCallback cancelled";
@@ -67,5 +61,3 @@ void ThreadSafeCallback::callbackFunc(Napi::Env env,
     if (env && callback)
         callback.Call(context->Value(), args);
 }
-
-#endif
