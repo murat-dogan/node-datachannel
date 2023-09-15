@@ -30,7 +30,6 @@
         "css-loader": "^6.8.1",
         "electron": "26.2.0",
         "node-loader": "^2.0.0",
-        "plugin-node-datachannel": "github:murat-dogan/plugin-node-datachannel",
         "style-loader": "^3.3.3"
     },
     "dependencies": {

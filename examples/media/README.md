@@ -1,11 +1,11 @@
-# Examples
-
-# media
+# media Example
 
 ## Example Webcam from Browser to Port 5000
+
 This is an example copy/paste demo to send your webcam from your browser and out port 5000 through the demo application.
 
 ## How to use
+
 Open main.html in your browser (you must open it either as HTTPS or as a domain of http://localhost).
 
 Start the application and copy it's offer into the text box of the web page.

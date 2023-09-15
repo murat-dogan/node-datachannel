@@ -38,7 +38,7 @@ npm install node-datachannel
 
 ## Electron
 
-`node-datachannel` supports Electron. For Electron native module should be rebuilt.
+`node-datachannel` supports Electron.
 
 Please check [electron demo](/examples/electron-demo)
 

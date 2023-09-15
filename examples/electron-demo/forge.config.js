@@ -27,10 +27,6 @@ module.exports = {
             config: {},
         },
         {
-            name: 'plugin-node-datachannel',
-            config: {},
-        },
-        {
             name: '@electron-forge/plugin-webpack',
             config: {
                 mainConfig: './webpack.main.config.js',
