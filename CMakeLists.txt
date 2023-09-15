@@ -24,11 +24,11 @@ endif()
 # /usr/lib/gcc-cross/aarch64-linux-gnu/9/../../../../aarch64-linux-gnu/bin/ld: ../sysroot/usr/lib/aarch64-linux-gnu/libcrypto.a(sha1-armv8.o): relocation R_AARCH64_PREL64 against symbol `OPENSSL_armcap_P' which may bind externally can not be used when making a shared object; recompile with -fPIC
 # ../sysroot/usr/lib/aarch64-linux-gnu/libcrypto.a(sha1-armv8.o): in function `sha1_block_armv8':
 # (.text+0x1240): dangerous relocation: unsupported relocation
-if(NOT ${NODE_ARCH} STREQUAL "arm64")
-    set(OPENSSL_USE_STATIC_LIBS TRUE)
-    find_package(OpenSSL REQUIRED)
-endif()
+# if(NOT ${NODE_ARCH} STREQUAL "arm64")
+set(OPENSSL_USE_STATIC_LIBS TRUE)
+find_package(OpenSSL REQUIRED)
 
+# endif()
 include(FetchContent)
 
 # Fetch libdatachannel
