@@ -1,5 +1,5 @@
-/build
-/prebuilds
+build
+prebuilds
 node_modules
 .vscode
-/tmp
+tmp
