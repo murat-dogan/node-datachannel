@@ -12,7 +12,7 @@ Project created with
 
 Electron does not support `cmake-js` which `node-datachannel` uses as builder.
 
-As a workaround I created a plugin package for `electron-forge`.
+As a workaround you can use a custom plugin for `electron-forge`.
 
 Package named as [plugin-node-datachannel](https://github.com/murat-dogan/plugin-node-datachannel)
 
