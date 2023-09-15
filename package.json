@@ -60,7 +60,6 @@
         }
     ],
     "license": "MPL 2.0",
-    "gypfile": true,
     "bugs": {
         "url": "https://github.com/murat-dogan/node-datachannel/issues"
     },
@@ -79,9 +78,6 @@
         "prettier": "^2.8.8",
         "typescript": "^4.6.3"
     },
-    "bundledDependencies": [
-        "prebuild-install"
-    ],
     "dependencies": {
         "node-domexception": "^2.0.1",
         "prebuild-install": "^7.0.1"
