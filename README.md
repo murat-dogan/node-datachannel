@@ -2,11 +2,11 @@
 
 ![Linux CI Build](https://github.com/murat-dogan/node-datachannel/workflows/Build%20-%20Linux/badge.svg) ![Windows CI Build](https://github.com/murat-dogan/node-datachannel/workflows/Build%20-%20Win/badge.svg) ![Mac x64 CI Build](https://github.com/murat-dogan/node-datachannel/workflows/Build%20-%20Mac%20x64/badge.svg) ![Mac M1 CI Build](https://github.com/murat-dogan/node-datachannel/workflows/Build%20-%20Mac%20M1/badge.svg)
 
-- Easy to use
-- Lightweight
-  - No need to deal with WebRTC stack!
-  - Small binary sizes
-- Type infos for Typescript
+-   Easy to use
+-   Lightweight
+    -   No need to deal with WebRTC stack!
+    -   Small binary sizes
+-   Type infos for Typescript
 
 This project is NodeJS bindings for [libdatachannel](https://github.com/paullouisageneau/libdatachannel) library.
 
@@ -20,22 +20,27 @@ npm install node-datachannel
 
 ## Supported Platforms
 
-|          | Linux-x64 | Linux-armv7 | Linux-arm64(1)   | Windows-x86 | Windows-x64 | Mac (M1 + x64) |
-|----------|:---------:|:-----------:|:----------------:|:-----------:|:-----------:|:--------------:|
-| Node V10 |     +     |      +      |      +           |      +      |      +      |       +        |
-| Node V11 |     +     |      +      |      +           |      +      |      +      |       +        |
-| Node V12 |     +     |      +      |      +           |      +      |      +      |       +        |
-| Node V13 |     +     |      +      |      +           |      +      |      +      |       +        |
-| Node V14 |     +     |      +      |      +           |      +      |      +      |       +        |
-| Node V15 |     +     |      +      |      +           |      +      |      +      |       +        |
-| Node V16 |     +     |      +      |      +           |      +      |      +      |       +        |
-| Node V17 |     +     |      +      |      +           |      +      |      +      |       +        |
-| Node V18 |     +     |      +      |      +           |      +      |      +      |       +        |
-| Node V19 |     +     |      +      |      +           |      +      |      +      |       +        |
-| Node V20 |     +     |      +      |      +           |      +      |      +      |       +        |
+|          | Linux-x64 | Linux-armv7 | Linux-arm64(1) | Windows-x86 | Windows-x64 | Mac (M1 + x64) |
+| -------- | :-------: | :---------: | :------------: | :---------: | :---------: | :------------: |
+| Node V10 |     +     |      +      |       +        |      +      |      +      |       +        |
+| Node V11 |     +     |      +      |       +        |      +      |      +      |       +        |
+| Node V12 |     +     |      +      |       +        |      +      |      +      |       +        |
+| Node V13 |     +     |      +      |       +        |      +      |      +      |       +        |
+| Node V14 |     +     |      +      |       +        |      +      |      +      |       +        |
+| Node V15 |     +     |      +      |       +        |      +      |      +      |       +        |
+| Node V16 |     +     |      +      |       +        |      +      |      +      |       +        |
+| Node V17 |     +     |      +      |       +        |      +      |      +      |       +        |
+| Node V18 |     +     |      +      |       +        |      +      |      +      |       +        |
+| Node V19 |     +     |      +      |       +        |      +      |      +      |       +        |
+| Node V20 |     +     |      +      |       +        |      +      |      +      |       +        |
 
-1) Please note that; For Linux-arm64 platform we need OpenSSL to be installed locally.
+1. Please note that; For Linux-arm64 platform we need OpenSSL to be installed locally.
 
+## Electron
+
+`node-datachannel` supports Electron.
+
+Please check [electron demo](/examples/electron-demo)
 
 ## Example Usage
 
@@ -43,47 +48,47 @@ npm install node-datachannel
 const nodeDataChannel = require('node-datachannel');
 
 // Log Level
-nodeDataChannel.initLogger("Debug");
+nodeDataChannel.initLogger('Debug');
 
 let dc1 = null;
 let dc2 = null;
 
-let peer1 = new nodeDataChannel.PeerConnection("Peer1", { iceServers: ["stun:stun.l.google.com:19302"] });
+let peer1 = new nodeDataChannel.PeerConnection('Peer1', { iceServers: ['stun:stun.l.google.com:19302'] });
 
 // Set Callbacks
 peer1.onLocalDescription((sdp, type) => {
-    console.log("Peer1 SDP:", sdp, " Type:", type);
+    console.log('Peer1 SDP:', sdp, ' Type:', type);
     peer2.setRemoteDescription(sdp, type);
 });
 peer1.onLocalCandidate((candidate, mid) => {
-    console.log("Peer1 Candidate:", candidate);
+    console.log('Peer1 Candidate:', candidate);
     peer2.addRemoteCandidate(candidate, mid);
 });
 
-let peer2 = new nodeDataChannel.PeerConnection("Peer2", { iceServers: ["stun:stun.l.google.com:19302"] });
+let peer2 = new nodeDataChannel.PeerConnection('Peer2', { iceServers: ['stun:stun.l.google.com:19302'] });
 
 // Set Callbacks
 peer2.onLocalDescription((sdp, type) => {
-    console.log("Peer2 SDP:", sdp, " Type:", type);
+    console.log('Peer2 SDP:', sdp, ' Type:', type);
     peer1.setRemoteDescription(sdp, type);
 });
 peer2.onLocalCandidate((candidate, mid) => {
-    console.log("Peer2 Candidate:", candidate);
+    console.log('Peer2 Candidate:', candidate);
     peer1.addRemoteCandidate(candidate, mid);
 });
 peer2.onDataChannel((dc) => {
-    console.log("Peer2 Got DataChannel: ", dc.getLabel());
+    console.log('Peer2 Got DataChannel: ', dc.getLabel());
     dc2 = dc;
     dc2.onMessage((msg) => {
         console.log('Peer2 Received Msg:', msg);
     });
-    dc2.sendMessage("Hello From Peer2");
+    dc2.sendMessage('Hello From Peer2');
 });
 
-dc1 = peer1.createDataChannel("test");
+dc1 = peer1.createDataChannel('test');
 
 dc1.onOpen(() => {
-    dc1.sendMessage("Hello from Peer1");
+    dc1.sendMessage('Hello from Peer1');
 });
 
 dc1.onMessage((msg) => {
@@ -100,11 +105,11 @@ setTimeout(() => {
 ```
 
 ## Test
+
 ```sh
 npm run test                  # Unit tests
 node test/connectivity.js     # Connectivity
 ```
-
 
 ## Build
 
@@ -121,4 +126,3 @@ Please check [docs](/API.md) page
 ## Thanks
 
 Thanks to [Streamr](https://streamr.network/) for supporting this project by being a Sponsor!
-
