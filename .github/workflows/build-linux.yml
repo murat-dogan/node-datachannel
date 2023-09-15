@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-20.04
     strategy:
       matrix:
-        node-version: [10.x, 11.x, 12.x, 13.x, 14.x, 15.x, 16.x, 17.x, 18.x, 19.x, 20.x]
+        node-version: [ 16.x]
 
     steps:
       - uses: actions/checkout@v2
@@ -31,7 +31,7 @@ jobs:
         env:
           CI: true
       - name: Upload
-        run: node_modules/.bin/prebuild --upload -u ${{ secrets.GITHUB_TOKEN }}
+        run: node_modules/.bin/prebuild -r napi --upload -u ${{ secrets.GITHUB_TOKEN }}
         env:
           CI: true
 
@@ -40,7 +40,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [10.x, 11.x, 12.x, 13.x, 14.x, 15.x, 16.x, 17.x, 18.x, 19.x, 20.x]
+        node-version: [16.x]
     steps:
       - uses: actions/checkout@v2
       - name: Prepare Cross Compile
@@ -59,7 +59,7 @@ jobs:
       - name: Build & Upload
         run: |
           npm install --ignore-scripts
-          node_modules/.bin/prebuild --backend cmake-js --arch arm --upload -u ${{ secrets.GITHUB_TOKEN }} -- --CDCMAKE_TOOLCHAIN_FILE:FILEPATH=./cmake/toolchain/armv7.cmake
+          node_modules/.bin/prebuild -r napi --backend cmake-js --arch arm --upload -u ${{ secrets.GITHUB_TOKEN }} -- --CDCMAKE_TOOLCHAIN_FILE:FILEPATH=./cmake/toolchain/armv7.cmake
         env:
           CI: true
 
@@ -68,7 +68,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [10.x, 11.x, 12.x, 13.x, 14.x, 15.x, 16.x, 17.x, 18.x, 19.x, 20.x]
+        node-version: [16.x]
     steps:
       - uses: actions/checkout@v2
       - name: Prepare Cross Compile
@@ -87,7 +87,7 @@ jobs:
       - name: Build & Upload
         run: |
           npm install --ignore-scripts
-          node_modules/.bin/prebuild --backend cmake-js --arch arm64 --upload -u ${{ secrets.GITHUB_TOKEN }} -- --CDCMAKE_TOOLCHAIN_FILE:FILEPATH=./cmake/toolchain/arm64.cmake
+          node_modules/.bin/prebuild -r napi --backend cmake-js --arch arm64 --upload -u ${{ secrets.GITHUB_TOKEN }} -- --CDCMAKE_TOOLCHAIN_FILE:FILEPATH=./cmake/toolchain/arm64.cmake
         env:
           CI: true
 
@@ -101,7 +101,7 @@ jobs:
   #     - name: Set up Node.js
   #       uses: actions/setup-node@v1
   #       with:
-  #         node-version: 12.x
+  #         node-version: 16.x
   #         registry-url: "https://registry.npmjs.org"
   #     - name: Publish
   #       run: |
