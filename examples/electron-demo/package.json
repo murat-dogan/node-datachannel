@@ -34,7 +34,7 @@
     },
     "dependencies": {
         "electron-squirrel-startup": "^1.0.0",
-        "node-datachannel": "0.5.0"
+        "node-datachannel": "0.5.0-dev"
     },
     "cmake-js": {
         "runtime": "electron",
