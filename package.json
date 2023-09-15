@@ -75,7 +75,7 @@
         "eslint-plugin-prettier": "^4.2.1",
         "jest": "^27.5.1",
         "node-addon-api": "^7.0.0",
-        "prebuild": "^11.0.4",
+        "prebuild": "^12.0.0",
         "prettier": "^2.8.8",
         "typescript": "^4.6.3"
     },
