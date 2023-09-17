@@ -3,8 +3,6 @@ import RTCIceCandidate from './RTCIceCandidate.js';
 export default class _RTCIceTransport extends EventTarget {
     #pc = null;
     #extraFunctions = null;
-    #role = null;
-    #state = null;
 
     ongatheringstatechange = null;
     onselectedcandidatepairchange = null;
