@@ -62,6 +62,7 @@ Napi::Object PeerConnectionWrapper::Init(Napi::Env env, Napi::Object exports)
             InstanceMethod("bytesReceived", &PeerConnectionWrapper::bytesReceived),
             InstanceMethod("rtt", &PeerConnectionWrapper::rtt),
             InstanceMethod("getSelectedCandidatePair", &PeerConnectionWrapper::getSelectedCandidatePair),
+            InstanceMethod("maxDataChannelId", &PeerConnectionWrapper::maxDataChannelId),
         });
 
     constructor = Napi::Persistent(func);
@@ -984,11 +985,17 @@ Napi::Value PeerConnectionWrapper::getSelectedCandidatePair(const Napi::Callback
         localObj.Set("port", local.port().value_or(0));
         localObj.Set("type", candidateTypeToString(local.type()));
         localObj.Set("transportType", candidateTransportTypeToString(local.transportType()));
+        localObj.Set("candidate", local.candidate());
+        localObj.Set("mid", local.mid());
+        localObj.Set("priority", local.priority());
 
         remoteObj.Set("address", remote.address().value_or("?"));
         remoteObj.Set("port", remote.port().value_or(0));
         remoteObj.Set("type", candidateTypeToString(remote.type()));
         remoteObj.Set("transportType", candidateTransportTypeToString(remote.transportType()));
+        remoteObj.Set("candidate", remote.candidate());
+        remoteObj.Set("mid", remote.mid());
+        remoteObj.Set("priority", remote.priority());
 
         retvalue.Set("local", localObj);
         retvalue.Set("remote", remoteObj);
@@ -999,6 +1006,27 @@ Napi::Value PeerConnectionWrapper::getSelectedCandidatePair(const Napi::Callback
     {
         Napi::Error::New(env, std::string("libdatachannel error: ") + ex.what()).ThrowAsJavaScriptException();
         return Napi::Number::New(info.Env(), -1);
+    }
+}
+
+Napi::Value PeerConnectionWrapper::maxDataChannelId(const Napi::CallbackInfo &info)
+{
+    PLOG_DEBUG << "maxDataChannelId() called";
+    Napi::Env env = info.Env();
+
+    if (!mRtcPeerConnPtr)
+    {
+        return Napi::Number::New(info.Env(), 0);
+    }
+
+    try
+    {
+        return Napi::Number::New(env, mRtcPeerConnPtr->maxDataChannelId());
+    }
+    catch (std::exception &ex)
+    {
+        Napi::Error::New(env, std::string("libdatachannel error: ") + ex.what()).ThrowAsJavaScriptException();
+        return Napi::Number::New(info.Env(), 0);
     }
 }
 

@@ -98,6 +98,9 @@ export interface SelectedCandidateInfo {
     port: number;
     type: string;
     transportType: string;
+    candidate: string;
+    mid: string;
+    priority: number;
 }
 
 // Must be same as rtc enum class Direction
@@ -232,6 +235,7 @@ export class PeerConnection {
     bytesReceived(): number;
     rtt(): number;
     getSelectedCandidatePair(): { local: SelectedCandidateInfo; remote: SelectedCandidateInfo } | null;
+    maxDataChannelId(): number;
 }
 
 export class DataChannelStream extends stream.Duplex {
