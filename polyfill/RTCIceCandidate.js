@@ -34,7 +34,7 @@ export default class _RTCIceCandidate {
         if (candidate) {
             const fields = candidate.split(' ');
             this.#foundation = fields[0];
-            this.#component = fields[1];
+            this.#component = fields[1] == '1' ? 'rtp' : 'rtcp';
             this.#protocol = fields[2];
             this.#priority = parseInt(fields[3], 10);
             this.#ip = fields[4];
