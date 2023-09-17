@@ -1,34 +1,54 @@
+import RTCDtlsTransport from './RTCDtlsTransport.js';
+
 export default class _RTCSctpTransport extends EventTarget {
-    #maxChannels = null;
-    #maxMessageSize = null;
-    #state = null;
+    #pc = null;
+    #extraFunctions = null;
     #transport = null;
 
-    onstatechange = createEmptyFunction();
+    onstatechange = null;
 
-    constructor(init = {}) {
+    constructor({ pc, extraFunctions }) {
         super();
+        this.#pc = pc;
+        this.#extraFunctions = extraFunctions;
+
+        this.#transport = new RTCDtlsTransport({ pc, extraFunctions });
+
+        // forward peerConnection events
+        this.#pc.addEventListener('connectionstatechange', () => {
+            this.dispatchEvent(new Event('statechange'));
+        });
+
+        // forward events to properties
+        this.addEventListener('statechange', (e) => {
+            if (this.onstatechange) this.onstatechange(e);
+        });
     }
 
     get maxChannels() {
-        return this.#maxChannels;
+        if (this.state !== 'connected') return null;
+        return this.#pc ? this.#extraFunctions.maxDataChannelId() : 0;
     }
 
     get maxMessageSize() {
-        return this.#maxMessageSize;
+        // Default from libdatachannel
+        // Change that after exposing pc.maxMessageSize
+        return 256 * 1024;
     }
 
     get state() {
-        return this.#state;
+        // reduce state from new, connecting, connected, disconnected, failed, closed, unknown
+        // to RTCSctpTransport states connecting, connected, closed
+        let state = this.#pc.connectionState;
+        if (state === 'new' || state === 'connecting') {
+            state = 'connecting';
+        } else if (state === 'disconnected' || state === 'failed' || state === 'closed' || state === 'unknown') {
+            state = 'closed';
+        }
+        return state;
     }
 
     get transport() {
         return this.#transport;
     }
-}
-
-function createEmptyFunction() {
-    return () => {
-        /** */
-    };
 }

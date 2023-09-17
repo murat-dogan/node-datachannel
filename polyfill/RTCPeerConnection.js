@@ -3,6 +3,7 @@ import RTCSessionDescription from './RTCSessionDescription.js';
 import RTCDataChannel from './RTCDataChannel.js';
 import RTCIceCandidate from './RTCIceCandidate.js';
 import { RTCDataChannelEvent, RTCPeerConnectionIceEvent } from './Events.js';
+import RTCSctpTransport from './RTCSctpTransport.js';
 import DOMException from 'node-domexception';
 
 export default class _RTCPeerConnection extends EventTarget {
@@ -13,6 +14,9 @@ export default class _RTCPeerConnection extends EventTarget {
     #config;
     #canTrickleIceCandidates;
     #sctp;
+
+    #localCandidates = [];
+    #remoteCandidates = [];
 
     onconnectionstatechange;
     ondatachannel;
@@ -32,7 +36,6 @@ export default class _RTCPeerConnection extends EventTarget {
         this.#localAnswer = createDeferredPromise();
         this.#dataChannels = new Set();
         this.#canTrickleIceCandidates = null;
-        this.#sctp = null;
 
         const iceServers = init ? init.iceServers : [];
 
@@ -95,6 +98,7 @@ export default class _RTCPeerConnection extends EventTarget {
                 return;
             }
 
+            this.#localCandidates.push(new RTCIceCandidate({ candidate, sdpMid }));
             this.dispatchEvent(new RTCPeerConnectionIceEvent(new RTCIceCandidate({ candidate, sdpMid })));
         });
 
@@ -116,6 +120,24 @@ export default class _RTCPeerConnection extends EventTarget {
         });
         this.addEventListener('icecandidate', (e) => {
             if (this.onicecandidate) this.onicecandidate(e);
+        });
+
+        this.#sctp = new RTCSctpTransport({
+            pc: this,
+            extraFunctions: {
+                maxDataChannelId: () => {
+                    return this.#peerConnection.maxDataChannelId();
+                },
+                localCandidates: () => {
+                    return this.#localCandidates;
+                },
+                remoteCandidates: () => {
+                    return this.#remoteCandidates;
+                },
+                selectedCandidatePair: () => {
+                    return this.#peerConnection.getSelectedCandidatePair();
+                },
+            },
         });
     }
 
@@ -176,6 +198,9 @@ export default class _RTCPeerConnection extends EventTarget {
             throw new DOMException('Candidate invalid');
         }
 
+        this.#remoteCandidates.push(
+            new RTCIceCandidate({ candidate: candidate.candidate, sdpMid: candidate.sdpMid || '0' }),
+        );
         this.#peerConnection.addRemoteCandidate(candidate.candidate, candidate.sdpMid || '0');
     }
 
