@@ -3,7 +3,6 @@ import RTCIceCandidate from './RTCIceCandidate.js';
 export default class _RTCIceTransport extends EventTarget {
     #pc = null;
     #extraFunctions = null;
-    #component = null;
     #role = null;
     #state = null;
 
@@ -35,8 +34,9 @@ export default class _RTCIceTransport extends EventTarget {
     }
 
     get component() {
-        // TODO: expose component from pc
-        return this.#component;
+        let cp = this.getSelectedCandidatePair();
+        if (!cp) return null;
+        return cp.local.component;
     }
 
     get gatheringState() {
@@ -44,8 +44,7 @@ export default class _RTCIceTransport extends EventTarget {
     }
 
     get role() {
-        // return controlled or controlling
-        return this.#role;
+        return this.#pc.localDescription.type == 'offer' ? 'controlling' : 'controlled';
     }
 
     get state() {
