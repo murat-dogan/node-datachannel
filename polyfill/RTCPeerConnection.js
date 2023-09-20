@@ -37,13 +37,12 @@ export default class _RTCPeerConnection extends EventTarget {
         this.#dataChannels = new Set();
         this.#canTrickleIceCandidates = null;
 
-        const iceServers = init ? init.iceServers : [];
-
         this.#peerConnection = new NodeDataChannel.PeerConnection(
-            init && init.peerIdentity ? init.peerIdentity : `peer-${getRandomString(7)}`,
+            init?.peerIdentity ?? `peer-${getRandomString(7)}`,
             {
-                iceServers: iceServers
-                    .map((server) => {
+                ...init,
+                iceServers: init?.iceServers
+                    ?.map((server) => {
                         const urls = Array.isArray(server.urls) ? server.urls : [server.urls];
 
                         return urls.map((url) => {
@@ -55,7 +54,6 @@ export default class _RTCPeerConnection extends EventTarget {
                         });
                     })
                     .flat(),
-                iceTransportPolicy: init ? init.iceTransportPolicy : undefined,
             },
         );
 
