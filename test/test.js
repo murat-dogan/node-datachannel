@@ -1,5 +1,5 @@
 import { jest } from '@jest/globals';
-import nodeDataChannel, { DataChannelStream } from '../lib/index.js';
+import * as nodeDataChannel from '../lib';
 
 describe('Module Definition', () => {
     test('Module Defined', () => {
@@ -154,7 +154,7 @@ describe('DataChannel streams', () => {
         let clientPeer = new nodeDataChannel.PeerConnection('Client', { iceServers: [] });
         let echoPeer = new nodeDataChannel.PeerConnection('Client', { iceServers: [] });
 
-        const echoStream = new DataChannelStream(echoPeer.createDataChannel('echo-channel'));
+        const echoStream = new nodeDataChannel.DataChannelStream(echoPeer.createDataChannel('echo-channel'));
         echoStream.pipe(echoStream); // Echo all received data back to the client
 
         await waitForGathering(echoPeer);
