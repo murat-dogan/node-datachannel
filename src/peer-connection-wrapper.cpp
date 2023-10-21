@@ -63,6 +63,7 @@ Napi::Object PeerConnectionWrapper::Init(Napi::Env env, Napi::Object exports)
             InstanceMethod("rtt", &PeerConnectionWrapper::rtt),
             InstanceMethod("getSelectedCandidatePair", &PeerConnectionWrapper::getSelectedCandidatePair),
             InstanceMethod("maxDataChannelId", &PeerConnectionWrapper::maxDataChannelId),
+            InstanceMethod("maxMessageSize", &PeerConnectionWrapper::maxMessageSize),
         });
 
     constructor = Napi::Persistent(func);
@@ -1022,6 +1023,27 @@ Napi::Value PeerConnectionWrapper::maxDataChannelId(const Napi::CallbackInfo &in
     try
     {
         return Napi::Number::New(env, mRtcPeerConnPtr->maxDataChannelId());
+    }
+    catch (std::exception &ex)
+    {
+        Napi::Error::New(env, std::string("libdatachannel error: ") + ex.what()).ThrowAsJavaScriptException();
+        return Napi::Number::New(info.Env(), 0);
+    }
+}
+
+Napi::Value PeerConnectionWrapper::maxMessageSize(const Napi::CallbackInfo &info)
+{
+    PLOG_DEBUG << "maxMessageSize() called";
+    Napi::Env env = info.Env();
+
+    if (!mRtcPeerConnPtr)
+    {
+        return Napi::Number::New(info.Env(), 0);
+    }
+
+    try
+    {
+        return Napi::Number::New(env, mRtcPeerConnPtr->remoteMaxMessageSize());
     }
     catch (std::exception &ex)
     {

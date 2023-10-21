@@ -46,8 +46,6 @@ peer2.onicecandidate = (e) => {
     peer1.addIceCandidate(e.candidate);
 };
 peer2.ondatachannel = (dce) => {
-    console.log(11111, JSON.stringify(peer1.localDescription));
-    console.log(22222, JSON.stringify(peer2.localDescription));
     console.log('Peer2 Got DataChannel: ', dce.channel.label);
     dc2 = dce.channel;
     dc2.onmessage = (msg) => {
@@ -56,23 +54,6 @@ peer2.ondatachannel = (dce) => {
     dc2.send('Hello From Peer2');
     dc2.onclose = () => {
         console.log('dc2 closed');
-    };
-
-    //
-    let sctp = peer2.sctp;
-    console.log('sctp:', sctp.maxChannels, sctp.maxMessageSize, sctp.state);
-    sctp.onstatechange = () => {
-        console.log('sctp state:', sctp.state);
-    };
-
-    let ice = sctp.transport.iceTransport;
-    console.log('local', JSON.stringify(ice.getLocalCandidates()));
-    console.log('remote', JSON.stringify(ice.getRemoteCandidates()));
-    console.log('selected', JSON.stringify(ice.getSelectedCandidatePair()));
-    console.log('*******************', ice.role);
-
-    ice.onstatechange = () => {
-        console.log('ice state:', ice.state);
     };
 };
 

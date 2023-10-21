@@ -31,9 +31,8 @@ export default class _RTCSctpTransport extends EventTarget {
     }
 
     get maxMessageSize() {
-        // Default from libdatachannel
-        // Change that after exposing pc.maxMessageSize
-        return 256 * 1024;
+        if (this.state !== 'connected') return null;
+        return this.#pc ? this.#extraFunctions.maxMessageSize() : 0;
     }
 
     get state() {

@@ -52,6 +52,7 @@ public:
   Napi::Value rtt(const Napi::CallbackInfo &info);
   Napi::Value getSelectedCandidatePair(const Napi::CallbackInfo &info);
   Napi::Value maxDataChannelId(const Napi::CallbackInfo &info);
+  Napi::Value maxMessageSize(const Napi::CallbackInfo &info);
 
   // Close all existing Peer Connections
   static void CloseAll();

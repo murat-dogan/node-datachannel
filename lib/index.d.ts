@@ -236,6 +236,7 @@ export class PeerConnection {
     rtt(): number;
     getSelectedCandidatePair(): { local: SelectedCandidateInfo; remote: SelectedCandidateInfo } | null;
     maxDataChannelId(): number;
+    maxMessageSize(): number;
 }
 
 export class DataChannelStream extends stream.Duplex {
