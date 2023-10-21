@@ -28,7 +28,7 @@
         "@electron/rebuild": "^3.3.0",
         "@vercel/webpack-asset-relocator-loader": "^1.7.3",
         "css-loader": "^6.8.1",
-        "electron": "26.2.1",
+        "electron": "26.2.4",
         "node-loader": "^2.0.0",
         "style-loader": "^3.3.3"
     },
