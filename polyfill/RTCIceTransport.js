@@ -18,7 +18,6 @@ export default class _RTCIceTransport extends EventTarget {
             this.dispatchEvent(new Event('gatheringstatechange'));
         });
         this.#pc.addEventListener('iceconnectionstatechange', () => {
-            console.log('*********');
             this.dispatchEvent(new Event('statechange'));
         });
 
