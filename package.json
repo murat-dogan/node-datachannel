@@ -4,12 +4,8 @@
     "description": "libdatachannel node bindings",
     "type": "module",
     "exports": {
-        ".": {
-            "import": "./lib/index.js"
-        },
-        "./polyfill": {
-            "import": "./polyfill/index.js"
-        }
+        ".": "./lib/index.js",
+        "./polyfill": "./polyfill/index.js"
     },
     "typings": "lib/index.d.ts",
     "engines": {
