@@ -1,5 +1,5 @@
 import polyfill from '../polyfill/index.js';
-import * as nodeDataChannel from '../lib/index.js';
+import nodeDataChannel from '../lib/index.js';
 
 nodeDataChannel.initLogger('Info');
 

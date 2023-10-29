@@ -1,4 +1,4 @@
-import * as nodeDataChannel from '../lib/index.js';
+import nodeDataChannel from '../lib/index.js';
 
 nodeDataChannel.initLogger('Debug');
 nodeDataChannel.preload();
