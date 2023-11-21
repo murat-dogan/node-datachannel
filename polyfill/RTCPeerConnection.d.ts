@@ -36,7 +36,6 @@ export default class _RTCPeerConnection extends EventTarget implements RTCPeerCo
     close(): void;
     createAnswer(options?: RTCAnswerOptions): Promise<RTCSessionDescriptionInit>;
     createAnswer(successCallback: RTCSessionDescriptionCallback, failureCallback: RTCPeerConnectionErrorCallback): Promise<void>;
-
     createDataChannel(label: string, dataChannelDict?: RTCDataChannelInit): RTCDataChannel;
     createOffer(options?: RTCOfferOptions): Promise<RTCSessionDescriptionInit>;
     createOffer(successCallback: RTCSessionDescriptionCallback, failureCallback: RTCPeerConnectionErrorCallback, options?: RTCOfferOptions): Promise<void>;
