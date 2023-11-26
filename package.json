@@ -26,7 +26,8 @@
         "clean": "cmake-js clean",
         "lint": "eslint lib/**/* test/**/*",
         "test": "NODE_OPTIONS=--experimental-vm-modules jest",
-        "wpt-test": "node test/wpt.js"
+        "wpt-test": "node test/wpt.js",
+        "test-types": "tsc"
     },
     "binary": {
         "napi_versions": [
@@ -72,7 +73,7 @@
         "node-addon-api": "^7.0.0",
         "prebuild": "^12.0.0",
         "prettier": "^2.8.8",
-        "typescript": "^4.6.3"
+        "typescript": "^5.3.2"
     },
     "dependencies": {
         "node-domexception": "^2.0.1",
