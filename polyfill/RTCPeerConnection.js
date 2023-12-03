@@ -51,7 +51,7 @@ export default class _RTCPeerConnection extends EventTarget {
                         return url;
                     });
                 })
-                .flat(),
+                .flat() ?? [],
         });
 
         // forward peerConnection events
