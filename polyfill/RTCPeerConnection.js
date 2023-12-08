@@ -7,6 +7,10 @@ import RTCSctpTransport from './RTCSctpTransport.js';
 import DOMException from 'node-domexception';
 
 export default class _RTCPeerConnection extends EventTarget {
+    static async generateCertificate() {
+        throw new Error('Not implemented');
+    }
+
     #peerConnection;
     #localOffer;
     #localAnswer;
