@@ -20,3 +20,16 @@ export {
     RTCDataChannelEvent,
     RTCPeerConnectionIceEvent,
 };
+
+export default {
+    RTCCertificate,
+    RTCDataChannel,
+    RTCDtlsTransport,
+    RTCIceCandidate,
+    RTCIceTransport,
+    RTCPeerConnection,
+    RTCSctpTransport,
+    RTCSessionDescription,
+    RTCDataChannelEvent,
+    RTCPeerConnectionIceEvent,
+};

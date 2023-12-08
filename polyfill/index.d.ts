@@ -20,3 +20,18 @@ export {
     RTCDataChannelEvent,
     RTCPeerConnectionIceEvent,
 };
+
+declare const _default: {
+    RTCCertificate: typeof RTCCertificate;
+    RTCDataChannel: typeof RTCDataChannel;
+    RTCDtlsTransport: typeof RTCDtlsTransport;
+    RTCIceCandidate: typeof RTCIceCandidate;
+    RTCIceTransport: typeof RTCIceTransport;
+    RTCPeerConnection: typeof RTCPeerConnection;
+    RTCSctpTransport: typeof RTCSctpTransport;
+    RTCSessionDescription: typeof RTCSessionDescription;
+    RTCDataChannelEvent: typeof RTCDataChannelEvent;
+    RTCPeerConnectionIceEvent: typeof RTCPeerConnectionIceEvent;
+};
+
+export default _default;
