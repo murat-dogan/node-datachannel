@@ -1,15 +1,14 @@
-export { default as RTCCertificate } from './RTCCertificate.js';
-export { default as RTCDataChannel } from './RTCDataChannel.js';
-export { default as RTCDtlsTransport } from './RTCDtlsTransport.js';
-export { default as RTCIceCandidate } from './RTCIceCandidate.js';
-export { default as RTCIceTransport } from './RTCIceTransport.js';
-export { default as RTCPeerConnection } from './RTCPeerConnection.js';
-export { default as RTCSctpTransport } from './RTCSctpTransport.js';
-export { default as RTCSessionDescription } from './RTCSessionDescription.js';
+import RTCCertificate from './RTCCertificate.js';
+import RTCDataChannel from './RTCDataChannel.js';
+import RTCDtlsTransport from './RTCDtlsTransport.js';
+import RTCIceCandidate from './RTCIceCandidate.js';
+import RTCIceTransport from './RTCIceTransport.js';
+import RTCPeerConnection from './RTCPeerConnection.js';
+import RTCSctpTransport from './RTCSctpTransport.js';
+import RTCSessionDescription from './RTCSessionDescription.js';
+import { RTCDataChannelEvent, RTCPeerConnectionIceEvent } from './Events.js';
 
-export { RTCDataChannelEvent, RTCPeerConnectionIceEvent } from './Events.js';
-
-export default {
+export {
     RTCCertificate,
     RTCDataChannel,
     RTCDtlsTransport,

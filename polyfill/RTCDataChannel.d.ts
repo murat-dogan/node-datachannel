@@ -1,6 +1,6 @@
 /// <reference lib="dom" />
 
-import NodeDataChannel from '../lib';
+import * as NodeDataChannel from '../lib/index.js';
 
 export default class _RTCDataChannel extends EventTarget implements RTCDataChannel {
     constructor(dataChannel: NodeDataChannel.DataChannel, opts: RTCDataChannelInit);
