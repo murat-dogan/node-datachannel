@@ -294,6 +294,7 @@ void PeerConnectionWrapper::doResetCallbacks()
     mOnLocalDescriptionCallback.reset();
     mOnLocalCandidateCallback.reset();
     mOnStateChangeCallback.reset();
+    mOnIceStateChangeCallback.reset();
     mOnSignalingStateChangeCallback.reset();
     mOnGatheringStateChangeCallback.reset();
     mOnDataChannelCallback.reset();
