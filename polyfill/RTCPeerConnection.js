@@ -126,10 +126,10 @@ export default class _RTCPeerConnection extends EventTarget {
             pc: this,
             extraFunctions: {
                 maxDataChannelId: () => {
-                    return this.#peerConnection.maxDataChannelId();
+                    return this.#peerConnection?.maxDataChannelId() ?? 65535;
                 },
                 maxMessageSize: () => {
-                    return this.#peerConnection.maxMessageSize();
+                    return this.#peerConnection?.maxMessageSize() ?? 65535;
                 },
                 localCandidates: () => {
                     return this.#localCandidates;
@@ -138,7 +138,7 @@ export default class _RTCPeerConnection extends EventTarget {
                     return this.#remoteCandidates;
                 },
                 selectedCandidatePair: () => {
-                    return this.#peerConnection.getSelectedCandidatePair();
+                    return this.#peerConnection?.getSelectedCandidatePair() ?? {};
                 },
             },
         });
@@ -149,39 +149,39 @@ export default class _RTCPeerConnection extends EventTarget {
     }
 
     get connectionState() {
-        return this.#peerConnection.state();
+        return this.#peerConnection?.state() ?? 'closed';
     }
 
     get iceConnectionState() {
-        return this.#peerConnection.iceState();
+        return this.#peerConnection?.iceState() ?? 'closed';
     }
 
     get iceGatheringState() {
-        return this.#peerConnection.gatheringState();
+        return this.#peerConnection?.gatheringState() ?? 'new';
     }
 
     get currentLocalDescription() {
-        return new RTCSessionDescription(this.#peerConnection.localDescription());
+        return new RTCSessionDescription(this.#peerConnection?.localDescription() ?? {});
     }
 
     get currentRemoteDescription() {
-        return new RTCSessionDescription(this.#peerConnection.remoteDescription());
+        return new RTCSessionDescription(this.#peerConnection?.remoteDescription() ?? {});
     }
 
     get localDescription() {
-        return new RTCSessionDescription(this.#peerConnection.localDescription());
+        return new RTCSessionDescription(this.#peerConnection?.localDescription() ?? {});
     }
 
     get pendingLocalDescription() {
-        return new RTCSessionDescription(this.#peerConnection.localDescription());
+        return new RTCSessionDescription(this.#peerConnection?.localDescription() ?? {});
     }
 
     get pendingRemoteDescription() {
-        return new RTCSessionDescription(this.#peerConnection.remoteDescription());
+        return new RTCSessionDescription(this.#peerConnection?.remoteDescription() ?? {});
     }
 
     get remoteDescription() {
-        return new RTCSessionDescription(this.#peerConnection.remoteDescription());
+        return new RTCSessionDescription(this.#peerConnection?.remoteDescription() ?? {});
     }
 
     get sctp() {
@@ -189,7 +189,7 @@ export default class _RTCPeerConnection extends EventTarget {
     }
 
     get signalingState() {
-        return this.#peerConnection.signalingState();
+        return this.#peerConnection?.signalingState() ?? 'closed';
     }
 
     static generateCertificate(keygenAlgorithm) {
@@ -199,6 +199,10 @@ export default class _RTCPeerConnection extends EventTarget {
     async addIceCandidate(candidate) {
         if (candidate == null || candidate.candidate == null) {
             throw new DOMException('Candidate invalid');
+        }
+
+        if (!this.#peerConnection) {
+            throw new DOMException('Peer connection is closed');
         }
 
         this.#remoteCandidates.push(
@@ -219,9 +223,11 @@ export default class _RTCPeerConnection extends EventTarget {
         // close all channels before shutting down
         this.#dataChannels.forEach((channel) => {
             channel.close();
+            channel = null;
         });
 
-        this.#peerConnection.close();
+        this.#peerConnection?.close();
+        this.#peerConnection = null;
     }
 
     createAnswer() {
@@ -229,7 +235,11 @@ export default class _RTCPeerConnection extends EventTarget {
     }
 
     createDataChannel(label, opts = {}) {
-        const channel = this.#peerConnection.createDataChannel(label, opts);
+        if (!this.#peerConnection) {
+            throw new DOMException('Peer connection is closed');
+        }
+
+        const channel = this.#peerConnection?.createDataChannel(label, opts);
         const dataChannel = new RTCDataChannel(channel, opts);
 
         // ensure we can close all channels when shutting down
@@ -260,6 +270,10 @@ export default class _RTCPeerConnection extends EventTarget {
     getStats() {
         return new Promise((resolve) => {
             let report = new Map();
+            if (!this.#peerConnection) {
+                return resolve(report);
+            }
+
             let cp = this.#peerConnection.getSelectedCandidatePair();
             let bytesSent = this.#peerConnection.bytesSent();
             let bytesReceived = this.#peerConnection.bytesReceived();
@@ -344,7 +358,7 @@ export default class _RTCPeerConnection extends EventTarget {
             // any other type causes libdatachannel to throw
             return;
         }
-        this.#peerConnection.setLocalDescription(description.type);
+        this.#peerConnection?.setLocalDescription(description.type);
     }
 
     async setRemoteDescription(description) {
@@ -352,7 +366,7 @@ export default class _RTCPeerConnection extends EventTarget {
             throw new DOMException('Remote SDP must be set');
         }
 
-        this.#peerConnection.setRemoteDescription(description.sdp, description.type);
+        this.#peerConnection?.setRemoteDescription(description.sdp, description.type);
     }
 }
 

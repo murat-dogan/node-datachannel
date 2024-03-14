@@ -101,7 +101,7 @@ export default class _RTCDataChannel extends EventTarget {
     }
 
     get bufferedAmount() {
-        return this.#dataChannel.bufferedAmount();
+        return this.#dataChannel?.bufferedAmount() || 0;
     }
 
     get bufferedAmountLowThreshold() {
@@ -111,15 +111,15 @@ export default class _RTCDataChannel extends EventTarget {
     set bufferedAmountLowThreshold(value) {
         const number = Number(value) || 0;
         this.#bufferedAmountLowThreshold = number;
-        this.#dataChannel.setBufferedAmountLowThreshold(number);
+        this.#dataChannel?.setBufferedAmountLowThreshold(number);
     }
 
     get id() {
-        return this.#dataChannel.getId();
+        return this.#dataChannel?.getId() || null;
     }
 
     get label() {
-        return this.#dataChannel.getLabel();
+        return this.#dataChannel?.getLabel() || null;
     }
 
     get maxPacketLifeTime() {
@@ -139,7 +139,7 @@ export default class _RTCDataChannel extends EventTarget {
     }
 
     get protocol() {
-        return this.#dataChannel.getProtocol();
+        return this.#dataChannel?.getProtocol() || '';
     }
 
     get readyState() {
@@ -171,5 +171,6 @@ export default class _RTCDataChannel extends EventTarget {
         this.dispatchEvent(new Event('closing'));
 
         this.#dataChannel.close();
+        this.#dataChannel = null;
     }
 }
