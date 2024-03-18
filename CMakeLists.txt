@@ -20,14 +20,8 @@ if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Android")
     set(CMAKE_C_FLAGS "-Wno-error=unused-but-set-variable -Wno-error=strict-prototypes")
 endif()
 
-# Got linker error for arm64
-# /usr/lib/gcc-cross/aarch64-linux-gnu/9/../../../../aarch64-linux-gnu/bin/ld: ../sysroot/usr/lib/aarch64-linux-gnu/libcrypto.a(sha1-armv8.o): relocation R_AARCH64_PREL64 against symbol `OPENSSL_armcap_P' which may bind externally can not be used when making a shared object; recompile with -fPIC
-# ../sysroot/usr/lib/aarch64-linux-gnu/libcrypto.a(sha1-armv8.o): in function `sha1_block_armv8':
-# (.text+0x1240): dangerous relocation: unsupported relocation
-if(NOT ${NODE_ARCH} STREQUAL "arm64")
-    set(OPENSSL_USE_STATIC_LIBS TRUE)
-    find_package(OpenSSL REQUIRED)
-endif()
+set(OPENSSL_USE_STATIC_LIBS TRUE)
+find_package(OpenSSL REQUIRED)
 
 include(FetchContent)
 
