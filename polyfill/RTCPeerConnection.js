@@ -222,6 +222,7 @@ export default class _RTCPeerConnection extends EventTarget {
         });
 
         this.#peerConnection.close();
+        this.#peerConnection.destroy();
     }
 
     createAnswer() {
