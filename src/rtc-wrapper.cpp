@@ -2,6 +2,8 @@
 #include "peer-connection-wrapper.h"
 #include "data-channel-wrapper.h"
 #include "media-track-wrapper.h"
+#include "web-socket-wrapper.h"
+#include "web-socket-server-wrapper.h"
 
 #include "plog/Log.h"
 
@@ -116,6 +118,8 @@ void RtcWrapper::cleanup(const Napi::CallbackInfo &info)
         PeerConnectionWrapper::CloseAll();
         DataChannelWrapper::CloseAll();
         TrackWrapper::CloseAll();
+        WebSocketWrapper::CloseAll();
+        WebSocketServerWrapper::StopAll();
 
         const auto timeout = std::chrono::seconds(10);
         if (rtc::Cleanup().wait_for(std::chrono::seconds(timeout)) == std::future_status::timeout)

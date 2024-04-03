@@ -33,7 +33,7 @@ FetchContent_Declare(
 )
 
 option(NO_MEDIA "Disable media transport support in libdatachannel" OFF)
-option(NO_WEBSOCKET "Disable WebSocket support in libdatachannel" ON)
+option(NO_WEBSOCKET "Disable WebSocket support in libdatachannel" OFF)
 
 FetchContent_GetProperties(libdatachannel)
 
@@ -52,6 +52,8 @@ add_library(${PROJECT_NAME} SHARED
     src/data-channel-wrapper.cpp
     src/peer-connection-wrapper.cpp
     src/thread-safe-callback.cpp
+    src/web-socket-wrapper.cpp
+    src/web-socket-server-wrapper.cpp
     src/main.cpp
     ${CMAKE_JS_SRC}
 )

@@ -44,7 +44,8 @@
         "p2p",
         "peer-to-peer",
         "datachannel",
-        "data channel"
+        "data channel",
+        "websocket"
     ],
     "contributors": [
         {

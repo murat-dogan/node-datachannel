@@ -189,11 +189,8 @@ export class Track {
     onMessage(cb: (msg: Buffer) => void): void;
 }
 
-export class DataChannel {
+export interface Channel {
     close(): void;
-    getLabel(): string;
-    getId(): number;
-    getProtocol(): string;
     sendMessage(msg: string): boolean;
     sendMessageBinary(buffer: Uint8Array): boolean;
     isOpen(): boolean;
@@ -205,6 +202,74 @@ export class DataChannel {
     onError(cb: (err: string) => void): void;
     onBufferedAmountLow(cb: () => void): void;
     onMessage(cb: (msg: string | Buffer) => void): void;
+}
+export class DataChannel implements Channel {
+    getLabel(): string;
+    getId(): number;
+    getProtocol(): string;
+
+    // Channel implementation
+    close(): void;
+    sendMessage(msg: string): boolean;
+    sendMessageBinary(buffer: Uint8Array): boolean;
+    isOpen(): boolean;
+    bufferedAmount(): number;
+    maxMessageSize(): number;
+    setBufferedAmountLowThreshold(newSize: number): void;
+    onOpen(cb: () => void): void;
+    onClosed(cb: () => void): void;
+    onError(cb: (err: string) => void): void;
+    onBufferedAmountLow(cb: () => void): void;
+    onMessage(cb: (msg: string | Buffer) => void): void;
+}
+
+export interface WebSocketConfiguration {
+    disableTlsVerification?: boolean; // default = false, if true, don't verify the TLS certificate
+    proxyServer?: ProxyServer; // only non-authenticated http supported for now
+    protocols?: string[];
+    connectionTimeout?: number; // miliseconds, zero to disable
+    pingInterval?: number; // millisecondrs, zero to disable
+    maxOutstandingPings?: number;
+    caCertificatePemFile?: string;
+    certificatePemFile?: string;
+    keyPemFile?: string;
+    keyPemPass?: string;
+    maxMessageSize: number;
+}
+export class WebSocket implements Channel {
+    constructor(config?: WebSocketConfiguration);
+
+    // Channel implementation
+    close(): void;
+    sendMessage(msg: string): boolean;
+    sendMessageBinary(buffer: Uint8Array): boolean;
+    isOpen(): boolean;
+    bufferedAmount(): number;
+    maxMessageSize(): number;
+    setBufferedAmountLowThreshold(newSize: number): void;
+    onOpen(cb: () => void): void;
+    onClosed(cb: () => void): void;
+    onError(cb: (err: string) => void): void;
+    onBufferedAmountLow(cb: () => void): void;
+    onMessage(cb: (msg: string | Buffer) => void): void;
+}
+
+export interface WebSocketServerConfiguration {
+    port?: number; // default 8080
+    enableTls?: boolean; // default = false;
+    certificatePemFile?: string;
+    keyPemFile?: string;
+    keyPemPass?: string;
+    bindAddress?: string;
+    connectionTimeout?: number; // milliseconds
+    maxMessageSize?: number;
+}
+
+export class WebSocketServer {
+    constructor(config?: WebSocketServerConfiguration);
+    port(): number;
+    stop(): void;
+    onClient(cb: (ws: WebSocket) => void): void;
 }
 
 export class PeerConnection {

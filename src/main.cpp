@@ -6,6 +6,8 @@
 #include "media-track-wrapper.h"
 #include "media-video-wrapper.h"
 #include "media-audio-wrapper.h"
+#include "web-socket-wrapper.h"
+#include "web-socket-server-wrapper.h"
 
 Napi::Object InitAll(Napi::Env env, Napi::Object exports)
 {
@@ -16,6 +18,8 @@ Napi::Object InitAll(Napi::Env env, Napi::Object exports)
     AudioWrapper::Init(env, exports);
     DataChannelWrapper::Init(env, exports);
     PeerConnectionWrapper::Init(env, exports);
+    WebSocketWrapper::Init(env, exports);
+    WebSocketServerWrapper::Init(env, exports);
     return exports;
 }
 
