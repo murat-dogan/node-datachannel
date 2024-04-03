@@ -47,7 +47,7 @@ WebSocketWrapper::WebSocketWrapper(const Napi::CallbackInfo &info) : Napi::Objec
 {
     PLOG_DEBUG << "Constructor called";
     Napi::Env env = info.Env();
-   
+
     // Create WebSocket using rtc::WebSocket provided by WebSocketServer
     if (info.Length() > 1)
     {
@@ -80,10 +80,9 @@ WebSocketWrapper::WebSocketWrapper(const Napi::CallbackInfo &info) : Napi::Objec
     Napi::Object config = info[0].As<Napi::Object>();
     rtc::WebSocketConfiguration webSocketConfig;
 
-   
     if (config.Has("disableTlsVerification"))
     {
-        if (!config.Get("disableTlsVerification").IsBoolean()) 
+        if (!config.Get("disableTlsVerification").IsBoolean())
         {
             Napi::TypeError::New(info.Env(), "disableTlsVerification must be boolean").ThrowAsJavaScriptException();
             return;
@@ -92,7 +91,7 @@ WebSocketWrapper::WebSocketWrapper(const Napi::CallbackInfo &info) : Napi::Objec
     }
 
     // Proxy Server
-    if (config.Has("proxyServer")  && config.Get("proxyServer").IsObject())
+    if (config.Has("proxyServer") && config.Get("proxyServer").IsObject())
     {
         Napi::Object proxyServer = config.Get("proxyServer").As<Napi::Object>();
 
@@ -116,14 +115,14 @@ WebSocketWrapper::WebSocketWrapper(const Napi::CallbackInfo &info) : Napi::Objec
         if (proxyServer.Get("username").IsString())
             username = proxyServer.Get("username").As<Napi::String>().ToString();
         if (proxyServer.Get("password").IsString())
-            username = proxyServer.Get("password").As<Napi::String>().ToString();
+            password = proxyServer.Get("password").As<Napi::String>().ToString();
 
         webSocketConfig.proxyServer = rtc::ProxyServer(type, ip, port, username, password);
     }
 
     if (config.Has("protocols"))
     {
-        if (!config.Get("protocols").IsArray()) 
+        if (!config.Get("protocols").IsArray())
         {
             Napi::TypeError::New(info.Env(), "protocols must be an array").ThrowAsJavaScriptException();
             return;
@@ -134,10 +133,10 @@ WebSocketWrapper::WebSocketWrapper(const Napi::CallbackInfo &info) : Napi::Objec
             webSocketConfig.protocols.push_back(protocols.Get(i).ToString());
         }
     }
-    
+
     if (config.Has("connectionTimeout"))
     {
-        if (!config.Get("connectionTimeout").IsNumber()) 
+        if (!config.Get("connectionTimeout").IsNumber())
         {
             Napi::TypeError::New(info.Env(), "connectionTimeout must be a number").ThrowAsJavaScriptException();
             return;
@@ -147,7 +146,7 @@ WebSocketWrapper::WebSocketWrapper(const Napi::CallbackInfo &info) : Napi::Objec
 
     if (config.Has("pingInterval"))
     {
-        if (!config.Get("pingInterval").IsNumber()) 
+        if (!config.Get("pingInterval").IsNumber())
         {
             Napi::TypeError::New(info.Env(), "pingInterval must be a number").ThrowAsJavaScriptException();
             return;
@@ -157,7 +156,7 @@ WebSocketWrapper::WebSocketWrapper(const Napi::CallbackInfo &info) : Napi::Objec
 
     if (config.Has("maxOutstandingPings"))
     {
-        if (!config.Get("maxOutstandingPings").IsNumber()) 
+        if (!config.Get("maxOutstandingPings").IsNumber())
         {
             Napi::TypeError::New(info.Env(), "maxOutstandingPings must be a number").ThrowAsJavaScriptException();
             return;
@@ -167,7 +166,7 @@ WebSocketWrapper::WebSocketWrapper(const Napi::CallbackInfo &info) : Napi::Objec
 
     if (config.Has("caCertificatePemFile"))
     {
-        if (!config.Get("caCertificatePemFile").IsString()) 
+        if (!config.Get("caCertificatePemFile").IsString())
         {
             Napi::TypeError::New(info.Env(), "caCertificatePemFile must be a string").ThrowAsJavaScriptException();
             return;
@@ -177,7 +176,7 @@ WebSocketWrapper::WebSocketWrapper(const Napi::CallbackInfo &info) : Napi::Objec
 
     if (config.Has("certificatePemFile"))
     {
-        if (!config.Get("certificatePemFile").IsString()) 
+        if (!config.Get("certificatePemFile").IsString())
         {
             Napi::TypeError::New(info.Env(), "certificatePemFile must be a string").ThrowAsJavaScriptException();
             return;
@@ -187,7 +186,7 @@ WebSocketWrapper::WebSocketWrapper(const Napi::CallbackInfo &info) : Napi::Objec
 
     if (config.Has("keyPemFile"))
     {
-        if (!config.Get("keyPemFile").IsString()) 
+        if (!config.Get("keyPemFile").IsString())
         {
             Napi::TypeError::New(info.Env(), "keyPemFile must be a string").ThrowAsJavaScriptException();
             return;
@@ -197,7 +196,7 @@ WebSocketWrapper::WebSocketWrapper(const Napi::CallbackInfo &info) : Napi::Objec
 
     if (config.Has("keyPemPass"))
     {
-        if (!config.Get("keyPemPass").IsString()) 
+        if (!config.Get("keyPemPass").IsString())
         {
             Napi::TypeError::New(info.Env(), "keyPemPass must be a string").ThrowAsJavaScriptException();
             return;
@@ -207,7 +206,7 @@ WebSocketWrapper::WebSocketWrapper(const Napi::CallbackInfo &info) : Napi::Objec
 
     if (config.Has("maxMessageSize"))
     {
-        if (!config.Get("maxMessageSize").IsNumber()) 
+        if (!config.Get("maxMessageSize").IsNumber())
         {
             Napi::TypeError::New(info.Env(), "maxMessageSize must be a number").ThrowAsJavaScriptException();
             return;
@@ -215,7 +214,7 @@ WebSocketWrapper::WebSocketWrapper(const Napi::CallbackInfo &info) : Napi::Objec
         webSocketConfig.maxMessageSize = config.Get("maxMessageSize").ToNumber().Int32Value();
     }
 
-     // Create WebSocket
+    // Create WebSocket
     try
     {
         PLOG_DEBUG << "Creating a new WebSocket";
@@ -226,7 +225,7 @@ WebSocketWrapper::WebSocketWrapper(const Napi::CallbackInfo &info) : Napi::Objec
         Napi::Error::New(env, std::string("libdatachannel error while creating WebSocket: ") + ex.what()).ThrowAsJavaScriptException();
         return;
     }
-    
+
     PLOG_DEBUG << "WebSocket created";
     instances.insert(this);
 }
@@ -268,7 +267,7 @@ void WebSocketWrapper::open(const Napi::CallbackInfo &info)
 {
     PLOG_DEBUG << "open() called";
     Napi::Env env = info.Env();
-    
+
     if (!mWebSocketPtr)
     {
         Napi::Error::New(env, "open() called on destroyed WebSocket").ThrowAsJavaScriptException();
@@ -290,7 +289,6 @@ void WebSocketWrapper::open(const Napi::CallbackInfo &info)
         return;
     }
 }
-
 
 void WebSocketWrapper::close(const Napi::CallbackInfo &info)
 {
@@ -471,30 +469,27 @@ void WebSocketWrapper::onOpen(const Napi::CallbackInfo &info)
     // Callback
     mOnOpenCallback = std::make_unique<ThreadSafeCallback>(info[0].As<Napi::Function>());
 
-    
     mWebSocketPtr->onOpen([&]()
-        {
-            PLOG_DEBUG << "onOpen cb received from rtc";
-            
-            if (mOnOpenCallback)
-                mOnOpenCallback->call([this](Napi::Env env, std::vector<napi_value> &args) {
+                          {
+                              PLOG_DEBUG << "onOpen cb received from rtc";
+
+                              if (mOnOpenCallback)
+                                  mOnOpenCallback->call([this](Napi::Env env, std::vector<napi_value> &args)
+                                                        {
                     PLOG_DEBUG << "mOnOpenCallback call(1)";
                     // Check the WebSocket is not closed
-                    if(instances.find(this) == instances.end()) 
+                    if(instances.find(this) == instances.end())
                         {
                             PLOG_DEBUG << "WebSocket not found in instances";
                             throw ThreadSafeCallback::CancelException();
                         }
-                        
+
 
                     // This will run in main thread and needs to construct the
                     // arguments for the call
                     args = {};
-                    PLOG_DEBUG << "mOnOpenCallback call(2)";
-                });
-             
-        });
-
+                    PLOG_DEBUG << "mOnOpenCallback call(2)"; });
+                          });
 }
 
 void WebSocketWrapper::onClosed(const Napi::CallbackInfo &info)
@@ -519,7 +514,7 @@ void WebSocketWrapper::onClosed(const Napi::CallbackInfo &info)
     mOnClosedCallback = std::make_unique<ThreadSafeCallback>(info[0].As<Napi::Function>());
 
     mWebSocketPtr->onClosed([&]()
-                              {
+                            {
         PLOG_DEBUG << "onClosed cb received from rtc";
         if (mOnClosedCallback)
             mOnClosedCallback->call([this](Napi::Env env, std::vector<napi_value> &args) {
@@ -554,7 +549,7 @@ void WebSocketWrapper::onError(const Napi::CallbackInfo &info)
     mOnErrorCallback = std::make_unique<ThreadSafeCallback>(info[0].As<Napi::Function>());
 
     mWebSocketPtr->onError([&](std::string error)
-                             {
+                           {
         PLOG_DEBUG << "onError cb received from rtc";
         if (mOnErrorCallback)
             mOnErrorCallback->call([this, error = std::move(error)](Napi::Env env, std::vector<napi_value> &args) {
@@ -592,7 +587,7 @@ void WebSocketWrapper::onBufferedAmountLow(const Napi::CallbackInfo &info)
     mOnBufferedAmountLowCallback = std::make_unique<ThreadSafeCallback>(info[0].As<Napi::Function>());
 
     mWebSocketPtr->onBufferedAmountLow([&]()
-                                         {
+                                       {
         PLOG_DEBUG << "onBufferedAmountLow cb received from rtc";
         if (mOnBufferedAmountLowCallback)
             mOnBufferedAmountLowCallback->call([this](Napi::Env env, std::vector<napi_value> &args) {
@@ -629,10 +624,9 @@ void WebSocketWrapper::onMessage(const Napi::CallbackInfo &info)
     // Callback
     mOnMessageCallback = std::make_unique<ThreadSafeCallback>(info[0].As<Napi::Function>());
 
-
-     PLOG_DEBUG << "setting onMessage cb on mWebSocketPtr";
+    PLOG_DEBUG << "setting onMessage cb on mWebSocketPtr";
     mWebSocketPtr->onMessage([&](std::variant<rtc::binary, std::string> message)
-                               {
+                             {
         PLOG_DEBUG << "onMessage cb received from rtc";
         if (mOnMessageCallback)
             mOnMessageCallback->call([this, message = std::move(message)](Napi::Env env, std::vector<napi_value> &args) {
