@@ -1,6 +1,6 @@
 {
     "name": "node-datachannel",
-    "version": "0.5.6-dev",
+    "version": "0.6.0",
     "description": "libdatachannel node bindings",
     "type": "module",
     "exports": {
