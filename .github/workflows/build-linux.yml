@@ -76,8 +76,8 @@ jobs:
           sudo apt update
           sudo apt install -y g++-aarch64-linux-gnu gcc-aarch64-linux-gnu
           mkdir sysroot && cd sysroot
-          wget https://commondatastorage.googleapis.com/chrome-linux-sysroot/toolchain/953c2471bc7e71a788309f6c2d2003e8b703305d/debian_sid_arm64_sysroot.tar.xz
-          tar xf debian_sid_arm64_sysroot.tar.xz
+          wget https://commondatastorage.googleapis.com/chrome-linux-sysroot/toolchain/41a6c8dec4c4304d6509e30cbaf9218dffb4438e/debian_bullseye_arm64_sysroot.tar.xz
+          tar xf debian_bullseye_arm64_sysroot.tar.xz
           echo "ARM64_SYSROOT=$(pwd)" >> $GITHUB_ENV
           ls -l
       - name: Use Node.js ${{ matrix.node-version }}
