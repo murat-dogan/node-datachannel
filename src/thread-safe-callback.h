@@ -11,6 +11,7 @@ class ThreadSafeCallback
 public:
     using arg_vector_t = std::vector<napi_value>;
     using arg_func_t = std::function<void(napi_env, arg_vector_t &)>;
+    using cleanup_func_t = std::function<void()>;
 
     ThreadSafeCallback(Napi::Function callback);
     ~ThreadSafeCallback();
@@ -21,7 +22,7 @@ public:
     ThreadSafeCallback &operator=(const ThreadSafeCallback &) = delete;
     ThreadSafeCallback &operator=(ThreadSafeCallback &&) = delete;
 
-    void call(arg_func_t argFunc);
+    void call(arg_func_t argFunc, cleanup_func_t cleanupFunc = []() {});
 
     class CancelException : public std::exception
     {
@@ -32,6 +33,7 @@ private:
     struct CallbackData
     {
         arg_func_t argFunc;
+        cleanup_func_t cleanupFunc;
     };
 
     static void callbackFunc(Napi::Env env,

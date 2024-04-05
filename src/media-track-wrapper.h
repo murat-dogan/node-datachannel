@@ -39,17 +39,21 @@ public:
   void onError(const Napi::CallbackInfo &info);
   void onMessage(const Napi::CallbackInfo &info);
 
-  // Close all existing track
+  // Close all existing tracks
   static void CloseAll();
+
+  // Reset all Callbacks for existing tracks
+  static void ResetCallbacksAll();
 
 private:
   static std::unordered_set<TrackWrapper *> instances;
 
   void doClose();
+  void doResetCallbacks();
 
   std::shared_ptr<rtc::Track> mTrackPtr = nullptr;
 
-    // Callback Ptrs
+  // Callback Ptrs
   std::unique_ptr<ThreadSafeCallback> mOnOpenCallback = nullptr;
   std::unique_ptr<ThreadSafeCallback> mOnClosedCallback = nullptr;
   std::unique_ptr<ThreadSafeCallback> mOnErrorCallback = nullptr;

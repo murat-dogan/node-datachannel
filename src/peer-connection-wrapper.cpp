@@ -37,7 +37,6 @@ Napi::Object PeerConnectionWrapper::Init(Napi::Env env, Napi::Object exports)
         "PeerConnection",
         {
             InstanceMethod("close", &PeerConnectionWrapper::close),
-            InstanceMethod("destroy", &PeerConnectionWrapper::destroy),
             InstanceMethod("setLocalDescription", &PeerConnectionWrapper::setLocalDescription),
             InstanceMethod("setRemoteDescription", &PeerConnectionWrapper::setRemoteDescription),
             InstanceMethod("localDescription", &PeerConnectionWrapper::localDescription),
@@ -253,7 +252,8 @@ PeerConnectionWrapper::PeerConnectionWrapper(const Napi::CallbackInfo &info) : N
 PeerConnectionWrapper::~PeerConnectionWrapper()
 {
     PLOG_DEBUG << "Destructor called";
-    doDestroy();
+    doResetCallbacks();
+    doClose();
 }
 
 void PeerConnectionWrapper::doClose()
@@ -281,13 +281,6 @@ void PeerConnectionWrapper::close(const Napi::CallbackInfo &info)
     doClose();
 }
 
-void PeerConnectionWrapper::doDestroy()
-{
-    PLOG_DEBUG << "doDestroy() called";
-    doClose();
-    doResetCallbacks();
-}
-
 void PeerConnectionWrapper::doResetCallbacks()
 {
     PLOG_DEBUG << "doResetCallbacks() called";
@@ -301,12 +294,6 @@ void PeerConnectionWrapper::doResetCallbacks()
     mOnTrackCallback.reset();
 
     instances.erase(this);
-}
-
-void PeerConnectionWrapper::destroy(const Napi::CallbackInfo &info)
-{
-    PLOG_DEBUG << "destroy() called";
-    doDestroy();
 }
 
 void PeerConnectionWrapper::setLocalDescription(const Napi::CallbackInfo &info)
@@ -738,6 +725,13 @@ void PeerConnectionWrapper::onStateChange(const Napi::CallbackInfo &info)
                 stream << state;
                 args = {Napi::String::New(env, stream.str())};
                 PLOG_DEBUG << "mOnStateChangeCallback call(2)";
+            },[this,state](){
+                PLOG_DEBUG << "mOnStateChangeCallback cleanup";
+                // Special case for closed state, we need to reset all callbacks
+                if(state == rtc::PeerConnection::State::Closed)
+                {
+                    doResetCallbacks();
+                }
             }); });
 }
 

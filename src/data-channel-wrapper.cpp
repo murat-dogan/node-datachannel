@@ -13,6 +13,14 @@ void DataChannelWrapper::CloseAll()
         inst->doClose();
 }
 
+void DataChannelWrapper::ResetCallbacksAll()
+{
+    PLOG_DEBUG << "ResetCallbacksAll() called";
+    auto copy(instances);
+    for (auto inst : copy)
+        inst->doResetCallbacks();
+}
+
 Napi::Object DataChannelWrapper::Init(Napi::Env env, Napi::Object exports)
 {
     Napi::HandleScope scope(env);
@@ -76,7 +84,11 @@ void DataChannelWrapper::doClose()
             return;
         }
     }
+}
 
+void DataChannelWrapper::doResetCallbacks()
+{
+    PLOG_DEBUG << "doResetCallbacks() called";
     mOnOpenCallback.reset();
     mOnClosedCallback.reset();
     mOnErrorCallback.reset();
@@ -350,6 +362,8 @@ void DataChannelWrapper::onClosed(const Napi::CallbackInfo &info)
                 // This will run in main thread and needs to construct the
                 // arguments for the call
                 args = {};
+            },[this]{
+                doResetCallbacks();
             }); });
 }
 

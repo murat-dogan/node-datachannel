@@ -13,6 +13,14 @@ void WebSocketWrapper::CloseAll()
         inst->doClose();
 }
 
+void WebSocketWrapper::ResetCallbacksAll()
+{
+    PLOG_DEBUG << "ResetCallbacksAll() called";
+    auto copy(instances);
+    for (auto inst : copy)
+        inst->doResetCallbacks();
+}
+
 Napi::Object WebSocketWrapper::Init(Napi::Env env, Napi::Object exports)
 {
     Napi::HandleScope scope(env);
@@ -253,7 +261,11 @@ void WebSocketWrapper::doClose()
             return;
         }
     }
+}
 
+void WebSocketWrapper::doResetCallbacks()
+{
+    PLOG_DEBUG << "doResetCallbacks() called";
     mOnOpenCallback.reset();
     mOnClosedCallback.reset();
     mOnErrorCallback.reset();
@@ -488,8 +500,7 @@ void WebSocketWrapper::onOpen(const Napi::CallbackInfo &info)
                     // This will run in main thread and needs to construct the
                     // arguments for the call
                     args = {};
-                    PLOG_DEBUG << "mOnOpenCallback call(2)"; });
-                          });
+                    PLOG_DEBUG << "mOnOpenCallback call(2)"; }); });
 }
 
 void WebSocketWrapper::onClosed(const Napi::CallbackInfo &info)
@@ -524,6 +535,8 @@ void WebSocketWrapper::onClosed(const Napi::CallbackInfo &info)
                 // This will run in main thread and needs to construct the
                 // arguments for the call
                 args = {};
+            },[this]{
+                doResetCallbacks();
             }); });
 }
 

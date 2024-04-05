@@ -19,8 +19,6 @@ public:
   PeerConnectionWrapper(const Napi::CallbackInfo &info);
   ~PeerConnectionWrapper();
 
-  void destroy(const Napi::CallbackInfo &info);
-
   // Functions
   void close(const Napi::CallbackInfo &info);
   void setLocalDescription(const Napi::CallbackInfo &info);
@@ -65,7 +63,6 @@ private:
   static std::unordered_set<PeerConnectionWrapper *> instances;
 
   void doClose();
-  void doDestroy();
   void doResetCallbacks();
 
   std::string mPeerName;
