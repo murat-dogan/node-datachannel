@@ -20,12 +20,12 @@ void PeerConnectionWrapper::CloseAll()
         inst->doClose();
 }
 
-void PeerConnectionWrapper::ResetCallbacksAll()
+void PeerConnectionWrapper::CleanupAll()
 {
-    PLOG_DEBUG << "ResetCallbacksAll() called";
+    PLOG_DEBUG << "CleanupAll() called";
     auto copy(instances);
     for (auto inst : copy)
-        inst->doResetCallbacks();
+        inst->doCleanup();
 }
 
 Napi::Object PeerConnectionWrapper::Init(Napi::Env env, Napi::Object exports)
@@ -252,7 +252,7 @@ PeerConnectionWrapper::PeerConnectionWrapper(const Napi::CallbackInfo &info) : N
 PeerConnectionWrapper::~PeerConnectionWrapper()
 {
     PLOG_DEBUG << "Destructor called";
-    doResetCallbacks();
+    doCleanup();
     doClose();
 }
 
@@ -273,6 +273,14 @@ void PeerConnectionWrapper::doClose()
             return;
         }
     }
+
+    mOnLocalDescriptionCallback.reset();
+    mOnLocalCandidateCallback.reset();
+    mOnIceStateChangeCallback.reset();
+    mOnSignalingStateChangeCallback.reset();
+    mOnGatheringStateChangeCallback.reset();
+    mOnDataChannelCallback.reset();
+    mOnTrackCallback.reset();
 }
 
 void PeerConnectionWrapper::close(const Napi::CallbackInfo &info)
@@ -281,18 +289,10 @@ void PeerConnectionWrapper::close(const Napi::CallbackInfo &info)
     doClose();
 }
 
-void PeerConnectionWrapper::doResetCallbacks()
+void PeerConnectionWrapper::doCleanup()
 {
-    PLOG_DEBUG << "doResetCallbacks() called";
-    mOnLocalDescriptionCallback.reset();
-    mOnLocalCandidateCallback.reset();
+    PLOG_DEBUG << "doCleanup() called";
     mOnStateChangeCallback.reset();
-    mOnIceStateChangeCallback.reset();
-    mOnSignalingStateChangeCallback.reset();
-    mOnGatheringStateChangeCallback.reset();
-    mOnDataChannelCallback.reset();
-    mOnTrackCallback.reset();
-
     instances.erase(this);
 }
 
@@ -730,7 +730,7 @@ void PeerConnectionWrapper::onStateChange(const Napi::CallbackInfo &info)
                 // Special case for closed state, we need to reset all callbacks
                 if(state == rtc::PeerConnection::State::Closed)
                 {
-                    doResetCallbacks();
+                    doCleanup();
                 }
             }); });
 }

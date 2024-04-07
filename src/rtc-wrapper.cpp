@@ -125,13 +125,11 @@ void RtcWrapper::cleanup(const Napi::CallbackInfo &info)
         if (rtc::Cleanup().wait_for(std::chrono::seconds(timeout)) == std::future_status::timeout)
             throw std::runtime_error("cleanup timeout (possible deadlock)");
 
-        // Clear Callbacks
-        // Calling close on all instances should clear the callbacks
-        // But just in case, we will reset them here
-        PeerConnectionWrapper::ResetCallbacksAll();
-        DataChannelWrapper::ResetCallbacksAll();
-        TrackWrapper::ResetCallbacksAll();
-        WebSocketWrapper::ResetCallbacksAll();
+        // Cleanup the instances
+        PeerConnectionWrapper::CleanupAll();
+        DataChannelWrapper::CleanupAll();
+        TrackWrapper::CleanupAll();
+        WebSocketWrapper::CleanupAll();
 
         if (logCallback)
             logCallback.reset();

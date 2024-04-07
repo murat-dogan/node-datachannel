@@ -41,13 +41,13 @@ public:
   static void CloseAll();
 
   // Reset all Callbacks for existing WebSockets
-  static void ResetCallbacksAll();
+  static void CleanupAll();
 
 private:
   static std::unordered_set<WebSocketWrapper *> instances;
 
   void doClose();
-  void doResetCallbacks();
+  void doCleanup();
 
   std::shared_ptr<rtc::WebSocket> mWebSocketPtr = nullptr;
 

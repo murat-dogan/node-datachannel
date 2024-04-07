@@ -43,13 +43,13 @@ public:
   static void CloseAll();
 
   // Reset all Callbacks for existing DataChannels
-  static void ResetCallbacksAll();
+  static void CleanupAll();
 
 private:
   static std::unordered_set<DataChannelWrapper *> instances;
 
   void doClose();
-  void doResetCallbacks();
+  void doCleanup();
 
   std::string mLabel;
   std::shared_ptr<rtc::DataChannel> mDataChannelPtr = nullptr;

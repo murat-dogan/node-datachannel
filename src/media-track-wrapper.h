@@ -43,13 +43,13 @@ public:
   static void CloseAll();
 
   // Reset all Callbacks for existing tracks
-  static void ResetCallbacksAll();
+  static void CleanupAll();
 
 private:
   static std::unordered_set<TrackWrapper *> instances;
 
   void doClose();
-  void doResetCallbacks();
+  void doCleanup();
 
   std::shared_ptr<rtc::Track> mTrackPtr = nullptr;
 

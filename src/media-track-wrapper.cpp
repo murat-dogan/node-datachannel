@@ -14,12 +14,12 @@ void TrackWrapper::CloseAll()
         inst->doClose();
 }
 
-void TrackWrapper::ResetCallbacksAll()
+void TrackWrapper::CleanupAll()
 {
-    PLOG_DEBUG << "ResetCallbacksAll() called";
+    PLOG_DEBUG << "CleanupAll() called";
     auto copy(instances);
     for (auto inst : copy)
-        inst->doResetCallbacks();
+        inst->doCleanup();
 }
 
 Napi::Object TrackWrapper::Init(Napi::Env env, Napi::Object exports)
@@ -81,16 +81,16 @@ void TrackWrapper::doClose()
             return;
         }
     }
-}
 
-void TrackWrapper::doResetCallbacks()
-{
-    PLOG_DEBUG << "doResetCallbacks() called";
     mOnOpenCallback.reset();
-    mOnClosedCallback.reset();
     mOnErrorCallback.reset();
     mOnMessageCallback.reset();
+}
 
+void TrackWrapper::doCleanup()
+{
+    PLOG_DEBUG << "doCleanup() called";
+    mOnClosedCallback.reset();
     instances.erase(this);
 }
 
@@ -334,7 +334,7 @@ void TrackWrapper::onClosed(const Napi::CallbackInfo &info)
                 // arguments for the call
                 args = {};
             },[this]{
-                doResetCallbacks();
+                doCleanup();
             }); });
 }
 

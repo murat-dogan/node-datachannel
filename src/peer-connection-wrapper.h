@@ -56,14 +56,14 @@ public:
   static void CloseAll();
 
   // Reset all Callbacks for existing Peer Connections
-  static void ResetCallbacksAll();
+  static void CleanupAll();
 
 private:
   static Napi::FunctionReference constructor;
   static std::unordered_set<PeerConnectionWrapper *> instances;
 
   void doClose();
-  void doResetCallbacks();
+  void doCleanup();
 
   std::string mPeerName;
   std::unique_ptr<rtc::PeerConnection> mRtcPeerConnPtr = nullptr;
