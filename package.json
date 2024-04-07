@@ -4,8 +4,14 @@
     "description": "libdatachannel node bindings",
     "type": "module",
     "exports": {
-        ".": "./lib/index.js",
-        "./polyfill": "./polyfill/index.js"
+        ".": {
+            "import": "./lib/index.js",
+            "require": "./lib/index.cjs"
+        },
+        "./polyfill": {
+            "import": "./polyfill/index.js",
+            "require": "./polyfill/polyfill.cjs"
+        }
     },
     "typings": "lib/index.d.ts",
     "engines": {
@@ -27,7 +33,8 @@
         "lint": "eslint lib/**/* test/**/*",
         "test": "NODE_OPTIONS=--experimental-vm-modules jest",
         "wpt-test": "node test/wpt.js",
-        "test-types": "tsc"
+        "test-types": "tsc",
+        "prepublishOnly": "rollup lib/index.js --file lib/index.cjs --format cjs && rollup polyfill/index.js --file polyfill/polyfill.cjs --format cjs"
     },
     "binary": {
         "napi_versions": [
@@ -78,6 +85,7 @@
     },
     "dependencies": {
         "node-domexception": "^2.0.1",
-        "prebuild-install": "^7.0.1"
+        "prebuild-install": "^7.0.1",
+        "rollup": "^4.14.1"
     }
 }
