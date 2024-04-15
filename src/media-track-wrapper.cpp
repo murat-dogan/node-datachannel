@@ -2,6 +2,8 @@
 #include "media-direction.h"
 #include "media-rtcpreceivingsession-wrapper.h"
 
+#include "plog/Log.h"
+
 Napi::FunctionReference TrackWrapper::constructor;
 std::unordered_set<TrackWrapper *> TrackWrapper::instances;
 
@@ -10,6 +12,14 @@ void TrackWrapper::CloseAll()
     auto copy(instances);
     for (auto inst : copy)
         inst->doClose();
+}
+
+void TrackWrapper::CleanupAll()
+{
+    PLOG_DEBUG << "CleanupAll() called";
+    auto copy(instances);
+    for (auto inst : copy)
+        inst->doCleanup();
 }
 
 Napi::Object TrackWrapper::Init(Napi::Env env, Napi::Object exports)
@@ -73,10 +83,14 @@ void TrackWrapper::doClose()
     }
 
     mOnOpenCallback.reset();
-    mOnClosedCallback.reset();
     mOnErrorCallback.reset();
     mOnMessageCallback.reset();
+}
 
+void TrackWrapper::doCleanup()
+{
+    PLOG_DEBUG << "doCleanup() called";
+    mOnClosedCallback.reset();
     instances.erase(this);
 }
 
@@ -276,7 +290,8 @@ void TrackWrapper::onOpen(const Napi::CallbackInfo &info)
     // Callback
     mOnOpenCallback = std::make_unique<ThreadSafeCallback>(info[0].As<Napi::Function>());
 
-    mTrackPtr->onOpen([&]() {
+    mTrackPtr->onOpen([&]()
+                      {
         if (mOnOpenCallback)
             mOnOpenCallback->call([this](Napi::Env env, std::vector<napi_value> &args) {
                 // Check the track is not closed
@@ -309,7 +324,8 @@ void TrackWrapper::onClosed(const Napi::CallbackInfo &info)
     // Callback
     mOnClosedCallback = std::make_unique<ThreadSafeCallback>(info[0].As<Napi::Function>());
 
-    mTrackPtr->onClosed([&]() {
+    mTrackPtr->onClosed([&]()
+                        {
         if (mOnClosedCallback)
             mOnClosedCallback->call([this](Napi::Env env, std::vector<napi_value> &args) {
                 // Do not check if the data channel has been closed here
@@ -317,6 +333,8 @@ void TrackWrapper::onClosed(const Napi::CallbackInfo &info)
                 // This will run in main thread and needs to construct the
                 // arguments for the call
                 args = {};
+            },[this]{
+                doCleanup();
             }); });
 }
 
@@ -340,7 +358,8 @@ void TrackWrapper::onError(const Napi::CallbackInfo &info)
     // Callback
     mOnErrorCallback = std::make_unique<ThreadSafeCallback>(info[0].As<Napi::Function>());
 
-    mTrackPtr->onError([&](const std::string &error) {
+    mTrackPtr->onError([&](const std::string &error)
+                       {
         if (mOnErrorCallback)
             mOnErrorCallback->call([this, error](Napi::Env env, std::vector<napi_value> &args) {
                 // Check the track is not closed
@@ -373,7 +392,8 @@ void TrackWrapper::onMessage(const Napi::CallbackInfo &info)
     // Callback
     mOnMessageCallback = std::make_unique<ThreadSafeCallback>(info[0].As<Napi::Function>());
 
-    mTrackPtr->onMessage([&](std::variant<rtc::binary, std::string> message) {
+    mTrackPtr->onMessage([&](std::variant<rtc::binary, std::string> message)
+                         {
         if (mOnMessageCallback)
             mOnMessageCallback->call([this, message = std::move(message)](Napi::Env env, std::vector<napi_value> &args) {
                 // Check the track is not closed

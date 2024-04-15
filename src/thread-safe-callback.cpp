@@ -26,9 +26,9 @@ ThreadSafeCallback::~ThreadSafeCallback()
     tsfn.Abort();
 }
 
-void ThreadSafeCallback::call(arg_func_t argFunc)
+void ThreadSafeCallback::call(arg_func_t argFunc, cleanup_func_t cleanupFunc)
 {
-    CallbackData *data = new CallbackData{std::move(argFunc)};
+    CallbackData *data = new CallbackData{std::move(argFunc), std::move(cleanupFunc)};
     if (tsfn.BlockingCall(data) != napi_ok)
     {
         delete data;
@@ -47,6 +47,7 @@ void ThreadSafeCallback::callbackFunc(Napi::Env env,
 
     arg_vector_t args;
     arg_func_t argFunc(std::move(data->argFunc));
+    cleanup_func_t cleanup(std::move(data->cleanupFunc));
     delete data;
 
     try
@@ -59,5 +60,8 @@ void ThreadSafeCallback::callbackFunc(Napi::Env env,
     }
 
     if (env && callback)
+    {
         callback.Call(context->Value(), args);
+        cleanup();
+    }
 }

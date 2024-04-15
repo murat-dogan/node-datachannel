@@ -22,7 +22,7 @@ public:
 
   // Functions
   void open(const Napi::CallbackInfo &info);
-  void close(const Napi::CallbackInfo &info); 
+  void close(const Napi::CallbackInfo &info);
   Napi::Value sendMessage(const Napi::CallbackInfo &info);
   Napi::Value sendMessageBinary(const Napi::CallbackInfo &info);
   Napi::Value isOpen(const Napi::CallbackInfo &info);
@@ -40,10 +40,14 @@ public:
   // Close all existing WebSockets
   static void CloseAll();
 
+  // Reset all Callbacks for existing WebSockets
+  static void CleanupAll();
+
 private:
-  static std::unordered_set<WebSocketWrapper*> instances;
+  static std::unordered_set<WebSocketWrapper *> instances;
 
   void doClose();
+  void doCleanup();
 
   std::shared_ptr<rtc::WebSocket> mWebSocketPtr = nullptr;
 

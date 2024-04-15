@@ -275,7 +275,6 @@ export class WebSocketServer {
 export class PeerConnection {
     constructor(peerName: string, config: RtcConfig);
     close(): void;
-    destroy(): void;
     setLocalDescription(type?: DescriptionType): void;
     setRemoteDescription(sdp: string, type: DescriptionType): void;
     localDescription(): { type: string; sdp: string } | null;
