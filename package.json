@@ -1,19 +1,30 @@
 {
     "name": "node-datachannel",
-    "version": "0.7.0",
+    "version": "0.8.0-dev",
     "description": "libdatachannel node bindings",
     "type": "module",
     "exports": {
         ".": {
-            "import": "./lib/index.js",
-            "require": "./lib/index.cjs"
+            "import": {
+                "default": "./lib/index.js",
+                "types": "./lib/index.d.ts"
+            },
+            "require": {
+                "default": "./lib/index.cjs",
+                "types": "./lib/index.d.cts"
+            }
         },
         "./polyfill": {
-            "import": "./polyfill/index.js",
-            "require": "./polyfill/polyfill.cjs"
+            "import": {
+                "default": "./polyfill/index.js",
+                "types": "./polyfill/index.d.ts"
+            },
+            "require": {
+                "default": "./polyfill/index.cjs",
+                "types": "./polyfill/index.d.cts"
+            }
         }
     },
-    "typings": "lib/index.d.ts",
     "engines": {
         "node": ">=16.0.0"
     },
@@ -34,7 +45,7 @@
         "test": "NODE_OPTIONS=--experimental-vm-modules jest",
         "wpt-test": "node test/wpt.js",
         "test-types": "tsc",
-        "prepublishOnly": "rollup lib/index.js --file lib/index.cjs --format cjs && rollup polyfill/index.js --file polyfill/polyfill.cjs --format cjs"
+        "prepublishOnly": "cp lib/index.d.ts lib/index.d.cts && cp polyfill/index.d.ts polyfill/index.d.cts && rollup lib/index.js --file lib/index.cjs --format cjs && rollup polyfill/index.js --file polyfill/index.cjs --format cjs"
     },
     "binary": {
         "napi_versions": [
