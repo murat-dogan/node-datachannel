@@ -23,12 +23,15 @@ public:
   // Functions
   void open(const Napi::CallbackInfo &info);
   void close(const Napi::CallbackInfo &info);
+  void forceClose(const Napi::CallbackInfo &info);
   Napi::Value sendMessage(const Napi::CallbackInfo &info);
   Napi::Value sendMessageBinary(const Napi::CallbackInfo &info);
   Napi::Value isOpen(const Napi::CallbackInfo &info);
   Napi::Value bufferedAmount(const Napi::CallbackInfo &info);
   Napi::Value maxMessageSize(const Napi::CallbackInfo &info);
   void setBufferedAmountLowThreshold(const Napi::CallbackInfo &info);
+  Napi::Value remoteAddress(const Napi::CallbackInfo &info);
+  Napi::Value path(const Napi::CallbackInfo &info);
 
   // Callbacks
   void onOpen(const Napi::CallbackInfo &info);
@@ -47,6 +50,7 @@ private:
   static std::unordered_set<WebSocketWrapper *> instances;
 
   void doClose();
+  void doForceClose();
   void doCleanup();
 
   std::shared_ptr<rtc::WebSocket> mWebSocketPtr = nullptr;
