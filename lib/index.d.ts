@@ -238,6 +238,10 @@ export interface WebSocketConfiguration {
 }
 export class WebSocket implements Channel {
     constructor(config?: WebSocketConfiguration);
+    open(url: string): void;
+    forceClose(): void;
+    remoteAddress(): string | undefined;
+    path(): string | undefined;
 
     // Channel implementation
     close(): void;

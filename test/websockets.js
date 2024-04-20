@@ -6,7 +6,9 @@ nodeDataChannel.preload();
 const webSocketServer = new nodeDataChannel.WebSocketServer({ bindAddress: '127.0.0.1', port: 1987 });
 
 webSocketServer.onClient((serverSocket) => {
-    console.log('webSocketServer.onClient()');
+    console.log(
+        'webSocketServer.onClient() remoteAddress: ' + serverSocket.remoteAddress() + ', path: ' + serverSocket.path(),
+    );
 
     serverSocket.onOpen(() => {
         console.log('serverSocket.onOpen()');
@@ -32,7 +34,7 @@ clientSocket.onOpen(() => {
 
 clientSocket.onMessage((message) => {
     console.log('clientSocket.onMessage():', message);
-    clientSocket.close();
+    clientSocket.forceClose();
     webSocketServer.stop();
 });
 
