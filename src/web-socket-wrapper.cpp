@@ -31,6 +31,7 @@ Napi::Object WebSocketWrapper::Init(Napi::Env env, Napi::Object exports)
         {
             InstanceMethod("open", &WebSocketWrapper::open),
             InstanceMethod("close", &WebSocketWrapper::close),
+            InstanceMethod("forceClose", &WebSocketWrapper::forceClose),
             InstanceMethod("sendMessage", &WebSocketWrapper::sendMessage),
             InstanceMethod("sendMessageBinary", &WebSocketWrapper::sendMessageBinary),
             InstanceMethod("isOpen", &WebSocketWrapper::isOpen),
@@ -42,6 +43,8 @@ Napi::Object WebSocketWrapper::Init(Napi::Env env, Napi::Object exports)
             InstanceMethod("onError", &WebSocketWrapper::onError),
             InstanceMethod("onBufferedAmountLow", &WebSocketWrapper::onBufferedAmountLow),
             InstanceMethod("onMessage", &WebSocketWrapper::onMessage),
+            InstanceMethod("remoteAddress", &WebSocketWrapper::remoteAddress),
+            InstanceMethod("path", &WebSocketWrapper::path),
         });
 
     constructor = Napi::Persistent(func);
@@ -257,7 +260,31 @@ void WebSocketWrapper::doClose()
         }
         catch (std::exception &ex)
         {
-            std::cerr << std::string("libWebSocket error while closing WebSocket: ") + ex.what() << std::endl;
+            std::cerr << std::string("libdatachannel error while closing WebSocket: ") + ex.what() << std::endl;
+            return;
+        }
+    }
+
+    mOnOpenCallback.reset();
+    mOnErrorCallback.reset();
+    mOnBufferedAmountLowCallback.reset();
+    mOnMessageCallback.reset();
+}
+
+void WebSocketWrapper::doForceClose()
+{
+    PLOG_DEBUG << "doForceClose() called";
+    if (mWebSocketPtr)
+    {
+        PLOG_DEBUG << "Force closing...";
+        try
+        {
+            mWebSocketPtr->forceClose();
+            mWebSocketPtr.reset();
+        }
+        catch (std::exception &ex)
+        {
+            std::cerr << std::string("libdatachannel error while force closing WebSocket: ") + ex.what() << std::endl;
             return;
         }
     }
@@ -297,7 +324,7 @@ void WebSocketWrapper::open(const Napi::CallbackInfo &info)
     }
     catch (std::exception &ex)
     {
-        Napi::Error::New(env, std::string("libWebSocket error while opening WebSocket: ") + ex.what()).ThrowAsJavaScriptException();
+        Napi::Error::New(env, std::string("libdatachannel error while opening WebSocket: ") + ex.what()).ThrowAsJavaScriptException();
         return;
     }
 }
@@ -306,6 +333,12 @@ void WebSocketWrapper::close(const Napi::CallbackInfo &info)
 {
     PLOG_DEBUG << "close() called";
     doClose();
+}
+
+void WebSocketWrapper::forceClose(const Napi::CallbackInfo &info)
+{
+    PLOG_DEBUG << "forceClose() called";
+    doForceClose();
 }
 
 Napi::Value WebSocketWrapper::sendMessage(const Napi::CallbackInfo &info)
@@ -333,7 +366,7 @@ Napi::Value WebSocketWrapper::sendMessage(const Napi::CallbackInfo &info)
     }
     catch (std::exception &ex)
     {
-        Napi::Error::New(env, std::string("libWebSocket error while sending data channel message: ") + ex.what()).ThrowAsJavaScriptException();
+        Napi::Error::New(env, std::string("libdatachannel error while sending data channel message: ") + ex.what()).ThrowAsJavaScriptException();
         return Napi::Boolean::New(info.Env(), false);
     }
 }
@@ -363,7 +396,7 @@ Napi::Value WebSocketWrapper::sendMessageBinary(const Napi::CallbackInfo &info)
     }
     catch (std::exception &ex)
     {
-        Napi::Error::New(env, std::string("libWebSocket error while sending data channel message: ") + ex.what()).ThrowAsJavaScriptException();
+        Napi::Error::New(env, std::string("libdatachannel error while sending data channel message: ") + ex.what()).ThrowAsJavaScriptException();
         return Napi::Boolean::New(info.Env(), false);
     }
 }
@@ -384,7 +417,7 @@ Napi::Value WebSocketWrapper::isOpen(const Napi::CallbackInfo &info)
     }
     catch (std::exception &ex)
     {
-        Napi::Error::New(env, std::string("libWebSocket error: ") + ex.what()).ThrowAsJavaScriptException();
+        Napi::Error::New(env, std::string("libdatachannel error: ") + ex.what()).ThrowAsJavaScriptException();
         return Napi::Boolean::New(info.Env(), false);
     }
 }
@@ -405,7 +438,7 @@ Napi::Value WebSocketWrapper::bufferedAmount(const Napi::CallbackInfo &info)
     }
     catch (std::exception &ex)
     {
-        Napi::Error::New(env, std::string("libWebSocket error: ") + ex.what()).ThrowAsJavaScriptException();
+        Napi::Error::New(env, std::string("libdatachannel error: ") + ex.what()).ThrowAsJavaScriptException();
         return Napi::Number::New(info.Env(), 0);
     }
 }
@@ -426,8 +459,66 @@ Napi::Value WebSocketWrapper::maxMessageSize(const Napi::CallbackInfo &info)
     }
     catch (std::exception &ex)
     {
-        Napi::Error::New(env, std::string("libWebSocket error: ") + ex.what()).ThrowAsJavaScriptException();
+        Napi::Error::New(env, std::string("libdatachannel error: ") + ex.what()).ThrowAsJavaScriptException();
         return Napi::Number::New(info.Env(), 0);
+    }
+}
+
+Napi::Value WebSocketWrapper::remoteAddress(const Napi::CallbackInfo &info)
+{
+    PLOG_DEBUG << "remoteAddress() called";
+    Napi::Env env = info.Env();
+
+    if (!mWebSocketPtr)
+    {
+        return env.Undefined(); 
+    }
+
+    try
+    {
+        auto address = mWebSocketPtr->remoteAddress();
+        if (address.has_value())
+        {
+            return Napi::String::New(info.Env(), address.value());
+        }
+        else
+        {
+            return env.Undefined();
+        }
+    }
+    catch (std::exception &ex)
+    {
+        Napi::Error::New(env, std::string("libdatachannel error: ") + ex.what()).ThrowAsJavaScriptException();
+        return env.Undefined();
+    }
+}
+
+Napi::Value WebSocketWrapper::path(const Napi::CallbackInfo &info)
+{
+    PLOG_DEBUG << "path() called";
+    Napi::Env env = info.Env();
+
+    if (!mWebSocketPtr)
+    {
+        return env.Undefined(); 
+    }
+
+    try
+    {
+        auto path = mWebSocketPtr->path();
+        if (path.has_value())
+        {
+            return Napi::String::New(info.Env(), path.value());
+        }
+        else
+        {
+            return env.Undefined();
+        }
+    }
+    catch (std::exception &ex)
+    {
+        Napi::Error::New(env, std::string("libdatachannel error: ") + ex.what()).ThrowAsJavaScriptException();
+        return env.Undefined();
     }
 }
 
@@ -455,7 +546,7 @@ void WebSocketWrapper::setBufferedAmountLowThreshold(const Napi::CallbackInfo &i
     }
     catch (std::exception &ex)
     {
-        Napi::Error::New(env, std::string("libWebSocket error: ") + ex.what()).ThrowAsJavaScriptException();
+        Napi::Error::New(env, std::string("libdatachannel error: ") + ex.what()).ThrowAsJavaScriptException();
         return;
     }
 }
