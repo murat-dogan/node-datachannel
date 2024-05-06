@@ -58,6 +58,10 @@ DataChannelWrapper::DataChannelWrapper(const Napi::CallbackInfo &info) : Napi::O
     PLOG_DEBUG << "Constructor called";
     mDataChannelPtr = *(info[0].As<Napi::External<std::shared_ptr<rtc::DataChannel>>>().Data());
     PLOG_DEBUG << "Data Channel created";
+
+    // Closed callback must be set to trigger cleanup
+    mOnClosedCallback = std::make_unique<ThreadSafeCallback>(Napi::Function::New(info.Env(), [](const Napi::CallbackInfo&){}));
+
     instances.insert(this);
 }
 
