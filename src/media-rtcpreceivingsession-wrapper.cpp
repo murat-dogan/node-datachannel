@@ -51,9 +51,8 @@ void RtcpReceivingSessionWrapper::requestBitrate(const Napi::CallbackInfo &info)
         return;
     }
 
-    unsigned int bitRate = static_cast<unsigned int>(info[0].As<Napi::Number>().ToNumber());
-
-    mSessionPtr->requestBitrate(bitRate);
+    unsigned int bitrate = static_cast<uint32_t>(info[0].As<Napi::Number>().ToNumber());
+    mSessionPtr->requestBitrate(bitrate);
 }
 
 Napi::Value RtcpReceivingSessionWrapper::requestKeyframe(const Napi::CallbackInfo &info)

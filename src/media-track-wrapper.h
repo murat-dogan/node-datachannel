@@ -30,6 +30,7 @@ public:
   Napi::Value isOpen(const Napi::CallbackInfo &info);
   Napi::Value isClosed(const Napi::CallbackInfo &info);
   Napi::Value maxMessageSize(const Napi::CallbackInfo &info);
+  Napi::Value requestBitrate(const Napi::CallbackInfo &info);
   Napi::Value requestKeyframe(const Napi::CallbackInfo &info);
   void setMediaHandler(const Napi::CallbackInfo &info);
 
