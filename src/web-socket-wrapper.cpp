@@ -238,6 +238,10 @@ WebSocketWrapper::WebSocketWrapper(const Napi::CallbackInfo &info) : Napi::Objec
     }
 
     PLOG_DEBUG << "WebSocket created";
+
+    // Closed callback must set to trigger cleanup
+    mOnClosedCallback = std::make_unique<ThreadSafeCallback>(Napi::Function::New(info.Env(), [](const Napi::CallbackInfo&){}));
+
     instances.insert(this);
 }
 
@@ -471,7 +475,7 @@ Napi::Value WebSocketWrapper::remoteAddress(const Napi::CallbackInfo &info)
 
     if (!mWebSocketPtr)
     {
-        return env.Undefined(); 
+        return env.Undefined();
     }
 
     try
@@ -500,7 +504,7 @@ Napi::Value WebSocketWrapper::path(const Napi::CallbackInfo &info)
 
     if (!mWebSocketPtr)
     {
-        return env.Undefined(); 
+        return env.Undefined();
     }
 
     try

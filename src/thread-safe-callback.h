@@ -30,6 +30,7 @@ public:
     };
 
 private:
+    using ContextType = std::nullptr_t;
     struct CallbackData
     {
         arg_func_t argFunc;
@@ -38,12 +39,10 @@ private:
 
     static void callbackFunc(Napi::Env env,
                              Napi::Function callback,
-                             Napi::Reference<Napi::Value> *context,
+                             ContextType *context,
                              CallbackData *data);
 
-    using tsfn_t = Napi::TypedThreadSafeFunction<Napi::Reference<Napi::Value>, CallbackData, callbackFunc>;
-
-    Napi::Reference<Napi::Value> receiver;
+    using tsfn_t = Napi::TypedThreadSafeFunction<ContextType, CallbackData, callbackFunc>;
     tsfn_t tsfn;
 };
 
