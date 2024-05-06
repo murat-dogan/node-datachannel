@@ -39,6 +39,7 @@ Napi::Object TrackWrapper::Init(Napi::Env env, Napi::Object exports)
             InstanceMethod("isOpen", &TrackWrapper::isOpen),
             InstanceMethod("isClosed", &TrackWrapper::isClosed),
             InstanceMethod("maxMessageSize", &TrackWrapper::maxMessageSize),
+            InstanceMethod("requestBitrate", &TrackWrapper::requestBitrate),
             InstanceMethod("requestKeyframe", &TrackWrapper::requestKeyframe),
             InstanceMethod("setMediaHandler", &TrackWrapper::setMediaHandler),
             InstanceMethod("onOpen", &TrackWrapper::onOpen),
@@ -235,6 +236,27 @@ Napi::Value TrackWrapper::maxMessageSize(const Napi::CallbackInfo &info)
         Napi::Error::New(env, std::string("libdatachannel error: ") + ex.what()).ThrowAsJavaScriptException();
         return Napi::Number::New(info.Env(), 0);
     }
+}
+
+Napi::Value TrackWrapper::requestBitrate(const Napi::CallbackInfo &info)
+{
+    if (!mTrackPtr)
+    {
+        Napi::Error::New(info.Env(), "requestBitrate() called on destroyed track").ThrowAsJavaScriptException();
+        return info.Env().Null();
+    }
+
+    Napi::Env env = info.Env();
+    int length = info.Length();
+
+    if (length < 1 || !info[0].IsNumber())
+    {
+        Napi::TypeError::New(env, "Number expected").ThrowAsJavaScriptException();
+        return info.Env().Null();
+    }
+
+    unsigned int bitrate = static_cast<uint32_t>(info[0].As<Napi::Number>());
+    return Napi::Boolean::New(env, mTrackPtr->requestBitrate(bitrate));
 }
 
 Napi::Value TrackWrapper::requestKeyframe(const Napi::CallbackInfo &info)

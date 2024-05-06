@@ -552,10 +552,10 @@ Napi::Value PeerConnectionWrapper::createDataChannel(const Napi::CallbackInfo &i
                 switch (reliability.Get("type").As<Napi::Number>().Uint32Value())
                 {
                 case 1:
-                    init.reliability.rexmit = static_cast<int>(reliability.Get("rexmit").As<Napi::Number>().ToNumber());
+                    init.reliability.rexmit = int(reliability.Get("rexmit").As<Napi::Number>().ToNumber().Uint32Value());
                     break;
                 case 2:
-                    init.reliability.rexmit = std::chrono::milliseconds(reliability.Get("rexmit").As<Napi::Number>().Uint32Value());
+                    init.reliability.rexmit = std::chrono::milliseconds(reliability.Get("rexmit").As<Napi::Number>().Int32Value());
                     break;
                 }
             }
@@ -572,25 +572,31 @@ Napi::Value PeerConnectionWrapper::createDataChannel(const Napi::CallbackInfo &i
             init.reliability.unordered = !initConfig.Get("ordered").As<Napi::Boolean>();
         }
 
-        if (initConfig.Get("maxPacketLifeTime").IsNumber() && initConfig.Get("maxRetransmits").IsNumber())
+
+        if (!initConfig.Get("maxPacketLifeTime").IsUndefined() && !initConfig.Get("maxPacketLifeTime").IsNull() &&
+            !initConfig.Get("maxRetransmits").IsUndefined() && !initConfig.Get("maxRetransmits").IsNull())
         {
             Napi::TypeError::New(env, "Wrong DataChannel Init Config, maxPacketLifeTime and maxRetransmits are exclusive").ThrowAsJavaScriptException();
             return info.Env().Null();
         }
 
-        if (initConfig.Get("maxPacketLifeTime").IsNumber())
+        if (!initConfig.Get("maxPacketLifeTime").IsUndefined() && !initConfig.Get("maxPacketLifeTime").IsNull())
         {
-            init.reliability.type = rtc::Reliability::Type::Timed;
-            init.reliability.rexmit = std::chrono::milliseconds(initConfig.Get("maxPacketLifeTime").As<Napi::Number>().Uint32Value());
+            if (!initConfig.Get("maxPacketLifeTime").IsNumber())
+            {
+                Napi::TypeError::New(env, "Wrong DataChannel Init Config (maxPacketLifeTime)").ThrowAsJavaScriptException();
+                return info.Env().Null();
+            }
+            init.reliability.maxPacketLifeTime = std::chrono::milliseconds(initConfig.Get("maxPacketLifeTime").As<Napi::Number>().Uint32Value());
         }
-        else if (initConfig.Get("maxRetransmits").IsNumber())
+        else if (!initConfig.Get("maxRetransmits").IsUndefined() && !initConfig.Get("maxRetransmits").IsNull())
         {
-            init.reliability.type = rtc::Reliability::Type::Rexmit;
-            init.reliability.rexmit = int(initConfig.Get("maxRetransmits").As<Napi::Number>().Uint32Value());
-        }
-        else
-        {
-            init.reliability.type = rtc::Reliability::Type::Reliable;
+            if (!initConfig.Get("maxRetransmits").IsNumber())
+            {
+                Napi::TypeError::New(env, "Wrong DataChannel Init Config (maxRetransmits)").ThrowAsJavaScriptException();
+                return info.Env().Null();
+            }
+            init.reliability.maxRetransmits = int(initConfig.Get("maxRetransmits").As<Napi::Number>().Int32Value());
         }
     }
 

@@ -423,14 +423,12 @@ void VideoWrapper::setBitrate(const Napi::CallbackInfo &info)
         return;
     }
 
-    int bitRate = static_cast<int>(info[0].As<Napi::Number>().ToNumber());
-
-    mVideoPtr->setBitrate(bitRate);
+    unsigned int bitrate = info[0].As<Napi::Number>().ToNumber().Uint32Value();
+    mVideoPtr->setBitrate(bitrate);
 }
 
 Napi::Value VideoWrapper::getBitrate(const Napi::CallbackInfo &info)
 {
-
     return Napi::Number::New(info.Env(), mVideoPtr->bitrate());
 }
 
@@ -445,7 +443,7 @@ Napi::Value VideoWrapper::hasPayloadType(const Napi::CallbackInfo &info)
         return env.Null();
     }
 
-    int payloadType = static_cast<int>(info[0].As<Napi::Number>().ToNumber());
+    int payloadType = static_cast<int32_t>(info[0].As<Napi::Number>().ToNumber());
 
     return Napi::Boolean::New(env, mVideoPtr->hasPayloadType(payloadType));
 }
@@ -461,9 +459,9 @@ void VideoWrapper::addRTXCodec(const Napi::CallbackInfo &info)
         return;
     }
 
-    unsigned int payloadType = static_cast<unsigned int>(info[0].As<Napi::Number>().ToNumber());
-    unsigned int originalPayloadType = static_cast<unsigned int>(info[1].As<Napi::Number>().ToNumber());
-    unsigned int clockRate = static_cast<unsigned int>(info[2].As<Napi::Number>().ToNumber());
+    int payloadType = static_cast<int32_t>(info[0].As<Napi::Number>().ToNumber());
+    int originalPayloadType = static_cast<int32_t>(info[1].As<Napi::Number>().ToNumber());
+    unsigned int clockRate = static_cast<uint32_t>(info[2].As<Napi::Number>().ToNumber());
 
     mVideoPtr->addRtxCodec(payloadType, originalPayloadType, clockRate);
 }
