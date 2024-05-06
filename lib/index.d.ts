@@ -180,6 +180,7 @@ export class Track {
     isClosed(): boolean;
     bufferedAmount(): number;
     maxMessageSize(): number;
+    requestBitrate(bitRate: number): boolean;
     setBufferedAmountLowThreshold(newSize: number): void;
     requestKeyframe(): boolean;
     setMediaHandler(handler: RtcpReceivingSession): void;
