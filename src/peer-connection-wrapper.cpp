@@ -237,7 +237,7 @@ PeerConnectionWrapper::PeerConnectionWrapper(const Napi::CallbackInfo &info) : N
     // Create peer-connection
     try
     {
-        PLOG_DEBUG << "Creating a new peer";
+        PLOG_DEBUG << "Creating a new Peer Connection";
         mRtcPeerConnPtr = std::make_unique<rtc::PeerConnection>(rtcConfig);
     }
     catch (std::exception &ex)
@@ -245,6 +245,11 @@ PeerConnectionWrapper::PeerConnectionWrapper(const Napi::CallbackInfo &info) : N
         Napi::Error::New(env, std::string("libdatachannel error while creating peer connection: ") + ex.what()).ThrowAsJavaScriptException();
         return;
     }
+
+    PLOG_DEBUG << "Peer Connection created";
+
+    // State change callback must be set to trigger cleanup on close
+    mOnStateChangeCallback = std::make_unique<ThreadSafeCallback>(Napi::Function::New(info.Env(), [](const Napi::CallbackInfo&){}));
 
     instances.insert(this);
 }

@@ -41,7 +41,7 @@ void ThreadSafeCallback::callbackFunc(Napi::Env env,
                                       ContextType *context,
                                       CallbackData *data)
 {
-    // if env is gone this could mean cb fn has changed. See issue#176
+    // if env is gone, it could mean this cb was destroyed. See issue#176
     if (!data || !env)
         return;
 
@@ -59,9 +59,10 @@ void ThreadSafeCallback::callbackFunc(Napi::Env env,
         return;
     }
 
-    if (env && callback)
+    if (callback)
     {
         callback.Call(args);
-        cleanup();
     }
+
+    cleanup();
 }

@@ -56,7 +56,12 @@ Napi::Object TrackWrapper::Init(Napi::Env env, Napi::Object exports)
 
 TrackWrapper::TrackWrapper(const Napi::CallbackInfo &info) : Napi::ObjectWrap<TrackWrapper>(info)
 {
+    PLOG_DEBUG << "Constructor called";
     mTrackPtr = *(info[0].As<Napi::External<std::shared_ptr<rtc::Track>>>().Data());
+    PLOG_DEBUG << "Track created";
+
+    // Closed callback must be set to trigger cleanup
+    mOnClosedCallback = std::make_unique<ThreadSafeCallback>(Napi::Function::New(info.Env(), [](const Napi::CallbackInfo&){}));
 
     instances.insert(this);
 }
