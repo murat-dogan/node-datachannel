@@ -6,22 +6,22 @@
     "exports": {
         ".": {
             "import": {
-                "default": "./lib/index.js",
-                "types": "./lib/index.d.ts"
+                "types": "./lib/index.d.ts",
+                "default": "./lib/index.js"
             },
             "require": {
-                "default": "./lib/index.cjs",
-                "types": "./lib/index.d.cts"
+                "types": "./lib/index.d.cts",
+                "default": "./lib/index.cjs"
             }
         },
         "./polyfill": {
             "import": {
-                "default": "./polyfill/index.js",
-                "types": "./polyfill/index.d.ts"
+                "types": "./polyfill/index.d.ts",
+                "default": "./polyfill/index.js"
             },
             "require": {
-                "default": "./polyfill/index.cjs",
-                "types": "./polyfill/index.d.cts"
+                "types": "./polyfill/index.d.cts",
+                "default": "./polyfill/index.cjs"
             }
         }
     },
