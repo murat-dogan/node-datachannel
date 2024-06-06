@@ -4,11 +4,11 @@ import RTCDataChannel from './RTCDataChannel.js';
 import RTCIceCandidate from './RTCIceCandidate.js';
 import { RTCDataChannelEvent, RTCPeerConnectionIceEvent } from './Events.js';
 import RTCSctpTransport from './RTCSctpTransport.js';
-import DOMException from 'node-domexception';
+import 'node-domexception';
 
 export default class _RTCPeerConnection extends EventTarget {
     static async generateCertificate() {
-        throw new Error('Not implemented');
+        throw new DOMException('Not implemented');
     }
 
     #peerConnection;
@@ -190,10 +190,6 @@ export default class _RTCPeerConnection extends EventTarget {
 
     get signalingState() {
         return this.#peerConnection.signalingState();
-    }
-
-    static generateCertificate(keygenAlgorithm) {
-        throw new DOMException('Not implemented');
     }
 
     async addIceCandidate(candidate) {
