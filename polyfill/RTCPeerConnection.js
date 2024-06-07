@@ -165,7 +165,7 @@ export default class _RTCPeerConnection extends EventTarget {
     }
 
     get currentRemoteDescription() {
-        return new RTCSessionDescription(this.#peerConnection.remoteDescription());
+        return new RTCSessionDescription(this.#peerConnection.currentRemoteDescription());
     }
 
     get localDescription() {

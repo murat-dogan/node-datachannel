@@ -25,6 +25,7 @@ public:
   void setRemoteDescription(const Napi::CallbackInfo &info);
   Napi::Value localDescription(const Napi::CallbackInfo &info);
   Napi::Value remoteDescription(const Napi::CallbackInfo &info);
+  Napi::Value currentRemoteDescription(const Napi::CallbackInfo &info);
   void addRemoteCandidate(const Napi::CallbackInfo &info);
   Napi::Value createDataChannel(const Napi::CallbackInfo &info);
   Napi::Value addTrack(const Napi::CallbackInfo &info);

@@ -284,6 +284,7 @@ export class PeerConnection {
     setRemoteDescription(sdp: string, type: DescriptionType): void;
     localDescription(): { type: string; sdp: string } | null;
     remoteDescription(): { type: string; sdp: string } | null;
+    currentRemoteDescription(): { type: string; sdp: string } | null;
     addRemoteCandidate(candidate: string, mid: string): void;
     createDataChannel(label: string, config?: DataChannelInitConfig): DataChannel;
     addTrack(media: Video | Audio): Track;
