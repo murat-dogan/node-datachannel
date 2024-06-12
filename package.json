@@ -3,6 +3,7 @@
     "version": "0.9.1",
     "description": "libdatachannel node bindings",
     "type": "module",
+    "types": "./lib/index.d.ts",
     "exports": {
         ".": {
             "import": {
