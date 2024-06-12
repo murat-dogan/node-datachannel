@@ -2,6 +2,7 @@
 #include "rtc-wrapper.h"
 #include "peer-connection-wrapper.h"
 #include "data-channel-wrapper.h"
+#include "ice-udp-mux-listener-wrapper.h"
 #include "media-rtcpreceivingsession-wrapper.h"
 #include "media-track-wrapper.h"
 #include "media-video-wrapper.h"
@@ -17,6 +18,7 @@ Napi::Object InitAll(Napi::Env env, Napi::Object exports)
     VideoWrapper::Init(env, exports);
     AudioWrapper::Init(env, exports);
     DataChannelWrapper::Init(env, exports);
+    IceUdpMuxListenerWrapper::Init(env, exports);
     PeerConnectionWrapper::Init(env, exports);
     WebSocketWrapper::Init(env, exports);
     WebSocketServerWrapper::Init(env, exports);
