@@ -1,7 +1,13 @@
 /// <reference lib="dom" />
 
+import { PeerConnection } from '../lib/index.js';
+
+export interface _RTCConfiguration extends RTCConfiguration {
+    peerConnection?: PeerConnection;
+}
+
 export default class _RTCPeerConnection extends EventTarget implements RTCPeerConnection {
-    constructor(config?: RTCConfiguration);
+    constructor(config?: _RTCConfiguration);
 
     // events
     onconnectionstatechange: ((this: RTCPeerConnection, ev: Event) => any) | null;
