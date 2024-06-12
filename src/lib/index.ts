@@ -1,7 +1,7 @@
 import nodeDataChannel from './node-datachannel';
 import _DataChannelStream from './datachannel-stream';
 import { WebSocketServer } from './websocket-server';
-import { Channel, DataChannelInitConfig, DescriptionType, Direction, LogLevel, RtcConfig, RTCIceConnectionState, RTCIceGatheringState, RTCPeerConnectionState, RTCSignalingState, SctpSettings, SelectedCandidateInfo } from './types';
+import { CertificateFingerprint, Channel, DataChannelInitConfig, DescriptionType, Direction, LocalDescriptionInit, LogLevel, RtcConfig, RTCIceConnectionState, RTCIceGatheringState, RTCPeerConnectionState, RTCSignalingState, SctpSettings, SelectedCandidateInfo } from './types';
 import { WebSocket } from './websocket';
 
 export function preload(): void { nodeDataChannel.preload(); }
@@ -113,10 +113,11 @@ export const DataChannel: {
 
 export interface PeerConnection {
     close(): void;
-    setLocalDescription(type?: DescriptionType): void;
+    setLocalDescription(type?: DescriptionType, init?: LocalDescriptionInit): void;
     setRemoteDescription(sdp: string, type: DescriptionType): void;
     localDescription(): { type: DescriptionType; sdp: string } | null;
     remoteDescription(): { type: DescriptionType; sdp: string } | null;
+    remoteFingerprint(): CertificateFingerprint;
     addRemoteCandidate(candidate: string, mid: string): void;
     createDataChannel(label: string, config?: DataChannelInitConfig): DataChannel;
     addTrack(media: Video | Audio): Track;

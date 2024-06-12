@@ -77,6 +77,10 @@ export interface RtcConfig {
     mtu?: number;
     iceTransportPolicy?: TransportPolicy;
     disableFingerprintVerification?: boolean;
+    disableAutoGathering?: boolean;
+    certificatePemFile?: string;
+    keyPemFile?: string;
+    keyPemPass?: string;
 }
 
 // Lowercase to match the description type string from libdatachannel
@@ -97,6 +101,10 @@ export type RTCIceGathererState = "complete" | "gathering" | "new";
 export type RTCIceGatheringState = "complete" | "gathering" | "new";
 export type RTCSignalingState = "closed" | "have-local-offer" | "have-local-pranswer" | "have-remote-offer" | "have-remote-pranswer" | "stable";
 
+export interface LocalDescriptionInit {
+    iceUfrag?: string;
+    icePwd?: string;
+}
 
 export interface DataChannelInitConfig {
     protocol?: string;
@@ -105,6 +113,17 @@ export interface DataChannelInitConfig {
     unordered?: boolean; // Reliability
     maxPacketLifeTime?: number; // Reliability
     maxRetransmits?: number; // Reliability
+}
+
+export interface CertificateFingerprint {
+    /**
+     * @see https://developer.mozilla.org/en-US/docs/Web/API/RTCCertificate/getFingerprints#value
+     */
+    value: string;
+    /**
+     * @see https://developer.mozilla.org/en-US/docs/Web/API/RTCCertificate/getFingerprints#algorithm
+     */
+    algorithm: 'sha-1' | 'sha-224' | 'sha-256' | 'sha-384' | 'sha-512' | 'md5' | 'md2';
 }
 
 export interface SelectedCandidateInfo {
