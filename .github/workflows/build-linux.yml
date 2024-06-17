@@ -35,6 +35,37 @@ jobs:
         env:
           CI: true
 
+  build-linux-musl:
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        node-version: [ 16.x]
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Install musl
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y musl-tools
+      - name: Build
+        run: npm install --build-from-source
+        env:
+          CI: true
+          cc: musl-gcc
+          cxx: musl-gcc
+      - name: Test
+        run: npm run test
+        env:
+          CI: true
+      - name: Upload
+        run: node_modules/.bin/prebuild -r napi --upload -u ${{ secrets.GITHUB_TOKEN }} --libc musl
+        env:
+          CI: true
+
   build-linux-armv7:
     runs-on: ubuntu-20.04
 
