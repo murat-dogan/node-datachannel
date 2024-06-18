@@ -11,101 +11,85 @@ env:
 
 jobs:
   build-linux:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     strategy:
       matrix:
-        node-version: [ 16.x]
+        node-version: [16]
+        arch: [amd64, arm64, arm]
+        platform: [ubuntu, alpine]
+        include:
+          # Set baselines per platform
+          - triple: "alpine-linux-musl"
+            platform: alpine
+            version: 3.16
+            libc: musl
+          - triple: "linux-gnu"
+            platform: ubuntu
+            version: 20.04
+          # Set baselines per architecture
+          - archid: x86_64
+            nodearch: x64
+            arch: amd64
+            gcc-install: gcc g++
+            gcc: gcc
+          - archid: armv7
+            archpost: eabihf
+            nodearch: arm
+            arch: arm
+            flags: -march=armv7-a -mfpu=neon-vfpv4 -mfloat-abi=hard -fPIC
+            gcc-install: gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf
+            gcc: arm-linux-gnueabihf-gcc
+          - archid: aarch64
+            nodearch: arm64
+            arch: arm64
+            flags: -march=armv8-a -fPIC
+            gcc-install: gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
+            gcc: aarch64-linux-gnu-gcc
+          # Set edge case overrides for specific platform + architecture
+          # gcc has issues building on the same arch but for a different libc, use clang instead
+          - arch: amd64
+            platform: alpine
+            gcc-install: clang lld
+            gcc: clang
+          # ubuntu uses the triple `arm-linux-gnueabihf` instead of alpine's `armv7-alpine-linux-musleabihf`
+          - archid: arm
+            arch: arm
+            platform: ubuntu
+          # ubuntu 20.04 uses openssl 1.1.1f, however static versions of openssl 1.1.1 are bugged on aarch64, use ubuntu 22.04 instead
+          - version: 22.04
+            arch: arm64
+            platform: ubuntu
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-      - name: Build
-        run: npm install --build-from-source
+      - name: Install node dependencies
+        run: npm install --ignore-scripts
         env:
           CI: true
-      - name: Test
-        run: npm run test
-        env:
-          CI: true
-      - name: Upload
-        run: node_modules/.bin/prebuild -r napi --upload -u ${{ secrets.GITHUB_TOKEN }}
-        env:
-          CI: true
-
-  build-linux-armv7:
-    runs-on: ubuntu-20.04
-
-    strategy:
-      matrix:
-        node-version: [16.x]
-    steps:
-      - uses: actions/checkout@v2
-      - name: Prepare Cross Compile
+      - if: matrix.arch != 'amd64'
+        name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: ${{ matrix.arch }}
+      - name: Install system dependencies
         run: |
           sudo apt update
-          sudo apt install -y g++-arm-linux-gnueabihf gcc-arm-linux-gnueabihf
-          mkdir sysroot && cd sysroot
-          wget https://commondatastorage.googleapis.com/chrome-linux-sysroot/toolchain/ef5c4f84bcafb7a3796d36bb1db7826317dde51c/debian_sid_arm_sysroot.tar.xz
-          tar xf debian_sid_arm_sysroot.tar.xz
-          echo "ARM_SYSROOT=$(pwd)" >> $GITHUB_ENV
-          ls -l
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
-        with:
-          node-version: ${{ matrix.node-version }}
-      - name: Build & Upload
-        run: |
-          npm install --ignore-scripts
-          node_modules/.bin/prebuild -r napi --backend cmake-js --arch arm --upload -u ${{ secrets.GITHUB_TOKEN }} -- --CDCMAKE_TOOLCHAIN_FILE:FILEPATH=./cmake/toolchain/armv7.cmake
+          sudo apt install -y podman ninja-build ${{ matrix.gcc-install }}
+      - name: Build sysroot
+        run: sudo podman build -t ndc-buildroot:${{ matrix.platform }}-${{ matrix.arch }} ./build-containers --file Dockerfile.${{ matrix.platform }} --platform linux/${{ matrix.arch }} --build-arg="version=${{ matrix.version }}"
+      - name: Mount sysroot
+        id: sysroot
+        run: echo "sysroot=$(sudo podman image mount ndc-buildroot:${{ matrix.platform }}-${{ matrix.arch }})" >> $GITHUB_OUTPUT
+      - name: Build and upload
+        run: sudo --preserve-env=SYSROOT,TRIPLE,COMPILER_FLAGS,LIBC,GCC,CI,PATH node_modules/.bin/prebuild --arch ${{ matrix.nodearch }} -r napi --backend cmake-js --upload -u ${{ secrets.GITHUB_TOKEN }} -- --CDCMAKE_TOOLCHAIN_FILE:FILEPATH=./cmake/toolchain/ci.cmake
         env:
+          SYSROOT: ${{ steps.sysroot.outputs.sysroot }}
+          TRIPLE: ${{ matrix.archid }}-${{ matrix.triple }}${{ matrix.archpost }}
+          COMPILER_FLAGS: ${{ matrix.flags }}
+          LIBC: ${{ matrix.libc }}
+          GCC: ${{ matrix.gcc }}
           CI: true
-
-  build-linux-arm64:
-    runs-on: ubuntu-20.04
-
-    strategy:
-      matrix:
-        node-version: [16.x]
-    steps:
-      - uses: actions/checkout@v2
-      - name: Prepare Cross Compile
-        run: |
-          sudo apt update
-          sudo apt install -y g++-aarch64-linux-gnu gcc-aarch64-linux-gnu
-          mkdir sysroot && cd sysroot
-          wget https://commondatastorage.googleapis.com/chrome-linux-sysroot/toolchain/41a6c8dec4c4304d6509e30cbaf9218dffb4438e/debian_bullseye_arm64_sysroot.tar.xz
-          tar xf debian_bullseye_arm64_sysroot.tar.xz
-          echo "ARM64_SYSROOT=$(pwd)" >> $GITHUB_ENV
-          ls -l
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
-        with:
-          node-version: ${{ matrix.node-version }}
-      - name: Build & Upload
-        run: |
-          npm install --ignore-scripts
-          node_modules/.bin/prebuild -r napi --backend cmake-js --arch arm64 --upload -u ${{ secrets.GITHUB_TOKEN }} -- --CDCMAKE_TOOLCHAIN_FILE:FILEPATH=./cmake/toolchain/arm64.cmake
-        env:
-          CI: true
-
-  # npm-publish:
-  #   needs: [build-linux, build-linux-armv7, build-linux-arm64]
-  #   name: npm-publish
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Checkout repository
-  #       uses: actions/checkout@v2
-  #     - name: Set up Node.js
-  #       uses: actions/setup-node@v1
-  #       with:
-  #         node-version: 16.x
-  #         registry-url: "https://registry.npmjs.org"
-  #     - name: Publish
-  #       run: |
-  #         npm install
-  #         npm publish
-  #       env:
-  #         NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
