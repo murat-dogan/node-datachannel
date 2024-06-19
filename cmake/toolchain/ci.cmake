@@ -4,6 +4,9 @@ set(triple $ENV{TRIPLE})
 # use clang and lld
 set(CMAKE_C_COMPILER $ENV{GCC})
 set(CMAKE_CXX_COMPILER $ENV{GCC})
+if (CMAKE_C_COMPILER MATCHES clang)
+    add_link_options("-fuse-ld=lld")
+endif()
 
 set(CMAKE_SYSROOT "$ENV{SYSROOT}")
 message(STATUS "Using sysroot: ${CMAKE_SYSROOT}")

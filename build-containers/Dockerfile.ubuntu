@@ -1,4 +1,0 @@
-ARG version=20.04
-FROM ubuntu:${version}
-RUN apt update
-RUN apt install -y build-essential libssl-dev
