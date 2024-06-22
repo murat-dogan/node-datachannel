@@ -63,7 +63,7 @@ export interface RtcConfig {
 }
 
 // Lowercase to match the description type string from libdatachannel
-export const enum DescriptionType {
+export enum DescriptionType {
     Unspec = 'unspec',
     Offer = 'offer',
     Answer = 'answer',
