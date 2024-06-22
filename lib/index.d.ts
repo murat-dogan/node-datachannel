@@ -31,7 +31,7 @@ export interface ProxyServer {
     password?: string;
 }
 
-export const enum RelayType {
+export enum RelayType {
     TurnUdp = 'TurnUdp',
     TurnTcp = 'TurnTcp',
     TurnTls = 'TurnTls',
@@ -71,7 +71,7 @@ export enum DescriptionType {
     Rollback = 'rollback',
 }
 
-export const enum ReliabilityType {
+export enum ReliabilityType {
     Reliable = 0,
     Rexmit = 1,
     Timed = 2,
@@ -104,7 +104,7 @@ export interface SelectedCandidateInfo {
 }
 
 // Must be same as rtc enum class Direction
-export const enum Direction {
+export enum Direction {
     SendOnly = 'SendOnly',
     RecvOnly = 'RecvOnly',
     SendRecv = 'SendRecv',
