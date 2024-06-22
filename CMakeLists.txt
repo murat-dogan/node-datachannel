@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.15)
 cmake_policy(SET CMP0091 NEW)
 cmake_policy(SET CMP0042 NEW)
 
-project(node_datachannel VERSION 0.9.1)
+project(node_datachannel VERSION 0.9.2)
 
 # -Dnapi_build_version=8
 add_definitions(-DNAPI_VERSION=8)
@@ -29,7 +29,7 @@ include(FetchContent)
 FetchContent_Declare(
     libdatachannel
     GIT_REPOSITORY https://github.com/paullouisageneau/libdatachannel.git
-    GIT_TAG "v0.21.0"
+    GIT_TAG "v0.21.1"
 )
 
 option(NO_MEDIA "Disable media transport support in libdatachannel" OFF)
