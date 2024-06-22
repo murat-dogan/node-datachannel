@@ -23,39 +23,41 @@ jobs:
             platform: alpine
             version: 3.16
             libc: musl
-            gcc-install: clang lld
+            gcc_install: clang lld
             gcc: clang
+          # libc is intentionally not set here, as prebuild-install requires libc to not be set for glibc builds
           - triple: "linux-gnu"
             platform: debian
             version: bullseye
           # Set baselines per architecture
-          - archid: x86_64
-            nodearch: x64
+          - triple_arch: x86_64
+            node_arch: x64
             arch: amd64
-          - archid: armv7
-            archpost: eabihf
-            nodearch: arm
+          - triple_arch: armv7
+            node_arch: arm
+            triple_postfix: eabihf
             arch: arm
             flags: -march=armv7-a -mfpu=neon-vfpv4 -mfloat-abi=hard -fPIC
-          - archid: aarch64
-            nodearch: arm64
+          - triple_arch: aarch64
+            node_arch: arm64
             arch: arm64
             flags: -march=armv8-a -fPIC
           # Set edge case overrides for specific platform + architecture
-          # gcc has issues building on the same arch but for a different libc, use clang instead
+          # also define gcc commands for each architecture 
           - arch: amd64
             platform: debian
-            gcc-install: gcc g++
+            gcc_install: gcc g++
             gcc: gcc
           - arch: arm64
             platform: debian
-            gcc-install: gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
+            gcc_install: gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
             gcc: aarch64-linux-gnu-gcc
           # debian uses the triple `arm-linux-gnueabihf` instead of alpine's `armv7-alpine-linux-musleabihf`
-          - archid: arm
+          # because of this, we explicitly override triple_arch for debian arm
+          - triple_arch: arm
             arch: arm
             platform: debian
-            gcc-install: gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf
+            gcc_install: gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf
             gcc: arm-linux-gnueabihf-gcc
 
     steps:
@@ -76,7 +78,7 @@ jobs:
       - name: Install system dependencies
         run: |
           sudo apt update
-          sudo apt install -y podman ninja-build ${{ matrix.gcc-install }}
+          sudo apt install -y podman ninja-build ${{ matrix.gcc_install }}
       - name: List installed libc
         run: apt list --installed | grep libc6-dev
       - name: Build sysroot
@@ -85,10 +87,10 @@ jobs:
         id: sysroot
         run: echo "sysroot=$(sudo podman image mount ndc-buildroot:${{ matrix.platform }}-${{ matrix.arch }})" >> $GITHUB_OUTPUT
       - name: Build
-        run: sudo --preserve-env=SYSROOT,TRIPLE,COMPILER_FLAGS,LIBC,GCC,CI,PATH node_modules/.bin/prebuild --arch ${{ matrix.nodearch }} -r napi --backend cmake-js -- --CDCMAKE_TOOLCHAIN_FILE:FILEPATH=./cmake/toolchain/ci.cmake
+        run: sudo --preserve-env=SYSROOT,TRIPLE,COMPILER_FLAGS,LIBC,GCC,CI,PATH node_modules/.bin/prebuild --arch ${{ matrix.node_arch }} -r napi --backend cmake-js -- --CDCMAKE_TOOLCHAIN_FILE:FILEPATH=./cmake/toolchain/ci.cmake
         env:
           SYSROOT: ${{ steps.sysroot.outputs.sysroot }}
-          TRIPLE: ${{ matrix.archid }}-${{ matrix.triple }}${{ matrix.archpost }}
+          TRIPLE: ${{ matrix.triple_arch }}-${{ matrix.triple }}${{ matrix.triple_postfix }}
           COMPILER_FLAGS: ${{ matrix.flags }}
           LIBC: ${{ matrix.libc }}
           GCC: ${{ matrix.gcc }}
@@ -96,7 +98,7 @@ jobs:
       - name: Test
         run: sudo podman run --rm -v $(pwd):/usr/app/ -e CI=true --platform linux/${{ matrix.arch }} -t ndc-buildroot:${{ matrix.platform }}-${{ matrix.arch }} npm run test
       - name: Upload
-        run: sudo --preserve-env=CI,LIBC node_modules/.bin/prebuild --arch ${{ matrix.nodearch }} -r napi --upload -u ${{ secrets.GITHUB_TOKEN }}
+        run: sudo --preserve-env=CI,LIBC node_modules/.bin/prebuild --arch ${{ matrix.node_arch }} -r napi --upload -u ${{ secrets.GITHUB_TOKEN }}
         env:
           LIBC: ${{ matrix.libc }}
           CI: true
