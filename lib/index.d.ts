@@ -54,12 +54,17 @@ export interface RtcConfig {
     enableIceTcp?: boolean;
     enableIceUdpMux?: boolean;
     disableAutoNegotiation?: boolean;
+    disableFingerprintVerification?: boolean;
+    disableAutoGathering?: boolean;
     forceMediaTransport?: boolean;
     portRangeBegin?: number;
     portRangeEnd?: number;
     maxMessageSize?: number;
     mtu?: number;
     iceTransportPolicy?: TransportPolicy;
+    certificatePemFile?: string;
+    keyPemFile?: string;
+    keyPemPass?: string;
 }
 
 // Lowercase to match the description type string from libdatachannel
@@ -75,6 +80,11 @@ export const enum ReliabilityType {
     Reliable = 0,
     Rexmit = 1,
     Timed = 2,
+}
+
+export interface LocalDescriptionInit {
+    iceUfrag?: string;
+    icePwd?: string;
 }
 
 export interface DataChannelInitConfig {
@@ -277,13 +287,25 @@ export class WebSocketServer {
     onClient(cb: (ws: WebSocket) => void): void;
 }
 
+export interface CertificateFingerprint {
+    /**
+     * @see https://developer.mozilla.org/en-US/docs/Web/API/RTCCertificate/getFingerprints#value
+     */
+    value: string;
+    /**
+     * @see https://developer.mozilla.org/en-US/docs/Web/API/RTCCertificate/getFingerprints#algorithm
+     */
+    algorithm: 'sha-1' | 'sha-224' | 'sha-256' | 'sha-384' | 'sha-512' | 'md5' | 'md2';
+}
+
 export class PeerConnection {
     constructor(peerName: string, config: RtcConfig);
     close(): void;
-    setLocalDescription(type?: DescriptionType): void;
+    setLocalDescription(type?: DescriptionType, init?: LocalDescriptionInit): void;
     setRemoteDescription(sdp: string, type: DescriptionType): void;
     localDescription(): { type: string; sdp: string } | null;
     remoteDescription(): { type: string; sdp: string } | null;
+    remoteFingerprint(): CertificateFingerprint;
     addRemoteCandidate(candidate: string, mid: string): void;
     createDataChannel(label: string, config?: DataChannelInitConfig): DataChannel;
     addTrack(media: Video | Audio): Track;
