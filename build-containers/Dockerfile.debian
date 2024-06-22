@@ -1,4 +1,4 @@
-ARG version=buster
+ARG version=bullseye
 ARG node_version=16
 FROM node:${node_version}-${version}
 RUN apt update
