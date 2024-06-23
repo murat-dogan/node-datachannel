@@ -1,6 +1,6 @@
 {
     "name": "node-datachannel",
-    "version": "0.9.2",
+    "version": "0.10.0-dev",
     "description": "libdatachannel node bindings",
     "type": "module",
     "types": "./lib/index.d.ts",
