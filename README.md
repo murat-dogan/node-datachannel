@@ -22,13 +22,13 @@ npm install node-datachannel
 
 `node-datachannel` targets N-API version 8 and supports NodeJS v16 and above. It is tested on Linux, Windows and MacOS. For N-API compatibility please check [here](https://nodejs.org/api/n-api.html#n_api_n_api_version_matrix).
 
-|          | Linux [x64,armv7,arm64](1) | Windows [x86,x64] | Mac [M1,x64] |
-| -------- | :------------------------: | :---------------: | :----------: |
-| Node V16 |             +              |         +         |      +       |
-| Node V17 |             +              |         +         |      +       |
-| Node V18 |             +              |         +         |      +       |
-| Node V19 |             +              |         +         |      +       |
-| Node V20 |             +              |         +         |      +       |
+|          | Linux [x64,armv7,arm64] (1) | Windows [x86,x64] | Mac [M1,x64] |
+| -------- | :-------------------------: | :---------------: | :----------: |
+| Node V16 |              +              |         +         |      +       |
+| Node V17 |              +              |         +         |      +       |
+| Node V18 |              +              |         +         |      +       |
+| Node V19 |              +              |         +         |      +       |
+| Node V20 |              +              |         +         |      +       |
 
 **(1)** For Linux musl + libc
 
