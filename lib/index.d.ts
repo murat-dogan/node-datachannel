@@ -71,26 +71,13 @@ export enum DescriptionType {
     Rollback = 'rollback',
 }
 
-export const enum ReliabilityType {
-    Reliable = 0,
-    Rexmit = 1,
-    Timed = 2,
-}
-
 export interface DataChannelInitConfig {
     protocol?: string;
     negotiated?: boolean;
     id?: number;
-    ordered?: boolean;
-    maxPacketLifeTime?: number;
-    maxRetransmits?: number;
-
-    // Deprecated, use ordered, maxPacketLifeTime, and maxRetransmits
-    reliability?: {
-        type?: ReliabilityType;
-        unordered?: boolean;
-        rexmit?: number;
-    };
+    unordered?: boolean; // Reliability
+    maxPacketLifeTime?: number; // Reliability
+    maxRetransmits?: number; // Reliability
 }
 
 export interface SelectedCandidateInfo {
@@ -113,8 +100,7 @@ export const enum Direction {
 }
 
 export class RtcpReceivingSession {
-    requestBitrate(bitRate: number): void;
-    requestKeyframe(): boolean;
+    //
 }
 
 export class Audio {

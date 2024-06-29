@@ -22,14 +22,11 @@ public:
   std::shared_ptr<rtc::RtcpReceivingSession> getSessionInstance();
 
   // Functions
-  void requestBitrate(const Napi::CallbackInfo &info);
-  Napi::Value requestKeyframe(const Napi::CallbackInfo &info);
 
   // Callbacks
-  
 
 private:
-  static std::unordered_set<RtcpReceivingSessionWrapper*> instances;
+  static std::unordered_set<RtcpReceivingSessionWrapper *> instances;
   std::shared_ptr<rtc::RtcpReceivingSession> mSessionPtr = nullptr;
 };
 

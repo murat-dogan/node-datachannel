@@ -249,7 +249,7 @@ PeerConnectionWrapper::PeerConnectionWrapper(const Napi::CallbackInfo &info) : N
     PLOG_DEBUG << "Peer Connection created";
 
     // State change callback must be set to trigger cleanup on close
-    mOnStateChangeCallback = std::make_unique<ThreadSafeCallback>(Napi::Function::New(info.Env(), [](const Napi::CallbackInfo&){}));
+    mOnStateChangeCallback = std::make_unique<ThreadSafeCallback>(Napi::Function::New(info.Env(), [](const Napi::CallbackInfo &) {}));
 
     instances.insert(this);
 }
@@ -503,80 +503,16 @@ Napi::Value PeerConnectionWrapper::createDataChannel(const Napi::CallbackInfo &i
             init.id = uint16_t(initConfig.Get("id").As<Napi::Number>().Uint32Value());
         }
 
-        // Deprecated reliability object, kept for retro-compatibility
-        if (!initConfig.Get("reliability").IsUndefined())
+        // Reliability.unordered parameter
+        if (!initConfig.Get("unordered").IsUndefined())
         {
-            if (!initConfig.Get("reliability").IsObject())
-            {
-                Napi::TypeError::New(env, "Wrong DataChannel Init Config (reliability)").ThrowAsJavaScriptException();
-                return info.Env().Null();
-            }
-
-            Napi::Object reliability = initConfig.Get("reliability").As<Napi::Object>();
-            if (!reliability.Get("type").IsUndefined())
-            {
-                if (!reliability.Get("type").IsNumber())
-                {
-                    Napi::TypeError::New(env, "Wrong Reliability Config (type)").ThrowAsJavaScriptException();
-                    return info.Env().Null();
-                }
-                switch (reliability.Get("type").As<Napi::Number>().Uint32Value())
-                {
-                case 0:
-                    init.reliability.type = rtc::Reliability::Type::Reliable;
-                    break;
-                case 1:
-                    init.reliability.type = rtc::Reliability::Type::Rexmit;
-                    break;
-                case 2:
-                    init.reliability.type = rtc::Reliability::Type::Timed;
-                    break;
-                default:
-                    Napi::TypeError::New(env, "Unknown DataChannel Reliability Type").ThrowAsJavaScriptException();
-                    return info.Env().Null();
-                }
-            }
-
-            if (!reliability.Get("unordered").IsUndefined())
-            {
-                if (!reliability.Get("unordered").IsBoolean())
-                {
-                    Napi::TypeError::New(env, "Wrong reliability Config (unordered)").ThrowAsJavaScriptException();
-                    return info.Env().Null();
-                }
-                init.reliability.unordered = reliability.Get("unordered").As<Napi::Boolean>();
-            }
-
-            if (!reliability.Get("rexmit").IsUndefined())
-            {
-                if (!reliability.Get("rexmit").IsNumber())
-                {
-                    Napi::TypeError::New(env, "Wrong Reliability Config (rexmit)").ThrowAsJavaScriptException();
-                    return info.Env().Null();
-                }
-                switch (reliability.Get("type").As<Napi::Number>().Uint32Value())
-                {
-                case 1:
-                    init.reliability.rexmit = int(reliability.Get("rexmit").As<Napi::Number>().ToNumber().Uint32Value());
-                    break;
-                case 2:
-                    init.reliability.rexmit = std::chrono::milliseconds(reliability.Get("rexmit").As<Napi::Number>().Int32Value());
-                    break;
-                }
-            }
-        }
-
-        // Reliability parameters
-        if (!initConfig.Get("ordered").IsUndefined())
-        {
-            if (!initConfig.Get("ordered").IsBoolean())
+            if (!initConfig.Get("unordered").IsBoolean())
             {
                 Napi::TypeError::New(env, "Wrong DataChannel Init Config (ordered)").ThrowAsJavaScriptException();
                 return info.Env().Null();
             }
-            init.reliability.unordered = !initConfig.Get("ordered").As<Napi::Boolean>();
+            init.reliability.unordered = !initConfig.Get("unordered").As<Napi::Boolean>();
         }
-
 
         if (!initConfig.Get("maxPacketLifeTime").IsUndefined() && !initConfig.Get("maxPacketLifeTime").IsNull() &&
             !initConfig.Get("maxRetransmits").IsUndefined() && !initConfig.Get("maxRetransmits").IsNull())
