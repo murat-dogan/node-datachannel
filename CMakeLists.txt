@@ -78,7 +78,7 @@ if(APPLE)
 elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL "Android")
     list(APPEND LINK_LIBRARIES -static-libgcc)
 elseif(UNIX)
-    list(APPEND LINK_LIBRARIES -static-libgcc -static-libstdc++)
+    list(APPEND LINK_LIBRARIES -static-libgcc -static-libstdc++ -static)
 endif()
 
 if(WIN32)
