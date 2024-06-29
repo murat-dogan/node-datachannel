@@ -508,7 +508,7 @@ Napi::Value PeerConnectionWrapper::createDataChannel(const Napi::CallbackInfo &i
         {
             if (!initConfig.Get("unordered").IsBoolean())
             {
-                Napi::TypeError::New(env, "Wrong DataChannel Init Config (ordered)").ThrowAsJavaScriptException();
+                Napi::TypeError::New(env, "Wrong DataChannel Init Config (unordered)").ThrowAsJavaScriptException();
                 return info.Env().Null();
             }
             init.reliability.unordered = !initConfig.Get("unordered").As<Napi::Boolean>();
