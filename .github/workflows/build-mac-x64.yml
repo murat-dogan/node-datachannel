@@ -28,8 +28,8 @@ jobs:
         run: npm install --build-from-source
         env:
           CI: true
-          OPENSSL_ROOT_DIR: /usr/local/opt/openssl
-          OPENSSL_LIBRARIES: /usr/local/opt/openssl/lib
+          OPENSSL_ROOT_DIR: /usr/local/opt/openssl@1.1
+          OPENSSL_LIBRARIES: /usr/local/opt/openssl@1.1/lib
       - name: Test
         run: npm run test
         env:
