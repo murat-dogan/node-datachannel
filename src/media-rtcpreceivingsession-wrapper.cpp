@@ -11,8 +11,7 @@ Napi::Object RtcpReceivingSessionWrapper::Init(Napi::Env env, Napi::Object expor
         env,
         "RtcpReceivingSession",
         {
-            Napi::ObjectWrap<RtcpReceivingSessionWrapper>::InstanceMethod("requestBitrate", &RtcpReceivingSessionWrapper::requestBitrate),
-            Napi::ObjectWrap<RtcpReceivingSessionWrapper>::InstanceMethod("requestKeyframe", &RtcpReceivingSessionWrapper::requestKeyframe),
+            // Instance Methods
         });
 
     constructor = Napi::Persistent(func);
@@ -38,25 +37,4 @@ RtcpReceivingSessionWrapper::~RtcpReceivingSessionWrapper()
 std::shared_ptr<rtc::RtcpReceivingSession> RtcpReceivingSessionWrapper::getSessionInstance()
 {
     return mSessionPtr;
-}
-
-void RtcpReceivingSessionWrapper::requestBitrate(const Napi::CallbackInfo &info)
-{
-    Napi::Env env = info.Env();
-    int length = info.Length();
-
-    if (length < 1 || !info[0].IsNumber())
-    {
-        Napi::TypeError::New(env, "We expect (Number) as param").ThrowAsJavaScriptException();
-        return;
-    }
-
-    unsigned int bitrate = static_cast<uint32_t>(info[0].As<Napi::Number>().ToNumber());
-    mSessionPtr->requestBitrate(bitrate);
-}
-
-Napi::Value RtcpReceivingSessionWrapper::requestKeyframe(const Napi::CallbackInfo &info)
-{
-    Napi::Env env = info.Env();
-    return Napi::Boolean::New(env, mSessionPtr->requestKeyframe());
 }
