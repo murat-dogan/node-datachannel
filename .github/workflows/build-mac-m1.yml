@@ -6,6 +6,17 @@ on:
   #   tags:
   #     - v*
 
+
+  # OpenSSL
+  # Instead of downloading binaries from somewhere, it is better to use Homebrew to install OpenSSL.
+  #      - name: Install OpenSSL
+  #      run: |
+  #        wget https://mac.r-project.org/bin/darwin20/arm64/openssl-1.1.1o-darwin.20-arm64.tar.xz
+  #        tar -xf openssl-1.1.1o-darwin.20-arm64.tar.xz -C /tmp
+  #        rm -rf openssl-1.1.1o-darwin.20-arm64.tar.xz
+
+
+
 env:
   ACTIONS_ALLOW_UNSECURE_COMMANDS: true
 
@@ -19,7 +30,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install OpenSSL
-        run: HOMEBREW_NO_INSTALL_CLEANUP=1 brew reinstall openssl@1.1
+        run: HOMEBREW_NO_INSTALL_CLEANUP=1 brew reinstall openssl@3
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
@@ -30,5 +41,3 @@ jobs:
           node_modules/.bin/prebuild -r napi --backend cmake-js --arch arm64 --upload -u ${{ secrets.GITHUB_TOKEN }} -- --CDCMAKE_OSX_ARCHITECTURES="arm64"
         env:
           CI: true
-          OPENSSL_ROOT_DIR: /usr/local/opt/openssl@1.1
-          OPENSSL_LIBRARIES: /usr/local/opt/openssl@1.1/lib
