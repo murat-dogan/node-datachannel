@@ -17,14 +17,11 @@ jobs:
         node-version: [16.x]
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Install OpenSSL
-        run: |
-          wget https://mac.r-project.org/bin/darwin20/arm64/openssl-1.1.1o-darwin.20-arm64.tar.xz
-          tar -xf openssl-1.1.1o-darwin.20-arm64.tar.xz -C /tmp
-          rm -rf openssl-1.1.1o-darwin.20-arm64.tar.xz
+        run: HOMEBREW_NO_INSTALL_CLEANUP=1 brew reinstall openssl@1.1
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
       - name: Build
@@ -33,5 +30,5 @@ jobs:
           node_modules/.bin/prebuild -r napi --backend cmake-js --arch arm64 --upload -u ${{ secrets.GITHUB_TOKEN }} -- --CDCMAKE_OSX_ARCHITECTURES="arm64"
         env:
           CI: true
-          OPENSSL_ROOT_DIR: /tmp/opt/R/arm64
-          OPENSSL_LIBRARIES: /tmp/opt/R/arm64/lib
+          OPENSSL_ROOT_DIR: /opt/homebrew/opt/openssl
+          OPENSSL_LIBRARIES: /opt/homebrew/opt/openssl/lib
