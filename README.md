@@ -103,6 +103,10 @@ Please check [here](/BULDING.md)
 
 Please check [docs](/API.md) page
 
+## Contributing
+
+Contributions welcome!
+
 ## Thanks
 
 Thanks to [Streamr](https://streamr.network/) for supporting this project by being a Sponsor!
