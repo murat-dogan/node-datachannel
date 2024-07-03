@@ -4,7 +4,7 @@
 
 -   Lightweight
     -   No need to deal with WebRTC stack!
-    -   Small binary sizes (~8MB for Linux X64)
+    -   Small binary sizes (~8MB for Linux x64)
 -   Type infos for Typescript
 
 This project is Node.js bindings for [libdatachannel](https://github.com/paullouisageneau/libdatachannel) library.
