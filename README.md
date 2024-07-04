@@ -1,4 +1,4 @@
-# WebRTC For Node.js and Electron
+# WebRTC For Node.js and Electron ( with Websocket)
 
 ![Linux CI Build](https://github.com/murat-dogan/node-datachannel/workflows/Build%20-%20Linux/badge.svg) ![Windows CI Build](https://github.com/murat-dogan/node-datachannel/workflows/Build%20-%20Win/badge.svg) ![Mac x64 CI Build](https://github.com/murat-dogan/node-datachannel/workflows/Build%20-%20Mac%20x64/badge.svg) ![Mac M1 CI Build](https://github.com/murat-dogan/node-datachannel/workflows/Build%20-%20Mac%20M1/badge.svg)
 
@@ -6,6 +6,7 @@
     -   No need to deal with WebRTC stack!
     -   Small binary sizes (~8MB for Linux x64)
 -   Type infos for Typescript
+-   Integrated WebSocket Client & Server Implementation
 
 This project is Node.js bindings for [libdatachannel](https://github.com/paullouisageneau/libdatachannel) library.
 
@@ -37,6 +38,12 @@ WebRTC polyfills to be used for libraries like `simple-peer`.
 
 Please check [here](/polyfill)
 
+## WebSocket Client & Server
+
+Integrated WebSocket Client & Server is available, which can be used separately or for signaling.
+
+For an example usage, [check here](/examples/websocket)
+
 ## Example Usage
 
 ```js
@@ -44,6 +51,9 @@ import nodeDataChannel from 'node-datachannel';
 
 // Log Level
 nodeDataChannel.initLogger('Debug');
+
+// Integrated WebSocket available and can be used for signaling etc
+// const ws = new nodeDataChannel.WebSocket();
 
 let dc1 = null;
 let dc2 = null;
