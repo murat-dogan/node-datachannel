@@ -1,4 +1,4 @@
-# WebRTC For Node.js and Electron ( with Websocket)
+# WebRTC For Node.js and Electron ( with WebSocket)
 
 ![Linux CI Build](https://github.com/murat-dogan/node-datachannel/workflows/Build%20-%20Linux/badge.svg) ![Windows CI Build](https://github.com/murat-dogan/node-datachannel/workflows/Build%20-%20Win/badge.svg) ![Mac x64 CI Build](https://github.com/murat-dogan/node-datachannel/workflows/Build%20-%20Mac%20x64/badge.svg) ![Mac M1 CI Build](https://github.com/murat-dogan/node-datachannel/workflows/Build%20-%20Mac%20M1/badge.svg)
 
