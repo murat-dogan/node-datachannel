@@ -5,6 +5,7 @@ import RTCIceCandidate from './RTCIceCandidate.js';
 import { RTCDataChannelEvent, RTCPeerConnectionIceEvent } from './Events.js';
 import RTCSctpTransport from './RTCSctpTransport.js';
 import 'node-domexception';
+import { InvalidStateError } from './Exception.js';
 
 export default class _RTCPeerConnection extends EventTarget {
     static async generateCertificate() {
@@ -197,10 +198,14 @@ export default class _RTCPeerConnection extends EventTarget {
             throw new DOMException('Candidate invalid');
         }
 
-        this.#remoteCandidates.push(
-            new RTCIceCandidate({ candidate: candidate.candidate, sdpMid: candidate.sdpMid || '0' }),
-        );
-        this.#peerConnection.addRemoteCandidate(candidate.candidate, candidate.sdpMid || '0');
+        try {
+            this.#peerConnection.addRemoteCandidate(candidate.candidate, candidate.sdpMid || '0');
+            this.#remoteCandidates.push(
+                new RTCIceCandidate({ candidate: candidate.candidate, sdpMid: candidate.sdpMid || '0' }),
+            );
+        } catch (error) {
+            throw InvalidStateError(error.message);
+        }
     }
 
     addTrack(track, ...streams) {

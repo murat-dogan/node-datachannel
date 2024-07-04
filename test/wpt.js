@@ -1,9 +1,7 @@
-// RUn WPT manually before calling this script
-// Example: ./wpt serve
-// Example: node test/wpt.js
+// Run WPT manually before calling this script
 
 import { JSDOM } from 'jsdom';
-import nodeDataChannel from '../lib/index.js';
+import nodeDataChannel from '../polyfill/index.js';
 
 const WPT_SERVER_URL = 'http://web-platform.test:8000';
 const WPT_TEST_PATH_LIST = ['/webrtc/RTCPeerConnection-addIceCandidate.html', '/webrtc/RTCDataChannel-send.html'];
@@ -23,11 +21,14 @@ function runTest(filePath) {
         JSDOM.fromURL(filePath, {
             runScripts: 'dangerously',
             resources: 'usable',
+            pretendToBeVisual: true,
         }).then((dom) => {
             const { window } = dom;
 
-            // Assign the data channel polyfill to the window object
+            // Assign the  polyfill to the window object
             Object.assign(window, nodeDataChannel);
+            // Overwrite the DOMException object
+            window.DOMException = DOMException;
 
             const returnObject = [];
             window.addEventListener('load', () => {
