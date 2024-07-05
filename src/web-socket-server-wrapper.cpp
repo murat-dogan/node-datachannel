@@ -256,7 +256,8 @@ void WebSocketServerWrapper::onClient(const Napi::CallbackInfo &info)
                 // This will run in main thread and needs to construct the
                 // arguments for the call
                 std::shared_ptr<rtc::WebSocket> webSocket = ws;
-                auto instance = WebSocketWrapper::constructor.New({Napi::External<std::shared_ptr<rtc::WebSocket>>::New(env, nullptr), Napi::External<std::shared_ptr<rtc::WebSocket>>::New(env, &webSocket)});
+                // First argument is just a placeholder
+                auto instance = WebSocketWrapper::constructor.New({Napi::Boolean::New(env, false), Napi::External<std::shared_ptr<rtc::WebSocket>>::New(env, &webSocket)});
                 args = {instance};
                 PLOG_DEBUG << "mOnClientCallback call(2)";
             });
