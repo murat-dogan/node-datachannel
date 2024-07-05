@@ -65,6 +65,9 @@ WebSocketWrapper::WebSocketWrapper(const Napi::CallbackInfo &info) : Napi::Objec
         mWebSocketPtr = *(info[1].As<Napi::External<std::shared_ptr<rtc::WebSocket>>>().Data());
         PLOG_DEBUG << "Using WebSocket got from WebSocketServer";
         instances.insert(this);
+
+        // Closed callback must be set to trigger cleanup
+        mOnClosedCallback = std::make_unique<ThreadSafeCallback>(Napi::Function::New(info.Env(), [](const Napi::CallbackInfo &) {}));
         return;
     }
 
@@ -82,6 +85,9 @@ WebSocketWrapper::WebSocketWrapper(const Napi::CallbackInfo &info) : Napi::Objec
             return;
         }
         instances.insert(this);
+
+        // Closed callback must be set to trigger cleanup
+        mOnClosedCallback = std::make_unique<ThreadSafeCallback>(Napi::Function::New(info.Env(), [](const Napi::CallbackInfo &) {}));
         return;
     }
 
@@ -240,7 +246,7 @@ WebSocketWrapper::WebSocketWrapper(const Napi::CallbackInfo &info) : Napi::Objec
     PLOG_DEBUG << "WebSocket created";
 
     // Closed callback must set to trigger cleanup
-    mOnClosedCallback = std::make_unique<ThreadSafeCallback>(Napi::Function::New(info.Env(), [](const Napi::CallbackInfo&){}));
+    mOnClosedCallback = std::make_unique<ThreadSafeCallback>(Napi::Function::New(info.Env(), [](const Napi::CallbackInfo &) {}));
 
     instances.insert(this);
 }
