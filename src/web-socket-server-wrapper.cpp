@@ -20,11 +20,9 @@ Napi::Object WebSocketServerWrapper::Init(Napi::Env env, Napi::Object exports)
     Napi::Function func = DefineClass(
         env,
         "WebSocketServer",
-        {
-            InstanceMethod("stop", &WebSocketServerWrapper::stop),
-            InstanceMethod("port", &WebSocketServerWrapper::port),
-            InstanceMethod("onClient", &WebSocketServerWrapper::onClient)
-        });
+        {InstanceMethod("stop", &WebSocketServerWrapper::stop),
+         InstanceMethod("port", &WebSocketServerWrapper::port),
+         InstanceMethod("onClient", &WebSocketServerWrapper::onClient)});
 
     constructor = Napi::Persistent(func);
     constructor.SuppressDestruct();
@@ -36,7 +34,7 @@ Napi::Object WebSocketServerWrapper::Init(Napi::Env env, Napi::Object exports)
 WebSocketServerWrapper::WebSocketServerWrapper(const Napi::CallbackInfo &info) : Napi::ObjectWrap<WebSocketServerWrapper>(info)
 {
     PLOG_DEBUG << "Constructor called";
-    
+
     Napi::Env env = info.Env();
 
     // Create WebSocketServer without config
@@ -52,7 +50,7 @@ WebSocketServerWrapper::WebSocketServerWrapper(const Napi::CallbackInfo &info) :
             Napi::Error::New(env, std::string("libdatachannel error while creating WebSocketServer without config: ") + ex.what()).ThrowAsJavaScriptException();
             return;
         }
- 
+
         PLOG_DEBUG << "WebSocketServer created without config";
 
         instances.insert(this);
@@ -60,14 +58,14 @@ WebSocketServerWrapper::WebSocketServerWrapper(const Napi::CallbackInfo &info) :
     }
 
     // Create WebSocketServer with config
-    
-    Napi::Object config = info[0].As<Napi::Object>();    
+
+    Napi::Object config = info[0].As<Napi::Object>();
     rtc::WebSocketServerConfiguration webSocketServerConfig;
 
     // Port
     if (config.Has("port"))
     {
-        if (!config.Get("port").IsNumber()) 
+        if (!config.Get("port").IsNumber())
         {
             Napi::TypeError::New(info.Env(), "port must be a number").ThrowAsJavaScriptException();
             return;
@@ -78,7 +76,7 @@ WebSocketServerWrapper::WebSocketServerWrapper(const Napi::CallbackInfo &info) :
     // Enable TLS
     if (config.Has("enableTls"))
     {
-        if (!config.Get("enableTls").IsBoolean()) 
+        if (!config.Get("enableTls").IsBoolean())
         {
             Napi::TypeError::New(info.Env(), "enableTls must be boolean").ThrowAsJavaScriptException();
             return;
@@ -89,7 +87,7 @@ WebSocketServerWrapper::WebSocketServerWrapper(const Napi::CallbackInfo &info) :
     // Certificate PEM File
     if (config.Has("certificatePemFile"))
     {
-        if (!config.Get("certificatePemFile").IsString()) 
+        if (!config.Get("certificatePemFile").IsString())
         {
             Napi::TypeError::New(info.Env(), "certificatePemFile must be a string").ThrowAsJavaScriptException();
             return;
@@ -100,7 +98,7 @@ WebSocketServerWrapper::WebSocketServerWrapper(const Napi::CallbackInfo &info) :
     // Key PEM File
     if (config.Has("keyPemFile"))
     {
-        if (!config.Get("keyPemFile").IsString()) 
+        if (!config.Get("keyPemFile").IsString())
         {
             Napi::TypeError::New(info.Env(), "keyPemFile must be a string").ThrowAsJavaScriptException();
             return;
@@ -111,7 +109,7 @@ WebSocketServerWrapper::WebSocketServerWrapper(const Napi::CallbackInfo &info) :
     // Key PEM Pass
     if (config.Has("keyPemPass"))
     {
-        if (!config.Get("keyPemPass").IsString()) 
+        if (!config.Get("keyPemPass").IsString())
         {
             Napi::TypeError::New(info.Env(), "keyPemPass must be a string").ThrowAsJavaScriptException();
             return;
@@ -122,7 +120,7 @@ WebSocketServerWrapper::WebSocketServerWrapper(const Napi::CallbackInfo &info) :
     // Bind Address
     if (config.Has("bindAddress"))
     {
-        if (!config.Get("bindAddress").IsString()) 
+        if (!config.Get("bindAddress").IsString())
         {
             Napi::TypeError::New(info.Env(), "bindAddress must be a string").ThrowAsJavaScriptException();
             return;
@@ -133,7 +131,7 @@ WebSocketServerWrapper::WebSocketServerWrapper(const Napi::CallbackInfo &info) :
     // Connection Timeout
     if (config.Has("connectionTimeout"))
     {
-        if (!config.Get("connectionTimeout").IsNumber()) 
+        if (!config.Get("connectionTimeout").IsNumber())
         {
             Napi::TypeError::New(info.Env(), "connectionTimeout must be a number").ThrowAsJavaScriptException();
             return;
@@ -144,7 +142,7 @@ WebSocketServerWrapper::WebSocketServerWrapper(const Napi::CallbackInfo &info) :
     // Max Message Size
     if (config.Has("maxMessageSize"))
     {
-        if (!config.Get("maxMessageSize").IsNumber()) 
+        if (!config.Get("maxMessageSize").IsNumber())
         {
             Napi::TypeError::New(info.Env(), "maxMessageSize must be a number").ThrowAsJavaScriptException();
             return;
@@ -163,7 +161,7 @@ WebSocketServerWrapper::WebSocketServerWrapper(const Napi::CallbackInfo &info) :
         Napi::Error::New(env, std::string("libdatachannel error while creating WebSocketServer: ") + ex.what()).ThrowAsJavaScriptException();
         return;
     }
- 
+
     PLOG_DEBUG << "WebSocketServer created";
     instances.insert(this);
 }
@@ -187,7 +185,7 @@ void WebSocketServerWrapper::doStop()
         }
         catch (std::exception &ex)
         {
-            std::cerr << std::string("libWebRtc error while closing WebSocketServer: ") + ex.what() << std::endl;
+            std::cerr << std::string("libdatachannel error while closing WebSocketServer: ") + ex.what() << std::endl;
             return;
         }
     }
@@ -238,7 +236,7 @@ void WebSocketServerWrapper::onClient(const Napi::CallbackInfo &info)
 
     if (length < 1 || !info[0].IsFunction())
     {
-        Napi::TypeError::New(env, "Function expected as onClient calback").ThrowAsJavaScriptException();
+        Napi::TypeError::New(env, "Function expected as onClient callback").ThrowAsJavaScriptException();
         return;
     }
 
@@ -246,7 +244,7 @@ void WebSocketServerWrapper::onClient(const Napi::CallbackInfo &info)
     mOnClientCallback = std::make_unique<ThreadSafeCallback>(info[0].As<Napi::Function>());
 
     mWebSocketServerPtr->onClient([&](std::shared_ptr<rtc::WebSocket> ws)
-                                   {
+                                  {
         PLOG_DEBUG << "onClient ws received from WebSocketServer";
         if (mOnClientCallback)
             mOnClientCallback->call([this, ws](Napi::Env env, std::vector<napi_value> &args) {
