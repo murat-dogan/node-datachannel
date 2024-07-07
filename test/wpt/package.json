@@ -1,0 +1,17 @@
+{
+  "name": "wpt-tests",
+  "version": "1.0.0",
+  "description": "git clone https://github.com/web-platform-tests/wpt.git cd wpt ./wpt make-hosts-file | sudo tee -a /etc/hosts ./wpt serve",
+  "type": "module",
+  "main": "wpt.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "jsdom": "^24.1.0",
+    "puppeteer": "^22.12.1"
+  }
+}
