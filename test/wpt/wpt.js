@@ -6,15 +6,15 @@ import nodeDataChannel from '../../polyfill/index.js';
 
 export async function runWptTests(wptTestList, _forChrome = false, _wptServerUrl = 'http://web-platform.test:8000') {
     const browser = await puppeteer.launch({
-        headless: false,
-        devtools: true,
+        headless: true,
+        devtools: false,
     });
     let results = [];
 
     // call runTest for each test path
     for (let i = 0; i < wptTestList.length; i++) {
         const path = `${_wptServerUrl}${wptTestList[i]}`;
-        const result = _forChrome ? await runTestForChrome(browser, path) : await runTest(path);
+        const result = _forChrome ? await runTestForChrome(browser, path) : await runTestForLibrary(path);
         results.push({ test: wptTestList[i], result });
 
         // sleep for 1 second
@@ -27,7 +27,7 @@ export async function runWptTests(wptTestList, _forChrome = false, _wptServerUrl
     return results;
 }
 
-function runTest(filePath) {
+function runTestForLibrary(filePath) {
     // return new promise
     return new Promise((resolve, reject) => {
         JSDOM.fromURL(filePath, {
@@ -43,6 +43,7 @@ function runTest(filePath) {
 
             // Overwrite the DOMException object
             window.DOMException = DOMException;
+            window.TypeError = TypeError;
 
             const returnObject = [];
             window.addEventListener('load', () => {
@@ -68,10 +69,10 @@ async function runTestForChrome(browser, filePath) {
     const page = await browser.newPage();
     // Evaluate the script in the page context
     await page.evaluateOnNewDocument(() => {
-        window.returnObject = [];
+        window.returnTestResults = [];
         window.addEventListener('load', () => {
             window.add_result_callback((test) => {
-                window.returnObject.push({ name: test.name, message: test.message, status: test.status });
+                window.returnTestResults.push({ name: test.name, message: test.message, status: test.status });
             });
         });
     });
@@ -81,7 +82,7 @@ async function runTestForChrome(browser, filePath) {
 
     // get the results
     const results = await page.evaluate(() => {
-        return window.returnObject;
+        return window.returnTestResults;
     });
 
     // close the page

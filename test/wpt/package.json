@@ -5,7 +5,7 @@
   "type": "module",
   "main": "wpt.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node index.js"
   },
   "keywords": [],
   "author": "",

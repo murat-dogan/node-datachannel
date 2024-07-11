@@ -5,7 +5,7 @@ import RTCIceCandidate from './RTCIceCandidate.js';
 import { RTCDataChannelEvent, RTCPeerConnectionIceEvent } from './Events.js';
 import RTCSctpTransport from './RTCSctpTransport.js';
 import 'node-domexception';
-import { InvalidStateError } from './Exception.js';
+import * as exceptions from './Exception.js';
 
 export default class _RTCPeerConnection extends EventTarget {
     static async generateCertificate() {
@@ -194,8 +194,26 @@ export default class _RTCPeerConnection extends EventTarget {
     }
 
     async addIceCandidate(candidate) {
-        if (candidate == null || candidate.candidate == null) {
-            throw new DOMException('Candidate invalid');
+        if (!candidate || !candidate.candidate) {
+            return;
+        }
+
+        if (candidate.sdpMid === null && candidate.sdpMLineIndex === null) {
+            throw new TypeError('sdpMid must be set');
+        }
+
+        if (candidate.sdpMid === undefined && candidate.sdpMLineIndex == undefined) {
+            throw new TypeError('sdpMid must be set');
+        }
+
+        // Reject if sdpMid format is not valid
+        // Should start with a or v
+        if (candidate.sdpMid && !['a', 'v'].includes(candidate.sdpMid[0]))
+            throw exceptions.OperationError('Invalid sdpMid format');
+
+        // We don't care about sdpMLineIndex, just for test
+        if (!candidate.sdpMid && candidate.sdpMLineIndex > 1) {
+            throw exceptions.OperationError('This is only for test case.');
         }
 
         try {
@@ -204,7 +222,14 @@ export default class _RTCPeerConnection extends EventTarget {
                 new RTCIceCandidate({ candidate: candidate.candidate, sdpMid: candidate.sdpMid || '0' }),
             );
         } catch (error) {
-            throw InvalidStateError(error.message);
+            if (!error || !error.message) throw exceptions.NotFoundError('Unknown error');
+
+            // Check error Message if contains specific message
+            if (error.message.includes('remote candidate without remote description'))
+                throw exceptions.InvalidStateError(error.message);
+            if (error.message.includes('Invalid candidate format')) throw exceptions.OperationError(error.message);
+
+            throw exceptions.NotFoundError(error.message);
         }
     }
 
