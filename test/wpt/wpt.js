@@ -2,11 +2,7 @@
 
 import { JSDOM } from 'jsdom';
 import puppeteer from 'puppeteer';
-import ndc from '../../lib/index.js';
 import ndcPolyfill from '../../polyfill/index.js';
-
-// Set the log level, for debugging purposes
-// ndc.initLogger('Debug');
 
 export async function runWptTests(wptTestList, _forChrome = false, _wptServerUrl = 'http://web-platform.test:8000') {
     const browser = await puppeteer.launch({

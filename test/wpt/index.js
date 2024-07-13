@@ -1,6 +1,11 @@
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import ndc from '../../lib/index.js';
 import wptTestList from './wpt-test-list.js';
 import { runWptTests } from './wpt.js';
 import { runChromeTests, isTestForChromeFailed, getTotalNumberOfTests } from './chrome-failed-tests.js';
+
+// Set the log level, for debugging purposes
+// ndc.initLogger('Debug');
 
 // Run tests for Chrome
 console.log('Running tests for Chrome...');
