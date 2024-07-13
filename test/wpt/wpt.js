@@ -1,6 +1,6 @@
 // Run WPT manually before calling this script
 
-import { JSDOM } from 'jsdom';
+import { JSDOM, VirtualConsole } from 'jsdom';
 import puppeteer from 'puppeteer';
 import ndcPolyfill from '../../polyfill/index.js';
 
@@ -30,34 +30,42 @@ export async function runWptTests(wptTestList, _forChrome = false, _wptServerUrl
 function runTestForLibrary(filePath) {
     // return new promise
     return new Promise((resolve, reject) => {
+        const virtualConsole = new VirtualConsole();
+        virtualConsole.sendTo(console);
+
         JSDOM.fromURL(filePath, {
             runScripts: 'dangerously',
             resources: 'usable',
             pretendToBeVisual: true,
+            virtualConsole,
+            beforeParse(window) {
+                // Assign the  polyfill to the window object
+                Object.assign(window, ndcPolyfill);
+
+                // Overwrite the DOMException object
+                window.DOMException = DOMException;
+                window.TypeError = TypeError;
+            },
         }).then((dom) => {
             // Get the window object from the DOM
             const { window } = dom;
-
-            // Assign the  polyfill to the window object
-            Object.assign(window, ndcPolyfill);
-
-            // Overwrite the DOMException object
-            window.DOMException = DOMException;
-            window.TypeError = TypeError;
-
-            const returnObject = [];
             window.addEventListener('load', () => {
-                window.add_result_callback((test) => {
+                window.add_completion_callback((results) => {
+                    window.close();
+
                     // Meaning of status
                     // 0: PASS (test passed)
                     // 1: FAIL (test failed)
                     // 2: TIMEOUT (test timed out)
                     // 3: PRECONDITION_FAILED (test skipped)
-                    returnObject.push({ name: test.name, message: test.message, status: test.status });
-                });
-
-                window.add_completion_callback(() => {
-                    window.close();
+                    const returnObject = [];
+                    for (let i = 0; i < results.length; i++) {
+                        returnObject.push({
+                            name: results[i].name,
+                            message: results[i].message,
+                            status: results[i].status,
+                        });
+                    }
                     return resolve(returnObject);
                 });
             });
@@ -69,10 +77,17 @@ async function runTestForChrome(browser, filePath) {
     const page = await browser.newPage();
     // Evaluate the script in the page context
     await page.evaluateOnNewDocument(() => {
-        window.returnTestResults = [];
         window.addEventListener('load', () => {
-            window.add_result_callback((test) => {
-                window.returnTestResults.push({ name: test.name, message: test.message, status: test.status });
+            window.add_completion_callback((results) => {
+                // window.returnTestResults.push({ name: test.name, message: test.message, status: test.status });
+                window.returnTestResults = [];
+                for (let i = 0; i < results.length; i++) {
+                    window.returnTestResults.push({
+                        name: results[i].name,
+                        message: results[i].message,
+                        status: results[i].status,
+                    });
+                }
             });
         });
     });
