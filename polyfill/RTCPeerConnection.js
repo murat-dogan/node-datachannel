@@ -16,6 +16,7 @@ export default class _RTCPeerConnection extends EventTarget {
     #localOffer;
     #localAnswer;
     #dataChannels;
+    #dataChannelsClosed = 0;
     #config;
     #canTrickleIceCandidates;
     #sctp;
@@ -154,7 +155,11 @@ export default class _RTCPeerConnection extends EventTarget {
     }
 
     get iceConnectionState() {
-        return this.#peerConnection.iceState();
+        let state = this.#peerConnection.iceState();
+        // libdatachannel uses 'completed' instead of 'connected'
+        // see /webrtc/getstats.html
+        if (state == 'completed') state = 'connected';
+        return state;
     }
 
     get iceGatheringState() {
@@ -207,9 +212,11 @@ export default class _RTCPeerConnection extends EventTarget {
         }
 
         // Reject if sdpMid format is not valid
-        // Should start with a or v
-        if (candidate.sdpMid && !['a', 'v'].includes(candidate.sdpMid[0]))
+        // ??
+        if (candidate.sdpMid && candidate.sdpMid.length > 3) {
+            console.log(candidate.sdpMid);
             throw exceptions.OperationError('Invalid sdpMid format');
+        }
 
         // We don't care about sdpMLineIndex, just for test
         if (!candidate.sdpMid && candidate.sdpMLineIndex > 1) {
@@ -245,6 +252,7 @@ export default class _RTCPeerConnection extends EventTarget {
         // close all channels before shutting down
         this.#dataChannels.forEach((channel) => {
             channel.close();
+            this.#dataChannelsClosed++;
         });
 
         this.#peerConnection.close();
@@ -262,6 +270,7 @@ export default class _RTCPeerConnection extends EventTarget {
         this.#dataChannels.add(dataChannel);
         dataChannel.addEventListener('close', () => {
             this.#dataChannels.delete(dataChannel);
+            this.#dataChannelsClosed++;
         });
 
         return dataChannel;
@@ -295,7 +304,7 @@ export default class _RTCPeerConnection extends EventTarget {
             let localId = 'RTCIceCandidate_' + localIdRs;
             report.set(localId, {
                 id: localId,
-                type: 'localcandidate',
+                type: 'local-candidate',
                 timestamp: Date.now(),
                 candidateType: cp.local.type,
                 ip: cp.local.address,
@@ -306,7 +315,7 @@ export default class _RTCPeerConnection extends EventTarget {
             let remoteId = 'RTCIceCandidate_' + remoteIdRs;
             report.set(remoteId, {
                 id: remoteId,
-                type: 'remotecandidate',
+                type: 'remote-candidate',
                 timestamp: Date.now(),
                 candidateType: cp.remote.type,
                 ip: cp.remote.address,
@@ -339,6 +348,15 @@ export default class _RTCPeerConnection extends EventTarget {
                 dtlsState: 'connected',
                 selectedCandidatePairId: candidateId,
                 selectedCandidatePairChanges: 1,
+            });
+
+            // peer-connection'
+            report.set('P', {
+                id: 'P',
+                type: 'peer-connection',
+                timestamp: Date.now(),
+                dataChannelsOpened: this.#dataChannels.size,
+                dataChannelsClosed: this.#dataChannelsClosed,
             });
 
             return resolve(report);

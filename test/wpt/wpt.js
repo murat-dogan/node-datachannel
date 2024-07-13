@@ -2,7 +2,11 @@
 
 import { JSDOM } from 'jsdom';
 import puppeteer from 'puppeteer';
-import nodeDataChannel from '../../polyfill/index.js';
+import ndc from '../../lib/index.js';
+import ndcPolyfill from '../../polyfill/index.js';
+
+// Set the log level, for debugging purposes
+// ndc.initLogger('Debug');
 
 export async function runWptTests(wptTestList, _forChrome = false, _wptServerUrl = 'http://web-platform.test:8000') {
     const browser = await puppeteer.launch({
@@ -39,7 +43,7 @@ function runTestForLibrary(filePath) {
             const { window } = dom;
 
             // Assign the  polyfill to the window object
-            Object.assign(window, nodeDataChannel);
+            Object.assign(window, ndcPolyfill);
 
             // Overwrite the DOMException object
             window.DOMException = DOMException;

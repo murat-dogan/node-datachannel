@@ -1,6 +1,6 @@
 import wptTestList from './wpt-test-list.js';
 import { runWptTests } from './wpt.js';
-import { runChromeTests, isTestForChromeFailed, getChromeFailedTests } from './chrome-failed-tests.js';
+import { runChromeTests, isTestForChromeFailed, getTotalNumberOfTests } from './chrome-failed-tests.js';
 
 // Run tests for Chrome
 console.log('Running tests for Chrome...');
@@ -54,7 +54,12 @@ failedTests.forEach((result) => {
 // Print Test Names
 console.log(`Tests Run for:\n${wptTestList}`);
 // Total number of tests
-console.log('Total Tests                        : ', totalTests);
+console.log('Total Tests [Chrome]               : ', getTotalNumberOfTests());
+console.log(
+    'Total Tests [Library]              : ',
+    totalTests,
+    ' (We expect this to be equal to Total Tests [Chrome])',
+);
 // Number of passed tests
 console.log('Passed Tests                       : ', totalTests - totalFailedTestsLibrary);
 // Number of failed tests for chrome + node-datachannel
