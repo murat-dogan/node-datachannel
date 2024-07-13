@@ -4,6 +4,7 @@ import { JSDOM, VirtualConsole } from 'jsdom';
 import puppeteer from 'puppeteer';
 import ndcPolyfill from '../../polyfill/index.js';
 
+
 export async function runWptTests(wptTestList, _forChrome = false, _wptServerUrl = 'http://web-platform.test:8000') {
     const browser = await puppeteer.launch({
         headless: true,
@@ -13,12 +14,13 @@ export async function runWptTests(wptTestList, _forChrome = false, _wptServerUrl
 
     // call runTest for each test path
     for (let i = 0; i < wptTestList.length; i++) {
+        console.log(`Running test: ${wptTestList[i]}  `);
         const path = `${_wptServerUrl}${wptTestList[i]}`;
         const result = _forChrome ? await runTestForChrome(browser, path) : await runTestForLibrary(path);
         results.push({ test: wptTestList[i], result });
 
         // sleep for 1 second
-        await new Promise((resolve) => setTimeout(resolve, 1000));
+        // await new Promise((resolve) => setTimeout(resolve, 1000));
     }
 
     // close the client

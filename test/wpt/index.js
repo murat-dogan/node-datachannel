@@ -1,4 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import ndc from '../../lib/index.js';
 import wptTestList from './wpt-test-list.js';
 import { runWptTests } from './wpt.js';
@@ -8,12 +7,13 @@ import { runChromeTests, isTestForChromeFailed, getTotalNumberOfTests } from './
 // ndc.initLogger('Debug');
 
 // Run tests for Chrome
-console.log('Running tests for Chrome...');
+console.log('# Running tests for Chrome...');
 await runChromeTests(wptTestList);
 //console.log(JSON.stringify(getChromeFailedTests(), null, 2));
 
 // Run tests for node-datachannel
-console.log('Running tests for node-datachannel...');
+console.log('');
+console.log('# Running tests for node-datachannel...');
 let results = await runWptTests(wptTestList);
 
 // Calc total number of tests
@@ -57,22 +57,35 @@ failedTests.forEach((result) => {
 
 // Print Report
 // Print Test Names
-console.log(`Tests Run for:\n${wptTestList}`);
+console.log('');
+console.log('# Tests Report');
+console.log(`Tests Run for: ${wptTestList}  `);
 // Total number of tests
-console.log('Total Tests [Chrome]               : ', getTotalNumberOfTests());
-console.log(
-    'Total Tests [Library]              : ',
-    totalTests,
-    ' (We expect this to be equal to Total Tests [Chrome])',
-);
+console.log('Total Tests [Chrome]: ', getTotalNumberOfTests(), '  ');
+console.log('Total Tests [Library]: ', totalTests, ' (We expect this to be equal to Total Tests [Chrome])  ');
 // Number of passed tests
-console.log('Passed Tests                       : ', totalTests - totalFailedTestsLibrary);
+console.log('Passed Tests: ', totalTests - totalFailedTestsLibrary, '  ');
 // Number of failed tests for chrome + node-datachannel
 console.log(
-    'Failed Tests (Chrome + Library)    : ',
+    'Failed Tests (Chrome + Library): ',
     totalFailedTestsLibrary - totalFailedTests,
-    " (We don't care about these tests)",
+    " (We don't care about these tests)  ",
 );
 // Number of failed tests
-console.log('Failed Tests                       : ', totalFailedTests);
-console.log(JSON.stringify(failedTests, null, 2));
+console.log('Failed Tests: ', totalFailedTests, '   ');
+
+// Print Failed Tests
+console.log('');
+console.log('## Failed Tests');
+for (let i = 0; i < failedTests.length; i++) {
+    console.log(`### ${failedTests[i].test}`);
+    for (let j = 0; j < failedTests[i].result.length; j++) {
+        console.log(`- name: ${failedTests[i].result[j].name}  `);
+        console.log(`  message: ${failedTests[i].result[j].message}  `);
+        console.log(`  status: ${failedTests[i].result[j].status}  `);
+    }
+}
+
+// Sometimes failed tests are not cleaned up
+// This can prevent the process from exiting
+ndc.cleanup();

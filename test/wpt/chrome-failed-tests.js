@@ -10,8 +10,8 @@ export async function runChromeTests(wptTestList) {
     totalNumberOfTests = 0;
     let results = await runWptTests(wptTestList, true);
     for (let i = 0; i < results.length; i++) {
-        totalNumberOfTests += results[i].result.length;
-        if (results[i].result.some((test) => test.status === 1)) {
+        totalNumberOfTests += results[i].result?.length || 0;
+        if (results[i].result && results[i].result.some((test) => test.status === 1)) {
             chromeFailedTests.push({
                 test: results[i].test,
                 result: results[i].result.filter((test) => test.status === 1),
