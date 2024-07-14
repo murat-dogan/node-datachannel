@@ -16,13 +16,11 @@
 class WebSocketServerWrapper : public Napi::ObjectWrap<WebSocketServerWrapper>
 {
 public:
-  static Napi::FunctionReference constructor;
   static Napi::Object Init(Napi::Env env, Napi::Object exports);
   WebSocketServerWrapper(const Napi::CallbackInfo &info);
   ~WebSocketServerWrapper();
 
   // Functions
-
   void stop(const Napi::CallbackInfo &info);
   Napi::Value port(const Napi::CallbackInfo &info);
 
@@ -31,13 +29,17 @@ public:
 
   // Close all existing WebSocketServers
   static void StopAll();
- 
+
 private:
-  static std::unordered_set<WebSocketServerWrapper*> instances;
-  std::unique_ptr<rtc::WebSocketServer> mWebSocketServerPtr = nullptr;
-  std::unique_ptr<ThreadSafeCallback> mOnClientCallback = nullptr;
+  static Napi::FunctionReference constructor;
+  static std::unordered_set<WebSocketServerWrapper *> instances;
 
   void doStop();
+
+  std::unique_ptr<rtc::WebSocketServer> mWebSocketServerPtr = nullptr;
+
+  // Callback Ptrs
+  std::unique_ptr<ThreadSafeCallback> mOnClientCallback = nullptr;
 };
 
 #endif // WEB_SOCKET_SERVER_WRAPPER_H

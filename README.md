@@ -115,7 +115,7 @@ Please check [docs](/API.md) page
 
 ## Contributing
 
-Contributions welcome!
+Contributions are welcome!
 
 ## Thanks
 

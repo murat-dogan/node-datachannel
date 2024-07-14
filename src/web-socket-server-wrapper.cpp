@@ -2,6 +2,9 @@
 
 #include "plog/Log.h"
 
+Napi::FunctionReference WebSocketServerWrapper::constructor;
+std::unordered_set<WebSocketServerWrapper *> WebSocketServerWrapper::instances;
+
 void WebSocketServerWrapper::StopAll()
 {
     PLOG_DEBUG << "StopAll() called";
@@ -10,9 +13,6 @@ void WebSocketServerWrapper::StopAll()
         inst->doStop();
 }
 
-Napi::FunctionReference WebSocketServerWrapper::constructor;
-std::unordered_set<WebSocketServerWrapper *> WebSocketServerWrapper::instances;
-
 Napi::Object WebSocketServerWrapper::Init(Napi::Env env, Napi::Object exports)
 {
     Napi::HandleScope scope(env);
@@ -20,9 +20,11 @@ Napi::Object WebSocketServerWrapper::Init(Napi::Env env, Napi::Object exports)
     Napi::Function func = DefineClass(
         env,
         "WebSocketServer",
-        {InstanceMethod("stop", &WebSocketServerWrapper::stop),
-         InstanceMethod("port", &WebSocketServerWrapper::port),
-         InstanceMethod("onClient", &WebSocketServerWrapper::onClient)});
+        {
+            InstanceMethod("stop", &WebSocketServerWrapper::stop),
+            InstanceMethod("port", &WebSocketServerWrapper::port),
+            InstanceMethod("onClient", &WebSocketServerWrapper::onClient)
+        });
 
     constructor = Napi::Persistent(func);
     constructor.SuppressDestruct();
@@ -34,7 +36,6 @@ Napi::Object WebSocketServerWrapper::Init(Napi::Env env, Napi::Object exports)
 WebSocketServerWrapper::WebSocketServerWrapper(const Napi::CallbackInfo &info) : Napi::ObjectWrap<WebSocketServerWrapper>(info)
 {
     PLOG_DEBUG << "Constructor called";
-
     Napi::Env env = info.Env();
 
     // Create WebSocketServer without config
@@ -177,7 +178,7 @@ void WebSocketServerWrapper::doStop()
     PLOG_DEBUG << "doStop() called";
     if (mWebSocketServerPtr)
     {
-        PLOG_DEBUG << "Closing...";
+        PLOG_DEBUG << "Stopping...";
         try
         {
             mWebSocketServerPtr->stop();
@@ -191,7 +192,6 @@ void WebSocketServerWrapper::doStop()
     }
 
     mOnClientCallback.reset();
-
     instances.erase(this);
 }
 
@@ -256,8 +256,10 @@ void WebSocketServerWrapper::onClient(const Napi::CallbackInfo &info)
                 // This will run in main thread and needs to construct the
                 // arguments for the call
                 std::shared_ptr<rtc::WebSocket> webSocket = ws;
-                auto instance = WebSocketWrapper::constructor.New({Napi::External<std::shared_ptr<rtc::WebSocket>>::New(env, nullptr), Napi::External<std::shared_ptr<rtc::WebSocket>>::New(env, &webSocket)});
+                // First argument is just a placeholder
+                auto instance = WebSocketWrapper::constructor.New({Napi::Boolean::New(env, false), Napi::External<std::shared_ptr<rtc::WebSocket>>::New(env, &webSocket)});
                 args = {instance};
                 PLOG_DEBUG << "mOnClientCallback call(2)";
-            }); });
+            });
+    });
 }
