@@ -5,7 +5,9 @@
   "type": "module",
   "main": "wpt.js",
   "scripts": {
-    "test": "node index.js"
+    "test": "npm run run:wpt & (sleep 8 && (npm run run:test > last-test-results.md) )",
+    "run:wpt": "cd wpt && ./wpt serve",
+    "run:test": "node index.js"
   },
   "keywords": [],
   "author": "",

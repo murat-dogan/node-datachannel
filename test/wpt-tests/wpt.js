@@ -4,11 +4,10 @@ import { JSDOM, VirtualConsole } from 'jsdom';
 import puppeteer from 'puppeteer';
 import ndcPolyfill from '../../polyfill/index.js';
 
-
 export async function runWptTests(wptTestList, _forChrome = false, _wptServerUrl = 'http://web-platform.test:8000') {
     const browser = await puppeteer.launch({
         headless: true,
-        devtools: false,
+        devtools: true,
     });
     let results = [];
 
@@ -79,27 +78,42 @@ async function runTestForChrome(browser, filePath) {
     const page = await browser.newPage();
     // Evaluate the script in the page context
     await page.evaluateOnNewDocument(() => {
+        function createDeferredPromise() {
+            let resolve, reject;
+
+            let promise = new Promise(function (_resolve, _reject) {
+                resolve = _resolve;
+                reject = _reject;
+            });
+
+            promise.resolve = resolve;
+            promise.reject = reject;
+            return promise;
+        }
+
         window.addEventListener('load', () => {
+            window.resultPromise = createDeferredPromise();
             window.add_completion_callback((results) => {
                 // window.returnTestResults.push({ name: test.name, message: test.message, status: test.status });
-                window.returnTestResults = [];
+                let returnTestResults = [];
                 for (let i = 0; i < results.length; i++) {
-                    window.returnTestResults.push({
+                    returnTestResults.push({
                         name: results[i].name,
                         message: results[i].message,
                         status: results[i].status,
                     });
                 }
+                window.resultPromise.resolve(returnTestResults);
             });
         });
     });
 
     // Navigate to the specified URL
-    await page.goto(filePath, { waitUntil: 'networkidle0' });
+    await page.goto(filePath, { waitUntil: 'load' });
 
     // get the results
     const results = await page.evaluate(() => {
-        return window.returnTestResults;
+        return window.resultPromise;
     });
 
     // close the page

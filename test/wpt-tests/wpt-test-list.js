@@ -7,9 +7,9 @@ export default [
     '/webrtc/recvonly-transceiver-can-become-sendrecv.https.html',
     '/webrtc/RollbackEvents.https.html',
     '/webrtc/RTCCertificate.html',
-    // '/webrtc/RTCCertificate-postMessage.html',                           // SKIP, iframe
-    '/webrtc/RTCConfiguration-bundlePolicy.html',
-    '/webrtc/RTCConfiguration-iceCandidatePoolSize.html',
+    // // '/webrtc/RTCCertificate-postMessage.html',                           // SKIP, iframe
+    // '/webrtc/RTCConfiguration-bundlePolicy.html',
+    // '/webrtc/RTCConfiguration-iceCandidatePoolSize.html',
     // '/webrtc/RTCConfiguration-iceServers.html',
     // '/webrtc/RTCConfiguration-iceTransportPolicy.html',
     // '/webrtc/RTCConfiguration-rtcpMuxPolicy.html',
@@ -33,9 +33,9 @@ export default [
     // '/webrtc/RTCIceConnectionState-candidate-pair.https.html',
     // '/webrtc/RTCIceTransport.html',
     // '/webrtc/RTCPeerConnection-addIceCandidate-connectionSetup.html',
-    // '/webrtc/RTCPeerConnection-addIceCandidate.html',                    // OK
+    '/webrtc/RTCPeerConnection-addIceCandidate.html',
     // '/webrtc/RTCPeerConnection-addIceCandidate-timing.https.html',
-    // '/webrtc/RTCPeerConnection-addTcpIceCandidate.html',                 //OK
+    '/webrtc/RTCPeerConnection-addTcpIceCandidate.html',
     // '/webrtc/RTCPeerConnection-addTrack.https.html',
     // '/webrtc/RTCPeerConnection-add-track-no-deadlock.https.html',
     // '/webrtc/RTCPeerConnection-addTransceiver.https.html',

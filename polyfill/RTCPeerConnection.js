@@ -222,7 +222,7 @@ export default class _RTCPeerConnection extends EventTarget {
         // Reject if sdpMid format is not valid
         // ??
         if (candidate.sdpMid && candidate.sdpMid.length > 3) {
-            console.log(candidate.sdpMid);
+            // console.log(candidate.sdpMid);
             throw exceptions.OperationError('Invalid sdpMid format');
         }
 
