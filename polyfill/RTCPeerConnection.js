@@ -43,23 +43,31 @@ export default class _RTCPeerConnection extends EventTarget {
         this.#dataChannels = new Set();
         this.#canTrickleIceCandidates = null;
 
-        this.#peerConnection = new NodeDataChannel.PeerConnection(init?.peerIdentity ?? `peer-${getRandomString(7)}`, {
-            ...init,
-            iceServers:
-                init?.iceServers
-                    ?.map((server) => {
-                        const urls = Array.isArray(server.urls) ? server.urls : [server.urls];
+        try {
+            this.#peerConnection = new NodeDataChannel.PeerConnection(
+                init?.peerIdentity ?? `peer-${getRandomString(7)}`,
+                {
+                    ...init,
+                    iceServers:
+                        init?.iceServers
+                            ?.map((server) => {
+                                const urls = Array.isArray(server.urls) ? server.urls : [server.urls];
 
-                        return urls.map((url) => {
-                            if (server.username && server.credential) {
-                                const [protocol, rest] = url.split(/:(.*)/);
-                                return `${protocol}:${server.username}:${server.credential}@${rest}`;
-                            }
-                            return url;
-                        });
-                    })
-                    .flat() ?? [],
-        });
+                                return urls.map((url) => {
+                                    if (server.username && server.credential) {
+                                        const [protocol, rest] = url.split(/:(.*)/);
+                                        return `${protocol}:${server.username}:${server.credential}@${rest}`;
+                                    }
+                                    return url;
+                                });
+                            })
+                            .flat() ?? [],
+                },
+            );
+        } catch (error) {
+            if (!error || !error.message) throw exceptions.NotFoundError('Unknown error');
+            throw exceptions.SyntaxError(error.message);
+        }
 
         // forward peerConnection events
         this.#peerConnection.onStateChange(() => {

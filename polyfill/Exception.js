@@ -13,3 +13,7 @@ export const OperationError = (msg) => {
 export const TypeError = (msg) => {
     return new DOMException(msg, 'TypeError');
 };
+
+export const SyntaxError = (msg) => {
+    return new DOMException(msg, 'SyntaxError');
+};

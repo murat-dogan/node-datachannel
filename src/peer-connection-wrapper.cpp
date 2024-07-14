@@ -100,8 +100,17 @@ PeerConnectionWrapper::PeerConnectionWrapper(const Napi::CallbackInfo &info) : N
     Napi::Array iceServers = config.Get("iceServers").As<Napi::Array>();
     for (uint32_t i = 0; i < iceServers.Length(); i++)
     {
-        if (iceServers.Get(i).IsString())
-            rtcConfig.iceServers.emplace_back(iceServers.Get(i).As<Napi::String>().ToString());
+        if (iceServers.Get(i).IsString()){
+            try
+            {
+                rtcConfig.iceServers.emplace_back(iceServers.Get(i).As<Napi::String>().ToString());
+            }
+            catch(std::exception &ex)
+            {
+                Napi::TypeError::New(env, "SyntaxError: IceServer config error: " + std::string(ex.what())).ThrowAsJavaScriptException();
+                return;
+            }
+        }
         else
         {
             if (!iceServers.Get(i).IsObject())
@@ -116,7 +125,6 @@ PeerConnectionWrapper::PeerConnectionWrapper(const Napi::CallbackInfo &info) : N
                 Napi::TypeError::New(env, "IceServer config error (hostname OR/AND port is not suitable)").ThrowAsJavaScriptException();
                 return;
             }
-
             if (iceServer.Get("relayType").IsString() &&
                 (!iceServer.Get("username").IsString() || !iceServer.Get("password").IsString()))
             {

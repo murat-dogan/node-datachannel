@@ -59,7 +59,6 @@ failedTests.forEach((result) => {
 // Print Test Names
 console.log('');
 console.log('# Tests Report');
-console.log(`Tests Run for: ${wptTestList}  `);
 // Total number of tests
 console.log('Total Tests [Chrome]: ', getTotalNumberOfTests(), '  ');
 console.log('Total Tests [Library]: ', totalTests, ' (We expect this to be equal to Total Tests [Chrome])  ');
@@ -82,7 +81,6 @@ for (let i = 0; i < failedTests.length; i++) {
     for (let j = 0; j < failedTests[i].result.length; j++) {
         console.log(`- name: ${failedTests[i].result[j].name}  `);
         console.log(`  message: ${failedTests[i].result[j].message}  `);
-        console.log(`  status: ${failedTests[i].result[j].status}  `);
     }
 }
 
