@@ -42,5 +42,5 @@ Contributions are welcome!
 
 # Test Results
 
-Please check [last-test-results.md](/last-test-results.md) page
+Please check [last-test-results.md](./last-test-results.md) page
 
