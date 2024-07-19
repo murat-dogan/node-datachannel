@@ -2,6 +2,10 @@ export const InvalidStateError = (msg) => {
     return new DOMException(msg, 'InvalidStateError');
 };
 
+export const InvalidAccessError = (msg) => {
+    return new DOMException(msg, 'InvalidAccessError');
+};
+
 export const NotFoundError = (msg) => {
     return new DOMException(msg, 'NotFoundError');
 };

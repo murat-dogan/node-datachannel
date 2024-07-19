@@ -34,10 +34,59 @@ export default class _RTCPeerConnection extends EventTarget {
     onsignalingstatechange;
     ontrack;
 
-    constructor(init = {}) {
+    _checkConfiguration(config) {
+        if (config && config.iceServers === undefined) config.iceServers = [];
+        if (config?.iceServers === null) throw new TypeError('IceServers cannot be null');
+
+        // Check for all the properties of iceServers
+        if (Array.isArray(config?.iceServers)) {
+            for (let i = 0; i < config.iceServers.length; i++) {
+                if (config.iceServers[i] === null) throw new TypeError('IceServers cannot be null');
+                if (config.iceServers[i] === undefined) throw new TypeError('IceServers cannot be undefined');
+                if (Object.keys(config.iceServers[i]).length === 0) throw new TypeError('IceServers cannot be empty');
+
+                // If iceServers is string convert to array
+                if (typeof config.iceServers[i].urls === 'string')
+                    config.iceServers[i].urls = [config.iceServers[i].urls];
+
+                // urls can not be empty
+                if (config.iceServers[i].urls?.some((url) => url == ''))
+                    throw exceptions.SyntaxError('IceServers urls cannot be empty');
+
+                // urls should match the regex "stun\:\w*|turn\:\w*|turns\:\w*"
+                if (
+                    config.iceServers[i].urls?.some(
+                        (url) => !/^(stun:[\w,\.,:]*|turn:[\w,\.,:]*|turns:[\w,\.,:]*)$/.test(url),
+                    )
+                )
+                    throw exceptions.SyntaxError('IceServers urls wrong format');
+
+                // If this is a turn server check for username and credential
+                if (config.iceServers[i].urls?.some((url) => url.startsWith('turn'))) {
+                    if (!config.iceServers[i].username)
+                        throw exceptions.InvalidAccessError('IceServers username cannot be null');
+                    if (!config.iceServers[i].credential)
+                        throw exceptions.InvalidAccessError('IceServers username cannot be undefined');
+                }
+
+                // length of urls can not be 0
+                if (config.iceServers[i].urls?.length === 0)
+                    throw exceptions.SyntaxError('IceServers urls cannot be empty');
+
+            }
+        }
+    }
+
+    setConfiguration(config) {
+        this._checkConfiguration(config);
+        this.#config = config;
+    }
+
+    constructor(config = { iceServers: [] }) {
         super();
 
-        this.#config = init;
+        this._checkConfiguration(config);
+        this.#config = config;
         this.#localOffer = createDeferredPromise();
         this.#localAnswer = createDeferredPromise();
         this.#dataChannels = new Set();
@@ -45,11 +94,11 @@ export default class _RTCPeerConnection extends EventTarget {
 
         try {
             this.#peerConnection = new NodeDataChannel.PeerConnection(
-                init?.peerIdentity ?? `peer-${getRandomString(7)}`,
+                config?.peerIdentity ?? `peer-${getRandomString(7)}`,
                 {
-                    ...init,
+                    ...config,
                     iceServers:
-                        init?.iceServers
+                        config?.iceServers
                             ?.map((server) => {
                                 const urls = Array.isArray(server.urls) ? server.urls : [server.urls];
 
@@ -381,10 +430,6 @@ export default class _RTCPeerConnection extends EventTarget {
 
     restartIce() {
         throw new DOMException('Not implemented');
-    }
-
-    setConfiguration(config) {
-        this.#config = config;
     }
 
     async setLocalDescription(description) {

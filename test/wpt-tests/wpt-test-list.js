@@ -8,9 +8,9 @@ export default [
     '/webrtc/RollbackEvents.https.html',
     '/webrtc/RTCCertificate.html',
     // // '/webrtc/RTCCertificate-postMessage.html',                           // SKIP, iframe
-    // '/webrtc/RTCConfiguration-bundlePolicy.html',
-    // '/webrtc/RTCConfiguration-iceCandidatePoolSize.html',
-    // '/webrtc/RTCConfiguration-iceServers.html',
+    '/webrtc/RTCConfiguration-bundlePolicy.html',
+    '/webrtc/RTCConfiguration-iceCandidatePoolSize.html',
+    '/webrtc/RTCConfiguration-iceServers.html',
     // '/webrtc/RTCConfiguration-iceTransportPolicy.html',
     // '/webrtc/RTCConfiguration-rtcpMuxPolicy.html',
     // '/webrtc/RTCConfiguration-validation.html',
