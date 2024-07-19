@@ -37,9 +37,3 @@ wsServer.onClient((ws) => {
         console.error(err);
     });
 });
-
-// There is a bug in the library that causes the WebSocketServer to be garbage collected
-// This is a workaround to keep it alive
-setInterval(() => {
-    console.log(wsServer);
-}, 60 * 60 * 60);
