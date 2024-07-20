@@ -15,10 +15,12 @@ export class RTCPeerConnectionIceEvent extends Event {
 export class RTCDataChannelEvent extends Event {
     #channel;
 
-    constructor(channel) {
-        super('datachannel');
+    constructor(type, eventInitDict) {
+        super(type);
 
-        this.#channel = channel;
+        if (eventInitDict && !eventInitDict.channel) throw new TypeError('channel member is required');
+
+        this.#channel = eventInitDict.channel;
     }
 
     get channel() {
