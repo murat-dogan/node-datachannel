@@ -5,11 +5,14 @@ import puppeteer from 'puppeteer';
 import ndcPolyfill from '../../polyfill/index.js';
 
 export async function runWptTests(wptTestList, _forChrome = false, _wptServerUrl = 'http://web-platform.test:8000') {
-    const browser = await puppeteer.launch({
-        headless: true,
-        devtools: true,
-    });
+    let browser;
     let results = [];
+
+    if (_forChrome)
+        browser = await puppeteer.launch({
+            headless: false,
+            devtools: true,
+        });
 
     // call runTest for each test path
     for (let i = 0; i < wptTestList.length; i++) {
@@ -23,7 +26,7 @@ export async function runWptTests(wptTestList, _forChrome = false, _wptServerUrl
     }
 
     // close the client
-    await browser.close();
+    if (_forChrome) await browser.close();
 
     return results;
 }

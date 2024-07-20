@@ -10,6 +10,8 @@ export default class _RTCDataChannel extends EventTarget {
     #negotiated;
     #ordered;
 
+    #closeRequested = false;
+
     onbufferedamountlow;
     onclose;
     onclosing;
@@ -36,8 +38,16 @@ export default class _RTCDataChannel extends EventTarget {
         });
 
         this.#dataChannel.onClosed(() => {
-            this.#readyState = 'closed';
-            this.dispatchEvent(new Event('close'));
+            // Simulate closing event
+            if (!this.#closeRequested) {
+                this.#readyState = 'closing';
+                this.dispatchEvent(new Event('closing'));
+            }
+
+            setImmediate(() => {
+                this.#readyState = 'closed';
+                this.dispatchEvent(new Event('close'));
+            });
         });
 
         this.#dataChannel.onError((msg) => {
@@ -167,9 +177,7 @@ export default class _RTCDataChannel extends EventTarget {
     }
 
     close() {
-        this.#readyState = 'closing';
-        this.dispatchEvent(new Event('closing'));
-
+        this.#closeRequested = true;
         this.#dataChannel.close();
     }
 }

@@ -36,6 +36,8 @@ export default class _RTCPeerConnection extends EventTarget {
 
     _checkConfiguration(config) {
         if (config && config.iceServers === undefined) config.iceServers = [];
+        if (config && config.iceTransportPolicy === undefined) config.iceTransportPolicy = 'all';
+
         if (config?.iceServers === null) throw new TypeError('IceServers cannot be null');
 
         // Check for all the properties of iceServers
@@ -72,9 +74,11 @@ export default class _RTCPeerConnection extends EventTarget {
                 // length of urls can not be 0
                 if (config.iceServers[i].urls?.length === 0)
                     throw exceptions.SyntaxError('IceServers urls cannot be empty');
-
             }
         }
+
+        if (config?.iceTransportPolicy !== 'all' && config?.iceTransportPolicy !== 'relay')
+            throw new TypeError('IceTransportPolicy must be either "all" or "relay"');
     }
 
     setConfiguration(config) {
@@ -82,7 +86,7 @@ export default class _RTCPeerConnection extends EventTarget {
         this.#config = config;
     }
 
-    constructor(config = { iceServers: [] }) {
+    constructor(config = { iceServers: [], iceTransportPolicy: 'all' }) {
         super();
 
         this._checkConfiguration(config);
