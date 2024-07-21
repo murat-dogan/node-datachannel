@@ -2,6 +2,10 @@
 
 WebRTC polyfills to be used for libraries like `simple-peer`.
 
+# web-platform-tests
+
+Please check actual situation [here](/test/wpt-tests/)
+
 ## Example Usage
 
 > For a native usage example please check test folder.

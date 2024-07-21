@@ -36,7 +36,11 @@ Please check [electron demo](/examples/electron-demo)
 
 WebRTC polyfills to be used for libraries like `simple-peer`.
 
-Please check [here](/polyfill)
+Please check [here for more](/polyfill)
+
+### web-platform-tests
+
+Please check actual situation [here](/test/wpt-tests/)
 
 ## WebSocket Client & Server
 

@@ -40,7 +40,7 @@ Contributions are welcome!
 
 ./wpt run chrome /webrtc/RTCPeerConnection-addIceCandidate.html
 
-# Test Results
+# Latest Test Results
 
 Please check [last-test-results.md](./last-test-results.md) page
 
