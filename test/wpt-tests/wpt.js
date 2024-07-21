@@ -1,6 +1,7 @@
 // Run WPT manually before calling this script
 
 import { JSDOM, VirtualConsole } from 'jsdom';
+import { TextEncoder, TextDecoder } from 'util';
 import puppeteer from 'puppeteer';
 import ndcPolyfill from '../../polyfill/index.js';
 
@@ -49,6 +50,10 @@ function runTestForLibrary(filePath) {
                 // Overwrite the DOMException object
                 window.DOMException = DOMException;
                 window.TypeError = TypeError;
+                window.TextEncoder = TextEncoder;
+                window.TextDecoder = TextDecoder;
+                window.Uint8Array = Uint8Array;
+                window.ArrayBuffer = ArrayBuffer;
             },
         }).then((dom) => {
             // Get the window object from the DOM

@@ -1,4 +1,5 @@
-import DOMException from 'node-domexception';
+import 'node-domexception';
+import * as exceptions from './Exception.js';
 
 export default class _RTCDataChannel extends EventTarget {
     #dataChannel;
@@ -158,9 +159,8 @@ export default class _RTCDataChannel extends EventTarget {
 
     send(data) {
         if (this.#readyState !== 'open') {
-            throw new DOMException(
+            throw exceptions.InvalidStateError(
                 "Failed to execute 'send' on 'RTCDataChannel': RTCDataChannel.readyState is not 'open'",
-                'InvalidStateError',
             );
         }
 
