@@ -6,6 +6,12 @@ import { runChromeTests, isTestForChromeFailed, getTotalNumberOfTests } from './
 // Set the log level, for debugging purposes
 // ndc.initLogger('Debug');
 
+// Catch unhandled exceptions
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+    process.exit(1);
+});
+
 // Run tests for Chrome
 console.log('# Running tests for Chrome...');
 await runChromeTests(wptTestList);
@@ -87,3 +93,4 @@ for (let i = 0; i < failedTests.length; i++) {
 // Sometimes failed tests are not cleaned up
 // This can prevent the process from exiting
 ndc.cleanup();
+console.log('End of tests');

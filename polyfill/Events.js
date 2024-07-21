@@ -18,9 +18,9 @@ export class RTCDataChannelEvent extends Event {
     constructor(type, eventInitDict) {
         super(type);
 
-        if (eventInitDict && !eventInitDict.channel) throw new TypeError('channel member is required');
+        if (type && !eventInitDict.channel) throw new TypeError('channel member is required');
 
-        this.#channel = eventInitDict.channel;
+        this.#channel = eventInitDict?.channel;
     }
 
     get channel() {

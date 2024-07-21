@@ -34,19 +34,19 @@ export default class _RTCDataChannel extends EventTarget {
         // forward dataChannel events
         this.#dataChannel.onOpen(() => {
             this.#readyState = 'open';
-            this.dispatchEvent(new Event('open'));
+            this.dispatchEvent(new Event('open', { channel: this }));
         });
 
         this.#dataChannel.onClosed(() => {
             // Simulate closing event
             if (!this.#closeRequested) {
                 this.#readyState = 'closing';
-                this.dispatchEvent(new Event('closing'));
+                this.dispatchEvent(new Event('closing', { channel: this }));
             }
 
             setImmediate(() => {
                 this.#readyState = 'closed';
-                this.dispatchEvent(new Event('close'));
+                this.dispatchEvent(new Event('close', { channel: this }));
             });
         });
 
@@ -64,7 +64,7 @@ export default class _RTCDataChannel extends EventTarget {
         });
 
         this.#dataChannel.onBufferedAmountLow(() => {
-            this.dispatchEvent(new Event('bufferedamountlow'));
+            this.dispatchEvent(new Event('bufferedamountlow', { channel: this }));
         });
 
         this.#dataChannel.onMessage((data) => {
@@ -72,7 +72,7 @@ export default class _RTCDataChannel extends EventTarget {
                 data = data.buffer;
             }
 
-            this.dispatchEvent(new MessageEvent('message', { data }));
+            this.dispatchEvent(new MessageEvent('message', { data, channel: this }));
         });
 
         // forward events to properties

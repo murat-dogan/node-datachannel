@@ -77,7 +77,12 @@ export default class _RTCPeerConnection extends EventTarget {
             }
         }
 
-        if (config?.iceTransportPolicy !== 'all' && config?.iceTransportPolicy !== 'relay')
+        if (
+            config &&
+            config.iceTransportPolicy &&
+            config.iceTransportPolicy !== 'all' &&
+            config.iceTransportPolicy !== 'relay'
+        )
             throw new TypeError('IceTransportPolicy must be either "all" or "relay"');
     }
 
@@ -140,9 +145,9 @@ export default class _RTCPeerConnection extends EventTarget {
         });
 
         this.#peerConnection.onDataChannel((channel) => {
-            const dataChannel = new RTCDataChannel(channel);
-            this.#dataChannels.add(dataChannel);
-            this.dispatchEvent(new RTCDataChannelEvent(dataChannel));
+            const dc = new RTCDataChannel(channel);
+            this.#dataChannels.add(dc);
+            this.dispatchEvent(new RTCDataChannelEvent('datachannel', { channel: dc }));
         });
 
         this.#peerConnection.onLocalDescription((sdp, type) => {
@@ -437,15 +442,12 @@ export default class _RTCPeerConnection extends EventTarget {
     }
 
     async setLocalDescription(description) {
-        if (description == null || description.type == null) {
-            throw new DOMException('Local description type must be set');
-        }
-
-        if (description.type !== 'offer') {
+        if (description?.type !== 'offer') {
             // any other type causes libdatachannel to throw
             return;
         }
-        this.#peerConnection.setLocalDescription(description.type);
+
+        this.#peerConnection.setLocalDescription(description?.type);
     }
 
     async setRemoteDescription(description) {

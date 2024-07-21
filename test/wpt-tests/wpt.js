@@ -10,7 +10,7 @@ export async function runWptTests(wptTestList, _forChrome = false, _wptServerUrl
 
     if (_forChrome)
         browser = await puppeteer.launch({
-            headless: false,
+            headless: true,
             devtools: true,
         });
 
