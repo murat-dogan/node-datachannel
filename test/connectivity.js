@@ -1,30 +1,16 @@
 import nodeDataChannel from '../lib/index.js';
 
 nodeDataChannel.initLogger('Debug');
-nodeDataChannel.preload();
 
 let dc1 = null;
 let dc2 = null;
 
-// Config options
-// export interface RtcConfig {
-//     iceServers: string[];
-//     proxyServer?: ProxyServer;
-//     bindAddress?: string;
-//     enableIceTcp?: boolean;
-//     portRangeBegin?: number;
-//     portRangeEnd?: number;
-//     maxMessageSize?: number;
-//     iceTransportPolicy?: TransportPolicy;
-// }
-//
 // "iceServers" option is an array of stun/turn server urls
 // Examples;
 // STUN Server Example          : stun:stun.l.google.com:19302
 // TURN Server Example          : turn:USERNAME:PASSWORD@TURN_IP_OR_ADDRESS:PORT
 // TURN Server Example (TCP)    : turn:USERNAME:PASSWORD@TURN_IP_OR_ADDRESS:PORT?transport=tcp
 // TURN Server Example (TLS)    : turns:USERNAME:PASSWORD@TURN_IP_OR_ADDRESS:PORT
-
 let peer1 = new nodeDataChannel.PeerConnection('Peer1', { iceServers: ['stun:stun.l.google.com:19302'] });
 
 // Set Callbacks
@@ -78,15 +64,7 @@ peer2.onDataChannel((dc) => {
     });
 });
 
-// DataChannel Options
-// export interface DataChannelInitConfig {
-//     protocol?: string;
-//     negotiated?: boolean;
-//     id?: number;
-//     ordered?: boolean;
-//     maxPacketLifeTime?: number;
-//     maxRetransmits?: number;
-// }
+// Create DataChannel
 dc1 = peer1.createDataChannel('test');
 dc1.onOpen(() => {
     dc1.sendMessage('Hello from Peer1');

@@ -1,15 +1,22 @@
-import WebSocket from 'ws';
+import nodeDataChannel from '../../lib/index.js';
+
+// Init Logger
+nodeDataChannel.initLogger('Debug');
 
 const clients = {};
 
-const wss = new WebSocket.Server({ port: 8000 });
+const wsServer = new nodeDataChannel.WebSocketServer({ bindAddress: '127.0.0.1', port: 8000 });
 
-wss.on('connection', (ws, req) => {
-    const id = req.url.replace('/', '');
-    console.log(`New Connection from ${id}`);
+wsServer.onClient((ws) => {
+    let id = '';
 
-    clients[id] = ws;
-    ws.on('message', (buffer) => {
+    ws.onOpen(() => {
+        id = ws.path().replace('/', '');
+        console.log(`New Connection from ${id}`);
+        clients[id] = ws;
+    });
+
+    ws.onMessage((buffer) => {
         let msg = JSON.parse(buffer);
         let peerId = msg.id;
         let peerWs = clients[peerId];
@@ -18,11 +25,15 @@ wss.on('connection', (ws, req) => {
         if (!peerWs) return console.error(`Can not find peer with ID ${peerId}`);
 
         msg.id = id;
-        peerWs.send(JSON.stringify(msg));
+        peerWs.sendMessage(JSON.stringify(msg));
     });
 
-    ws.on('close', () => {
-        console.log(`${id} disconected`);
+    ws.onClosed(() => {
+        console.log(`${id} disconnected`);
         delete clients[id];
+    });
+
+    ws.onError((err) => {
+        console.error(err);
     });
 });

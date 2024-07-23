@@ -1,4 +1,3 @@
-import WebSocket from 'ws';
 import readline from 'readline';
 import nodeDataChannel from '../../lib/index.js';
 
@@ -13,23 +12,22 @@ const id = randomId(4);
 
 // Signaling Server
 const WS_URL = process.env.WS_URL || 'ws://localhost:8000';
-const ws = new WebSocket(WS_URL + '/' + id, {
-    perMessageDeflate: false,
-});
+const ws = new nodeDataChannel.WebSocket();
+ws.open(WS_URL + '/' + id);
 
 console.log(`The local ID is: ${id}`);
 console.log(`Waiting for signaling to be connected...`);
 
-ws.on('open', () => {
+ws.onOpen(() => {
     console.log('WebSocket connected, signaling ready');
     readUserInput();
 });
 
-ws.on('error', (err) => {
+ws.onError((err) => {
     console.log('WebSocket Error: ', err);
 });
 
-ws.on('message', (msgStr) => {
+ws.onMessage((msgStr) => {
     let msg = JSON.parse(msgStr);
     switch (msg.type) {
         case 'offer':
@@ -86,10 +84,10 @@ function createPeerConnection(peerId) {
         console.log('GatheringState: ', state);
     });
     peerConnection.onLocalDescription((description, type) => {
-        ws.send(JSON.stringify({ id: peerId, type, description }));
+        ws.sendMessage(JSON.stringify({ id: peerId, type, description }));
     });
     peerConnection.onLocalCandidate((candidate, mid) => {
-        ws.send(JSON.stringify({ id: peerId, type: 'candidate', candidate, mid }));
+        ws.sendMessage(JSON.stringify({ id: peerId, type: 'candidate', candidate, mid }));
     });
     peerConnection.onDataChannel((dc) => {
         console.log('DataChannel from ' + peerId + ' received with label "', dc.getLabel() + '"');
