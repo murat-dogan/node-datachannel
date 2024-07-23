@@ -1,7 +1,7 @@
 /** @type {import('jest').Config} */
 const config = {
     verbose: true,
-    testPathIgnorePatterns: ['<rootDir>/node_modules/', 'multiple-run.test'],
+    testPathIgnorePatterns: ['node_modules', 'multiple-run.test', 'wpt-tests'],
 };
 
 module.exports = config;
