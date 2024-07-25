@@ -2,7 +2,7 @@
 //
 // Example: candidate:123456 1 UDP 123456 192.168.1.1 12345 typ host raddr=10.0.0.1 rport=54321 generation 0
 
-import DOMException from 'node-domexception';
+import 'node-domexception';
 
 export default class _RTCIceCandidate {
     #address;
@@ -19,41 +19,40 @@ export default class _RTCIceCandidate {
     #tcpType;
     #type;
     #usernameFragment;
-    #ip;
 
     constructor({ candidate, sdpMLineIndex, sdpMid, usernameFragment }) {
-        if (candidate == null) {
-            throw new DOMException('candidate must be specified');
-        }
+        if (sdpMLineIndex == null && sdpMid == null)
+            throw new TypeError('At least one of sdpMLineIndex or sdpMid must be specified');
 
-        this.#candidate = candidate;
-        this.#sdpMLineIndex = sdpMLineIndex || null;
-        this.#sdpMid = sdpMid || null;
-        this.#usernameFragment = usernameFragment || null;
+        this.#candidate = candidate === null ? 'null' : candidate ?? '';
+        this.#sdpMLineIndex = sdpMLineIndex ?? null;
+        this.#sdpMid = sdpMid ?? null;
+        this.#usernameFragment = usernameFragment ?? null;
 
         if (candidate) {
             const fields = candidate.split(' ');
-            this.#foundation = fields[0];
+            this.#foundation = fields[0].replace('candidate:', ''); // remove text candidate:
             this.#component = fields[1] == '1' ? 'rtp' : 'rtcp';
             this.#protocol = fields[2];
             this.#priority = parseInt(fields[3], 10);
-            this.#ip = fields[4];
+            this.#address = fields[4];
             this.#port = parseInt(fields[5], 10);
             this.#type = fields[7];
-            if (fields[6] === 'typ') {
-                this.#tcpType = null;
-            } else if (fields[6] === 'tcp') {
-                this.#tcpType = fields[7];
-                this.#type = fields[8];
-            }
+            this.#tcpType = null;
+            this.#relatedAddress = null;
+            this.#relatedPort = null;
 
             // Parse the candidate string to extract relatedPort and relatedAddress
-            for (let i = 9; i < fields.length; i++) {
+            for (let i = 8; i < fields.length; i++) {
                 const field = fields[i];
-                if (field.startsWith('raddr')) {
-                    this.#relatedAddress = field.split('=')[1];
-                } else if (field.startsWith('rport')) {
-                    this.#relatedPort = parseInt(field.split('=')[1], 10);
+                if (field === 'raddr') {
+                    this.#relatedAddress = fields[i + 1];
+                } else if (field === 'rport') {
+                    this.#relatedPort = parseInt(fields[i + 1], 10);
+                }
+
+                if (this.#protocol === 'tcp' && field === 'tcptype') {
+                    this.#tcpType = fields[i + 1];
                 }
             }
         }
@@ -64,7 +63,7 @@ export default class _RTCIceCandidate {
     }
 
     get candidate() {
-        return this.#candidate || '';
+        return this.#candidate;
     }
 
     get component() {

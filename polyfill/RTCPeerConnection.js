@@ -1,10 +1,10 @@
+import 'node-domexception';
 import NodeDataChannel from '../lib/index.js';
 import RTCSessionDescription from './RTCSessionDescription.js';
 import RTCDataChannel from './RTCDataChannel.js';
 import RTCIceCandidate from './RTCIceCandidate.js';
 import { RTCDataChannelEvent, RTCPeerConnectionIceEvent } from './Events.js';
 import RTCSctpTransport from './RTCSctpTransport.js';
-import 'node-domexception';
 import * as exceptions from './Exception.js';
 
 export default class _RTCPeerConnection extends EventTarget {
