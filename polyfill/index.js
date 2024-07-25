@@ -7,6 +7,7 @@ import RTCPeerConnection from './RTCPeerConnection.js';
 import RTCSctpTransport from './RTCSctpTransport.js';
 import RTCSessionDescription from './RTCSessionDescription.js';
 import { RTCDataChannelEvent, RTCPeerConnectionIceEvent } from './Events.js';
+import RTCError from './RTCError.js';
 
 export {
     RTCCertificate,
@@ -19,6 +20,7 @@ export {
     RTCSessionDescription,
     RTCDataChannelEvent,
     RTCPeerConnectionIceEvent,
+    RTCError,
 };
 
 export default {
@@ -32,4 +34,5 @@ export default {
     RTCSessionDescription,
     RTCDataChannelEvent,
     RTCPeerConnectionIceEvent,
+    RTCError,
 };
