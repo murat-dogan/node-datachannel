@@ -7,7 +7,6 @@ export default [
     '/webrtc/recvonly-transceiver-can-become-sendrecv.https.html',
     '/webrtc/RollbackEvents.https.html',
     '/webrtc/RTCCertificate.html',
-    // // '/webrtc/RTCCertificate-postMessage.html',                           // SKIP, iframe
     '/webrtc/RTCConfiguration-bundlePolicy.html',
     '/webrtc/RTCConfiguration-iceCandidatePoolSize.html',
     '/webrtc/RTCConfiguration-iceServers.html',
@@ -15,14 +14,10 @@ export default [
     '/webrtc/RTCConfiguration-rtcpMuxPolicy.html',
     '/webrtc/RTCConfiguration-validation.html',
     '/webrtc/RTCDataChannel-bufferedAmount.html',
-    // // '/webrtc/RTCDataChannel-close.html',                                   // Not ending
     '/webrtc/RTCDataChannelEvent-constructor.html',
-    // // '/webrtc/RTCDataChannel-GC.html',                                      // Not ending
     '/webrtc/RTCDataChannel-iceRestart.html',
     '/webrtc/RTCDataChannel-id.html',
     '/webrtc/RTCDataChannel-send-blob-order.html',
-    // '/webrtc/RTCDataChannel-send-close.html',                                // libdatachannel not giving OperationError error
-    // '/webrtc/RTCDataChannel-send.html',                                      // throws Error
     '/webrtc/RTCDtlsTransport-getRemoteCertificates.html',
     '/webrtc/RTCDtlsTransport-state.html',
     '/webrtc/RTCDTMFSender-insertDTMF.https.html',
@@ -33,9 +28,9 @@ export default [
     '/webrtc/RTCIceConnectionState-candidate-pair.https.html',
     '/webrtc/RTCIceTransport.html',
     '/webrtc/RTCPeerConnection-addIceCandidate-connectionSetup.html',
-    '/webrtc/RTCPeerConnection-addIceCandidate.html', // ok
-    // '/webrtc/RTCPeerConnection-addIceCandidate-timing.https.html',
-    '/webrtc/RTCPeerConnection-addTcpIceCandidate.html', // ok
+    '/webrtc/RTCPeerConnection-addIceCandidate.html',
+    '/webrtc/RTCPeerConnection-addIceCandidate-timing.https.html',
+    '/webrtc/RTCPeerConnection-addTcpIceCandidate.html',
     // '/webrtc/RTCPeerConnection-addTrack.https.html',
     // '/webrtc/RTCPeerConnection-add-track-no-deadlock.https.html',
     // '/webrtc/RTCPeerConnection-addTransceiver.https.html',
@@ -134,4 +129,11 @@ export default [
     // '/webrtc/simplecall.https.html',
     // '/webrtc/simplecall-no-ssrcs.https.html',
     // '/webrtc/toJSON.html',
+
+    // Failed or skipped tests
+    // '/webrtc/RTCCertificate-postMessage.html',                             // SKIP, iframe
+    // '/webrtc/RTCDataChannel-close.html',                                   // Not ending
+    // '/webrtc/RTCDataChannel-GC.html',                                      // Not ending
+    // '/webrtc/RTCDataChannel-send-close.html',                              // libdatachannel not giving OperationError error
+    // '/webrtc/RTCDataChannel-send.html',                                    // throws Error
 ];
