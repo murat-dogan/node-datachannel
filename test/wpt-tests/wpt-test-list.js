@@ -15,27 +15,27 @@ export default [
     '/webrtc/RTCConfiguration-rtcpMuxPolicy.html',
     '/webrtc/RTCConfiguration-validation.html',
     '/webrtc/RTCDataChannel-bufferedAmount.html',
-    // '/webrtc/RTCDataChannel-close.html',                                   // Not ending
+    // // '/webrtc/RTCDataChannel-close.html',                                   // Not ending
     '/webrtc/RTCDataChannelEvent-constructor.html',
-    // '/webrtc/RTCDataChannel-GC.html',                                      // Not ending
+    // // '/webrtc/RTCDataChannel-GC.html',                                      // Not ending
     '/webrtc/RTCDataChannel-iceRestart.html',
     '/webrtc/RTCDataChannel-id.html',
     '/webrtc/RTCDataChannel-send-blob-order.html',
-    // '/webrtc/RTCDataChannel-send-close.html',
-    // '/webrtc/RTCDataChannel-send.html',
-    // '/webrtc/RTCDtlsTransport-getRemoteCertificates.html',
-    // '/webrtc/RTCDtlsTransport-state.html',
-    // '/webrtc/RTCDTMFSender-insertDTMF.https.html',
-    // '/webrtc/RTCDTMFSender-ontonechange.https.html',
-    // '/webrtc/RTCDTMFSender-ontonechange-long.https.html',
-    // '/webrtc/RTCError.html',
-    // '/webrtc/RTCIceCandidate-constructor.html',
-    // '/webrtc/RTCIceConnectionState-candidate-pair.https.html',
-    // '/webrtc/RTCIceTransport.html',
-    // '/webrtc/RTCPeerConnection-addIceCandidate-connectionSetup.html',
-    '/webrtc/RTCPeerConnection-addIceCandidate.html',
+    // '/webrtc/RTCDataChannel-send-close.html',                                // libdatachannel not giving OperationError error
+    // '/webrtc/RTCDataChannel-send.html',                                      // throws Error
+    '/webrtc/RTCDtlsTransport-getRemoteCertificates.html',
+    '/webrtc/RTCDtlsTransport-state.html',
+    '/webrtc/RTCDTMFSender-insertDTMF.https.html',
+    '/webrtc/RTCDTMFSender-ontonechange.https.html',
+    '/webrtc/RTCDTMFSender-ontonechange-long.https.html',
+    '/webrtc/RTCError.html',
+    '/webrtc/RTCIceCandidate-constructor.html',
+    '/webrtc/RTCIceConnectionState-candidate-pair.https.html',
+    '/webrtc/RTCIceTransport.html',
+    '/webrtc/RTCPeerConnection-addIceCandidate-connectionSetup.html',
+    '/webrtc/RTCPeerConnection-addIceCandidate.html', // ok
     // '/webrtc/RTCPeerConnection-addIceCandidate-timing.https.html',
-    '/webrtc/RTCPeerConnection-addTcpIceCandidate.html',
+    '/webrtc/RTCPeerConnection-addTcpIceCandidate.html', // ok
     // '/webrtc/RTCPeerConnection-addTrack.https.html',
     // '/webrtc/RTCPeerConnection-add-track-no-deadlock.https.html',
     // '/webrtc/RTCPeerConnection-addTransceiver.https.html',
