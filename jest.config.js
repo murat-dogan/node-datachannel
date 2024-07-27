@@ -1,5 +1,6 @@
-export default {
-    testEnvironment: 'node',
+/** @type {import('ts-jest').JestConfigWithTsJest} **/
+module.exports = {
+  testEnvironment: 'node',
     verbose: true,
     testPathIgnorePatterns: ['node_modules', 'multiple-run.test'],
     preset: 'ts-jest/presets/default-esm',

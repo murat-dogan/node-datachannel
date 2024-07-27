@@ -1,7 +1,7 @@
 import { EventEmitter } from 'events';
-import nodeDataChannel from './node-datachannel.js';
-import { WebSocketServerConfiguration } from './types.js';
-import { WebSocket } from './websocket.js';
+import nodeDataChannel from './node-datachannel';
+import { WebSocketServerConfiguration } from './types';
+import { WebSocket } from './websocket';
 
 export class WebSocketServer extends EventEmitter {
     #server: any;

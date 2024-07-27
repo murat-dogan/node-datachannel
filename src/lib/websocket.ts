@@ -1,5 +1,5 @@
-import nodeDataChannel from './node-datachannel.js';
-import { Channel, WebSocketServerConfiguration } from './types.js';
+import nodeDataChannel from './node-datachannel';
+import { Channel, WebSocketServerConfiguration } from './types';
 
 export interface WebSocket extends Channel {
     open(url: string): void;
