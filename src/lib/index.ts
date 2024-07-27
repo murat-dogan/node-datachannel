@@ -107,9 +107,9 @@ export interface DataChannel extends Channel {
     onBufferedAmountLow(cb: () => void): void;
     onMessage(cb: (msg: string | Buffer) => void): void;
 }
-// export const DataChannel: {
-//     new(): DataChannel
-// } = nodeDataChannel.DataChannel
+export const DataChannel: {
+    // DataChannel implementation
+} = nodeDataChannel.DataChannel
 
 export interface PeerConnection {
     close(): void;
@@ -170,6 +170,7 @@ export default {
     Track,
     Video,
     Audio,
+    DataChannel,
     PeerConnection,
     WebSocket,
     WebSocketServer,
