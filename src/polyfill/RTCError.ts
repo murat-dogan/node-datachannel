@@ -1,5 +1,11 @@
 export default class RTCError extends DOMException {
-    constructor(init, message = '') {
+    #errorDetail: RTCErrorDetailType;
+    #receivedAlert: number | null;
+    #sctpCauseCode: number | null;
+    #sdpLineNumber: number | null;
+    #sentAlert: number | null;
+
+    constructor(init: RTCErrorInit, message?: string) {
         super(message, 'OperationError');
 
         if (!init || !init.errorDetail) throw new TypeError('Cannot construct RTCError, errorDetail is required');
@@ -16,50 +22,50 @@ export default class RTCError extends DOMException {
         )
             throw new TypeError('Cannot construct RTCError, errorDetail is invalid');
 
-        this._errorDetail = init.errorDetail;
-        this._receivedAlert = init.receivedAlert ?? null;
-        this._sctpCauseCode = init.sctpCauseCode ?? null;
-        this._sdpLineNumber = init.sdpLineNumber ?? null;
-        this._sentAlert = init.sentAlert ?? null;
+        this.#errorDetail = init.errorDetail;
+        this.#receivedAlert = init.receivedAlert ?? null;
+        this.#sctpCauseCode = init.sctpCauseCode ?? null;
+        this.#sdpLineNumber = init.sdpLineNumber ?? null;
+        this.#sentAlert = init.sentAlert ?? null;
     }
 
-    get errorDetail() {
-        return this._errorDetail;
+    get errorDetail(): RTCErrorDetailType {
+        return this.#errorDetail;
     }
 
-    set errorDetail(value) {
+    set errorDetail(_value) {
         throw new TypeError('Cannot set errorDetail, it is read-only');
     }
 
-    get receivedAlert() {
-        return this._receivedAlert;
+    get receivedAlert(): number | null {
+        return this.#receivedAlert;
     }
 
-    set receivedAlert(value) {
+    set receivedAlert(_value) {
         throw new TypeError('Cannot set receivedAlert, it is read-only');
     }
 
-    get sctpCauseCode() {
-        return this._sctpCauseCode;
+    get sctpCauseCode(): number | null {
+        return this.#sctpCauseCode;
     }
 
-    set sctpCauseCode(value) {
+    set sctpCauseCode(_value) {
         throw new TypeError('Cannot set sctpCauseCode, it is read-only');
     }
 
-    get sdpLineNumber() {
-        return this._sdpLineNumber;
+    get sdpLineNumber(): number | null {
+        return this.#sdpLineNumber;
     }
 
-    set sdpLineNumber(value) {
+    set sdpLineNumber(_value) {
         throw new TypeError('Cannot set sdpLineNumber, it is read-only');
     }
 
-    get sentAlert() {
-        return this._sentAlert;
+    get sentAlert(): number | null {
+        return this.#sentAlert;
     }
 
-    set sentAlert(value) {
+    set sentAlert(_value) {
         throw new TypeError('Cannot set sentAlert, it is read-only');
     }
 }

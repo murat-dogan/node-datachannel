@@ -6,29 +6,24 @@
 //     sdp: 'v=0\r\no=- 1234567890 1234567890 IN IP4 192.168.1.1\r\ns=-\r\nt=0 0\r\na=ice-ufrag:abcd\r\na=ice-pwd:efgh\r\n'
 //   };
 
-export default class _RTCSessionDescription {
-    #type;
-    #sdp;
+export default class RTCSessionDescription {
+    #type: RTCSdpType;
+    #sdp: string;
 
-    constructor(init = {}) {
-        // Allow Empty Constructor
-        // if (!init || !init.type || !init.sdp) {
-        //     throw new DOMException('Type and sdp properties are required.');
-        // }
-
+    constructor(init: RTCSessionDescriptionInit) {
         this.#type = init ? init.type : null;
         this.#sdp = init ? init.sdp : null;
     }
 
-    get type() {
+    get type(): RTCSdpType {
         return this.#type;
     }
 
-    get sdp() {
+    get sdp(): string {
         return this.#sdp;
     }
 
-    toJSON() {
+    toJSON(): RTCSessionDescriptionInit {
         return {
             sdp: this.#sdp,
             type: this.#type,

@@ -4,23 +4,23 @@
 
 import 'node-domexception';
 
-export default class _RTCIceCandidate {
-    #address;
-    #candidate;
-    #component;
-    #foundation;
-    #port;
-    #priority;
-    #protocol;
-    #relatedAddress;
-    #relatedPort;
-    #sdpMLineIndex;
-    #sdpMid;
-    #tcpType;
-    #type;
-    #usernameFragment;
+export default class RTCIceCandidate {
+    #address: string | null;
+    #candidate: string;
+    #component: RTCIceComponent | null;
+    #foundation: string | null;
+    #port: number | null;
+    #priority: number | null;
+    #protocol: RTCIceProtocol | null;
+    #relatedAddress: string | null;
+    #relatedPort: number | null;
+    #sdpMLineIndex: number | null;
+    #sdpMid: string | null;
+    #tcpType: RTCIceTcpCandidateType | null;
+    #type: RTCIceCandidateType | null;
+    #usernameFragment: string | null;
 
-    constructor({ candidate, sdpMLineIndex, sdpMid, usernameFragment }) {
+    constructor({ candidate, sdpMLineIndex, sdpMid, usernameFragment }: RTCIceCandidateInit) {
         if (sdpMLineIndex == null && sdpMid == null)
             throw new TypeError('At least one of sdpMLineIndex or sdpMid must be specified');
 
@@ -33,11 +33,11 @@ export default class _RTCIceCandidate {
             const fields = candidate.split(' ');
             this.#foundation = fields[0].replace('candidate:', ''); // remove text candidate:
             this.#component = fields[1] == '1' ? 'rtp' : 'rtcp';
-            this.#protocol = fields[2];
+            this.#protocol = fields[2] as RTCIceProtocol;
             this.#priority = parseInt(fields[3], 10);
             this.#address = fields[4];
             this.#port = parseInt(fields[5], 10);
-            this.#type = fields[7];
+            this.#type = fields[7] as RTCIceCandidateType;
             this.#tcpType = null;
             this.#relatedAddress = null;
             this.#relatedPort = null;
@@ -52,69 +52,69 @@ export default class _RTCIceCandidate {
                 }
 
                 if (this.#protocol === 'tcp' && field === 'tcptype') {
-                    this.#tcpType = fields[i + 1];
+                    this.#tcpType = fields[i + 1] as RTCIceTcpCandidateType;
                 }
             }
         }
     }
 
-    get address() {
+    get address(): string | null {
         return this.#address || null;
     }
 
-    get candidate() {
+    get candidate(): string {
         return this.#candidate;
     }
 
-    get component() {
+    get component(): RTCIceComponent | null {
         return this.#component;
     }
 
-    get foundation() {
+    get foundation(): string | null {
         return this.#foundation || null;
     }
 
-    get port() {
+    get port(): number | null {
         return this.#port || null;
     }
 
-    get priority() {
+    get priority(): number | null {
         return this.#priority || null;
     }
 
-    get protocol() {
+    get protocol(): RTCIceProtocol | null {
         return this.#protocol || null;
     }
 
-    get relatedAddress() {
+    get relatedAddress(): string | null {
         return this.#relatedAddress;
     }
 
-    get relatedPort() {
+    get relatedPort(): number | null {
         return this.#relatedPort || null;
     }
 
-    get sdpMLineIndex() {
+    get sdpMLineIndex(): number | null {
         return this.#sdpMLineIndex;
     }
 
-    get sdpMid() {
+    get sdpMid(): string | null {
         return this.#sdpMid;
     }
 
-    get tcpType() {
+    get tcpType(): RTCIceTcpCandidateType | null {
         return this.#tcpType;
     }
 
-    get type() {
+    get type(): RTCIceCandidateType | null {
         return this.#type || null;
     }
 
-    get usernameFragment() {
+    get usernameFragment(): string | null {
         return this.#usernameFragment;
     }
 
-    toJSON() {
+    toJSON(): RTCIceCandidateInit {
         return {
             candidate: this.#candidate,
             sdpMLineIndex: this.#sdpMLineIndex,

@@ -1,17 +1,17 @@
 export default class RTCCertificate {
-    #expires;
-    #fingerprints;
+    #expires: number;
+    #fingerprints: RTCDtlsFingerprint[];
 
     constructor() {
         this.#expires = null;
         this.#fingerprints = [];
     }
 
-    get expires() {
+    get expires(): number {
         return this.#expires;
     }
 
-    getFingerprints() {
+    getFingerprints(): RTCDtlsFingerprint[] {
         return this.#fingerprints;
     }
 }

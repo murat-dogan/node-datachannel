@@ -1,19 +1,18 @@
-import RTCIceTransport from './RTCIceTransport.js';
+import RTCIceTransport from './RTCIceTransport';
+import RTCPeerConnection from './RTCPeerConnection';
 
-export default class _RTCDtlsTransport extends EventTarget {
-    #pc = null;
-    #extraFunctions = null;
+export default class RTCDtlsTransport extends EventTarget {
+    #pc: RTCPeerConnection = null;
     #iceTransport = null;
 
-    onerror = null;
-    onstatechange = null;
+    onstatechange: ((this: RTCDtlsTransport, ev: Event) => any) | null = null;
+    onerror: ((this: RTCDtlsTransport, ev: Event) => any) | null = null;
 
-    constructor({ pc, extraFunctions }) {
+    constructor(init: { pc: RTCPeerConnection, extraFunctions }) {
         super();
-        this.#pc = pc;
-        this.#extraFunctions = extraFunctions;
+        this.#pc = init.pc;
 
-        this.#iceTransport = new RTCIceTransport({ pc, extraFunctions });
+        this.#iceTransport = new RTCIceTransport({ pc: init.pc, extraFunctions: init.extraFunctions });
 
         // forward peerConnection events
         this.#pc.addEventListener('connectionstatechange', () => {
@@ -26,22 +25,22 @@ export default class _RTCDtlsTransport extends EventTarget {
         });
     }
 
-    get iceTransport() {
+    get iceTransport(): RTCIceTransport {
         return this.#iceTransport;
     }
 
-    get state() {
+    get state(): RTCDtlsTransportState {
         // reduce state from new, connecting, connected, disconnected, failed, closed, unknown
         // to RTCDtlsTRansport states new, connecting, connected, closed, failed
         let state = this.#pc ? this.#pc.connectionState : 'new';
-        if (state === 'disconnected' || state === 'unknown') {
+        if (state === 'disconnected') {
             state = 'closed';
         }
         return state;
     }
 
-    getRemoteCertificates() {
+    getRemoteCertificates(): ArrayBuffer[] {
         // TODO: implement
-        return new ArrayBuffer(0);
+        return [new ArrayBuffer(0)];
     }
 }

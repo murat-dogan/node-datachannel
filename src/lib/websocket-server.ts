@@ -1,11 +1,13 @@
 import { EventEmitter } from 'events';
 import nodeDataChannel from './node-datachannel.js';
+import { WebSocketServerConfiguration } from './types.js';
+import { WebSocket } from './websocket.js';
 
-export default class WebSocketServer extends EventEmitter {
-    #server;
-    #clients = [];
+export class WebSocketServer extends EventEmitter {
+    #server: any;
+    #clients: WebSocket[] = [];
 
-    constructor(options) {
+    constructor(options: WebSocketServerConfiguration) {
         super();
         this.#server = new nodeDataChannel.WebSocketServer(options);
 
@@ -15,11 +17,11 @@ export default class WebSocketServer extends EventEmitter {
         });
     }
 
-    port() {
+    port(): number {
         return this.#server?.port() || 0;
     }
 
-    stop() {
+    stop(): void {
         this.#clients.forEach((client) => {
             client?.close();
         });
@@ -28,7 +30,7 @@ export default class WebSocketServer extends EventEmitter {
         this.removeAllListeners();
     }
 
-    onClient(cb) {
+    onClient(cb: (clientSocket: WebSocket) => void): void {
         if (this.#server) this.on('client', cb);
     }
 }

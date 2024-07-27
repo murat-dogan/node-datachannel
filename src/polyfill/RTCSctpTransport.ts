@@ -1,18 +1,19 @@
-import RTCDtlsTransport from './RTCDtlsTransport.js';
+import RTCDtlsTransport from './RTCDtlsTransport';
+import RTCPeerConnection from './RTCPeerConnection';
 
-export default class _RTCSctpTransport extends EventTarget {
-    #pc = null;
+export default class RTCSctpTransport extends EventTarget {
+    #pc: RTCPeerConnection = null;
     #extraFunctions = null;
-    #transport = null;
+    #transport: RTCDtlsTransport = null;
 
-    onstatechange = null;
+    onstatechange: ((this: RTCSctpTransport, ev: Event) => any) | null = null;
 
-    constructor({ pc, extraFunctions }) {
+    constructor(initial: { pc: RTCPeerConnection, extraFunctions }) {
         super();
-        this.#pc = pc;
-        this.#extraFunctions = extraFunctions;
+        this.#pc = initial.pc;
+        this.#extraFunctions = initial.extraFunctions;
 
-        this.#transport = new RTCDtlsTransport({ pc, extraFunctions });
+        this.#transport = new RTCDtlsTransport({ pc: initial.pc, extraFunctions: initial.extraFunctions });
 
         // forward peerConnection events
         this.#pc.addEventListener('connectionstatechange', () => {
@@ -25,29 +26,29 @@ export default class _RTCSctpTransport extends EventTarget {
         });
     }
 
-    get maxChannels() {
+    get maxChannels(): number | null {
         if (this.state !== 'connected') return null;
         return this.#pc ? this.#extraFunctions.maxDataChannelId() : 0;
     }
 
-    get maxMessageSize() {
+    get maxMessageSize(): number {
         if (this.state !== 'connected') return null;
         return this.#pc ? this.#extraFunctions.maxMessageSize() : 0;
     }
 
-    get state() {
+    get state(): RTCSctpTransportState {
         // reduce state from new, connecting, connected, disconnected, failed, closed, unknown
         // to RTCSctpTransport states connecting, connected, closed
         let state = this.#pc.connectionState;
         if (state === 'new' || state === 'connecting') {
             state = 'connecting';
-        } else if (state === 'disconnected' || state === 'failed' || state === 'closed' || state === 'unknown') {
+        } else if (state === 'disconnected' || state === 'failed' || state === 'closed') {
             state = 'closed';
         }
         return state;
     }
 
-    get transport() {
+    get transport(): RTCDtlsTransport {
         return this.#transport;
     }
 }

@@ -1,26 +1,28 @@
 import 'node-domexception';
-import * as exceptions from './Exception.js';
+import * as exceptions from './Exception';
+import { DataChannel } from '../lib/index';
 
-export default class _RTCDataChannel extends EventTarget {
-    #dataChannel;
-    #readyState;
-    #bufferedAmountLowThreshold;
-    #binaryType;
-    #maxPacketLifeTime;
-    #maxRetransmits;
-    #negotiated;
-    #ordered;
+export default class RTCDataChannel extends EventTarget {
+    #dataChannel: DataChannel;
+    #readyState: RTCDataChannelState;
+    #bufferedAmountLowThreshold: number;
+    #binaryType: BinaryType;
+    #maxPacketLifeTime: number | null;
+    #maxRetransmits: number | null;
+    #negotiated: boolean;
+    #ordered: boolean;
 
     #closeRequested = false;
 
-    onbufferedamountlow;
-    onclose;
-    onclosing;
-    onerror;
-    onmessage;
-    onopen;
+    // events
+    onbufferedamountlow: ((this: RTCDataChannel, ev: Event) => any) | null;
+    onclose: ((this: RTCDataChannel, ev: Event) => any) | null;
+    onclosing: ((this: RTCDataChannel, ev: Event) => any) | null;
+    onerror: ((this: RTCDataChannel, ev: Event) => any) | null;
+    onmessage: ((this: RTCDataChannel, ev: MessageEvent) => any) | null;
+    onopen: ((this: RTCDataChannel, ev: Event) => any) | null;
 
-    constructor(dataChannel, opts = {}) {
+    constructor(dataChannel: DataChannel, opts: RTCDataChannelInit = {}) {
         super();
 
         this.#dataChannel = dataChannel;
@@ -35,19 +37,19 @@ export default class _RTCDataChannel extends EventTarget {
         // forward dataChannel events
         this.#dataChannel.onOpen(() => {
             this.#readyState = 'open';
-            this.dispatchEvent(new Event('open', { channel: this }));
+            this.dispatchEvent(new Event('open', {}));
         });
 
         this.#dataChannel.onClosed(() => {
             // Simulate closing event
             if (!this.#closeRequested) {
                 this.#readyState = 'closing';
-                this.dispatchEvent(new Event('closing', { channel: this }));
+                this.dispatchEvent(new Event('closing'));
             }
 
             setImmediate(() => {
                 this.#readyState = 'closed';
-                this.dispatchEvent(new Event('close', { channel: this }));
+                this.dispatchEvent(new Event('close'));
             });
         });
 
@@ -65,20 +67,20 @@ export default class _RTCDataChannel extends EventTarget {
         });
 
         this.#dataChannel.onBufferedAmountLow(() => {
-            this.dispatchEvent(new Event('bufferedamountlow', { channel: this }));
+            this.dispatchEvent(new Event('bufferedamountlow'));
         });
 
         this.#dataChannel.onMessage((data) => {
             if (ArrayBuffer.isView(data)) {
-                data = data.buffer;
+                data = Buffer.from(data.buffer);
             }
 
-            this.dispatchEvent(new MessageEvent('message', { data, channel: this }));
+            this.dispatchEvent(new MessageEvent('message', { data }));
         });
 
         // forward events to properties
         this.addEventListener('message', (e) => {
-            if (this.onmessage) this.onmessage(e);
+            if (this.onmessage) this.onmessage(e as MessageEvent);
         });
         this.addEventListener('bufferedamountlow', (e) => {
             if (this.onbufferedamountlow) this.onbufferedamountlow(e);
@@ -107,15 +109,15 @@ export default class _RTCDataChannel extends EventTarget {
         this.#binaryType = type;
     }
 
-    get binaryType() {
+    get binaryType(): BinaryType {
         return this.#binaryType;
     }
 
-    get bufferedAmount() {
+    get bufferedAmount(): number {
         return this.#dataChannel.bufferedAmount();
     }
 
-    get bufferedAmountLowThreshold() {
+    get bufferedAmountLowThreshold(): number {
         return this.#bufferedAmountLowThreshold;
     }
 
@@ -125,41 +127,41 @@ export default class _RTCDataChannel extends EventTarget {
         this.#dataChannel.setBufferedAmountLowThreshold(number);
     }
 
-    get id() {
+    get id(): number | null {
         return this.#dataChannel.getId();
     }
 
-    get label() {
+    get label(): string {
         return this.#dataChannel.getLabel();
     }
 
-    get maxPacketLifeTime() {
+    get maxPacketLifeTime(): number | null {
         return this.#maxPacketLifeTime;
     }
 
-    get maxRetransmits() {
+    get maxRetransmits(): number | null {
         return this.#maxRetransmits;
     }
 
-    get negotiated() {
+    get negotiated(): boolean {
         return this.#negotiated;
     }
 
-    get ordered() {
+    get ordered(): boolean {
         return this.#ordered;
     }
 
-    get protocol() {
+    get protocol(): string {
         return this.#dataChannel.getProtocol();
     }
 
-    get readyState() {
+    get readyState(): RTCDataChannelState {
         return this.#readyState;
     }
 
-    send(data) {
+    send(data): void {
         if (this.#readyState !== 'open') {
-            throw exceptions.InvalidStateError(
+            throw new exceptions.InvalidStateError(
                 "Failed to execute 'send' on 'RTCDataChannel': RTCDataChannel.readyState is not 'open'",
             );
         }
@@ -176,7 +178,7 @@ export default class _RTCDataChannel extends EventTarget {
         }
     }
 
-    close() {
+    close(): void {
         this.#closeRequested = true;
         this.#dataChannel.close();
     }

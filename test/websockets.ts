@@ -1,9 +1,9 @@
-import nodeDataChannel from '../lib/index.js';
+import { cleanup, initLogger, preload, WebSocket, WebSocketServer } from '../src/lib';
 
-nodeDataChannel.initLogger('Debug');
-nodeDataChannel.preload();
+initLogger('Debug');
+preload();
 
-const webSocketServer = new nodeDataChannel.WebSocketServer({ bindAddress: '127.0.0.1', port: 1987 });
+const webSocketServer = new WebSocketServer({ bindAddress: '127.0.0.1', port: 1987 });
 
 webSocketServer.onClient((serverSocket) => {
     console.log(
@@ -25,7 +25,7 @@ webSocketServer.onClient((serverSocket) => {
     });
 });
 
-const clientSocket = new nodeDataChannel.WebSocket();
+const clientSocket = new WebSocket();
 
 clientSocket.onOpen(() => {
     console.log('clientSocket.onOpen()');
@@ -46,5 +46,5 @@ clientSocket.onClosed(() => {
 clientSocket.open('ws://127.0.0.1:1987');
 
 setTimeout(() => {
-    nodeDataChannel.cleanup();
+    cleanup();
 }, 1000);

@@ -1,17 +1,18 @@
-import RTCIceCandidate from './RTCIceCandidate.js';
+import RTCIceCandidate from './RTCIceCandidate';
+import RTCPeerConnection from './RTCPeerConnection';
 
-export default class _RTCIceTransport extends EventTarget {
-    #pc = null;
+export default class RTCIceTransport extends EventTarget {
+    #pc: RTCPeerConnection = null;
     #extraFunctions = null;
 
-    ongatheringstatechange = null;
-    onselectedcandidatepairchange = null;
-    onstatechange = null;
+    ongatheringstatechange: ((this: RTCIceTransport, ev: Event) => any) | null = null;
+    onselectedcandidatepairchange: ((this: RTCIceTransport, ev: Event) => any) | null = null;
+    onstatechange: ((this: RTCIceTransport, ev: Event) => any) | null = null;
 
-    constructor({ pc, extraFunctions }) {
+    constructor(init: { pc: RTCPeerConnection, extraFunctions }) {
         super();
-        this.#pc = pc;
-        this.#extraFunctions = extraFunctions;
+        this.#pc = init.pc;
+        this.#extraFunctions = init.extraFunctions;
 
         // forward peerConnection events
         this.#pc.addEventListener('icegatheringstatechange', () => {
@@ -30,42 +31,42 @@ export default class _RTCIceTransport extends EventTarget {
         });
     }
 
-    get component() {
-        let cp = this.getSelectedCandidatePair();
+    get component(): RTCIceComponent {
+        const cp = this.getSelectedCandidatePair();
         if (!cp) return null;
         return cp.local.component;
     }
 
-    get gatheringState() {
+    get gatheringState(): RTCIceGatheringState {
         return this.#pc ? this.#pc.iceGatheringState : 'new';
     }
 
-    get role() {
+    get role(): string {
         return this.#pc.localDescription.type == 'offer' ? 'controlling' : 'controlled';
     }
 
-    get state() {
+    get state(): RTCIceTransportState {
         return this.#pc ? this.#pc.iceConnectionState : 'new';
     }
 
-    getLocalCandidates() {
+    getLocalCandidates(): RTCIceCandidate[] {
         return this.#pc ? this.#extraFunctions.localCandidates() : [];
     }
 
-    getLocalParameters() {
+    getLocalParameters(): any {
         /** */
     }
 
-    getRemoteCandidates() {
+    getRemoteCandidates(): RTCIceCandidate[] {
         return this.#pc ? this.#extraFunctions.remoteCandidates() : [];
     }
 
-    getRemoteParameters() {
+    getRemoteParameters(): any {
         /** */
     }
 
-    getSelectedCandidatePair() {
-        let cp = this.#extraFunctions.selectedCandidatePair();
+    getSelectedCandidatePair(): RTCIceCandidatePair | null {
+        const cp = this.#extraFunctions.selectedCandidatePair();
         if (!cp) return null;
         return {
             local: new RTCIceCandidate({

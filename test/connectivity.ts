@@ -1,9 +1,9 @@
-import nodeDataChannel from '../lib/index.js';
+import { cleanup, DataChannel, initLogger, PeerConnection } from '../src/lib/index';
 
-nodeDataChannel.initLogger('Debug');
+initLogger('Debug');
 
-let dc1 = null;
-let dc2 = null;
+let dc1: DataChannel = null;
+let dc2: DataChannel = null;
 
 // "iceServers" option is an array of stun/turn server urls
 // Examples;
@@ -11,7 +11,7 @@ let dc2 = null;
 // TURN Server Example          : turn:USERNAME:PASSWORD@TURN_IP_OR_ADDRESS:PORT
 // TURN Server Example (TCP)    : turn:USERNAME:PASSWORD@TURN_IP_OR_ADDRESS:PORT?transport=tcp
 // TURN Server Example (TLS)    : turns:USERNAME:PASSWORD@TURN_IP_OR_ADDRESS:PORT
-let peer1 = new nodeDataChannel.PeerConnection('Peer1', { iceServers: ['stun:stun.l.google.com:19302'] });
+const peer1: PeerConnection = new PeerConnection('Peer1', { iceServers: ['stun:stun.l.google.com:19302'] });
 
 // Set Callbacks
 peer1.onStateChange((state) => {
@@ -32,7 +32,7 @@ peer1.onLocalCandidate((candidate, mid) => {
     peer2.addRemoteCandidate(candidate, mid);
 });
 
-let peer2 = new nodeDataChannel.PeerConnection('Peer2', { iceServers: ['stun:stun.l.google.com:19302'] });
+const peer2 = new PeerConnection('Peer2', { iceServers: ['stun:stun.l.google.com:19302'] });
 
 // Set Callbacks
 peer2.onStateChange((state) => {
@@ -82,5 +82,5 @@ setTimeout(() => {
     if (dc2) dc2.close();
     peer1.close();
     peer2.close();
-    nodeDataChannel.cleanup();
+    cleanup();
 }, 5 * 1000);

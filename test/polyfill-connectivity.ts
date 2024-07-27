@@ -1,75 +1,75 @@
-import polyfill from '../polyfill/index.js';
-import nodeDataChannel from '../lib/index.js';
+import { RTCPeerConnection, RTCDataChannel } from '../src/polyfill/index';
+import nodeDataChannel from '../src/lib/index';
 
 nodeDataChannel.initLogger('Info');
 
-let dc1 = null;
-let dc2 = null;
+let dc1: RTCDataChannel = null;
+let dc2: RTCDataChannel = null;
 
-let peer1 = new polyfill.RTCPeerConnection({
+const peer1 = new RTCPeerConnection({
     peerIdentity: 'peer1',
     iceServers: [{ urls: ['stun:stun.l.google.com:19302'] }],
 });
 
 // Set Callbacks
-peer1.onconnectionstatechange = () => {
+peer1.onconnectionstatechange = (): void => {
     console.log('Peer1 State:', peer1.connectionState);
 };
-peer1.oniceconnectionstatechange = () => {
+peer1.oniceconnectionstatechange = (): void => {
     console.log('Peer1 IceState:', peer1.iceConnectionState);
 };
-peer1.onicegatheringstatechange = () => {
+peer1.onicegatheringstatechange = (): void => {
     console.log('Peer1 GatheringState:', peer1.iceGatheringState);
 };
-peer1.onicecandidate = (e) => {
+peer1.onicecandidate = (e): void => {
     console.log('Peer1 Candidate:', e.candidate.candidate);
     peer2.addIceCandidate(e.candidate);
 };
 
-let peer2 = new polyfill.RTCPeerConnection({
+const peer2 = new RTCPeerConnection({
     peerIdentity: 'peer2',
     iceServers: [{ urls: ['stun:stun.l.google.com:19302'] }],
 });
 
 // Set Callbacks
-peer2.onconnectionstatechange = () => {
+peer2.onconnectionstatechange = (): void => {
     console.log('Peer2 State:', peer2.connectionState);
 };
-peer2.oniceconnectionstatechange = () => {
+peer2.oniceconnectionstatechange = (): void => {
     console.log('Peer2 IceState:', peer2.iceConnectionState);
 };
-peer2.onicegatheringstatechange = () => {
+peer2.onicegatheringstatechange = (): void => {
     console.log('Peer2 GatheringState:', peer2.iceGatheringState);
 };
-peer2.onicecandidate = (e) => {
+peer2.onicecandidate = (e): void => {
     console.log('Peer2 Candidate:', e.candidate.candidate);
     peer1.addIceCandidate(e.candidate);
 };
-peer2.ondatachannel = (dce) => {
+peer2.ondatachannel = (dce): void => {
     console.log('Peer2 Got DataChannel: ', dce.channel.label);
     dc2 = dce.channel;
-    dc2.onmessage = (msg) => {
+    dc2.onmessage = (msg): void => {
         console.log('Peer2 Received Msg:', msg.data.toString());
     };
     dc2.send('Hello From Peer2');
-    dc2.onclose = () => {
+    dc2.onclose = (): void => {
         console.log('dc2 closed');
     };
 };
 
 dc1 = peer1.createDataChannel('test');
-dc1.onopen = () => {
+dc1.onopen = (): void => {
     dc1.send('Hello from Peer1');
 };
-dc1.onmessage = (msg) => {
+dc1.onmessage = (msg): void => {
     console.log('Peer1 Received Msg:', msg.data.toString());
 };
-dc1.onclose = () => {
+dc1.onclose = (): void => {
     console.log('dc1 closed');
 };
 
 peer1
-    .createOffer({})
+    .createOffer()
     .then((desc) => {
         // console.log(122222, desc);
         peer2.setRemoteDescription(desc);
@@ -77,7 +77,7 @@ peer1
     .catch((err) => console.error(err));
 
 peer2
-    .createAnswer({})
+    .createAnswer()
     .then((answerDesc) => {
         peer1.setRemoteDescription(answerDesc);
     })

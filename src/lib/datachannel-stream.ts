@@ -1,4 +1,5 @@
 import stream from 'stream';
+// import { DataChannel } from './node-datachannel.js';
 
 /**
  * Turns a node-datachannel DataChannel into a real Node.js stream, complete with buffering,
@@ -9,7 +10,11 @@ import stream from 'stream';
  * the protocol level, and is preserved here throughout.
  */
 export default class DataChannelStream extends stream.Duplex {
-    constructor(rawChannel, streamOptions) {
+    private _rawChannel: any;
+    private _readActive: boolean;
+
+
+    constructor(rawChannel: any, streamOptions?: Omit<stream.DuplexOptions, 'objectMode'>) {
         super({
             allowHalfOpen: false, // Default to autoclose on end().
             ...streamOptions,
@@ -19,7 +24,7 @@ export default class DataChannelStream extends stream.Duplex {
         this._rawChannel = rawChannel;
         this._readActive = true;
 
-        rawChannel.onMessage((msg) => {
+        rawChannel.onMessage((msg: any) => {
             if (!this._readActive) return; // If the buffer is full, drop messages.
 
             // If the push is rejected, we pause reading until the next call to _read().
@@ -32,7 +37,7 @@ export default class DataChannelStream extends stream.Duplex {
             this.destroy();
         });
 
-        rawChannel.onError((errMsg) => {
+        rawChannel.onError((errMsg: string) => {
             this.destroy(new Error(`DataChannel error: ${errMsg}`));
         });
 
@@ -43,12 +48,12 @@ export default class DataChannelStream extends stream.Duplex {
         }
     }
 
-    _read() {
+    _read(): void {
         // Stop dropping messages, if the buffer filling up meant we were doing so before.
         this._readActive = true;
     }
 
-    _write(chunk, encoding, callback) {
+    _write(chunk, _encoding, callback): void {
         let sentOk;
 
         try {
@@ -71,26 +76,26 @@ export default class DataChannelStream extends stream.Duplex {
         }
     }
 
-    _final(callback) {
+    _final(callback): void {
         if (!this.allowHalfOpen) this.destroy();
         callback(null);
     }
 
-    _destroy(maybeErr, callback) {
+    _destroy(maybeErr, callback): void {
         // When the stream is destroyed, we close the DataChannel.
         this._rawChannel.close();
         callback(maybeErr);
     }
 
-    get label() {
+    get label(): string {
         return this._rawChannel.getLabel();
     }
 
-    get id() {
+    get id(): number {
         return this._rawChannel.getId();
     }
 
-    get protocol() {
+    get protocol(): string {
         return this._rawChannel.getProtocol();
     }
 }
