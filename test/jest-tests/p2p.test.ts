@@ -1,14 +1,14 @@
 import { jest } from '@jest/globals';
-import * as nodeDataChannel from '../../lib';
+import * as nodeDataChannel from '../../src/lib/index';
 
 describe('P2P', () => {
     // Default is 5000 ms but we need more
     jest.setTimeout(30000);
 
     test('P2P Test', () => {
-        return new Promise((done) => {
-            let peer1 = new nodeDataChannel.PeerConnection('Peer1', { iceServers: ['stun:stun.l.google.com:19302'] });
-            let peer2 = new nodeDataChannel.PeerConnection('Peer2', { iceServers: ['stun:stun.l.google.com:19302'] });
+        return new Promise<void>((done) => {
+            const peer1 = new nodeDataChannel.PeerConnection('Peer1', { iceServers: ['stun:stun.l.google.com:19302'] });
+            const peer2 = new nodeDataChannel.PeerConnection('Peer2', { iceServers: ['stun:stun.l.google.com:19302'] });
             let dc1 = null;
             let dc2 = null;
 

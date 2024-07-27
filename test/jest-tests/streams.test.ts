@@ -1,6 +1,6 @@
-import * as nodeDataChannel from '../../lib';
+import * as nodeDataChannel from '../../src/lib/index';
 
-function waitForGathering(peer) {
+function waitForGathering(peer: nodeDataChannel.PeerConnection): Promise<void> {
     return new Promise((resolve) => {
         peer.onGatheringStateChange((state) => {
             if (state === 'complete') resolve();
@@ -14,8 +14,8 @@ function waitForGathering(peer) {
 
 describe('DataChannel streams', () => {
     test('can build an echo pipeline', async () => {
-        let clientPeer = new nodeDataChannel.PeerConnection('Client', { iceServers: [] });
-        let echoPeer = new nodeDataChannel.PeerConnection('Client', { iceServers: [] });
+        const clientPeer = new nodeDataChannel.PeerConnection('Client', { iceServers: [] });
+        const echoPeer = new nodeDataChannel.PeerConnection('Client', { iceServers: [] });
 
         const echoStream = new nodeDataChannel.DataChannelStream(echoPeer.createDataChannel('echo-channel'));
         echoStream.pipe(echoStream); // Echo all received data back to the client
@@ -29,7 +29,7 @@ describe('DataChannel streams', () => {
         const { sdp: clientDescSdp, type: clientDescType } = clientPeer.localDescription();
         echoPeer.setRemoteDescription(clientDescSdp, clientDescType);
 
-        const clientChannel = await new Promise((resolve) => clientPeer.onDataChannel(resolve));
+        const clientChannel: nodeDataChannel.DataChannel = await new Promise((resolve) => clientPeer.onDataChannel(resolve));
 
         const clientResponsePromise = new Promise((resolve) => clientChannel.onMessage(resolve));
         clientChannel.sendMessage('test message');

@@ -4,3 +4,4 @@ prebuilds
 node_modules
 .vscode
 tmp
+coverage

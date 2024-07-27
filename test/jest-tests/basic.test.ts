@@ -1,4 +1,4 @@
-import * as nodeDataChannel from '../../lib';
+import * as nodeDataChannel from '../../src/lib/index';
 
 describe('Module Definition', () => {
     test('Module Defined', () => {
@@ -13,7 +13,7 @@ describe('Module Definition', () => {
 
 describe('PeerConnection Classes', () => {
     test('Create PeerConnection', () => {
-        let peer = new nodeDataChannel.PeerConnection('Peer', { iceServers: ['stun:stun.l.google.com:19302'] });
+        const peer = new nodeDataChannel.PeerConnection('Peer', { iceServers: ['stun:stun.l.google.com:19302'] });
         expect(peer).toBeDefined();
         expect(peer.onStateChange).toBeDefined();
         expect(peer.createDataChannel).toBeDefined();
@@ -22,8 +22,8 @@ describe('PeerConnection Classes', () => {
     });
 
     test('Create Data Channel', () => {
-        let peer = new nodeDataChannel.PeerConnection('Peer', { iceServers: ['stun:stun.l.google.com:19302'] });
-        let dc = peer.createDataChannel('test', { protocol: 'test-protocol' });
+        const peer = new nodeDataChannel.PeerConnection('Peer', { iceServers: ['stun:stun.l.google.com:19302'] });
+        const dc = peer.createDataChannel('test', { protocol: 'test-protocol' });
         expect(dc).toBeDefined();
         expect(dc.getId()).toBeDefined();
         expect(dc.getProtocol()).toBe('test-protocol');

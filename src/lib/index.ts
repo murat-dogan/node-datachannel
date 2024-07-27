@@ -1,5 +1,5 @@
 import nodeDataChannel from './node-datachannel';
-import DataChannelStream from './datachannel-stream';
+import _DataChannelStream from './datachannel-stream';
 import { WebSocketServer } from './websocket-server';
 import { Channel, DataChannelInitConfig, DescriptionType, Direction, LogLevel, RtcConfig, RTCIceConnectionState, RTCIceGatheringState, RTCPeerConnectionState, RTCSdpType, RTCSignalingState, SctpSettings, SelectedCandidateInfo } from './types';
 import { WebSocket } from './websocket';
@@ -115,8 +115,8 @@ export interface PeerConnection {
     close(): void;
     setLocalDescription(type?: DescriptionType): void;
     setRemoteDescription(sdp: string, type: DescriptionType): void;
-    localDescription(): { type: string; sdp: RTCSdpType } | null;
-    remoteDescription(): { type: string; sdp: string } | null;
+    localDescription(): { type: DescriptionType; sdp: RTCSdpType } | null;
+    remoteDescription(): { type: DescriptionType; sdp: string } | null;
     addRemoteCandidate(candidate: string, mid: string): void;
     createDataChannel(label: string, config?: DataChannelInitConfig): DataChannel;
     addTrack(media: Video | Audio): Track;
@@ -161,6 +161,8 @@ export {
 export { WebSocketServer } from './websocket-server';
 export { WebSocket } from './websocket';
 
+export const DataChannelStream = _DataChannelStream;
+
 export default {
     initLogger,
     cleanup,
@@ -174,5 +176,5 @@ export default {
     PeerConnection,
     WebSocket,
     WebSocketServer,
-    DataChannelStream,
+    DataChannelStream
 };
