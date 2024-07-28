@@ -2,12 +2,23 @@
 
 import { JSDOM, VirtualConsole } from 'jsdom';
 import { TextEncoder, TextDecoder } from 'util';
-import puppeteer from 'puppeteer';
-import ndcPolyfill from '../../polyfill/index.js';
+import puppeteer, { Browser } from 'puppeteer';
+import ndcPolyfill from '../../src/polyfill/index';
 
-export async function runWptTests(wptTestList, _forChrome = false, _wptServerUrl = 'http://web-platform.test:8000') {
-    let browser;
-    let results = [];
+export interface TestResult {
+    name: string;
+    message: string;
+    status: number // 0: PASS, 1: FAIL, 2: TIMEOUT, 3: PRECONDITION_FAILED
+}
+
+export interface WptTestResult {
+    test: string;
+    result: TestResult[];
+}
+
+export async function runWptTests(wptTestList: string[], _forChrome = false, _wptServerUrl = 'http://web-platform.test:8000'): Promise<WptTestResult[]> {
+    let browser: Browser = null;
+    const results: WptTestResult[] = [];
 
     if (_forChrome)
         browser = await puppeteer.launch({
@@ -19,7 +30,7 @@ export async function runWptTests(wptTestList, _forChrome = false, _wptServerUrl
     for (let i = 0; i < wptTestList.length; i++) {
         console.log(`Running test: ${wptTestList[i]}  `);
         const path = `${_wptServerUrl}${wptTestList[i]}`;
-        const result = _forChrome ? await runTestForChrome(browser, path) : await runTestForLibrary(path);
+        const result: TestResult[] = _forChrome ? await runTestForChrome(browser, path) : await runTestForLibrary(path);
         results.push({ test: wptTestList[i], result });
 
         // sleep for 1 second
@@ -32,9 +43,9 @@ export async function runWptTests(wptTestList, _forChrome = false, _wptServerUrl
     return results;
 }
 
-function runTestForLibrary(filePath) {
+function runTestForLibrary(filePath: string): Promise<TestResult[]> {
     // return new promise
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
         const virtualConsole = new VirtualConsole();
         virtualConsole.sendTo(console);
 
@@ -43,7 +54,7 @@ function runTestForLibrary(filePath) {
             resources: 'usable',
             pretendToBeVisual: true,
             virtualConsole,
-            beforeParse(window) {
+            beforeParse(window: any) {
                 // Assign the  polyfill to the window object
                 Object.assign(window, ndcPolyfill);
 
@@ -55,7 +66,7 @@ function runTestForLibrary(filePath) {
                 window.Uint8Array = Uint8Array;
                 window.ArrayBuffer = ArrayBuffer;
             },
-        }).then((dom) => {
+        }).then((dom: any) => {
             // Get the window object from the DOM
             const { window } = dom;
             window.addEventListener('load', () => {
@@ -82,28 +93,28 @@ function runTestForLibrary(filePath) {
     });
 }
 
-async function runTestForChrome(browser, filePath) {
+async function runTestForChrome(browser: Browser, filePath: string): Promise<TestResult[]> {
     const page = await browser.newPage();
     // Evaluate the script in the page context
     await page.evaluateOnNewDocument(() => {
-        function createDeferredPromise() {
-            let resolve, reject;
+        function createDeferredPromise(): Promise<any> {
+            let resolve: any, reject: any;
 
-            let promise = new Promise(function (_resolve, _reject) {
+            const promise = new Promise(function (_resolve, _reject) {
                 resolve = _resolve;
                 reject = _reject;
             });
 
-            promise.resolve = resolve;
-            promise.reject = reject;
+            (promise as any).resolve = resolve;
+            (promise as any).reject = reject;
             return promise;
         }
 
         window.addEventListener('load', () => {
-            window.resultPromise = createDeferredPromise();
-            window.add_completion_callback((results) => {
+            (window as any).resultPromise = createDeferredPromise();
+            (window as any).add_completion_callback((results) => {
                 // window.returnTestResults.push({ name: test.name, message: test.message, status: test.status });
-                let returnTestResults = [];
+                const returnTestResults = [];
                 for (let i = 0; i < results.length; i++) {
                     returnTestResults.push({
                         name: results[i].name,
@@ -111,7 +122,7 @@ async function runTestForChrome(browser, filePath) {
                         status: results[i].status,
                     });
                 }
-                window.resultPromise.resolve(returnTestResults);
+                (window as any).resultPromise.resolve(returnTestResults);
             });
         });
     });
@@ -121,7 +132,7 @@ async function runTestForChrome(browser, filePath) {
 
     // get the results
     const results = await page.evaluate(() => {
-        return window.resultPromise;
+        return (window as any).resultPromise;
     });
 
     // close the page

@@ -11,11 +11,12 @@
     "forceConsistentCasingInFileNames": true,
     "noImplicitAny": false,
     "noImplicitThis": false,
+    "noImplicitReturns": true,
     "strictNullChecks": false,
     "noUnusedLocals": true,
     "alwaysStrict": true,
     "sourceMap": true,
   },
-  "include": ["src/**/*", "test/**/*","jest.config.ts"],
-  "exclude": ["node_modules", "dist","src/cpp", "test/wpt-tests"]
+  "include": ["src/**/*", "test/**/*"],
+  "exclude": ["node_modules", "dist", "src/cpp", "test/wpt-tests/wpt"]
 }
