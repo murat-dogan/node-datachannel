@@ -1,22 +1,7 @@
 {
+  "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    "target": "ESNext",
-    "module": "CommonJS",
-    "moduleResolution": "Node",
-    "rootDir": ".",
-    "outDir": "dist",
-    "importsNotUsedAsValues": "remove",
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "noImplicitAny": false,
-    "noImplicitThis": false,
-    "noImplicitReturns": true,
-    "strictNullChecks": false,
-    "noUnusedLocals": true,
-    "alwaysStrict": true,
-    "sourceMap": true,
-  },
-  "include": ["src/**/*", "test/**/*"],
-  "exclude": ["node_modules", "dist", "src/cpp", "test/wpt-tests/wpt"]
+    "outDir": "./dist/cjs",
+    "module": "CommonJS"
+  }
 }

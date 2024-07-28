@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "moduleResolution": "Node",
+    "rootDir": ".",
+    "importsNotUsedAsValues": "remove",
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "noImplicitAny": false,
+    "noImplicitThis": false,
+    "noImplicitReturns": true,
+    "strictNullChecks": false,
+    "noUnusedLocals": true,
+    "alwaysStrict": true,
+  },
+  "include": ["src/**/*", "test/**/*"],
+  "exclude": ["node_modules", "dist", "src/cpp", "test/wpt-tests/wpt"]
+}

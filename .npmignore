@@ -1,0 +1,10 @@
+build
+prebuilds
+node_modules
+.vscode
+tmp
+coverage
+test
+.github
+build-containers
+examples

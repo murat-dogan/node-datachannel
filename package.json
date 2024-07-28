@@ -1,37 +1,27 @@
 {
     "name": "node-datachannel",
     "version": "0.20.0-dev",
-    "description": "libdatachannel node bindings",
+    "description": "WebRTC For Node.js and Electron. libdatachannel node bindings.",
+    "main": "./dist/cjs/src/lib/index.js",
+    "module": "./dist/esm/src/lib/index.js",
+    "types": "./dist/types/src/lib/index.d.ts",
     "exports": {
         ".": {
-            "import": {
-                "types": "./lib/index.d.ts",
-                "default": "./lib/index.js"
-            },
-            "require": {
-                "types": "./lib/index.d.cts",
-                "default": "./lib/index.cjs"
-            }
+            "types": "./dist/types/src/lib/index.d.ts",
+            "require": "./dist/cjs/src/lib/index.js",
+            "import": "./dist/esm/src/lib/index.js",
+            "default": "./dist/esm/src/lib/index.js"
         },
         "./polyfill": {
-            "import": {
-                "types": "./polyfill/index.d.ts",
-                "default": "./polyfill/index.js"
-            },
-            "require": {
-                "types": "./polyfill/index.d.cts",
-                "default": "./polyfill/index.cjs"
-            }
+            "types": "./dist/types/src/lib/index.d.ts",
+            "require": "./dist/cjs/src/polyfill/index.js",
+            "import": "./dist/esm/src/polyfill/index.js",
+            "default": "./dist/esm/src/polyfill/index.js"
         }
     },
     "engines": {
         "node": ">=16.0.0"
     },
-    "directories": {
-        "lib": "lib",
-        "test": "test"
-    },
-    "_from": "node-datachannel@latest",
     "scripts": {
         "install": "prebuild-install -r napi || (npm install --ignore-scripts --production=false && npm run _prebuild)",
         "install:nice": "npm run clean && npm install --ignore-scripts --production=false && cmake-js build --CDUSE_NICE=1",
@@ -39,7 +29,7 @@
         "build": "npm run compile && npm run build:tsc",
         "compile": "cmake-js build",
         "compile:debug": "cmake-js build -D",
-        "build:tsc": "tsc -p tsconfig.json",
+        "build:tsc": "rimraf dist && tsc -p tsconfig.json && tsc -p tsconfig.esm.json && tsc -p tsconfig.types.json && bash scripts/create-package-json.sh",
         "build:tsc:watch": "tsc -w -p tsconfig.json",
         "clean": "rimraf dist build",
         "lint": "eslint . --ext .ts --ext .mts",
