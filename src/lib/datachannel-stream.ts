@@ -1,4 +1,4 @@
-import stream from 'stream';
+import * as stream from 'stream';
 // import { DataChannel } from './node-datachannel.js';
 
 /**
