@@ -2,7 +2,7 @@ let nodeDataChannel;
 
 try {
     // from dist
-    nodeDataChannel = require('../../../../build/Release/node_datachannel.node');
+    nodeDataChannel = require('../../../build/Release/node_datachannel.node');
 }
 catch (e) {
     // from src

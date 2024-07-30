@@ -2,21 +2,21 @@
     "name": "node-datachannel",
     "version": "0.20.0-dev",
     "description": "WebRTC For Node.js and Electron. libdatachannel node bindings.",
-    "main": "./dist/cjs/src/lib/index.js",
-    "module": "./dist/esm/src/lib/index.js",
-    "types": "./dist/types/src/lib/index.d.ts",
+    "main": "./dist/cjs/lib/index.cjs",
+    "module": "./dist/esm/lib/index.mjs",
+    "types": "./dist/types/lib/index.d.ts",
     "exports": {
         ".": {
-            "types": "./dist/types/src/lib/index.d.ts",
-            "require": "./dist/cjs/src/lib/index.js",
-            "import": "./dist/esm/src/lib/index.js",
-            "default": "./dist/esm/src/lib/index.js"
+            "types": "./dist/types/lib/index.d.ts",
+            "require": "./dist/cjs/lib/index.cjs",
+            "import": "./dist/esm/lib/index.mjs",
+            "default": "./dist/lib/esm/index.mjs"
         },
         "./polyfill": {
-            "types": "./dist/types/src/lib/index.d.ts",
-            "require": "./dist/cjs/src/polyfill/index.js",
-            "import": "./dist/esm/src/polyfill/index.js",
-            "default": "./dist/esm/src/polyfill/index.js"
+            "types": "./dist/types/polyfill/index.d.ts",
+            "require": "./dist/cjs/polyfill/index.cjs",
+            "import": "./dist/esm/polyfill/index.mjs",
+            "default": "./dist/polyfill/esm/index.mjs"
         }
     },
     "engines": {
@@ -29,8 +29,8 @@
         "build": "npm run compile && npm run build:tsc",
         "compile": "cmake-js build",
         "compile:debug": "cmake-js build -D",
-        "build:tsc": "rimraf dist && tsc -p tsconfig.json && tsc -p tsconfig.esm.json && tsc -p tsconfig.types.json && bash scripts/create-package-json.sh",
-        "build:tsc:watch": "tsc -w -p tsconfig.json",
+        "build:tsc": "rimraf dist && rollup -c",
+        "build:tsc:watch": "rollup -c -w",
         "clean": "rimraf dist build",
         "lint": "eslint . --ext .ts --ext .mts",
         "test": "NODE_OPTIONS=--experimental-vm-modules jest",
@@ -38,8 +38,7 @@
         "test:wpt": "npm run run:wpt:server & (sleep 8 && (npm run run:wpt:test | tee test/wpt-tests/last-test-results.md) )",
         "run:wpt:server": "cd test/wpt-tests/wpt && ./wpt serve",
         "run:wpt:test": "ts-node test/wpt-tests/index.ts",
-        "_prebuild": "prebuild -r napi --backend cmake-js",
-        "prepublishOnly": "cp lib/index.d.ts lib/index.d.cts && cp polyfill/index.d.ts polyfill/index.d.cts && rollup lib/index.js --file lib/index.cjs --format cjs && rollup polyfill/index.js --file polyfill/index.cjs --format cjs"
+        "_prebuild": "prebuild -r napi --backend cmake-js"
     },
     "binary": {
         "napi_versions": [
@@ -75,6 +74,7 @@
     },
     "homepage": "https://github.com/murat-dogan/node-datachannel#readme",
     "devDependencies": {
+        "@rollup/plugin-esm-shim": "^0.1.7",
         "@types/jest": "^29.5.12",
         "@types/node": "^20.6.1",
         "@typescript-eslint/eslint-plugin": "^7.17.0",
@@ -91,7 +91,9 @@
         "prettier": "^3.3.3",
         "puppeteer": "^22.14.0",
         "rimraf": "^5.0.9",
-        "rollup": "^4.14.1",
+        "rollup": "^4.19.1",
+        "rollup-plugin-dts": "^6.1.1",
+        "rollup-plugin-esbuild": "^6.1.1",
         "ts-api-utils": "^1.3.0",
         "ts-jest": "^29.2.3",
         "ts-node": "^10.9.2",

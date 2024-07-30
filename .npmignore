@@ -8,3 +8,4 @@ test
 .github
 build-containers
 examples
+cmake

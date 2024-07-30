@@ -1,5 +1,6 @@
 import 'node-domexception';
-import { PeerConnection, SelectedCandidateInfo } from '../lib/index';
+import { SelectedCandidateInfo } from '../lib/types';
+import {PeerConnection} from '../lib/index';
 import RTCSessionDescription from './RTCSessionDescription';
 import RTCDataChannel from './RTCDataChannel';
 import RTCIceCandidate from './RTCIceCandidate';
