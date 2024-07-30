@@ -11,6 +11,7 @@
     "author": "",
     "license": "ISC",
     "dependencies": {
+        "node-datachannel": "file:../..",
         "simple-peer": "^9.11.1"
     }
 }

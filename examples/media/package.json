@@ -1,0 +1,16 @@
+{
+  "name": "media",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "## Example Webcam from Browser to Port 5000",
+  "main": "media.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "node-datachannel": "file:../.."
+  }
+}

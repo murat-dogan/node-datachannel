@@ -43,18 +43,18 @@ if(NOT libdatachannel)
 endif()
 
 add_library(${PROJECT_NAME} SHARED
-    src/rtc-wrapper.cpp
-    src/media-direction.cpp
-    src/media-rtcpreceivingsession-wrapper.cpp
-    src/media-track-wrapper.cpp
-    src/media-audio-wrapper.cpp
-    src/media-video-wrapper.cpp
-    src/data-channel-wrapper.cpp
-    src/peer-connection-wrapper.cpp
-    src/thread-safe-callback.cpp
-    src/web-socket-wrapper.cpp
-    src/web-socket-server-wrapper.cpp
-    src/main.cpp
+    src/cpp/rtc-wrapper.cpp
+    src/cpp/media-direction.cpp
+    src/cpp/media-rtcpreceivingsession-wrapper.cpp
+    src/cpp/media-track-wrapper.cpp
+    src/cpp/media-audio-wrapper.cpp
+    src/cpp/media-video-wrapper.cpp
+    src/cpp/data-channel-wrapper.cpp
+    src/cpp/peer-connection-wrapper.cpp
+    src/cpp/thread-safe-callback.cpp
+    src/cpp/web-socket-wrapper.cpp
+    src/cpp/web-socket-server-wrapper.cpp
+    src/cpp/main.cpp
     ${CMAKE_JS_SRC}
 )
 
