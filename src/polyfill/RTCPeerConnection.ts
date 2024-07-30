@@ -1,6 +1,6 @@
 import 'node-domexception';
 import { SelectedCandidateInfo } from '../lib/types';
-import {PeerConnection} from '../lib/index';
+import { PeerConnection } from '../lib/index';
 import RTCSessionDescription from './RTCSessionDescription';
 import RTCDataChannel from './RTCDataChannel';
 import RTCIceCandidate from './RTCIceCandidate';
@@ -41,7 +41,7 @@ export default class RTCPeerConnection extends EventTarget {
     onsignalingstatechange: ((this: RTCPeerConnection, ev: Event) => any) | null;
     ontrack: ((this: RTCPeerConnection, ev: RTCTrackEvent) => any) | null;
 
-    _checkConfiguration(config: _RTCConfiguration): void {
+    private _checkConfiguration(config: _RTCConfiguration): void {
         if (config && config.iceServers === undefined) config.iceServers = [];
         if (config && config.iceTransportPolicy === undefined) config.iceTransportPolicy = 'all';
 
