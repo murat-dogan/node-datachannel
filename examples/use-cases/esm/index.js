@@ -13,3 +13,6 @@ const peer2 = new RTCPeerConnection({
     iceServers: [{ urls: ['stun:stun.l.google.com:19302'] }],
 });
 peer2.close();
+
+// Cleanup the node-datachannel library
+nodeDataChannel.cleanup();
