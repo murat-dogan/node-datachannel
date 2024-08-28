@@ -3,7 +3,7 @@ set(triple $ENV{TRIPLE})
 
 # use clang and lld
 set(CMAKE_C_COMPILER $ENV{GCC})
-set(CMAKE_CXX_COMPILER $ENV{GCC})
+set(CMAKE_CXX_COMPILER $ENV{GXX})
 if (CMAKE_C_COMPILER MATCHES clang)
     add_link_options("-fuse-ld=lld")
 endif()

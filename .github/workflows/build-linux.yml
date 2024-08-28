@@ -25,6 +25,7 @@ jobs:
             libc: musl
             gcc_install: clang lld
             gcc: clang
+            gxx: clang++
           # libc is intentionally not set here, as prebuild-install requires libc to not be set for glibc builds
           - triple: "linux-gnu"
             platform: debian
@@ -48,10 +49,12 @@ jobs:
             platform: debian
             gcc_install: gcc g++
             gcc: gcc
+            gxx: g++
           - arch: arm64
             platform: debian
             gcc_install: gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
             gcc: aarch64-linux-gnu-gcc
+            gxx: aarch64-linux-gnu-g++
           # debian uses the triple `arm-linux-gnueabihf` instead of alpine's `armv7-alpine-linux-musleabihf`
           # because of this, we explicitly override triple_arch for debian arm
           - triple_arch: arm
@@ -59,6 +62,7 @@ jobs:
             platform: debian
             gcc_install: gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf
             gcc: arm-linux-gnueabihf-gcc
+            gxx: arm-linux-gnueabihf-g++
 
     steps:
       - uses: actions/checkout@v4
