@@ -25,7 +25,7 @@ jobs:
             libc: musl
             gcc_install: clang lld
             gcc: clang
-            gxx: clang
+            gxx: clang++
           # libc is intentionally not set here, as prebuild-install requires libc to not be set for glibc builds
           - triple: "linux-gnu"
             platform: debian
