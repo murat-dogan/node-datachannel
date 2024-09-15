@@ -23,7 +23,7 @@ jobs:
             platform: alpine
             version: 3.16
             libc: musl
-            gcc_install: clang lld
+            gcc_install: clang clang++ lld
             gcc: clang
             gxx: clang++
           # libc is intentionally not set here, as prebuild-install requires libc to not be set for glibc builds
@@ -44,7 +44,7 @@ jobs:
             arch: arm64
             flags: -march=armv8-a -fPIC
           # Set edge case overrides for specific platform + architecture
-          # also define gcc commands for each architecture 
+          # also define gcc commands for each architecture
           - arch: amd64
             platform: debian
             gcc_install: gcc g++
