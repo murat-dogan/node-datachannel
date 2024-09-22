@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import 'node-domexception';
 import { SelectedCandidateInfo } from '../lib/types';
 import { PeerConnection } from '../lib/index';
@@ -64,7 +65,7 @@ export default class RTCPeerConnection extends EventTarget {
 
                 // urls should be valid URLs and match the protocols "stun:|turn:|turns:"
                 if (
-                    config.iceServers[i].urls?.some(
+                    (config.iceServers[i].urls as string[])?.some(
                         (url) => {
                             try {
                                 const parsedURL = new URL(url)
