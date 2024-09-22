@@ -47,9 +47,6 @@ video.addH264Codec(96);
 video.setBitrate(3000);
 
 let track = peerConnection.addTrack(video);
-let session = new nodeDataChannel.RtcpReceivingSession();
-
-track.setMediaHandler(session);
 track.onMessage((msg) => {
   client.send(msg, 5000, '127.0.0.1', (err, n) => {
     if (err) console.log(err, n);
