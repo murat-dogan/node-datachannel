@@ -62,11 +62,18 @@ export default class RTCPeerConnection extends EventTarget {
                 if ((config.iceServers[i].urls as string[])?.some((url) => url == ''))
                     throw new exceptions.SyntaxError('IceServers urls cannot be empty');
 
-                // urls should match the regex "stun\:\w*|turn\:\w*|turns\:\w*"
+                // urls should be valid URLs and match the protocols "stun:|turn:|turns:"
                 if (
-                    (config.iceServers[i].urls as string[])?.some(
-                        // eslint-disable-next-line no-useless-escape
-                        (url) => !/^(stun:[\w,\.,:]*|turn:[\w,\.,:]*|turns:[\w,\.,:]*)$/.test(url),
+                    config.iceServers[i].urls?.some(
+                        (url) => {
+                            try {
+                                const parsedURL = new URL(url)
+
+                                return !/^(stun:|turn:|turns:)$/.test(parsedURL.protocol)
+                            } catch (error) {
+                                return true
+                            }
+                        },
                     )
                 )
                     throw new exceptions.SyntaxError('IceServers urls wrong format');

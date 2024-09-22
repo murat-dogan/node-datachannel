@@ -25,6 +25,7 @@ jobs:
             libc: musl
             gcc_install: clang lld
             gcc: clang
+            gxx: clang++
           # libc is intentionally not set here, as prebuild-install requires libc to not be set for glibc builds
           - triple: "linux-gnu"
             platform: debian
@@ -43,15 +44,17 @@ jobs:
             arch: arm64
             flags: -march=armv8-a -fPIC
           # Set edge case overrides for specific platform + architecture
-          # also define gcc commands for each architecture 
+          # also define gcc commands for each architecture
           - arch: amd64
             platform: debian
             gcc_install: gcc g++
             gcc: gcc
+            gxx: g++
           - arch: arm64
             platform: debian
             gcc_install: gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
             gcc: aarch64-linux-gnu-gcc
+            gxx: aarch64-linux-gnu-g++
           # debian uses the triple `arm-linux-gnueabihf` instead of alpine's `armv7-alpine-linux-musleabihf`
           # because of this, we explicitly override triple_arch for debian arm
           - triple_arch: arm
@@ -59,6 +62,7 @@ jobs:
             platform: debian
             gcc_install: gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf
             gcc: arm-linux-gnueabihf-gcc
+            gxx: arm-linux-gnueabihf-g++
 
     steps:
       - uses: actions/checkout@v4
@@ -87,13 +91,14 @@ jobs:
         id: sysroot
         run: echo "sysroot=$(sudo podman image mount ndc-buildroot:${{ matrix.platform }}-${{ matrix.arch }})" >> $GITHUB_OUTPUT
       - name: Build
-        run: sudo --preserve-env=SYSROOT,TRIPLE,COMPILER_FLAGS,LIBC,GCC,CI,PATH node_modules/.bin/prebuild --arch ${{ matrix.node_arch }} -r napi --backend cmake-js -- --CDCMAKE_TOOLCHAIN_FILE:FILEPATH=./cmake/toolchain/ci.cmake
+        run: sudo --preserve-env=SYSROOT,TRIPLE,COMPILER_FLAGS,LIBC,GCC,GXX,CI,PATH node_modules/.bin/prebuild --arch ${{ matrix.node_arch }} -r napi --backend cmake-js -- --CDCMAKE_TOOLCHAIN_FILE:FILEPATH=./cmake/toolchain/ci.cmake
         env:
           SYSROOT: ${{ steps.sysroot.outputs.sysroot }}
           TRIPLE: ${{ matrix.triple_arch }}-${{ matrix.triple }}${{ matrix.triple_postfix }}
           COMPILER_FLAGS: ${{ matrix.flags }}
           LIBC: ${{ matrix.libc }}
           GCC: ${{ matrix.gcc }}
+          GXX: ${{ matrix.gxx }}
           CI: true
       - name: Test
         run: sudo podman run --rm -v $(pwd):/usr/app/ -e CI=true --platform linux/${{ matrix.arch }} -t ndc-buildroot:${{ matrix.platform }}-${{ matrix.arch }} npm run test
