@@ -1,11 +1,11 @@
-export default class RTCError extends DOMException {
+export default class RTCError extends DOMException implements globalThis.RTCError {
     #errorDetail: RTCErrorDetailType;
     #receivedAlert: number | null;
     #sctpCauseCode: number | null;
     #sdpLineNumber: number | null;
     #sentAlert: number | null;
 
-    constructor(init: RTCErrorInit, message?: string) {
+    constructor(init: globalThis.RTCErrorInit, message?: string) {
         super(message, 'OperationError');
 
         if (!init || !init.errorDetail) throw new TypeError('Cannot construct RTCError, errorDetail is required');
@@ -29,7 +29,7 @@ export default class RTCError extends DOMException {
         this.#sentAlert = init.sentAlert ?? null;
     }
 
-    get errorDetail(): RTCErrorDetailType {
+    get errorDetail(): globalThis.RTCErrorDetailType {
         return this.#errorDetail;
     }
 

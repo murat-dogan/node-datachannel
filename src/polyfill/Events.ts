@@ -1,13 +1,8 @@
 import RTCDataChannel from './RTCDataChannel';
 import RTCIceCandidate from './RTCIceCandidate';
 
-interface EventInit {
-    bubbles?: boolean;
-    cancelable?: boolean;
-    composed?: boolean;
-}
 
-export class RTCPeerConnectionIceEvent extends Event {
+export class RTCPeerConnectionIceEvent extends Event implements globalThis.RTCPeerConnectionIceEvent {
     #candidate: RTCIceCandidate;
 
     constructor(candidate: RTCIceCandidate) {
@@ -21,19 +16,15 @@ export class RTCPeerConnectionIceEvent extends Event {
     }
 }
 
-export interface RTCDataChannelEventInit extends EventInit {
-    channel: RTCDataChannel;
-}
-
-export class RTCDataChannelEvent extends Event {
+export class RTCDataChannelEvent extends Event implements globalThis.RTCDataChannelEvent {
     #channel: RTCDataChannel;
 
-    constructor(type: string, eventInitDict: RTCDataChannelEventInit) {
+    constructor(type: string, eventInitDict: globalThis.RTCDataChannelEventInit) {
         super(type);
 
         if (type && !eventInitDict.channel) throw new TypeError('channel member is required');
 
-        this.#channel = eventInitDict?.channel;
+        this.#channel = eventInitDict?.channel as RTCDataChannel;
     }
 
     get channel(): RTCDataChannel {

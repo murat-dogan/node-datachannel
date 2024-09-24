@@ -1,7 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import RTCDtlsTransport from './RTCDtlsTransport';
 import RTCPeerConnection from './RTCPeerConnection';
 
-export default class RTCSctpTransport extends EventTarget {
+export default class RTCSctpTransport extends EventTarget implements globalThis.RTCSctpTransport {
     #pc: RTCPeerConnection = null;
     #extraFunctions = null;
     #transport: RTCDtlsTransport = null;
@@ -36,7 +37,7 @@ export default class RTCSctpTransport extends EventTarget {
         return this.#pc ? this.#extraFunctions.maxMessageSize() : 0;
     }
 
-    get state(): RTCSctpTransportState {
+    get state(): globalThis.RTCSctpTransportState {
         // reduce state from new, connecting, connected, disconnected, failed, closed, unknown
         // to RTCSctpTransport states connecting, connected, closed
         let state = this.#pc.connectionState;

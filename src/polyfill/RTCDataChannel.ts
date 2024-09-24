@@ -1,8 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import 'node-domexception';
 import * as exceptions from './Exception';
 import { DataChannel } from '../lib/index';
 
-export default class RTCDataChannel extends EventTarget {
+export default class RTCDataChannel extends EventTarget implements globalThis.RTCDataChannel {
     #dataChannel: DataChannel;
     #readyState: RTCDataChannelState;
     #bufferedAmountLowThreshold: number;
@@ -22,7 +23,7 @@ export default class RTCDataChannel extends EventTarget {
     onmessage: ((this: RTCDataChannel, ev: MessageEvent) => any) | null;
     onopen: ((this: RTCDataChannel, ev: Event) => any) | null;
 
-    constructor(dataChannel: DataChannel, opts: RTCDataChannelInit = {}) {
+    constructor(dataChannel: DataChannel, opts: globalThis.RTCDataChannelInit = {}) {
         super();
 
         this.#dataChannel = dataChannel;
@@ -55,7 +56,7 @@ export default class RTCDataChannel extends EventTarget {
 
         this.#dataChannel.onError((msg) => {
             this.dispatchEvent(
-                new RTCErrorEvent('error', {
+                new globalThis.RTCErrorEvent('error', {
                     error: new RTCError(
                         {
                             errorDetail: 'data-channel-failure',
@@ -155,7 +156,7 @@ export default class RTCDataChannel extends EventTarget {
         return this.#dataChannel.getProtocol();
     }
 
-    get readyState(): RTCDataChannelState {
+    get readyState(): globalThis.RTCDataChannelState {
         return this.#readyState;
     }
 

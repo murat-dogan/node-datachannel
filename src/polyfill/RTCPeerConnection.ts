@@ -8,13 +8,14 @@ import RTCIceCandidate from './RTCIceCandidate';
 import { RTCDataChannelEvent, RTCPeerConnectionIceEvent } from './Events';
 import RTCSctpTransport from './RTCSctpTransport';
 import * as exceptions from './Exception';
+import RTCCertificate from './RTCCertificate';
 
 // extend RTCConfiguration with peerIdentity
-interface _RTCConfiguration extends RTCConfiguration {
+interface RTCConfiguration extends globalThis.RTCConfiguration {
     peerIdentity?: string;
 }
 
-export default class RTCPeerConnection extends EventTarget {
+export default class RTCPeerConnection extends EventTarget implements globalThis.RTCPeerConnection {
     static async generateCertificate(): Promise<RTCCertificate> {
         throw new DOMException('Not implemented');
     }
@@ -40,9 +41,9 @@ export default class RTCPeerConnection extends EventTarget {
     onicegatheringstatechange: ((this: RTCPeerConnection, ev: Event) => any) | null;
     onnegotiationneeded: ((this: RTCPeerConnection, ev: Event) => any) | null;
     onsignalingstatechange: ((this: RTCPeerConnection, ev: Event) => any) | null;
-    ontrack: ((this: RTCPeerConnection, ev: RTCTrackEvent) => any) | null;
+    ontrack: ((this: RTCPeerConnection, ev: globalThis.RTCTrackEvent) => any) | null;
 
-    private _checkConfiguration(config: _RTCConfiguration): void {
+    private _checkConfiguration(config: RTCConfiguration): void {
         if (config && config.iceServers === undefined) config.iceServers = [];
         if (config && config.iceTransportPolicy === undefined) config.iceTransportPolicy = 'all';
 
@@ -102,14 +103,14 @@ export default class RTCPeerConnection extends EventTarget {
             throw new TypeError('IceTransportPolicy must be either "all" or "relay"');
     }
 
-    setConfiguration(config: _RTCConfiguration): void {
+    setConfiguration(config: RTCConfiguration): void {
         this._checkConfiguration(config);
         this.#config = config;
     }
 
 
 
-    constructor(config: _RTCConfiguration = { iceServers: [], iceTransportPolicy: 'all' }) {
+    constructor(config: RTCConfiguration = { iceServers: [], iceTransportPolicy: 'all' }) {
         super();
 
         this._checkConfiguration(config);
@@ -234,11 +235,11 @@ export default class RTCPeerConnection extends EventTarget {
         return this.#canTrickleIceCandidates;
     }
 
-    get connectionState(): RTCPeerConnectionState {
+    get connectionState(): globalThis.RTCPeerConnectionState {
         return this.#peerConnection.state();
     }
 
-    get iceConnectionState(): RTCIceConnectionState {
+    get iceConnectionState(): globalThis.RTCIceConnectionState {
         let state = this.#peerConnection.iceState();
         // libdatachannel uses 'completed' instead of 'connected'
         // see /webrtc/getstats.html
@@ -246,7 +247,7 @@ export default class RTCPeerConnection extends EventTarget {
         return state;
     }
 
-    get iceGatheringState(): RTCIceGatheringState {
+    get iceGatheringState(): globalThis.RTCIceGatheringState {
         return this.#peerConnection.gatheringState();
     }
 
@@ -278,11 +279,11 @@ export default class RTCPeerConnection extends EventTarget {
         return this.#sctp;
     }
 
-    get signalingState(): RTCSignalingState {
+    get signalingState(): globalThis.RTCSignalingState {
         return this.#peerConnection.signalingState();
     }
 
-    async addIceCandidate(candidate?: RTCIceCandidateInit | RTCIceCandidate): Promise<void> {
+    async addIceCandidate(candidate?: globalThis.RTCIceCandidateInit | RTCIceCandidate): Promise<void> {
         if (!candidate || !candidate.candidate) {
             return;
         }
@@ -324,11 +325,13 @@ export default class RTCPeerConnection extends EventTarget {
         }
     }
 
-    addTrack(_track, ..._streams): RTCRtpSender {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    addTrack(_track, ..._streams): globalThis.RTCRtpSender {
         throw new DOMException('Not implemented');
     }
 
-    addTransceiver(_trackOrKind, _init): RTCRtpTransceiver {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    addTransceiver(_trackOrKind, _init): globalThis.RTCRtpTransceiver {
         throw new DOMException('Not implemented');
     }
 
@@ -342,9 +345,10 @@ export default class RTCPeerConnection extends EventTarget {
         this.#peerConnection.close();
     }
 
-    createAnswer(): Promise<RTCSessionDescriptionInit> {
+    createAnswer(): Promise<globalThis.RTCSessionDescriptionInit | any> {
         return this.#localAnswer;
     }
+
 
     createDataChannel(label, opts = {}): RTCDataChannel {
         const channel = this.#peerConnection.createDataChannel(label, opts);
@@ -360,23 +364,23 @@ export default class RTCPeerConnection extends EventTarget {
         return dataChannel;
     }
 
-    createOffer(): Promise<RTCSessionDescriptionInit> {
+    createOffer(): Promise<globalThis.RTCSessionDescriptionInit | any> {
         return this.#localOffer;
     }
 
-    getConfiguration(): RTCConfiguration {
+    getConfiguration(): globalThis.RTCConfiguration {
         return this.#config;
     }
 
-    getReceivers(): RTCRtpReceiver[] {
+    getReceivers(): globalThis.RTCRtpReceiver[] {
         throw new DOMException('Not implemented');
     }
 
-    getSenders(): RTCRtpSender[] {
+    getSenders(): globalThis.RTCRtpSender[] {
         throw new DOMException('Not implemented');
     }
 
-    getStats(): Promise<RTCStatsReport> {
+    getStats(): Promise<globalThis.RTCStatsReport> {
         return new Promise((resolve) => {
             const report = new Map();
             const cp = this.#peerConnection.getSelectedCandidatePair();
@@ -447,7 +451,7 @@ export default class RTCPeerConnection extends EventTarget {
         });
     }
 
-    getTransceivers(): RTCRtpTransceiver[] {
+    getTransceivers(): globalThis.RTCRtpTransceiver[] {
         return []; // throw new DOMException('Not implemented');
     }
 
@@ -459,7 +463,7 @@ export default class RTCPeerConnection extends EventTarget {
         throw new DOMException('Not implemented');
     }
 
-    async setLocalDescription(description: RTCSessionDescriptionInit): Promise<void> {
+    async setLocalDescription(description: globalThis.RTCSessionDescriptionInit): Promise<void> {
         if (description?.type !== 'offer') {
             // any other type causes libdatachannel to throw
             return;
@@ -468,7 +472,7 @@ export default class RTCPeerConnection extends EventTarget {
         this.#peerConnection.setLocalDescription(description?.type as any);
     }
 
-    async setRemoteDescription(description: RTCSessionDescriptionInit): Promise<void> {
+    async setRemoteDescription(description: globalThis.RTCSessionDescriptionInit): Promise<void> {
         if (description.sdp == null) {
             throw new DOMException('Remote SDP must be set');
         }

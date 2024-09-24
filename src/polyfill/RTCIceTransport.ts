@@ -1,7 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import RTCIceCandidate from './RTCIceCandidate';
 import RTCPeerConnection from './RTCPeerConnection';
 
-export default class RTCIceTransport extends EventTarget {
+export default class RTCIceTransport extends EventTarget implements globalThis.RTCIceTransport {
     #pc: RTCPeerConnection = null;
     #extraFunctions = null;
 
@@ -31,13 +32,13 @@ export default class RTCIceTransport extends EventTarget {
         });
     }
 
-    get component(): RTCIceComponent {
+    get component(): globalThis.RTCIceComponent {
         const cp = this.getSelectedCandidatePair();
         if (!cp) return null;
         return cp.local.component;
     }
 
-    get gatheringState(): RTCIceGatheringState {
+    get gatheringState(): globalThis.RTCIceGatheringState {
         return this.#pc ? this.#pc.iceGatheringState : 'new';
     }
 
@@ -45,7 +46,7 @@ export default class RTCIceTransport extends EventTarget {
         return this.#pc.localDescription.type == 'offer' ? 'controlling' : 'controlled';
     }
 
-    get state(): RTCIceTransportState {
+    get state(): globalThis.RTCIceTransportState {
         return this.#pc ? this.#pc.iceConnectionState : 'new';
     }
 
@@ -65,7 +66,7 @@ export default class RTCIceTransport extends EventTarget {
         /** */
     }
 
-    getSelectedCandidatePair(): RTCIceCandidatePair | null {
+    getSelectedCandidatePair(): globalThis.RTCIceCandidatePair | null {
         const cp = this.#extraFunctions.selectedCandidatePair();
         if (!cp) return null;
         return {
