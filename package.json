@@ -1,52 +1,44 @@
 {
     "name": "node-datachannel",
-    "version": "0.12.0",
-    "description": "libdatachannel node bindings",
-    "type": "module",
-    "types": "./lib/index.d.ts",
+    "version": "0.20.0-dev",
+    "description": "WebRTC For Node.js and Electron. libdatachannel node bindings.",
+    "main": "./dist/cjs/lib/index.cjs",
+    "module": "./dist/esm/lib/index.mjs",
+    "types": "./dist/types/lib/index.d.ts",
     "exports": {
         ".": {
-            "import": {
-                "types": "./lib/index.d.ts",
-                "default": "./lib/index.js"
-            },
-            "require": {
-                "types": "./lib/index.d.cts",
-                "default": "./lib/index.cjs"
-            }
+            "types": "./dist/types/lib/index.d.ts",
+            "require": "./dist/cjs/lib/index.cjs",
+            "import": "./dist/esm/lib/index.mjs",
+            "default": "./dist/lib/esm/index.mjs"
         },
         "./polyfill": {
-            "import": {
-                "types": "./polyfill/index.d.ts",
-                "default": "./polyfill/index.js"
-            },
-            "require": {
-                "types": "./polyfill/index.d.cts",
-                "default": "./polyfill/index.cjs"
-            }
+            "types": "./dist/types/polyfill/index.d.ts",
+            "require": "./dist/cjs/polyfill/index.cjs",
+            "import": "./dist/esm/polyfill/index.mjs",
+            "default": "./dist/polyfill/esm/index.mjs"
         }
     },
     "engines": {
         "node": ">=16.0.0"
     },
-    "directories": {
-        "lib": "lib",
-        "test": "test"
-    },
-    "_from": "node-datachannel@latest",
     "scripts": {
         "install": "prebuild-install -r napi || (npm install --ignore-scripts --production=false && npm run _prebuild)",
-        "install-nice": "npm run clean && npm install --ignore-scripts --production=false && cmake-js build --CDUSE_NICE=1",
-        "install-gnu-tls": "npm run clean && npm install --ignore-scripts --production=false && cmake-js build --CDUSE_GNUTLS=1",
-        "build": "cmake-js build",
-        "build:debug": "cmake-js build -D",
-        "_prebuild": "prebuild -r napi --backend cmake-js",
-        "clean": "cmake-js clean",
-        "lint": "eslint lib/**/* test/**/*",
+        "install:nice": "npm run clean && npm install --ignore-scripts --production=false && cmake-js build --CDUSE_NICE=1",
+        "install:gnu": "npm run clean && npm install --ignore-scripts --production=false && cmake-js build --CDUSE_GNUTLS=1",
+        "build": "npm run compile && npm run build:tsc",
+        "compile": "cmake-js build",
+        "compile:debug": "cmake-js build -D",
+        "build:tsc": "rimraf dist && rollup -c",
+        "build:tsc:watch": "rollup -c -w",
+        "clean": "rimraf dist build",
+        "lint": "eslint . --ext .ts --ext .mts",
         "test": "NODE_OPTIONS=--experimental-vm-modules jest",
-        "wpt-test": "node test/wpt.js",
-        "test-types": "tsc",
-        "prepublishOnly": "cp lib/index.d.ts lib/index.d.cts && cp polyfill/index.d.ts polyfill/index.d.cts && rollup lib/index.js --file lib/index.cjs --format cjs && rollup polyfill/index.js --file polyfill/index.cjs --format cjs"
+        "test:watch": "NODE_OPTIONS=--experimental-vm-modules jest --watch",
+        "test:wpt": "npm run run:wpt:server & (sleep 8 && (npm run run:wpt:test | tee test/wpt-tests/last-test-results.md) )",
+        "run:wpt:server": "cd test/wpt-tests/wpt && ./wpt serve",
+        "run:wpt:test": "ts-node test/wpt-tests/index.ts",
+        "_prebuild": "prebuild -r napi --backend cmake-js"
     },
     "binary": {
         "napi_versions": [
@@ -82,19 +74,30 @@
     },
     "homepage": "https://github.com/murat-dogan/node-datachannel#readme",
     "devDependencies": {
+        "@rollup/plugin-esm-shim": "^0.1.7",
+        "@types/jest": "^29.5.12",
         "@types/node": "^20.6.1",
-        "@typescript-eslint/eslint-plugin": "^5.62.0",
-        "@typescript-eslint/parser": "^5.62.0",
+        "@typescript-eslint/eslint-plugin": "^7.17.0",
+        "@typescript-eslint/parser": "^7.17.0",
         "cmake-js": "^6.3.2",
-        "eslint": "^8.49.0",
-        "eslint-config-prettier": "^8.10.0",
-        "eslint-plugin-prettier": "^4.2.1",
+        "eslint": "^8.57.0",
+        "eslint-config-prettier": "^9.1.0",
+        "eslint-plugin-jest": "^28.6.0",
+        "eslint-plugin-prettier": "^5.2.1",
         "jest": "^29.7.0",
+        "jsdom": "^24.1.1",
         "node-addon-api": "^7.0.0",
         "prebuild": "^12.0.0",
-        "prettier": "^2.8.8",
-        "rollup": "^4.14.1",
-        "typescript": "^5.3.2"
+        "prettier": "^3.3.3",
+        "puppeteer": "^22.14.0",
+        "rimraf": "^5.0.9",
+        "rollup": "^4.22.5",
+        "rollup-plugin-dts": "^6.1.1",
+        "rollup-plugin-esbuild": "^6.1.1",
+        "ts-api-utils": "^1.3.0",
+        "ts-jest": "^29.2.3",
+        "ts-node": "^10.9.2",
+        "typescript": "5.4"
     },
     "dependencies": {
         "node-domexception": "^2.0.1",

@@ -1,14 +1,21 @@
 {
-    "compilerOptions": {
-      "target": "es5",
-      "module": "commonjs",
-      "declaration": true,
-      "strict": true,
-      "esModuleInterop": true,
-      "noEmit": true
-    },
-    "exclude": [
-      "node_modules",
-      "build"
-    ]
-  }
+  "compilerOptions": {
+    "target": "ESNext",
+    "moduleResolution": "Node",
+    "rootDir": ".",
+    "importsNotUsedAsValues": "remove",
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "noImplicitAny": false,
+    "noImplicitThis": false,
+    "noImplicitReturns": true,
+    "strictNullChecks": false,
+    "noUnusedLocals": true,
+    "alwaysStrict": true,
+    "outDir": "./dist",
+    "module": "CommonJS"
+  },
+  "include": ["src/**/*", "test/**/*"],
+  "exclude": ["node_modules", "dist", "src/cpp", "test/wpt-tests/wpt"]
+}
