@@ -121,7 +121,7 @@ export default class RTCPeerConnection extends EventTarget implements globalThis
         this.#canTrickleIceCandidates = null;
 
         try {
-            const peerIdentity = (config as any).peerIdentity ?? `peer-${getRandomString(7)}`;
+            const peerIdentity = (config as any)?.peerIdentity ?? `peer-${getRandomString(7)}`;
             this.#peerConnection = new PeerConnection(peerIdentity,
                 {
                     ...config,
