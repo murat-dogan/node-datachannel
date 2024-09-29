@@ -1,6 +1,6 @@
 {
     "name": "node-datachannel",
-    "version": "0.20.0-alpha.1",
+    "version": "0.20.0-alpha.2",
     "description": "WebRTC For Node.js and Electron. libdatachannel node bindings.",
     "main": "./dist/cjs/lib/index.cjs",
     "module": "./dist/esm/lib/index.mjs",
@@ -38,7 +38,8 @@
         "test:wpt": "npm run run:wpt:server & (sleep 8 && (npm run run:wpt:test | tee test/wpt-tests/last-test-results.md) )",
         "run:wpt:server": "cd test/wpt-tests/wpt && ./wpt serve",
         "run:wpt:test": "ts-node test/wpt-tests/index.ts",
-        "_prebuild": "prebuild -r napi --backend cmake-js"
+        "_prebuild": "prebuild -r napi --backend cmake-js",
+        "prepack": "npm run build:tsc"
     },
     "binary": {
         "napi_versions": [
