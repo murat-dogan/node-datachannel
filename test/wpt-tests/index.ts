@@ -1,7 +1,7 @@
 import ndc from '../../src/lib/index'
 import wptTestList from './wpt-test-list';
 import { runWptTests, WptTestResult } from './wpt';
-import { runChromeTests, isTestForChromeFailed, getTotalNumberOfTests } from './chrome-failed-tests';
+import { runChromeTests, isTestForChromeFailed } from './chrome-failed-tests';
 
 // Set the log level, for debugging purposes
 // ndc.initLogger('Debug');
@@ -18,7 +18,6 @@ async function run(): Promise<void> {
     // Run tests for Chrome
     console.log('# Running tests for Chrome...');
     await runChromeTests(wptTestList);
-    //console.log(JSON.stringify(getChromeFailedTests(), null, 2));
 
     // Run tests for node-datachannel
     console.log('');
@@ -46,7 +45,6 @@ async function run(): Promise<void> {
     failedTestsLibrary.forEach((result) => {
         totalFailedTestsLibrary += result.result.length;
     });
-    // console.log(JSON.stringify(failedTestsLibrary, null, 2));
 
     // Filter out any failed tests that also failed in Chrome
     const failedTests: WptTestResult[] = [];
@@ -69,8 +67,7 @@ async function run(): Promise<void> {
     console.log('');
     console.log('# Tests Report');
     // Total number of tests
-    console.log('Total Tests [Chrome]: ', getTotalNumberOfTests(), '  ');
-    console.log('Total Tests [Library]: ', totalTests, ' (We expect this to be equal to Total Tests [Chrome])  ');
+    console.log('Total Tests [Library]: ', totalTests);
     // Number of passed tests
     console.log('Passed Tests: ', totalTests - totalFailedTestsLibrary, '  ');
     // Number of failed tests for chrome + node-datachannel
