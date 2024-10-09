@@ -36,7 +36,7 @@ Please check [electron demo](/examples/electron-demo)
 
 WebRTC polyfills to be used for libraries like `simple-peer`.
 
-Please check [here for more](/polyfill)
+Please check [here for more](/src/polyfill)
 
 ### web-platform-tests
 
