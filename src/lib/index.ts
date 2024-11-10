@@ -148,16 +148,6 @@ export class RtcpReceivingSession {
     //
 }
 
-/**export {
-    Channel, DataChannelInitConfig, DescriptionType,
-    Direction, LogLevel, RtcConfig, SctpSettings,
-    SelectedCandidateInfo, RTCIceConnectionState,
-    RTCIceGathererState, RTCIceGatheringState,
-    RTCIceTransportState, RTCPeerConnectionState,
-    RTCSdpType, RTCSignalingState, RelayType,
-    ProxyServerType, TransportPolicy,
-    WebSocketServerConfiguration, IceServer, ProxyServer
-} from './types';**/
 export { WebSocketServer } from './websocket-server';
 export { WebSocket } from './websocket';
 
@@ -178,3 +168,8 @@ export default {
     WebSocketServer,
     DataChannelStream
 };
+
+
+// Types
+// https://github.com/murat-dogan/node-datachannel/issues/300
+export *  from './types';
