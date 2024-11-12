@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import * as stream from 'stream';
 // import { DataChannel } from './node-datachannel.js';
 

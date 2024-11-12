@@ -4,6 +4,7 @@ import { WebSocketServerConfiguration } from './types';
 import { WebSocket } from './websocket';
 
 export class WebSocketServer extends EventEmitter {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     #server: any;
     #clients: WebSocket[] = [];
 
