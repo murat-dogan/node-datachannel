@@ -1,7 +1,7 @@
 import nodeDataChannel from './node-datachannel';
 import _DataChannelStream from './datachannel-stream';
 import { WebSocketServer } from './websocket-server';
-import { Channel, DataChannelInitConfig, DescriptionType, Direction, LogLevel, RtcConfig, RTCIceConnectionState, RTCIceGatheringState, RTCPeerConnectionState, RTCSdpType, RTCSignalingState, SctpSettings, SelectedCandidateInfo } from './types';
+import { Channel, DataChannelInitConfig, DescriptionType, Direction, LogLevel, RtcConfig, RTCIceConnectionState, RTCIceGatheringState, RTCPeerConnectionState, RTCSignalingState, SctpSettings, SelectedCandidateInfo } from './types';
 import { WebSocket } from './websocket';
 
 export function preload(): void { nodeDataChannel.preload(); }
@@ -115,7 +115,7 @@ export interface PeerConnection {
     close(): void;
     setLocalDescription(type?: DescriptionType): void;
     setRemoteDescription(sdp: string, type: DescriptionType): void;
-    localDescription(): { type: DescriptionType; sdp: RTCSdpType } | null;
+    localDescription(): { type: DescriptionType; sdp: string } | null;
     remoteDescription(): { type: DescriptionType; sdp: string } | null;
     addRemoteCandidate(candidate: string, mid: string): void;
     createDataChannel(label: string, config?: DataChannelInitConfig): DataChannel;
