@@ -383,10 +383,14 @@ export default class RTCPeerConnection extends EventTarget implements globalThis
     getStats(): Promise<globalThis.RTCStatsReport> {
         return new Promise((resolve) => {
             const report = new Map();
-            const cp = this.#peerConnection.getSelectedCandidatePair();
-            const bytesSent = this.#peerConnection.bytesSent();
-            const bytesReceived = this.#peerConnection.bytesReceived();
-            const rtt = this.#peerConnection.rtt();
+            const cp = this.#peerConnection?.getSelectedCandidatePair();
+            const bytesSent = this.#peerConnection?.bytesSent();
+            const bytesReceived = this.#peerConnection?.bytesReceived();
+            const rtt = this.#peerConnection?.rtt();
+
+            if(!cp) {
+                return resolve(report);
+            }
 
             const localIdRs = getRandomString(8);
             const localId = 'RTCIceCandidate_' + localIdRs;
