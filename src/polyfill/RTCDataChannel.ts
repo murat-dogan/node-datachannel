@@ -73,7 +73,10 @@ export default class RTCDataChannel extends EventTarget implements globalThis.RT
 
         this.#dataChannel.onMessage((data) => {
             if (ArrayBuffer.isView(data)) {
-                data = Buffer.from(data.buffer);
+                if (this.binaryType=="arraybuffer")
+                    data = data.buffer;
+                else
+                    data = Buffer.from(data);
             }
 
             this.dispatchEvent(new MessageEvent('message', { data }));
