@@ -21,6 +21,7 @@ export interface RtcConfig {
     maxMessageSize?: number;
     mtu?: number;
     iceTransportPolicy?: TransportPolicy;
+    disableFingerprintVerification?: boolean;
 }
 
 export const enum RelayType {

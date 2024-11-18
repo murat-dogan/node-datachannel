@@ -76,6 +76,7 @@ export interface RtcConfig {
     maxMessageSize?: number;
     mtu?: number;
     iceTransportPolicy?: TransportPolicy;
+    disableFingerprintVerification?: boolean;
 }
 
 // Lowercase to match the description type string from libdatachannel
