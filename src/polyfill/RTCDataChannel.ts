@@ -27,7 +27,7 @@ export default class RTCDataChannel extends EventTarget implements globalThis.RT
         super();
 
         this.#dataChannel = dataChannel;
-        this.#binaryType = 'arraybuffer';
+        this.#binaryType = 'blob';
         this.#readyState = this.#dataChannel.isOpen() ? 'open' : 'connecting';
         this.#bufferedAmountLowThreshold = 0;
         this.#maxPacketLifeTime = opts.maxPacketLifeTime || null;
@@ -72,9 +72,12 @@ export default class RTCDataChannel extends EventTarget implements globalThis.RT
         });
 
         this.#dataChannel.onMessage((data) => {
-            if (ArrayBuffer.isView(data)) {
-                data = Buffer.from(data.buffer);
-            }
+			if (ArrayBuffer.isView(data)) {
+                if (this.binaryType == 'arraybuffer')
+                    data = data.buffer;
+                else
+				    data = Buffer.from(data.buffer);
+			}
 
             this.dispatchEvent(new MessageEvent('message', { data }));
         });
