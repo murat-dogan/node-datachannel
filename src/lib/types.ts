@@ -10,7 +10,7 @@ export interface Channel {
     onClosed(cb: () => void): void;
     onError(cb: (err: string) => void): void;
     onBufferedAmountLow(cb: () => void): void;
-    onMessage(cb: (msg: string | Buffer) => void): void;
+    onMessage(cb: (msg: string | Buffer | ArrayBuffer) => void): void;
 }
 
 export interface WebSocketServerConfiguration {
