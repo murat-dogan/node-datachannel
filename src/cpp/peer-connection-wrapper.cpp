@@ -242,6 +242,11 @@ PeerConnectionWrapper::PeerConnectionWrapper(const Napi::CallbackInfo &info) : N
         }
     }
 
+    // Allow skipping fingerprint validation
+    if (config.Get("disableFingerprintVerification").IsBoolean()) {
+        rtcConfig.disableFingerprintVerification = config.Get("disableFingerprintVerification").As<Napi::Boolean>();
+    }
+
     // Create peer-connection
     try
     {
