@@ -2,6 +2,9 @@ import { expect } from '@jest/globals';
 import { RTCPeerConnection, RTCDataChannel } from '../../src/polyfill/index';
 
 describe('polyfill', () => {
+    // Default is 5000 ms but we need more
+    jest.setTimeout(30000);
+
 	test('generateCertificate should throw', async () => {
 		await expect(async () => {
 			await RTCPeerConnection.generateCertificate();
@@ -29,7 +32,7 @@ describe('polyfill', () => {
 				peerIdentity: 'peer1',
 				iceServers: [{ urls: ['stun:stun.l.google.com:19302'] }],
 			});
-			
+
 			const peer2 = new RTCPeerConnection({
 				peerIdentity: 'peer2',
 				iceServers: [{ urls: ['stun:stun.l.google.com:19302'] }],
@@ -54,7 +57,7 @@ describe('polyfill', () => {
 				const dv = new DataView(binaryData);
 				return (dv.getInt8(0)==123 && dv.getFloat32(1)==Math.fround(123.456) && dv.getUint32(5)==987654321 && dv.getFloat64(9)==789.012);
 			}
-			
+
 			// We will set the "binaryType" and then send/receive the "data" from the datachannel in each test, and then compare them.
 			// For example, the first line will send a "Hello" string after setting binaryType to "arraybuffer".
 			const testMessages = [
@@ -136,7 +139,7 @@ describe('polyfill', () => {
 				// Send the test message
 				dc1.send(current.data);
 			}
-			
+
 			// Set Callbacks
 			peer1.onconnectionstatechange = (): void => {
 				p1ConnectionStateMock();
@@ -151,7 +154,7 @@ describe('polyfill', () => {
 				p1IceCandidateMock();
 				peer2.addIceCandidate(e.candidate);
 			};
-			
+
 			// Set Callbacks
 			peer2.onconnectionstatechange = (): void => {
 				p2ConnectionStateMock();
@@ -185,7 +188,7 @@ describe('polyfill', () => {
 					peer2.setRemoteDescription(desc);
 				})
 				//.catch((err) => console.error(err));
-			
+
 			peer2
 				.createAnswer()
 				.then((answerDesc) => {
@@ -193,7 +196,7 @@ describe('polyfill', () => {
 					peer1.setRemoteDescription(answerDesc);
 				})
 				//.catch((err) => console.error('Couldn't create answer', err));
-			
+
 			dc1 = peer1.createDataChannel('test-p2p');
 			dc1.onopen = (): void => {
 				p1DCMock();
