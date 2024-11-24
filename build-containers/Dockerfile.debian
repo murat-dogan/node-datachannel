@@ -1,5 +1,5 @@
 ARG version=bullseye
-ARG node_version=16
+ARG node_version=18
 FROM node:${node_version}-${version}
 RUN apt update
 RUN apt install -y build-essential libssl-dev
