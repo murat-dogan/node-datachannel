@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as stream from 'stream';
-// import { DataChannel } from './node-datachannel.js';
 
 /**
  * Turns a node-datachannel DataChannel into a real Node.js stream, complete with buffering,
