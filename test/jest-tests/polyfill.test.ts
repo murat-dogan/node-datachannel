@@ -10,11 +10,6 @@ describe('polyfill', () => {
 			await RTCPeerConnection.generateCertificate();
 		}).rejects.toEqual(new DOMException('Not implemented'));
 	});
-    // eslint-disable-next-line jest/valid-describe-callback
-    return;
-
-    // Node V16 has Problems with pollyfill (Blob)
-    // Disabling the test for now
 
 	test('P2P Test', () => {
 		return new Promise<void>((done) => {
