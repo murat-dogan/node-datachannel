@@ -135,7 +135,10 @@ describe('polyfill', () => {
 
 				// Assign the binaryType value
 				dc1.binaryType = current.binaryType as BinaryType;
-				dc2.binaryType = current.binaryType as BinaryType;
+                // dc2 also is initialized ?
+                if(dc2){
+                    dc2.binaryType = current.binaryType as BinaryType;
+                }
 
 				// Send the test message
 				dc1.send(current.data);
