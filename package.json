@@ -101,7 +101,6 @@
         "typescript": "5.4"
     },
     "dependencies": {
-        "node-domexception": "^2.0.1",
         "prebuild-install": "^7.0.1"
     }
 }
