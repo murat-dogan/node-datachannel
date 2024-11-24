@@ -20,7 +20,7 @@
         }
     },
     "engines": {
-        "node": ">=16.0.0"
+        "node": ">=18.20.0"
     },
     "scripts": {
         "install": "prebuild-install -r napi || (npm install --ignore-scripts --production=false && npm run _prebuild)",

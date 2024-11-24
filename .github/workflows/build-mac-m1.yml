@@ -15,7 +15,7 @@ jobs:
     runs-on: macos-13
     strategy:
       matrix:
-        node-version: [16.x]
+        node-version: [18]
 
     steps:
       - uses: actions/checkout@v4
