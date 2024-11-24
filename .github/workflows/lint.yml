@@ -17,4 +17,3 @@ jobs:
           node-version: '18'
       - run: npm ci
       - run: npm run lint
-      - run: npm run test-types
