@@ -42,7 +42,7 @@ jobs:
     runs-on: windows-2019
     strategy:
       matrix:
-        node_version: [16.x]
+        node_version: [18.x]
         node_arch:
           - x86
     steps:
