@@ -11,7 +11,7 @@ env:
 
 jobs:
   build-windows-x64:
-    runs-on: windows-2019
+    runs-on: windows-2022
     strategy:
       matrix:
         node-version: [18]
@@ -39,7 +39,7 @@ jobs:
           CI: true
 
   build-windows-x86:
-    runs-on: windows-2019
+    runs-on: windows-2022
     strategy:
       matrix:
         node_version: [18.x]
