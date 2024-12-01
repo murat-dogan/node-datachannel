@@ -6,9 +6,6 @@ on:
   #   tags:
   #     - v*
 
-env:
-  ACTIONS_ALLOW_UNSECURE_COMMANDS: true
-
 jobs:
   build-windows-x64:
     runs-on: windows-2022
@@ -18,15 +15,14 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - uses: ilammy/msvc-dev-cmd@v1
       - name: Install OpenSSL
-        run: choco install openssl
+        run: choco install openssl -y
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
       - name: Build
-        run: set npm_config_cache= && set NPM_CONFIG_CACHE= && npm install --build-from-source
+        run: npm install --build-from-source
         env:
           CI: true
       # - name: Test
@@ -39,10 +35,10 @@ jobs:
           CI: true
 
   build-windows-x86:
-    runs-on: windows-2022
+    runs-on: windows-2019
     strategy:
       matrix:
-        node_version: [18.x]
+        node_version: [18]
         node_arch:
           - x86
     steps:
@@ -61,7 +57,7 @@ jobs:
           node-version: ${{ matrix.node_version }}
           node-arch: ${{ matrix.node_arch }}
       - name: Build
-        run: set npm_config_cache= && set NPM_CONFIG_CACHE= && npm install --build-from-source
+        run: npm install --build-from-source
         env:
           CI: true
       # - name: Test
