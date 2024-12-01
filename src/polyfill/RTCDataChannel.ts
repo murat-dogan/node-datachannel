@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import 'node-domexception';
 import * as exceptions from './Exception';
 import { DataChannel } from '../lib/index';
 

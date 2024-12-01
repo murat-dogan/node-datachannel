@@ -2,7 +2,6 @@
 //
 // Example: candidate:123456 1 UDP 123456 192.168.1.1 12345 typ host raddr=10.0.0.1 rport=54321 generation 0
 
-import 'node-domexception';
 
 export default class RTCIceCandidate implements globalThis.RTCIceCandidate {
     #address: string | null;

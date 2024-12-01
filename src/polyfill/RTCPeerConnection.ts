@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import 'node-domexception';
 import { SelectedCandidateInfo } from '../lib/types';
 import { PeerConnection } from '../lib/index';
 import RTCSessionDescription from './RTCSessionDescription';
