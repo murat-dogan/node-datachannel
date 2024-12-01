@@ -71,7 +71,6 @@ dc1.onclose = (): void => {
 peer1
     .createOffer()
     .then((desc) => {
-        // console.log(122222, desc);
         peer2.setRemoteDescription(desc);
     })
     .catch((err) => console.error(err));
