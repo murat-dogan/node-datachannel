@@ -6,10 +6,6 @@ on:
   #   tags:
   #     - v*
 
-# x86
-env:
-  ACTIONS_ALLOW_UNSECURE_COMMANDS: true
-
 jobs:
   build-windows-x64:
     runs-on: windows-2022
@@ -72,3 +68,4 @@ jobs:
         run: node_modules/.bin/prebuild -r napi --upload -u ${{ secrets.GITHUB_TOKEN }}
         env:
           CI: true
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: true
