@@ -1,7 +1,7 @@
 #include "media-audio-wrapper.h"
 #include "media-direction.h"
 
-Napi::FunctionReference AudioWrapper::constructor;
+Napi::FunctionReference AudioWrapper::constructor = Napi::FunctionReference();
 std::unordered_set<AudioWrapper *> AudioWrapper::instances;
 
 Napi::Object AudioWrapper::Init(Napi::Env env, Napi::Object exports)
@@ -35,8 +35,12 @@ Napi::Object AudioWrapper::Init(Napi::Env env, Napi::Object exports)
             InstanceMethod("parseSdpLine", &AudioWrapper::parseSdpLine),
         });
 
-    constructor = Napi::Persistent(func);
-    constructor.SuppressDestruct();
+    // If this is not the first call, we don't want to reassign the constructor (hot-reload problem)
+    if(constructor.IsEmpty())
+    {
+        constructor = Napi::Persistent(func);
+        constructor.SuppressDestruct();
+    }
 
     exports.Set("Audio", func);
     return exports;

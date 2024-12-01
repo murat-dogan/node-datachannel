@@ -4,7 +4,7 @@
 
 #include "plog/Log.h"
 
-Napi::FunctionReference TrackWrapper::constructor;
+Napi::FunctionReference TrackWrapper::constructor = Napi::FunctionReference();
 std::unordered_set<TrackWrapper *> TrackWrapper::instances;
 
 void TrackWrapper::CloseAll()
@@ -48,8 +48,12 @@ Napi::Object TrackWrapper::Init(Napi::Env env, Napi::Object exports)
             InstanceMethod("onMessage", &TrackWrapper::onMessage),
         });
 
-    constructor = Napi::Persistent(func);
-    constructor.SuppressDestruct();
+    // If this is not the first call, we don't want to reassign the constructor (hot-reload problem)
+    if(constructor.IsEmpty())
+    {
+        constructor = Napi::Persistent(func);
+        constructor.SuppressDestruct();
+    }
 
     exports.Set("Track", func);
     return exports;

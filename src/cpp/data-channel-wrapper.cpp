@@ -2,7 +2,7 @@
 
 #include "plog/Log.h"
 
-Napi::FunctionReference DataChannelWrapper::constructor;
+Napi::FunctionReference DataChannelWrapper::constructor = Napi::FunctionReference();
 std::unordered_set<DataChannelWrapper *> DataChannelWrapper::instances;
 
 void DataChannelWrapper::CloseAll()
@@ -46,8 +46,12 @@ Napi::Object DataChannelWrapper::Init(Napi::Env env, Napi::Object exports)
             InstanceMethod("onMessage", &DataChannelWrapper::onMessage),
         });
 
-    constructor = Napi::Persistent(func);
-    constructor.SuppressDestruct();
+    // If this is not the first call, we don't want to reassign the constructor (hot-reload problem)
+    if(constructor.IsEmpty())
+    {
+        constructor = Napi::Persistent(func);
+        constructor.SuppressDestruct();
+    }
 
     exports.Set("DataChannel", func);
     return exports;
