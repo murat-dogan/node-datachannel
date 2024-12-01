@@ -2,7 +2,7 @@
 
 #include "plog/Log.h"
 
-Napi::FunctionReference WebSocketServerWrapper::constructor;
+Napi::FunctionReference WebSocketServerWrapper::constructor = Napi::FunctionReference();
 std::unordered_set<WebSocketServerWrapper *> WebSocketServerWrapper::instances;
 
 void WebSocketServerWrapper::StopAll()
@@ -26,8 +26,12 @@ Napi::Object WebSocketServerWrapper::Init(Napi::Env env, Napi::Object exports)
             InstanceMethod("onClient", &WebSocketServerWrapper::onClient)
         });
 
-    constructor = Napi::Persistent(func);
-    constructor.SuppressDestruct();
+    // If this is not the first call, we don't want to reassign the constructor (hot-reload problem)
+    if(constructor.IsEmpty())
+    {
+        constructor = Napi::Persistent(func);
+        constructor.SuppressDestruct();
+    }
 
     exports.Set("WebSocketServer", func);
     return exports;

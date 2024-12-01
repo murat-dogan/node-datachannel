@@ -9,7 +9,7 @@
 #include <cctype>
 #include <sstream>
 
-Napi::FunctionReference PeerConnectionWrapper::constructor;
+Napi::FunctionReference PeerConnectionWrapper::constructor = Napi::FunctionReference();
 std::unordered_set<PeerConnectionWrapper *> PeerConnectionWrapper::instances;
 
 void PeerConnectionWrapper::CloseAll()
@@ -65,8 +65,12 @@ Napi::Object PeerConnectionWrapper::Init(Napi::Env env, Napi::Object exports)
             InstanceMethod("maxMessageSize", &PeerConnectionWrapper::maxMessageSize),
         });
 
-    constructor = Napi::Persistent(func);
-    constructor.SuppressDestruct();
+    // If this is not the first call, we don't want to reassign the constructor (hot-reload problem)
+    if(constructor.IsEmpty())
+    {
+        constructor = Napi::Persistent(func);
+        constructor.SuppressDestruct();
+    }
 
     exports.Set("PeerConnection", func);
     return exports;

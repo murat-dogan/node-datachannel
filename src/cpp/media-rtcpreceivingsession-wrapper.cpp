@@ -1,6 +1,6 @@
 #include "media-rtcpreceivingsession-wrapper.h"
 
-Napi::FunctionReference RtcpReceivingSessionWrapper::constructor;
+Napi::FunctionReference RtcpReceivingSessionWrapper::constructor = Napi::FunctionReference();
 std::unordered_set<RtcpReceivingSessionWrapper *> RtcpReceivingSessionWrapper::instances;
 
 Napi::Object RtcpReceivingSessionWrapper::Init(Napi::Env env, Napi::Object exports)
@@ -14,8 +14,12 @@ Napi::Object RtcpReceivingSessionWrapper::Init(Napi::Env env, Napi::Object expor
             // Instance Methods
         });
 
-    constructor = Napi::Persistent(func);
-    constructor.SuppressDestruct();
+    // If this is not the first call, we don't want to reassign the constructor (hot-reload problem)
+    if(constructor.IsEmpty())
+    {
+        constructor = Napi::Persistent(func);
+        constructor.SuppressDestruct();
+    }
 
     exports.Set("RtcpReceivingSession", func);
     return exports;
