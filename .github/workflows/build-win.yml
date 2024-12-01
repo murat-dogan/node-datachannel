@@ -33,3 +33,38 @@ jobs:
         run: node_modules/.bin/prebuild -r napi --upload -u ${{ secrets.GITHUB_TOKEN }}
         env:
           CI: true
+
+  build-windows-x86:
+    runs-on: windows-2019
+    strategy:
+      matrix:
+        node_version: [18]
+        node_arch:
+          - x86
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x86
+      - name: Install OpenSSL
+      # openssl v3.1.1 [Approved]
+      # openssl package files install completed. Performing other installation steps.
+      # ERROR: 32-bit installation is not supported for openssl
+        run: choco install openssl --x86=true --version=1.1.1.2100
+      - name: Use Node.js ${{ matrix.node_version }}
+        uses: aminya/setup-node@x86
+        with:
+          node-version: ${{ matrix.node_version }}
+          node-arch: ${{ matrix.node_arch }}
+      - name: Build
+        run: npm install --build-from-source
+        env:
+          CI: true
+      # - name: Test
+      #   run: npm run test
+      #   env:
+      #     CI: true
+      - name: Upload
+        run: node_modules/.bin/prebuild -r napi --upload -u ${{ secrets.GITHUB_TOKEN }}
+        env:
+          CI: true
