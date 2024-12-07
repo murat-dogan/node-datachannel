@@ -1,6 +1,7 @@
 import dts from 'rollup-plugin-dts';
 import esbuild from 'rollup-plugin-esbuild';
 import esmShim from '@rollup/plugin-esm-shim';
+import replace from '@rollup/plugin-replace';
 
 const external = (id) => {
   return !/^[./]/.test(id);
@@ -14,7 +15,15 @@ const bundle = (config) => ({
 
 export default [
   bundle({
-    plugins: [esmShim(), esbuild()],
+    plugins: [
+      replace({
+        include: "src/lib/node-datachannel.ts",
+        preventAssignment: true,
+        "require('../../build": "require('../../../build",
+      }),
+      esmShim(),
+      esbuild(),
+    ],
     output: [
       {
         dir: 'dist/esm',
