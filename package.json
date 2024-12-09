@@ -76,6 +76,7 @@
     "homepage": "https://github.com/murat-dogan/node-datachannel#readme",
     "devDependencies": {
         "@rollup/plugin-esm-shim": "^0.1.7",
+        "@rollup/plugin-replace": "^6.0.1",
         "@types/jest": "^29.5.12",
         "@types/node": "^20.6.1",
         "@typescript-eslint/eslint-plugin": "^7.17.0",
