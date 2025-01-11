@@ -96,7 +96,7 @@ export interface DataChannel extends Channel {
     // Channel implementation
     close(): void;
     sendMessage(msg: string): boolean;
-    sendMessageBinary(buffer: Uint8Array): boolean;
+    sendMessageBinary(buffer: Buffer | Uint8Array): boolean;
     isOpen(): boolean;
     bufferedAmount(): number;
     maxMessageSize(): number;
