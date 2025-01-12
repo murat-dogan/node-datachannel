@@ -6,6 +6,9 @@ on:
   #   tags:
   #     - v*
 
+env:
+  ACTIONS_ALLOW_UNSECURE_COMMANDS: true
+
 jobs:
   build-windows-x64:
     runs-on: windows-2022
