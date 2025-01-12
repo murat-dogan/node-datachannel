@@ -172,12 +172,20 @@ export default class RTCDataChannel extends EventTarget implements globalThis.RT
         // Needs network error, type error implemented
         if (typeof data === 'string') {
             this.#dataChannel.sendMessage(data);
-        } else if (data instanceof Blob) {
+          } else if (data instanceof Blob) {
             data.arrayBuffer().then((ab) => {
+              if (process?.versions?.bun) {
+                this.#dataChannel.sendMessageBinary(Buffer.from(ab));
+              } else {
                 this.#dataChannel.sendMessageBinary(new Uint8Array(ab));
+              }
             });
-        } else {
-            this.#dataChannel.sendMessageBinary(new Uint8Array(data));
+          } else {
+            if (process?.versions?.bun) {
+              this.#dataChannel.sendMessageBinary(Buffer.from(data));
+            } else {
+              this.#dataChannel.sendMessageBinary(new Uint8Array(data));
+            }
         }
     }
 
