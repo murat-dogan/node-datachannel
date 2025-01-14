@@ -1,2 +1,2 @@
-let nodeDataChannel = require('../../build/Release/node_datachannel.node');
+import nodeDataChannel = require('../../build/Release/node_datachannel.node');
 export default nodeDataChannel;
