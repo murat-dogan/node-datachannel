@@ -18,6 +18,7 @@ Napi::Object RtcWrapper::Init(Napi::Env env, Napi::Object exports)
     exports.Set("cleanup", Napi::Function::New(env, &RtcWrapper::cleanup));
     exports.Set("preload", Napi::Function::New(env, &RtcWrapper::preload));
     exports.Set("setSctpSettings", Napi::Function::New(env, &RtcWrapper::setSctpSettings));
+    exports.Set("onUnhandledStunRequest", Napi::Function::New(env, &RtcWrapper::onUnhandledStunRequest));
 
     return exports;
 }
@@ -171,4 +172,62 @@ void RtcWrapper::setSctpSettings(const Napi::CallbackInfo &info)
         settings.delayedSackTime = std::chrono::milliseconds(config.Get("delayedSackTime").As<Napi::Number>().Uint32Value());
 
     rtc::SetSctpSettings(settings);
+}
+
+void RtcWrapper::onUnhandledStunRequest(const Napi::CallbackInfo &info)
+{
+    PLOG_DEBUG << "onUnhandledStunRequest() called";
+    Napi::Env env = info.Env();
+    int length = info.Length();
+
+    if (length < 1 || !info[0].IsString())
+    {
+        Napi::TypeError::New(env, "host (String) expected").ThrowAsJavaScriptException();
+        return;
+    }
+    Napi::String host = info[0].As<Napi::String>();
+
+    if (length < 2 || !info[1].IsNumber())
+    {
+        Napi::TypeError::New(env, "port (Number) expected").ThrowAsJavaScriptException();
+        return;
+    }
+    Napi::Number port = info[1].As<Napi::Number>();
+
+    // unbind listener if cb is null, undefined, or was omitted
+    if (length == 2 || (info[2].IsNull() || info[2].IsUndefined())) {
+        unboundStunCallbacks.erase(port.ToNumber().Uint32Value());
+        rtc::OnUnhandledStunRequest(host.ToString(), port.ToNumber());
+        return;
+    }
+
+    if (length < 3 || !info[2].IsFunction())
+    {
+        Napi::TypeError::New(env, "cb (Function) expected").ThrowAsJavaScriptException();
+        return;
+    }
+    Napi::Function cb = info[2].As<Napi::Function>();
+
+    std::unique_ptr<ThreadSafeCallback> callback = std::make_unique<ThreadSafeCallback>(cb);
+    unboundStunCallbacks[port.ToNumber().Uint32Value()] = std::move(callback);
+    void * ptr = &unboundStunCallbacks[port.ToNumber().Uint32Value()];
+
+    rtc::OnUnhandledStunRequest(host.ToString(), port.ToNumber(), [&](rtc::UnhandledStunRequest request, void *userPtr) {
+        PLOG_DEBUG << "mOnUnhandledStunRequestCallback call(1)";
+
+        std::unique_ptr<ThreadSafeCallback> &callback = *(std::unique_ptr<ThreadSafeCallback> *)userPtr;
+
+        if (callback) {
+            callback->call([request = std::move(request)](Napi::Env env, std::vector<napi_value> &args) {
+                Napi::Object reqObj = Napi::Object::New(env);
+                reqObj.Set("ufrag", request.remoteUfrag.c_str());
+                reqObj.Set("host", request.remoteHost.c_str());
+                reqObj.Set("port", request.remotePort);
+
+                args = {reqObj};
+            });
+        }
+
+        PLOG_DEBUG << "mOnUnhandledStunRequestCallback call(2)";
+    }, ptr);
 }
