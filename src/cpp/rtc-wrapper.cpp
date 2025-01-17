@@ -18,7 +18,7 @@ Napi::Object RtcWrapper::Init(Napi::Env env, Napi::Object exports)
     exports.Set("cleanup", Napi::Function::New(env, &RtcWrapper::cleanup));
     exports.Set("preload", Napi::Function::New(env, &RtcWrapper::preload));
     exports.Set("setSctpSettings", Napi::Function::New(env, &RtcWrapper::setSctpSettings));
-    exports.Set("onUnhandledStunRequest", Napi::Function::New(env, &RtcWrapper::onUnhandledStunRequest));
+    exports.Set("listenIceUdpMux", Napi::Function::New(env, &RtcWrapper::listenIceUdpMux));
 
     return exports;
 }
@@ -174,48 +174,46 @@ void RtcWrapper::setSctpSettings(const Napi::CallbackInfo &info)
     rtc::SetSctpSettings(settings);
 }
 
-void RtcWrapper::onUnhandledStunRequest(const Napi::CallbackInfo &info)
+void RtcWrapper::listenIceUdpMux(const Napi::CallbackInfo &info)
 {
-    PLOG_DEBUG << "onUnhandledStunRequest() called";
+    PLOG_DEBUG << "listenIceUdpMux() called";
     Napi::Env env = info.Env();
     int length = info.Length();
 
-    if (length < 1 || !info[0].IsString())
-    {
-        Napi::TypeError::New(env, "host (String) expected").ThrowAsJavaScriptException();
-        return;
-    }
-    Napi::String host = info[0].As<Napi::String>();
-
-    if (length < 2 || !info[1].IsNumber())
+    if (length < 1 || !info[0].IsNumber())
     {
         Napi::TypeError::New(env, "port (Number) expected").ThrowAsJavaScriptException();
         return;
     }
-    Napi::Number port = info[1].As<Napi::Number>();
+    int port = info[0].As<Napi::Number>().ToNumber();
+
+    Napi::Function listener;
+    if (length > 1 && info[1].IsFunction())
+    {
+       listener = info[1].As<Napi::Function>();
+    }
+
+    std::string host;
+    if (length > 2 && info[2].IsString())
+    {
+       host = info[2].As<Napi::String>().ToString();
+    }
 
     // unbind listener if cb is null, undefined, or was omitted
-    if (length == 2 || (info[2].IsNull() || info[2].IsUndefined())) {
-        unboundStunCallbacks.erase(port.ToNumber().Uint32Value());
-        rtc::OnUnhandledStunRequest(host.ToString(), port.ToNumber());
-        return;
-    }
-
-    if (length < 3 || !info[2].IsFunction())
+    if (!listener)
     {
-        Napi::TypeError::New(env, "cb (Function) expected").ThrowAsJavaScriptException();
+        std::lock_guard<std::mutex> guard(iceUdpMuxListenersMutex);
+        iceUdpMuxListeners.erase(port);
+        rtc::ListenIceUdpMux(port, nullptr, host);
         return;
     }
-    Napi::Function cb = info[2].As<Napi::Function>();
 
-    std::unique_ptr<ThreadSafeCallback> callback = std::make_unique<ThreadSafeCallback>(cb);
-    unboundStunCallbacks[port.ToNumber().Uint32Value()] = std::move(callback);
-    void * ptr = &unboundStunCallbacks[port.ToNumber().Uint32Value()];
+    auto uniqueCallback = std::make_unique<ThreadSafeCallback>(listener);
+    auto callback = std::shared_ptr<ThreadSafeCallback>(std::move(uniqueCallback));
 
-    rtc::OnUnhandledStunRequest(host.ToString(), port.ToNumber(), [&](rtc::UnhandledStunRequest request, void *userPtr) {
-        PLOG_DEBUG << "mOnUnhandledStunRequestCallback call(1)";
-
-        std::unique_ptr<ThreadSafeCallback> &callback = *(std::unique_ptr<ThreadSafeCallback> *)userPtr;
+    rtc::IceUdpMuxCallback iceUdpMuxCallback = [callback](rtc::IceUdpMuxRequest request)
+    {
+        PLOG_DEBUG << "listenIceUdpMux IceUdpMuxCallback call(1)";
 
         if (callback) {
             callback->call([request = std::move(request)](Napi::Env env, std::vector<napi_value> &args) {
@@ -228,6 +226,11 @@ void RtcWrapper::onUnhandledStunRequest(const Napi::CallbackInfo &info)
             });
         }
 
-        PLOG_DEBUG << "mOnUnhandledStunRequestCallback call(2)";
-    }, ptr);
+        PLOG_DEBUG << "listenIceUdpMux IceUdpMuxCallback call(2)";
+    };
+
+    std::lock_guard<std::mutex> guard(iceUdpMuxListenersMutex);
+    iceUdpMuxListeners[port] = std::move(iceUdpMuxCallback);
+
+    rtc::ListenIceUdpMux(port, &iceUdpMuxListeners[port], host);
 }
