@@ -47,11 +47,7 @@ export interface ProxyServer {
     password?: string;
 }
 
-export const enum RelayType {
-    TurnUdp = 'TurnUdp',
-    TurnTcp = 'TurnTcp',
-    TurnTls = 'TurnTls',
-}
+export type RelayType = 'TurnUdp' | 'TurnTcp' | 'TurnTls'
 
 export interface IceServer {
     hostname: string;
@@ -80,13 +76,7 @@ export interface RtcConfig {
 }
 
 // Lowercase to match the description type string from libdatachannel
-export enum DescriptionType {
-    Unspec = 'unspec',
-    Offer = 'offer',
-    Answer = 'answer',
-    Pranswer = 'pranswer',
-    Rollback = 'rollback',
-}
+export type DescriptionType = 'unspec' | 'offer' | 'answer' | 'pranswer' | 'rollback'
 
 export type RTCSdpType = 'answer' | 'offer' | 'pranswer' | 'rollback';
 
@@ -118,10 +108,4 @@ export interface SelectedCandidateInfo {
 }
 
 // Must be same as rtc enum class Direction
-export const enum Direction {
-    SendOnly = 'SendOnly',
-    RecvOnly = 'RecvOnly',
-    SendRecv = 'SendRecv',
-    Inactive = 'Inactive',
-    Unknown = 'Unknown',
-}
+export type Direction = 'SendOnly' | 'RecvOnly' | 'SendRecv' | 'Inactive' | 'Unknown'
