@@ -282,7 +282,7 @@ export default class RTCPeerConnection extends EventTarget implements globalThis
         return this.#peerConnection.signalingState();
     }
 
-    async addIceCandidate(candidate?: globalThis.RTCIceCandidateInit | RTCIceCandidate): Promise<void> {
+    async addIceCandidate(candidate?: globalThis.RTCIceCandidateInit | null): Promise<void> {
         if (!candidate || !candidate.candidate) {
             return;
         }
