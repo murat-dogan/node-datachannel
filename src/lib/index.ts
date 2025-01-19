@@ -1,13 +1,14 @@
 import nodeDataChannel from './node-datachannel';
 import _DataChannelStream from './datachannel-stream';
 import { WebSocketServer } from './websocket-server';
-import { Channel, DataChannelInitConfig, DescriptionType, Direction, LogLevel, RtcConfig, RTCIceConnectionState, RTCIceGatheringState, RTCPeerConnectionState, RTCSignalingState, SctpSettings, SelectedCandidateInfo } from './types';
+import { CertificateFingerprint, Channel, DataChannelInitConfig, DescriptionType, Direction, LocalDescriptionInit, LogLevel, RtcConfig, RTCIceConnectionState, RTCIceGatheringState, RTCPeerConnectionState, RTCSignalingState, SctpSettings, SelectedCandidateInfo } from './types';
 import { WebSocket } from './websocket';
 
 export function preload(): void { nodeDataChannel.preload(); }
 export function initLogger(level: LogLevel): void { nodeDataChannel.initLogger(level); }
 export function cleanup(): void { nodeDataChannel.cleanup(); }
 export function setSctpSettings(settings: SctpSettings): void { nodeDataChannel.setSctpSettings(settings); }
+export function listenIceUdpMux(port: number, cb?: (req: { ufrag: string, host: string, port: number }) => void | null, host?: string | null): void { nodeDataChannel.listenIceUdpMux(port, cb, host); }
 
 export interface Audio {
     addAudioCodec(payloadType: number, codec: string, profile?: string): void;
@@ -113,10 +114,11 @@ export const DataChannel: {
 
 export interface PeerConnection {
     close(): void;
-    setLocalDescription(type?: DescriptionType): void;
+    setLocalDescription(type?: DescriptionType, init?: LocalDescriptionInit): void;
     setRemoteDescription(sdp: string, type: DescriptionType): void;
     localDescription(): { type: DescriptionType; sdp: string } | null;
     remoteDescription(): { type: DescriptionType; sdp: string } | null;
+    remoteFingerprint(): CertificateFingerprint;
     addRemoteCandidate(candidate: string, mid: string): void;
     createDataChannel(label: string, config?: DataChannelInitConfig): DataChannel;
     addTrack(media: Video | Audio): Track;
@@ -158,6 +160,7 @@ export default {
     cleanup,
     preload,
     setSctpSettings,
+    listenIceUdpMux,
     RtcpReceivingSession,
     Track,
     Video,

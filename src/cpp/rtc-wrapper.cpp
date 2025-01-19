@@ -18,6 +18,7 @@ Napi::Object RtcWrapper::Init(Napi::Env env, Napi::Object exports)
     exports.Set("cleanup", Napi::Function::New(env, &RtcWrapper::cleanup));
     exports.Set("preload", Napi::Function::New(env, &RtcWrapper::preload));
     exports.Set("setSctpSettings", Napi::Function::New(env, &RtcWrapper::setSctpSettings));
+    exports.Set("listenIceUdpMux", Napi::Function::New(env, &RtcWrapper::listenIceUdpMux));
 
     return exports;
 }
@@ -171,4 +172,65 @@ void RtcWrapper::setSctpSettings(const Napi::CallbackInfo &info)
         settings.delayedSackTime = std::chrono::milliseconds(config.Get("delayedSackTime").As<Napi::Number>().Uint32Value());
 
     rtc::SetSctpSettings(settings);
+}
+
+void RtcWrapper::listenIceUdpMux(const Napi::CallbackInfo &info)
+{
+    PLOG_DEBUG << "listenIceUdpMux() called";
+    Napi::Env env = info.Env();
+    int length = info.Length();
+
+    if (length < 1 || !info[0].IsNumber())
+    {
+        Napi::TypeError::New(env, "port (Number) expected").ThrowAsJavaScriptException();
+        return;
+    }
+    int port = info[0].As<Napi::Number>().ToNumber();
+
+    Napi::Function listener;
+    if (length > 1 && info[1].IsFunction())
+    {
+       listener = info[1].As<Napi::Function>();
+    }
+
+    std::string host;
+    if (length > 2 && info[2].IsString())
+    {
+       host = info[2].As<Napi::String>().ToString();
+    }
+
+    // unbind listener if cb is null, undefined, or was omitted
+    if (!listener)
+    {
+        std::lock_guard<std::mutex> guard(iceUdpMuxListenersMutex);
+        iceUdpMuxListeners.erase(port);
+        rtc::ListenIceUdpMux(port, nullptr, host);
+        return;
+    }
+
+    auto uniqueCallback = std::make_unique<ThreadSafeCallback>(listener);
+    auto callback = std::shared_ptr<ThreadSafeCallback>(std::move(uniqueCallback));
+
+    rtc::IceUdpMuxCallback iceUdpMuxCallback = [callback](rtc::IceUdpMuxRequest request)
+    {
+        PLOG_DEBUG << "listenIceUdpMux IceUdpMuxCallback call(1)";
+
+        if (callback) {
+            callback->call([request = std::move(request)](Napi::Env env, std::vector<napi_value> &args) {
+                Napi::Object reqObj = Napi::Object::New(env);
+                reqObj.Set("ufrag", request.remoteUfrag.c_str());
+                reqObj.Set("host", request.remoteHost.c_str());
+                reqObj.Set("port", request.remotePort);
+
+                args = {reqObj};
+            });
+        }
+
+        PLOG_DEBUG << "listenIceUdpMux IceUdpMuxCallback call(2)";
+    };
+
+    std::lock_guard<std::mutex> guard(iceUdpMuxListenersMutex);
+    iceUdpMuxListeners[port] = std::move(iceUdpMuxCallback);
+
+    rtc::ListenIceUdpMux(port, &iceUdpMuxListeners[port], host);
 }

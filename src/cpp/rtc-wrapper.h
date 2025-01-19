@@ -18,8 +18,11 @@ public:
     static void initLogger(const Napi::CallbackInfo &info);
     static void cleanup(const Napi::CallbackInfo &info);
     static void setSctpSettings(const Napi::CallbackInfo &info);
+    static void listenIceUdpMux(const Napi::CallbackInfo &info);
 private:
     static inline std::unique_ptr<ThreadSafeCallback> logCallback = nullptr;
+    static inline std::mutex iceUdpMuxListenersMutex;
+    static inline std::map<u_int16_t, rtc::IceUdpMuxCallback> iceUdpMuxListeners;
 };
 
 #endif // RTC_WRAPPER_H

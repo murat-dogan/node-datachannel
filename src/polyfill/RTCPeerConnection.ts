@@ -121,7 +121,8 @@ export default class RTCPeerConnection extends EventTarget implements globalThis
 
         try {
             const peerIdentity = (config as any)?.peerIdentity ?? `peer-${getRandomString(7)}`;
-            this.#peerConnection = new PeerConnection(peerIdentity,
+            // @ts-expect-error fixme
+            this.#peerConnection = config.peerConnection ?? new PeerConnection(peerIdentity,
                 {
                     ...config,
                     iceServers:
