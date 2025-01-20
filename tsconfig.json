@@ -7,15 +7,22 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "noImplicitAny": false,
-    "noImplicitThis": false,
     "noImplicitReturns": true,
-    "strictNullChecks": false,
     "noUnusedLocals": true,
     "alwaysStrict": true,
+    "allowImportingTsExtensions": true,
+    "noEmit": true,
     "outDir": "./dist",
     "module": "CommonJS"
   },
-  "include": ["src/**/*", "test/**/*"],
-  "exclude": ["node_modules", "dist", "src/cpp", "test/wpt-tests/wpt"]
+  "include": [
+    "src/**/*",
+    "test/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "src/cpp",
+    "test/wpt-tests/wpt"
+  ]
 }

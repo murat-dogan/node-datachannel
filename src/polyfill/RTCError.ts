@@ -1,32 +1,33 @@
+const RTCErrorDetailType = [
+    'data-channel-failure',
+    'dtls-failure',
+    'fingerprint-failure',
+    'sctp-failure',
+    'sdp-syntax-error',
+    'hardware-encoder-not-available',
+    'hardware-encoder-error'
+]
+
 export default class RTCError extends DOMException implements globalThis.RTCError {
     #errorDetail: RTCErrorDetailType;
     #receivedAlert: number | null;
     #sctpCauseCode: number | null;
     #sdpLineNumber: number | null;
     #sentAlert: number | null;
+    #httpRequestStatusCode: number | null;
 
     constructor(init: globalThis.RTCErrorInit, message?: string) {
-        super(message, 'OperationError');
-
-        if (!init || !init.errorDetail) throw new TypeError('Cannot construct RTCError, errorDetail is required');
-        if (
-            [
-                'data-channel-failure',
-                'dtls-failure',
-                'fingerprint-failure',
-                'hardware-encoder-error',
-                'hardware-encoder-not-available',
-                'sctp-failure',
-                'sdp-syntax-error',
-            ].indexOf(init.errorDetail) === -1
-        )
-            throw new TypeError('Cannot construct RTCError, errorDetail is invalid');
+        if (arguments.length === 0) throw new TypeError("Failed to construct 'RTCError': 1 argument required, but only 0 present.")
+        if (!init.errorDetail) throw new TypeError("Failed to construct 'RTCError': Failed to read the 'errorDetail' property from 'RTCErrorInit': Required member is undefined.")
+        if (!RTCErrorDetailType.includes(init.errorDetail)) throw new TypeError(`Failed to construct 'RTCError': Failed to read the 'errorDetail' property from 'RTCErrorInit': The provided value '${init.errorDetail}' is not a valid enum value of type RTCErrorDetailType.`)
+        super(message, 'OperationError')
 
         this.#errorDetail = init.errorDetail;
         this.#receivedAlert = init.receivedAlert ?? null;
         this.#sctpCauseCode = init.sctpCauseCode ?? null;
         this.#sdpLineNumber = init.sdpLineNumber ?? null;
         this.#sentAlert = init.sentAlert ?? null;
+        this.#httpRequestStatusCode = init.httpRequestStatusCode ?? null
     }
 
     get errorDetail(): globalThis.RTCErrorDetailType {
@@ -55,6 +56,10 @@ export default class RTCError extends DOMException implements globalThis.RTCErro
 
     get sdpLineNumber(): number | null {
         return this.#sdpLineNumber;
+    }
+
+    get httpRequestStatusCode (): number {
+        return this.#httpRequestStatusCode ?? null
     }
 
     set sdpLineNumber(_value) {

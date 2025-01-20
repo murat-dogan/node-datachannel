@@ -1,6 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { SelectedCandidateInfo } from '../lib/types';
-import { PeerConnection } from '../lib/index';
+import { Audio, DataChannel, DataChannelInitConfig, Direction, PeerConnection, RtcpReceivingSession, Track, Video } from '../lib/index';
 import RTCSessionDescription from './RTCSessionDescription';
 import RTCDataChannel from './RTCDataChannel';
 import RTCIceCandidate from './RTCIceCandidate';
@@ -8,6 +6,17 @@ import { RTCDataChannelEvent, RTCPeerConnectionIceEvent } from './Events';
 import RTCSctpTransport from './RTCSctpTransport';
 import * as exceptions from './Exception';
 import RTCCertificate from './RTCCertificate';
+import { RTCRtpSender, RTCRtpTransceiver } from './RTCRtp';
+import { MediaStreamTrack } from './MediaStream';
+
+const ndcDirectionMap: Record<string, Direction> = {
+    inactive: 'Inactive',
+    recvonly: 'RecvOnly',
+    sendonly: 'SendOnly',
+    sendrecv: 'SendRecv',
+    stopped: 'Inactive',
+    undefined: 'Unknown'
+}
 
 // extend RTCConfiguration with peerIdentity
 interface RTCConfiguration extends globalThis.RTCConfiguration {
@@ -20,110 +29,86 @@ export default class RTCPeerConnection extends EventTarget implements globalThis
     }
 
     #peerConnection: PeerConnection;
-    #localOffer: any;
-    #localAnswer: any;
-    #dataChannels: Set<RTCDataChannel>;
+    #localOffer: ReturnType<typeof createDeferredPromise>;
+    #localAnswer: ReturnType<typeof createDeferredPromise>;
+    #dataChannels = new Set<RTCDataChannel>();
+    #tracks = new Set<Track>()
+    #transceivers: RTCRtpTransceiver[] = []
+    #unusedTransceivers: RTCRtpTransceiver[] = []
     #dataChannelsClosed = 0;
     #config: RTCConfiguration;
-    #canTrickleIceCandidates: boolean | null;
+    #canTrickleIceCandidates: boolean | null = null;
     #sctp: RTCSctpTransport;
+    #announceNegotiation: boolean | null = null;
 
     #localCandidates: RTCIceCandidate[] = [];
     #remoteCandidates: RTCIceCandidate[] = [];
 
     // events
-    onconnectionstatechange: ((this: RTCPeerConnection, ev: Event) => any) | null;
-    ondatachannel: ((this: RTCPeerConnection, ev: RTCDataChannelEvent) => any) | null;
-    onicecandidate: ((this: RTCPeerConnection, ev: RTCPeerConnectionIceEvent) => any) | null;
-    onicecandidateerror: ((this: RTCPeerConnection, ev: Event) => any) | null;
-    oniceconnectionstatechange: ((this: RTCPeerConnection, ev: Event) => any) | null;
-    onicegatheringstatechange: ((this: RTCPeerConnection, ev: Event) => any) | null;
-    onnegotiationneeded: ((this: RTCPeerConnection, ev: Event) => any) | null;
-    onsignalingstatechange: ((this: RTCPeerConnection, ev: Event) => any) | null;
-    ontrack: ((this: RTCPeerConnection, ev: globalThis.RTCTrackEvent) => any) | null;
-
-    private _checkConfiguration(config: RTCConfiguration): void {
-        if (config && config.iceServers === undefined) config.iceServers = [];
-        if (config && config.iceTransportPolicy === undefined) config.iceTransportPolicy = 'all';
-
-        if (config?.iceServers === null) throw new TypeError('IceServers cannot be null');
-
-        // Check for all the properties of iceServers
-        if (Array.isArray(config?.iceServers)) {
-            for (let i = 0; i < config.iceServers.length; i++) {
-                if (config.iceServers[i] === null) throw new TypeError('IceServers cannot be null');
-                if (config.iceServers[i] === undefined) throw new TypeError('IceServers cannot be undefined');
-                if (Object.keys(config.iceServers[i]).length === 0) throw new TypeError('IceServers cannot be empty');
-
-                // If iceServers is string convert to array
-                if (typeof config.iceServers[i].urls === 'string')
-                    config.iceServers[i].urls = [config.iceServers[i].urls as string];
-
-                // urls can not be empty
-                if ((config.iceServers[i].urls as string[])?.some((url) => url == ''))
-                    throw new exceptions.SyntaxError('IceServers urls cannot be empty');
-
-                // urls should be valid URLs and match the protocols "stun:|turn:|turns:"
-                if (
-                    (config.iceServers[i].urls as string[])?.some(
-                        (url) => {
-                            try {
-                                const parsedURL = new URL(url)
-
-                                return !/^(stun:|turn:|turns:)$/.test(parsedURL.protocol)
-                            } catch (error) {
-                                return true
-                            }
-                        },
-                    )
-                )
-                    throw new exceptions.SyntaxError('IceServers urls wrong format');
-
-                // If this is a turn server check for username and credential
-                if ((config.iceServers[i].urls as string[])?.some((url) => url.startsWith('turn'))) {
-                    if (!config.iceServers[i].username)
-                        throw new exceptions.InvalidAccessError('IceServers username cannot be null');
-                    if (!config.iceServers[i].credential)
-                        throw new exceptions.InvalidAccessError('IceServers username cannot be undefined');
-                }
-
-                // length of urls can not be 0
-                if (config.iceServers[i].urls?.length === 0)
-                    throw new exceptions.SyntaxError('IceServers urls cannot be empty');
-            }
-        }
-
-        if (
-            config &&
-            config.iceTransportPolicy &&
-            config.iceTransportPolicy !== 'all' &&
-            config.iceTransportPolicy !== 'relay'
-        )
-            throw new TypeError('IceTransportPolicy must be either "all" or "relay"');
-    }
+    onconnectionstatechange: globalThis.RTCPeerConnection['onconnectionstatechange'];
+    ondatachannel: globalThis.RTCPeerConnection['ondatachannel'];
+    onicecandidate: globalThis.RTCPeerConnection['onicecandidate'];
+    // TODO: not implemented
+    onicecandidateerror: globalThis.RTCPeerConnection['onicecandidateerror'];
+    oniceconnectionstatechange: globalThis.RTCPeerConnection['oniceconnectionstatechange'];
+    onicegatheringstatechange: globalThis.RTCPeerConnection['onicegatheringstatechange'];
+    onnegotiationneeded: globalThis.RTCPeerConnection['onnegotiationneeded'];
+    onsignalingstatechange: globalThis.RTCPeerConnection['onsignalingstatechange'];
+    ontrack: globalThis.RTCPeerConnection['ontrack'] | null;
 
     setConfiguration(config: RTCConfiguration): void {
-        this._checkConfiguration(config);
-        this.#config = config;
+        // TODO: this doesn't actually update the configuration :/
+            // most of these are unused x)
+            config ??= {}
+            if (config.bundlePolicy === undefined) config.bundlePolicy = 'balanced'
+            // @ts-expect-error non-standard
+            config.encodedInsertableStreams ??= false
+            config.iceCandidatePoolSize ??= 0
+            config.iceServers ??= []
+            for (let { urls } of config.iceServers) {
+                if (!Array.isArray(urls)) urls = [urls]
+                    for (const url of urls) {
+                        try {
+                            new URL(url)
+                        } catch (error) {
+                            throw new DOMException(`Failed to execute 'setConfiguration' on 'RTCPeerConnection': '${url}' is not a valid URL.`, 'SyntaxError')
+                        }
+                    }
+                }
+                config.iceTransportPolicy ??= 'all'
+                // @ts-expect-error non-standard
+                config.rtcAudioJitterBufferFastAccelerate ??= false
+                // @ts-expect-error non-standard
+                config.rtcAudioJitterBufferMaxPackets ??= 200
+                // @ts-expect-error non-standard
+                config.rtcAudioJitterBufferMinDelayMs ??= 0
+                config.rtcpMuxPolicy ??= 'require'
+
+                if (config.iceCandidatePoolSize < 0 || config.iceCandidatePoolSize > 255) throw new TypeError("Failed to execute 'setConfiguration' on 'RTCPeerConnection': Failed to read the 'iceCandidatePoolSize' property from 'RTCConfiguration': Value is outside the 'octet' value range.")
+                if (config.bundlePolicy !== 'balanced' && config.bundlePolicy !== 'max-compat' && config.bundlePolicy !== 'max-bundle') throw new TypeError("Failed to execute 'setConfiguration' on 'RTCPeerConnection': Failed to read the 'bundlePolicy' property from 'RTCConfiguration': The provided value '" + config.bundlePolicy + "' is not a valid enum value of type RTCBundlePolicy.")
+                if (this.#config) {
+                if (config.bundlePolicy !== this.#config.bundlePolicy) {
+                    throw new DOMException("Failed to execute 'setConfiguration' on 'RTCPeerConnection': Attempted to modify the PeerConnection's configuration in an unsupported way.", 'InvalidModificationError')
+                }
+            }
+
+            this.#config = config
     }
 
 
 
-    constructor(config: RTCConfiguration = { iceServers: [], iceTransportPolicy: 'all' }) {
+    constructor(config: RTCConfiguration = {}) {
         super();
 
-        this._checkConfiguration(config);
-        this.#config = config;
+        this.setConfiguration(config);
         this.#localOffer = createDeferredPromise();
         this.#localAnswer = createDeferredPromise();
-        this.#dataChannels = new Set();
-        this.#canTrickleIceCandidates = null;
 
         try {
-            const peerIdentity = (config as any)?.peerIdentity ?? `peer-${getRandomString(7)}`;
+            const peerIdentity = config?.peerIdentity ?? `peer-${getRandomString(7)}`;
             this.#peerConnection = new PeerConnection(peerIdentity,
                 {
-                    ...config,
+                    ...this.#config,
                     iceServers:
                         config?.iceServers
                             ?.map((server) => {
@@ -163,20 +148,34 @@ export default class RTCPeerConnection extends EventTarget implements globalThis
         });
 
         this.#peerConnection.onDataChannel((channel) => {
-            const dc = new RTCDataChannel(channel);
-            this.#dataChannels.add(dc);
-            this.dispatchEvent(new RTCDataChannelEvent('datachannel', { channel: dc }));
+            this.dispatchEvent(new RTCDataChannelEvent('datachannel', { channel: this.#handleDataChannel(channel) }))
         });
 
         this.#peerConnection.onLocalDescription((sdp, type) => {
             if (type === 'offer') {
-                this.#localOffer.resolve({ sdp, type });
+                this.#localOffer.resolve(new RTCSessionDescription({ sdp, type }));
             }
 
             if (type === 'answer') {
-                this.#localAnswer.resolve({ sdp, type });
+                this.#localAnswer.resolve(new RTCSessionDescription({ sdp, type }));
             }
         });
+
+        this.#peerConnection.onTrack(track => {
+            const transceiver = new RTCRtpTransceiver({ transceiver: track, pc: this })
+            this.#tracks.add(track)
+            transceiver._setNDCTrack(track)
+            this.#transceivers.push(transceiver)
+            const mediastream = new MediaStreamTrack({ kind: track.type(), label: track.mid() })
+            mediastream.track = track
+            track.onClosed(() => {
+                this.#tracks.delete(track)
+                mediastream.dispatchEvent(new Event('ended'))
+            })
+            track.onMessage(buf => mediastream.stream.push(buf))
+            transceiver.receiver.track = mediastream
+            this.dispatchEvent(new RTCTrackEvent('track', { track: mediastream, receiver: transceiver.receiver, transceiver }))
+        })
 
         this.#peerConnection.onLocalCandidate((candidate, sdpMid) => {
             if (sdpMid === 'unspec') {
@@ -190,44 +189,42 @@ export default class RTCPeerConnection extends EventTarget implements globalThis
 
         // forward events to properties
         this.addEventListener('connectionstatechange', (e) => {
-            if (this.onconnectionstatechange) this.onconnectionstatechange(e);
+            this.onconnectionstatechange?.(e);
         });
         this.addEventListener('signalingstatechange', (e) => {
-            if (this.onsignalingstatechange) this.onsignalingstatechange(e);
+            this.onsignalingstatechange?.(e);
         });
         this.addEventListener('iceconnectionstatechange', (e) => {
-            if (this.oniceconnectionstatechange) this.oniceconnectionstatechange(e);
+            this.oniceconnectionstatechange?.(e);
         });
         this.addEventListener('icegatheringstatechange', (e) => {
-            if (this.onicegatheringstatechange) this.onicegatheringstatechange(e);
+            this.onicegatheringstatechange?.(e);
         });
         this.addEventListener('datachannel', (e) => {
-            if (this.ondatachannel) this.ondatachannel(e as RTCDataChannelEvent);
+            this.ondatachannel?.(e as RTCDataChannelEvent);
         });
         this.addEventListener('icecandidate', (e) => {
-            if (this.onicecandidate) this.onicecandidate(e as RTCPeerConnectionIceEvent);
+            this.onicecandidate?.(e as RTCPeerConnectionIceEvent);
         });
 
-        this.#sctp = new RTCSctpTransport({
-            pc: this,
-            extraFunctions: {
-                maxDataChannelId: (): number => {
-                    return this.#peerConnection.maxDataChannelId();
-                },
-                maxMessageSize: (): number => {
-                    return this.#peerConnection.maxMessageSize();
-                },
-                localCandidates: (): RTCIceCandidate[] => {
-                    return this.#localCandidates;
-                },
-                remoteCandidates: (): RTCIceCandidate[] => {
-                    return this.#remoteCandidates;
-                },
-                selectedCandidatePair: (): { local: SelectedCandidateInfo; remote: SelectedCandidateInfo } | null => {
-                    return this.#peerConnection.getSelectedCandidatePair();
-                },
-            },
-        });
+        this.addEventListener('track', e => {
+            this.ontrack?.(e as RTCTrackEvent)
+        })
+
+        this.addEventListener('negotiationneeded', e => {
+            this.#announceNegotiation = true
+            this.onnegotiationneeded?.(e)
+        })
+
+        this.#sctp = new RTCSctpTransport({ pc: this });
+    }
+
+    get localCandidates (): RTCIceCandidate[] {
+        return this.#localCandidates
+    }
+    
+    get remoteCandidates (): RTCIceCandidate[] {
+        return this.#remoteCandidates
     }
 
     get canTrickleIceCandidates(): boolean | null {
@@ -250,28 +247,32 @@ export default class RTCPeerConnection extends EventTarget implements globalThis
         return this.#peerConnection.gatheringState();
     }
 
-    get currentLocalDescription(): RTCSessionDescription {
-        return new RTCSessionDescription(this.#peerConnection.localDescription() as any);
+    #nullableDescription (desc): RTCSessionDescription | null {
+        if (!desc) return null
+        return new RTCSessionDescription(desc)
     }
-
-    get currentRemoteDescription(): RTCSessionDescription {
-        return new RTCSessionDescription(this.#peerConnection.remoteDescription() as any);
+    get currentLocalDescription (): RTCSessionDescription {
+        return this.#nullableDescription(this.#peerConnection.localDescription())
     }
-
-    get localDescription(): RTCSessionDescription {
-        return new RTCSessionDescription(this.#peerConnection.localDescription() as any);
+    
+    get currentRemoteDescription (): RTCSessionDescription {
+        return this.#nullableDescription(this.#peerConnection.remoteDescription())
     }
-
-    get pendingLocalDescription(): RTCSessionDescription {
-        return new RTCSessionDescription(this.#peerConnection.localDescription() as any);
+    
+    get localDescription (): RTCSessionDescription {
+        return this.#nullableDescription(this.#peerConnection.localDescription())
     }
-
-    get pendingRemoteDescription(): RTCSessionDescription {
-        return new RTCSessionDescription(this.#peerConnection.remoteDescription() as any);
+    
+    get pendingLocalDescription (): RTCSessionDescription {
+        return this.#nullableDescription(this.#peerConnection.localDescription())
     }
-
-    get remoteDescription(): RTCSessionDescription {
-        return new RTCSessionDescription(this.#peerConnection.remoteDescription() as any);
+    
+    get pendingRemoteDescription (): RTCSessionDescription {
+        return this.#nullableDescription(this.#peerConnection.remoteDescription())
+    }
+    
+    get remoteDescription (): RTCSessionDescription {
+        return this.#nullableDescription(this.#peerConnection.remoteDescription())
     }
 
     get sctp(): RTCSctpTransport {
@@ -283,16 +284,17 @@ export default class RTCPeerConnection extends EventTarget implements globalThis
     }
 
     async addIceCandidate(candidate?: globalThis.RTCIceCandidateInit | null): Promise<void> {
+        // TODO: only resolve this once the candidate is added and not right away
         if (!candidate || !candidate.candidate) {
             return;
         }
 
         if (candidate.sdpMid === null && candidate.sdpMLineIndex === null) {
-            throw new TypeError('sdpMid must be set');
+            throw new DOMException('Candidate invalid');
         }
 
         if (candidate.sdpMid === undefined && candidate.sdpMLineIndex == undefined) {
-            throw new TypeError('sdpMid must be set');
+            throw new DOMException('Candidate invalid');
         }
 
         // Reject if sdpMid format is not valid
@@ -308,9 +310,9 @@ export default class RTCPeerConnection extends EventTarget implements globalThis
         }
 
         try {
-            this.#peerConnection.addRemoteCandidate(candidate.candidate, candidate.sdpMid || '0');
+            this.#peerConnection.addRemoteCandidate(candidate.candidate, candidate.sdpMid ?? '0');
             this.#remoteCandidates.push(
-                new RTCIceCandidate({ candidate: candidate.candidate, sdpMid: candidate.sdpMid || '0' }),
+                new RTCIceCandidate({ candidate: candidate.candidate, sdpMid: candidate.sdpMid ?? '0' }),
             );
         } catch (error) {
             if (!error || !error.message) throw new exceptions.NotFoundError('Unknown error');
@@ -320,18 +322,87 @@ export default class RTCPeerConnection extends EventTarget implements globalThis
                 throw new exceptions.InvalidStateError(error.message);
             if (error.message.includes('Invalid candidate format')) throw new exceptions.OperationError(error.message);
 
-            throw new exceptions.NotFoundError(error.message);
+            throw new DOMException(error.message, 'UnknownError');
         }
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    addTrack(_track, ..._streams): globalThis.RTCRtpSender {
-        throw new DOMException('Not implemented');
+    #findUnusedTransceiver (kind): RTCRtpTransceiver | null  {
+        const unused = this.#unusedTransceivers.find(tr => tr.track.type() === kind && tr.direction === 'sendonly')
+        if (!unused) return null
+        this.#unusedTransceivers.splice(this.#unusedTransceivers.indexOf(unused), 1)
+        return unused
     }
+    
+    #setUpTrack (media: Video | Audio, track: MediaStreamTrack, transceiver: RTCRtpTransceiver, direction): void {
+        const session = new RtcpReceivingSession()
+        const pctrack = this.#peerConnection.addTrack(media)
+        this.#tracks.add(pctrack)
+        pctrack.onClosed(() => {
+            this.#tracks.delete(pctrack)
+            track.dispatchEvent(new Event('ended'))
+        })
+        pctrack.setMediaHandler(session)
+        track.media = media
+        track.track = pctrack
+        transceiver._setNDCTrack(pctrack)
+        track.stream.on('data', buf => {
+            pctrack.sendMessageBinary(buf)
+        })
+        if (direction === 'recvonly') {
+            transceiver.receiver.track = track
+        } else if (direction === 'sendonly') {
+            transceiver.sender.track = track
+        }
+        if (this.#announceNegotiation) {
+            this.#announceNegotiation = false
+            this.dispatchEvent(new Event('negotiationneeded'))
+        }
+    }
+    
+    addTrack (track, ...streams): RTCRtpSender {
+        for (const stream of streams) stream.addTrack(track)
+    
+        const kind = track.kind
+    
+        const unused = this.#findUnusedTransceiver(kind)
+        if (unused) {
+            this.#setUpTrack(unused.media, track, unused, 'sendonly')
+            return unused.sender
+        } else {
+            const transceiver = this.addTransceiver(track, { direction: 'sendonly' })
+            return transceiver.sender
+        }
+    }
+    
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    addTransceiver(_trackOrKind, _init): globalThis.RTCRtpTransceiver {
-        throw new DOMException('Not implemented');
+    addTransceiver (trackOrKind: MediaStreamTrack | string, { direction = 'inactive', sendEncodings = undefined, streams = undefined }: RTCRtpTransceiverInit = {}): RTCRtpTransceiver {
+        if (direction === 'sendrecv') throw new TypeError('unsupported')
+        const track = trackOrKind instanceof MediaStreamTrack && trackOrKind
+        const kind = (track && track.kind) || trackOrKind
+        const ndcMedia = kind === 'video' ? new Video('video', ndcDirectionMap[direction]) : new Audio('audio', ndcDirectionMap[direction])
+    
+        const transceiver = new RTCRtpTransceiver({ transceiver: ndcMedia, pc: this })
+        this.#transceivers.push(transceiver)
+        if (track) {
+            this.#setUpTrack(ndcMedia, track, transceiver, direction)
+        } else {
+            this.#unusedTransceivers.push(transceiver)
+        }
+        return transceiver
+    }
+    
+    getReceivers (): RTCRtpReceiver[] {
+        // receivers are created on ontrack
+        return this.#transceivers.map(tr => tr.direction === 'recvonly' && tr.receiver).filter(re => re)
+    }
+    
+    getSenders (): RTCRtpSender[] {
+        // senders are created on addTrack or addTransceiver
+        return this.#transceivers.map(tr => tr.direction === 'sendonly' && tr.sender).filter(se => se)
+    }
+    
+    getTracks (): Track[] {
+        return [...this.#tracks]
     }
 
     close(): void {
@@ -341,29 +412,58 @@ export default class RTCPeerConnection extends EventTarget implements globalThis
             this.#dataChannelsClosed++;
         });
 
+        for (const transceiver of this.#transceivers) {
+            transceiver.close()
+        }
+        for (const track of this.#tracks) {
+            track.close()
+        }
+
         this.#peerConnection.close();
     }
 
-    createAnswer(): Promise<globalThis.RTCSessionDescriptionInit | any> {
+    get maxMessageSize (): number {
+        return this.#peerConnection.maxMessageSize()
+    }
+    
+    get maxChannels (): number {
+        return this.#peerConnection.maxDataChannelId()
+    }
+
+    createAnswer(): Promise<globalThis.RTCSessionDescriptionInit> & Promise<void> {
+        // @ts-expect-error dont support deprecated overload
         return this.#localAnswer;
     }
 
-
-    createDataChannel(label, opts = {}): RTCDataChannel {
-        const channel = this.#peerConnection.createDataChannel(label, opts);
-        const dataChannel = new RTCDataChannel(channel, opts);
-
+    #handleDataChannel (channel: DataChannel, opts?: DataChannelInitConfig): RTCDataChannel {
+        const dataChannel = new RTCDataChannel(channel, opts, this)
+    
         // ensure we can close all channels when shutting down
-        this.#dataChannels.add(dataChannel);
+        this.#dataChannels.add(dataChannel)
         dataChannel.addEventListener('close', () => {
-            this.#dataChannels.delete(dataChannel);
-            this.#dataChannelsClosed++;
-        });
-
-        return dataChannel;
+            this.#dataChannels.delete(dataChannel)
+        })
+    
+        return dataChannel
     }
 
-    createOffer(): Promise<globalThis.RTCSessionDescriptionInit | any> {
+
+    createDataChannel (label: string, opts: globalThis.RTCDataChannelInit = {}): RTCDataChannel {
+        const conf: DataChannelInitConfig = opts
+        if (opts.ordered === false) conf.unordered = true
+        const channel = this.#peerConnection.createDataChannel('' + label, conf)
+        const dataChannel = this.#handleDataChannel(channel, opts)
+    
+        if (this.#announceNegotiation == null) {
+            this.#announceNegotiation = false
+            this.dispatchEvent(new Event('negotiationneeded'))
+        }
+    
+        return dataChannel
+    }
+
+    createOffer(): Promise<globalThis.RTCSessionDescriptionInit> & Promise<void> {
+        // @ts-expect-error dont support deprecated overload
         return this.#localOffer;
     }
 
@@ -371,95 +471,93 @@ export default class RTCPeerConnection extends EventTarget implements globalThis
         return this.#config;
     }
 
-    getReceivers(): globalThis.RTCRtpReceiver[] {
-        throw new DOMException('Not implemented');
+    getSelectedCandidatePair () {
+        return this.#peerConnection.getSelectedCandidatePair()
     }
 
-    getSenders(): globalThis.RTCRtpSender[] {
-        throw new DOMException('Not implemented');
-    }
+    
+    getStats(): Promise<globalThis.RTCStatsReport> & Promise<void> {
+        const report = new Map();
+        const cp = this.getSelectedCandidatePair();
+        const bytesSent = this.#peerConnection.bytesSent();
+        const bytesReceived = this.#peerConnection.bytesReceived();
+        const rtt = this.#peerConnection.rtt();
 
-    getStats(): Promise<globalThis.RTCStatsReport> {
-        return new Promise((resolve) => {
-            const report = new Map();
-            const cp = this.#peerConnection?.getSelectedCandidatePair();
-            const bytesSent = this.#peerConnection?.bytesSent();
-            const bytesReceived = this.#peerConnection?.bytesReceived();
-            const rtt = this.#peerConnection?.rtt();
+        if(!cp) {
+            // @ts-expect-error dont support deprecated overload
+            return Promise.resolve(report as globalThis.RTCStatsReport);
+        }
 
-            if(!cp) {
-                return resolve(report);
-            }
-
-            const localIdRs = getRandomString(8);
-            const localId = 'RTCIceCandidate_' + localIdRs;
-            report.set(localId, {
-                id: localId,
-                type: 'local-candidate',
-                timestamp: Date.now(),
-                candidateType: cp.local.type,
-                ip: cp.local.address,
-                port: cp.local.port,
-            });
-
-            const remoteIdRs = getRandomString(8);
-            const remoteId = 'RTCIceCandidate_' + remoteIdRs;
-            report.set(remoteId, {
-                id: remoteId,
-                type: 'remote-candidate',
-                timestamp: Date.now(),
-                candidateType: cp.remote.type,
-                ip: cp.remote.address,
-                port: cp.remote.port,
-            });
-
-            const candidateId = 'RTCIceCandidatePair_' + localIdRs + '_' + remoteIdRs;
-            report.set(candidateId, {
-                id: candidateId,
-                type: 'candidate-pair',
-                timestamp: Date.now(),
-                localCandidateId: localId,
-                remoteCandidateId: remoteId,
-                state: 'succeeded',
-                nominated: true,
-                writable: true,
-                bytesSent: bytesSent,
-                bytesReceived: bytesReceived,
-                totalRoundTripTime: rtt,
-                currentRoundTripTime: rtt,
-            });
-
-            const transportId = 'RTCTransport_0_1';
-            report.set(transportId, {
-                id: transportId,
-                timestamp: Date.now(),
-                type: 'transport',
-                bytesSent: bytesSent,
-                bytesReceived: bytesReceived,
-                dtlsState: 'connected',
-                selectedCandidatePairId: candidateId,
-                selectedCandidatePairChanges: 1,
-            });
-
-            // peer-connection'
-            report.set('P', {
-                id: 'P',
-                type: 'peer-connection',
-                timestamp: Date.now(),
-                dataChannelsOpened: this.#dataChannels.size,
-                dataChannelsClosed: this.#dataChannelsClosed,
-            });
-
-            return resolve(report);
+        const localIdRs = getRandomString(8);
+        const localId = 'RTCIceCandidate_' + localIdRs;
+        report.set(localId, {
+            id: localId,
+            type: 'local-candidate',
+            timestamp: Date.now(),
+            candidateType: cp.local.type,
+            ip: cp.local.address,
+            port: cp.local.port,
         });
+
+        const remoteIdRs = getRandomString(8);
+        const remoteId = 'RTCIceCandidate_' + remoteIdRs;
+        report.set(remoteId, {
+            id: remoteId,
+            type: 'remote-candidate',
+            timestamp: Date.now(),
+            candidateType: cp.remote.type,
+            ip: cp.remote.address,
+            port: cp.remote.port,
+        });
+
+        const candidateId = 'RTCIceCandidatePair_' + localIdRs + '_' + remoteIdRs;
+        report.set(candidateId, {
+            id: candidateId,
+            type: 'candidate-pair',
+            timestamp: Date.now(),
+            localCandidateId: localId,
+            remoteCandidateId: remoteId,
+            state: 'succeeded',
+            nominated: true,
+            writable: true,
+            bytesSent: bytesSent,
+            bytesReceived: bytesReceived,
+            totalRoundTripTime: rtt,
+            currentRoundTripTime: rtt,
+        });
+
+        const transportId = 'RTCTransport_0_1';
+        report.set(transportId, {
+            id: transportId,
+            timestamp: Date.now(),
+            type: 'transport',
+            bytesSent: bytesSent,
+            bytesReceived: bytesReceived,
+            dtlsState: 'connected',
+            selectedCandidatePairId: candidateId,
+            selectedCandidatePairChanges: 1,
+        });
+
+        // peer-connection'
+        report.set('P', {
+            id: 'P',
+            type: 'peer-connection',
+            timestamp: Date.now(),
+            dataChannelsOpened: this.#dataChannels.size,
+            dataChannelsClosed: this.#dataChannelsClosed,
+        });
+
+        // @ts-expect-error dont support deprecated overload
+        return Promise.resolve(report as globalThis.RTCStatsReport);
     }
 
     getTransceivers(): globalThis.RTCRtpTransceiver[] {
-        return []; // throw new DOMException('Not implemented');
+        return this.#transceivers;
     }
 
     removeTrack(): void {
-        throw new DOMException('Not implemented');
+        console.warn('track detatching not supported')
+        // throw new DOMException('Not implemented');
     }
 
     restartIce(): Promise<void> {
@@ -467,12 +565,17 @@ export default class RTCPeerConnection extends EventTarget implements globalThis
     }
 
     async setLocalDescription(description: globalThis.RTCSessionDescriptionInit): Promise<void> {
-        if (description?.type !== 'offer') {
+        if (description == null || description.type == null) {
+            return this.#peerConnection.setLocalDescription()
+        }
+        // TODO: error and state checking
+
+        if (description.type !== 'offer') {
             // any other type causes libdatachannel to throw
-            return;
+            return this.#peerConnection.setLocalDescription()
         }
 
-        this.#peerConnection.setLocalDescription(description?.type as any);
+        this.#peerConnection.setLocalDescription(description?.type);
     }
 
     async setRemoteDescription(description: globalThis.RTCSessionDescriptionInit): Promise<void> {
@@ -480,21 +583,20 @@ export default class RTCPeerConnection extends EventTarget implements globalThis
             throw new DOMException('Remote SDP must be set');
         }
 
-        this.#peerConnection.setRemoteDescription(description.sdp, description.type as any);
+        this.#peerConnection.setRemoteDescription(description.sdp, description.type);
     }
 }
 
-function createDeferredPromise(): any {
-    let resolve: any, reject: any;
+function createDeferredPromise<T>(): Promise<T> & { resolve: (value: T) => void; reject: (reason?: unknown) => void } {
+    let resolve!: (value: T) => void;
+    let reject!: (reason?: unknown) => void;
 
-    const promise = new Promise(function (_resolve, _reject) {
+    const promise = new Promise<T>((_resolve, _reject) => {
         resolve = _resolve;
         reject = _reject;
     });
 
-    (promise as any).resolve = resolve;
-    (promise as any).reject = reject;
-    return promise;
+    return Object.assign(promise, { resolve, reject });
 }
 
 function getRandomString(length): string {

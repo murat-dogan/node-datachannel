@@ -14,4 +14,8 @@ export default class RTCCertificate implements globalThis.RTCCertificate {
     getFingerprints(): globalThis.RTCDtlsFingerprint[] {
         return this.#fingerprints;
     }
+
+    getAlgorithm (): string {
+        return ''
+    }
 }

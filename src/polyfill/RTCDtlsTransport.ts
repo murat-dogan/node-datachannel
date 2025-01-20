@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import RTCIceTransport from './RTCIceTransport';
 import RTCPeerConnection from './RTCPeerConnection';
 
@@ -6,23 +5,20 @@ export default class RTCDtlsTransport extends EventTarget implements globalThis.
     #pc: RTCPeerConnection = null;
     #iceTransport = null;
 
-    onstatechange: ((this: RTCDtlsTransport, ev: Event) => any) | null = null;
-    onerror: ((this: RTCDtlsTransport, ev: Event) => any) | null = null;
+    onstatechange: globalThis.RTCDtlsTransport['onstatechange'];
+    onerror: globalThis.RTCDtlsTransport['onstatechange'];
 
-    constructor(init: { pc: RTCPeerConnection, extraFunctions }) {
+    constructor({ pc }: { pc: RTCPeerConnection }) {
         super();
-        this.#pc = init.pc;
+        this.#pc = pc;
 
-        this.#iceTransport = new RTCIceTransport({ pc: init.pc, extraFunctions: init.extraFunctions });
+        this.#iceTransport = new RTCIceTransport({ pc });
 
         // forward peerConnection events
         this.#pc.addEventListener('connectionstatechange', () => {
-            this.dispatchEvent(new Event('statechange'));
-        });
-
-        // forward events to properties
-        this.addEventListener('statechange', (e) => {
-            if (this.onstatechange) this.onstatechange(e);
+            const e = new Event('statechange');
+            this.dispatchEvent(e);
+            this.onstatechange?.(e);
         });
     }
 
@@ -33,15 +29,12 @@ export default class RTCDtlsTransport extends EventTarget implements globalThis.
     get state(): RTCDtlsTransportState {
         // reduce state from new, connecting, connected, disconnected, failed, closed, unknown
         // to RTCDtlsTRansport states new, connecting, connected, closed, failed
-        let state = this.#pc ? this.#pc.connectionState : 'new';
-        if (state === 'disconnected') {
-            state = 'closed';
-        }
-        return state;
+        if (this.#pc.connectionState === 'disconnected') return 'closed'
+        return this.#pc.connectionState
     }
 
     getRemoteCertificates(): ArrayBuffer[] {
-        // TODO: implement
+        // TODO: implement, not supported by all browsers anyways
         return [new ArrayBuffer(0)];
     }
 }
