@@ -84,6 +84,7 @@ export class RTCRtpTransceiver implements globalThis.RTCRtpTransceiver {
   }
 
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   setCodecPreferences (_codecs): void {
     // TODO
     // addVideoCodec(payloadType: number, codec: string, profile?: string): void;

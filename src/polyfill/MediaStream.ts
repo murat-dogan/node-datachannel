@@ -137,7 +137,7 @@ export class MediaStream extends EventTarget {
     return this.#id
   }
 
-  addTrack (track) {
+  addTrack (track): void {
     this.#tracks.add(track)
     this.dispatchEvent(new MediaStreamTrackEvent('addtrack', { track }))
   }

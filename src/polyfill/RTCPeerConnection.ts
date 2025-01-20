@@ -375,7 +375,7 @@ export default class RTCPeerConnection extends EventTarget implements globalThis
     }
     
 
-    addTransceiver (trackOrKind: MediaStreamTrack | string, { direction = 'inactive', sendEncodings = undefined, streams = undefined }: RTCRtpTransceiverInit = {}): RTCRtpTransceiver {
+    addTransceiver (trackOrKind: MediaStreamTrack | string, { direction = 'inactive' }: RTCRtpTransceiverInit = {}): RTCRtpTransceiver {
         if (direction === 'sendrecv') throw new TypeError('unsupported')
         const track = trackOrKind instanceof MediaStreamTrack && trackOrKind
         const kind = (track && track.kind) || trackOrKind
