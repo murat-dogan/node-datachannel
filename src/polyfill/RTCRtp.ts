@@ -42,7 +42,7 @@ export class RTCRtpTransceiver implements globalThis.RTCRtpTransceiver {
 
   close (): void {
     this.#track?.close()
-    this.#transceiver.close?.()
+    (this.#transceiver as Video | Audio).close?.()
   }
 
   get track (): Track {
@@ -50,7 +50,7 @@ export class RTCRtpTransceiver implements globalThis.RTCRtpTransceiver {
   }
 
   get media (): Video | Audio {
-    return this.#transceiver
+    return this.#transceiver as Video | Audio
   }
 
   get direction (): RTCRtpTransceiverDirection {
