@@ -1,4 +1,4 @@
-import { Audio, DataChannel, DataChannelInitConfig, Direction, PeerConnection, RtcpReceivingSession, Track, Video } from '../lib/index';
+import { DataChannel, DataChannelInitConfig, PeerConnection } from '../lib/index';
 import RTCSessionDescription from './RTCSessionDescription';
 import RTCDataChannel from './RTCDataChannel';
 import RTCIceCandidate from './RTCIceCandidate';
@@ -6,17 +6,6 @@ import { RTCDataChannelEvent, RTCPeerConnectionIceEvent } from './Events';
 import RTCSctpTransport from './RTCSctpTransport';
 import * as exceptions from './Exception';
 import RTCCertificate from './RTCCertificate';
-import { RTCRtpSender, RTCRtpTransceiver } from './RTCRtp';
-import { MediaStreamTrack } from './MediaStream';
-
-const ndcDirectionMap: Record<string, Direction> = {
-    inactive: 'Inactive',
-    recvonly: 'RecvOnly',
-    sendonly: 'SendOnly',
-    sendrecv: 'SendRecv',
-    stopped: 'Inactive',
-    undefined: 'Unknown'
-}
 
 // extend RTCConfiguration with peerIdentity
 interface RTCConfiguration extends globalThis.RTCConfiguration {
@@ -32,9 +21,6 @@ export default class RTCPeerConnection extends EventTarget implements globalThis
     #localOffer: ReturnType<typeof createDeferredPromise>;
     #localAnswer: ReturnType<typeof createDeferredPromise>;
     #dataChannels = new Set<RTCDataChannel>();
-    #tracks = new Set<Track>()
-    #transceivers: RTCRtpTransceiver[] = []
-    #unusedTransceivers: RTCRtpTransceiver[] = []
     #dataChannelsClosed = 0;
     #config: RTCConfiguration;
     #canTrickleIceCandidates: boolean | null = null;
@@ -160,22 +146,6 @@ export default class RTCPeerConnection extends EventTarget implements globalThis
                 this.#localAnswer.resolve(new RTCSessionDescription({ sdp, type }));
             }
         });
-
-        this.#peerConnection.onTrack(track => {
-            const transceiver = new RTCRtpTransceiver({ transceiver: track, pc: this })
-            this.#tracks.add(track)
-            transceiver._setNDCTrack(track)
-            this.#transceivers.push(transceiver)
-            const mediastream = new MediaStreamTrack({ kind: track.type(), label: track.mid() })
-            mediastream.track = track
-            track.onClosed(() => {
-                this.#tracks.delete(track)
-                mediastream.dispatchEvent(new Event('ended'))
-            })
-            track.onMessage(buf => mediastream.stream.push(buf))
-            transceiver.receiver.track = mediastream
-            this.dispatchEvent(new RTCTrackEvent('track', { track: mediastream, receiver: transceiver.receiver, transceiver }))
-        })
 
         this.#peerConnection.onLocalCandidate((candidate, sdpMid) => {
             if (sdpMid === 'unspec') {
@@ -325,84 +295,28 @@ export default class RTCPeerConnection extends EventTarget implements globalThis
             throw new DOMException(error.message, 'UnknownError');
         }
     }
-
-    #findUnusedTransceiver (kind): RTCRtpTransceiver | null  {
-        const unused = this.#unusedTransceivers.find(tr => tr.track.type() === kind && tr.direction === 'sendonly')
-        if (!unused) return null
-        this.#unusedTransceivers.splice(this.#unusedTransceivers.indexOf(unused), 1)
-        return unused
-    }
     
-    #setUpTrack (media: Video | Audio, track: MediaStreamTrack, transceiver: RTCRtpTransceiver, direction): void {
-        const session = new RtcpReceivingSession()
-        const pctrack = this.#peerConnection.addTrack(media)
-        this.#tracks.add(pctrack)
-        pctrack.onClosed(() => {
-            this.#tracks.delete(pctrack)
-            track.dispatchEvent(new Event('ended'))
-        })
-        pctrack.setMediaHandler(session)
-        track.media = media
-        track.track = pctrack
-        transceiver._setNDCTrack(pctrack)
-        track.stream.on('data', buf => {
-            pctrack.sendMessageBinary(buf)
-        })
-        if (direction === 'recvonly') {
-            transceiver.receiver.track = track
-        } else if (direction === 'sendonly') {
-            transceiver.sender.track = track
-        }
-        if (this.#announceNegotiation) {
-            this.#announceNegotiation = false
-            this.dispatchEvent(new Event('negotiationneeded'))
-        }
-    }
-    
-    addTrack (track, ...streams): RTCRtpSender {
-        for (const stream of streams) stream.addTrack(track)
-    
-        const kind = track.kind
-    
-        const unused = this.#findUnusedTransceiver(kind)
-        if (unused) {
-            this.#setUpTrack(unused.media, track, unused, 'sendonly')
-            return unused.sender
-        } else {
-            const transceiver = this.addTransceiver(track, { direction: 'sendonly' })
-            return transceiver.sender
-        }
+    addTrack (): globalThis.RTCRtpSender {
+        return {} as globalThis.RTCRtpSender
     }
     
 
-    addTransceiver (trackOrKind: MediaStreamTrack | string, { direction = 'inactive' }: RTCRtpTransceiverInit = {}): RTCRtpTransceiver {
-        if (direction === 'sendrecv') throw new TypeError('unsupported')
-        const track = trackOrKind instanceof MediaStreamTrack && trackOrKind
-        const kind = (track && track.kind) || trackOrKind
-        const ndcMedia = kind === 'video' ? new Video('video', ndcDirectionMap[direction]) : new Audio('audio', ndcDirectionMap[direction])
-    
-        const transceiver = new RTCRtpTransceiver({ transceiver: ndcMedia, pc: this })
-        this.#transceivers.push(transceiver)
-        if (track) {
-            this.#setUpTrack(ndcMedia, track, transceiver, direction)
-        } else {
-            this.#unusedTransceivers.push(transceiver)
-        }
-        return transceiver
+    addTransceiver (): globalThis.RTCRtpTransceiver {
+        return {} as globalThis.RTCRtpTransceiver
     }
     
-    getReceivers (): RTCRtpReceiver[] {
+    getReceivers (): globalThis.RTCRtpReceiver[] {
         // receivers are created on ontrack
-        return this.#transceivers.map(tr => tr.direction === 'recvonly' && tr.receiver).filter(re => re)
+        return []
     }
     
-    getSenders (): RTCRtpSender[] {
+    getSenders (): globalThis.RTCRtpSender[] {
         // senders are created on addTrack or addTransceiver
-        return this.#transceivers.map(tr => tr.direction === 'sendonly' && tr.sender).filter(se => se)
+        return []
     }
     
-    getTracks (): Track[] {
-        return [...this.#tracks]
+    getTracks (): globalThis.MediaStreamTrack[] {
+        return []
     }
 
     close(): void {
@@ -411,13 +325,6 @@ export default class RTCPeerConnection extends EventTarget implements globalThis
             channel.close();
             this.#dataChannelsClosed++;
         });
-
-        for (const transceiver of this.#transceivers) {
-            transceiver.close()
-        }
-        for (const track of this.#tracks) {
-            track.close()
-        }
 
         this.#peerConnection.close();
     }
@@ -552,7 +459,7 @@ export default class RTCPeerConnection extends EventTarget implements globalThis
     }
 
     getTransceivers(): globalThis.RTCRtpTransceiver[] {
-        return this.#transceivers;
+        return [];
     }
 
     removeTrack(): void {
