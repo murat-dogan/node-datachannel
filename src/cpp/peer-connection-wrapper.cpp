@@ -392,6 +392,11 @@ void PeerConnectionWrapper::setLocalDescription(const Napi::CallbackInfo &info)
                 PLOG_DEBUG << "setLocalDescription() has password";
                 init.icePwd = obj.Get("icePwd").As<Napi::String>();
             }
+
+            if (obj.Get("iceMode").IsString()) {
+                PLOG_DEBUG << "setLocalDescription() has iceMode";
+                init.iceMode = obj.Get("iceMode").As<Napi::String>();
+            }
         }
     }
 

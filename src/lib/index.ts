@@ -3,12 +3,12 @@ import _DataChannelStream from './datachannel-stream';
 import { WebSocketServer } from './websocket-server';
 import { CertificateFingerprint, Channel, DataChannelInitConfig, DescriptionType, Direction, LocalDescriptionInit, LogLevel, RtcConfig, RTCIceConnectionState, RTCIceGatheringState, RTCPeerConnectionState, RTCSignalingState, SctpSettings, SelectedCandidateInfo } from './types';
 import { WebSocket } from './websocket';
+import type { IceUdpMuxRequest } from './types';
 
 export function preload(): void { nodeDataChannel.preload(); }
 export function initLogger(level: LogLevel): void { nodeDataChannel.initLogger(level); }
 export function cleanup(): void { nodeDataChannel.cleanup(); }
 export function setSctpSettings(settings: SctpSettings): void { nodeDataChannel.setSctpSettings(settings); }
-export function listenIceUdpMux(port: number, cb?: (req: { ufrag: string, host: string, port: number }) => void | null, host?: string | null): void { nodeDataChannel.listenIceUdpMux(port, cb, host); }
 
 export interface Audio {
     addAudioCodec(payloadType: number, codec: string, profile?: string): void;
@@ -146,6 +146,16 @@ export const PeerConnection: {
     new(peerName: string, config: RtcConfig): PeerConnection
 } = nodeDataChannel.PeerConnection
 
+export interface IceUdpMuxListener {
+    address?: string;
+    port: number;
+    stop(): void;
+    onUnhandledStunRequest(cb: (req: IceUdpMuxRequest) => void): void;
+}
+export const IceUdpMuxListener: {
+    new(port: number, address?: string): IceUdpMuxListener
+} = nodeDataChannel.IceUdpMuxListener
+
 export class RtcpReceivingSession {
     //
 }
@@ -160,7 +170,6 @@ export default {
     cleanup,
     preload,
     setSctpSettings,
-    listenIceUdpMux,
     RtcpReceivingSession,
     Track,
     Video,
@@ -169,7 +178,8 @@ export default {
     PeerConnection,
     WebSocket,
     WebSocketServer,
-    DataChannelStream
+    DataChannelStream,
+    IceUdpMuxListener
 };
 
 

@@ -90,10 +90,12 @@ export type RTCIceConnectionState = "checking" | "closed" | "completed" | "conne
 export type RTCIceGathererState = "complete" | "gathering" | "new";
 export type RTCIceGatheringState = "complete" | "gathering" | "new";
 export type RTCSignalingState = "closed" | "have-local-offer" | "have-local-pranswer" | "have-remote-offer" | "have-remote-pranswer" | "stable";
+export type RTCIceMode = "auto" | "controlling" | "controlled"
 
 export interface LocalDescriptionInit {
     iceUfrag?: string;
     icePwd?: string;
+    iceMode?: RTCIceMode
 }
 
 export interface DataChannelInitConfig {
@@ -128,3 +130,9 @@ export interface SelectedCandidateInfo {
 
 // Must be same as rtc enum class Direction
 export type Direction = 'SendOnly' | 'RecvOnly' | 'SendRecv' | 'Inactive' | 'Unknown'
+
+export interface IceUdpMuxRequest {
+    ufrag: string;
+    host: string;
+    port: number;
+}
