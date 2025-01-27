@@ -79,6 +79,7 @@
         "@rollup/plugin-replace": "^6.0.1",
         "@types/jest": "^29.5.12",
         "@types/node": "^20.6.1",
+        "@types/webrtc": "^0.0.44",
         "@typescript-eslint/eslint-plugin": "^7.17.0",
         "@typescript-eslint/parser": "^7.17.0",
         "cmake-js": "^7.3.0",
