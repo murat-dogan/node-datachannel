@@ -18,6 +18,7 @@ public:
     static void initLogger(const Napi::CallbackInfo &info);
     static void cleanup(const Napi::CallbackInfo &info);
     static void setSctpSettings(const Napi::CallbackInfo &info);
+    static Napi::Value getLibraryVersion(const Napi::CallbackInfo &info);
 private:
     static inline std::unique_ptr<ThreadSafeCallback> logCallback = nullptr;
 };

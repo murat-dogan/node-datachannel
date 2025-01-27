@@ -8,6 +8,7 @@ export function preload(): void { nodeDataChannel.preload(); }
 export function initLogger(level: LogLevel): void { nodeDataChannel.initLogger(level); }
 export function cleanup(): void { nodeDataChannel.cleanup(); }
 export function setSctpSettings(settings: SctpSettings): void { nodeDataChannel.setSctpSettings(settings); }
+export function getLibraryVersion(): string { return nodeDataChannel.getLibraryVersion(); }
 
 export interface Audio {
     addAudioCodec(payloadType: number, codec: string, profile?: string): void;
@@ -158,6 +159,7 @@ export default {
     cleanup,
     preload,
     setSctpSettings,
+    getLibraryVersion,
     RtcpReceivingSession,
     Track,
     Video,
