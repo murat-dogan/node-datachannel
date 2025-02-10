@@ -27,6 +27,7 @@
         "@electron-forge/plugin-webpack": "^6.4.2",
         "@electron/rebuild": "^3.3.0",
         "@vercel/webpack-asset-relocator-loader": "^1.7.3",
+        "copy-webpack-plugin": "^12.0.2",
         "css-loader": "^6.8.1",
         "electron": "26.2.4",
         "node-loader": "^2.0.0",
@@ -34,7 +35,7 @@
     },
     "dependencies": {
         "electron-squirrel-startup": "^1.0.0",
-        "node-datachannel": "^0.8.0"
+        "node-datachannel": "^0.12.0"
     },
     "cmake-js": {
         "runtime": "electron",

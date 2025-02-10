@@ -6,25 +6,26 @@ on:
   #   tags:
   #     - v*
 
+
 env:
   ACTIONS_ALLOW_UNSECURE_COMMANDS: true
 
 jobs:
   build-macos:
-    runs-on: macos-11
+    runs-on: macos-13
     strategy:
       matrix:
-        node-version: [16.x]
+        node-version: [18]
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Install OpenSSL
         run: |
-          wget https://mac.r-project.org/bin/darwin20/arm64/openssl-1.1.1o-darwin.20-arm64.tar.xz
-          tar -xf openssl-1.1.1o-darwin.20-arm64.tar.xz -C /tmp
-          rm -rf openssl-1.1.1o-darwin.20-arm64.tar.xz
+          wget https://mac.r-project.org/bin/darwin20/arm64/openssl-1.1.1t-darwin.20-arm64.tar.xz
+          tar -xf openssl-1.1.1t-darwin.20-arm64.tar.xz -C /tmp
+          rm -rf openssl-1.1.1t-darwin.20-arm64.tar.xz
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
       - name: Build

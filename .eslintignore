@@ -1,2 +1,8 @@
 node_modules
 build
+dist
+/**/*.js
+jest.config.ts
+rollup.config.mjs
+test/wpt-tests/
+examples

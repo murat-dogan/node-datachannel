@@ -6,7 +6,7 @@ Project created with
 
 ## Electron Compatibility and Rebuilding
 
-`node-datachannel` uses N-API for creating binaries. Normally `electron` is compatible with N-API binarıes, so you should not need to rebuild the binaries.
+`node-datachannel` uses N-API for creating binaries. Normally `electron` is compatible with N-API binaries, so you should not need to rebuild the binaries.
 
 ### If you need anyway, you can use `electron-rebuild` package with some modifications.
 

@@ -1,12 +1,14 @@
 # API
 
-##  PeerConnection Class
+## PeerConnection Class
 
 **Constructor**
 
 let pc = new PeerConnection(peerName[,options])
-- peerName `<string>` Peer name to use for logs etc..
-- options `<Object>` WebRTC Config Options
+
+-   peerName `<string>` Peer name to use for logs etc..
+-   options `<Object>` WebRTC Config Options
+
 ```
 export interface RtcConfig {
     iceServers: (string | IceServer)[];
@@ -19,6 +21,7 @@ export interface RtcConfig {
     maxMessageSize?: number;
     mtu?: number;
     iceTransportPolicy?: TransportPolicy;
+    disableFingerprintVerification?: boolean;
 }
 
 export const enum RelayType {
@@ -57,6 +60,7 @@ Close Peer Connection & Clear all callbacks
 **setRemoteDescription: (sdp: string, type: DescriptionType) => void**
 
 Set Remote Description
+
 ```
 export const enum DescriptionType {
     Unspec = 'Unspec',
@@ -72,29 +76,21 @@ Add remote candidate info
 **createDataChannel: (label: string, config?: DataChannelInitConfig) => DataChannel**
 
 Create new data-channel
-* label `<string>` Data channel name
-* config `<Object>` Data channel options
+
+-   label `<string>` Data channel name
+-   config `<Object>` Data channel options
+
 ```
 export interface DataChannelInitConfig {
     protocol?: string;
     negotiated?: boolean;
     id?: number;
-    ordered?: boolean;
-    maxPacketLifeTime?: number;
-    maxRetransmits?: number;
-
-    // Deprecated, use ordered, maxPacketLifeTime, and maxRetransmits
-    reliability?: {
-        type?: ReliabilityType;
-        unordered?: boolean;
-        rexmit?: number;
-    }
-}
-
-export const enum ReliabilityType {
-    Reliable = 0, Rexmit = 1, Timed = 2
+    unordered?: boolean; // Reliability
+    maxPacketLifeTime?: number; // Reliability
+    maxRetransmits?: number; // Reliability
 }
 ```
+
 **state: () => string**
 
 Get current state
@@ -110,6 +106,7 @@ Get current gathering state
 **onLocalDescription: (cb: (sdp: string, type: DescriptionType) => void) => void**
 
 Local Description Callback
+
 ```
 export const enum DescriptionType {
     Unspec = 'Unspec',
@@ -153,6 +150,7 @@ Get rtt stat
 **getSelectedCandidatePair: () => { local: SelectedCandidateInfo, remote: SelectedCandidateInfo }**
 
 Get info about selected candidate pair
+
 ```
 export interface SelectedCandidateInfo {
     address: string;
@@ -162,7 +160,7 @@ export interface SelectedCandidateInfo {
 }
 ```
 
-##  DataChannel Class
+## DataChannel Class
 
 > You can create a new Datachannel instance by calling `PeerConnection.createDataChannel` function.
 

@@ -1,0 +1,1117 @@
+[
+  {
+    "test": "/webrtc/historical.html",
+    "result": [
+      {
+        "name": "RTCDataChannel member reliable should not exist",
+        "message": "assert_false: expected false got true",
+        "status": 1
+      },
+      {
+        "name": "RTCPeerConnection member addStream should not exist",
+        "message": "assert_false: expected false got true",
+        "status": 1
+      },
+      {
+        "name": "RTCPeerConnection member createDTMFSender should not exist",
+        "message": "assert_false: expected false got true",
+        "status": 1
+      },
+      {
+        "name": "RTCPeerConnection member getLocalStreams should not exist",
+        "message": "assert_false: expected false got true",
+        "status": 1
+      },
+      {
+        "name": "RTCPeerConnection member getRemoteStreams should not exist",
+        "message": "assert_false: expected false got true",
+        "status": 1
+      },
+      {
+        "name": "RTCPeerConnection member onaddstream should not exist",
+        "message": "assert_false: expected false got true",
+        "status": 1
+      },
+      {
+        "name": "RTCPeerConnection member onremovestream should not exist",
+        "message": "assert_false: expected false got true",
+        "status": 1
+      },
+      {
+        "name": "RTCPeerConnection member removeStream should not exist",
+        "message": "assert_false: expected false got true",
+        "status": 1
+      },
+      {
+        "name": "webkitRTCPeerConnection interface should not exist",
+        "message": "assert_false: expected false got true",
+        "status": 1
+      },
+      {
+        "name": "new RTCPeerConnection(config) - with url field should throw TypeError",
+        "message": "assert_throws_js: function \"() =>\n    makePc({ iceServers: [{\n      url: 'stun:stun1.example.net'\n    }] })\" did not throw",
+        "status": 1
+      },
+      {
+        "name": "setConfiguration(config) - with url field should throw TypeError",
+        "message": "assert_throws_js: function \"() =>\n    makePc({ iceServers: [{\n      url: 'stun:stun1.example.net'\n    }] })\" did not throw",
+        "status": 1
+      }
+    ]
+  },
+  {
+    "test": "/webrtc/receiver-track-live.https.html",
+    "result": [
+      {
+        "name": "Setup audio call",
+        "message": "promise_test: Unhandled rejection with value: object \"Error: set_permission() is not implemented by testdriver-vendor.js\"",
+        "status": 1
+      },
+      {
+        "name": "Inactivate the audio transceiver",
+        "message": "promise_test: Unhandled rejection with value: object \"TypeError: Cannot read properties of undefined (reading 'getTransceivers')\"",
+        "status": 1
+      },
+      {
+        "name": "Reactivate the audio transceiver",
+        "message": "promise_test: Unhandled rejection with value: object \"TypeError: Cannot read properties of undefined (reading 'getTransceivers')\"",
+        "status": 1
+      },
+      {
+        "name": "Clean-up",
+        "message": "promise_test: Unhandled rejection with value: object \"TypeError: Cannot read properties of undefined (reading 'close')\"",
+        "status": 1
+      }
+    ]
+  },
+  {
+    "test": "/webrtc/RollbackEvents.https.html",
+    "result": [
+      {
+        "name": "[audio] Track with stream: removal due to disassociation in rollback and then add it back again",
+        "message": "promise_test: Unhandled rejection with value: object \"TypeError: Cannot read properties of undefined (reading 'getUserMedia')\"",
+        "status": 1
+      },
+      {
+        "name": "[audio] Track without stream: removal due to disassociation in rollback and then add it back",
+        "message": "promise_test: Unhandled rejection with value: object \"TypeError: Cannot read properties of undefined (reading 'getUserMedia')\"",
+        "status": 1
+      },
+      {
+        "name": "[audio] Track with stream: removal due to direction changing and then add back using rollback",
+        "message": "promise_test: Unhandled rejection with value: object \"TypeError: Cannot read properties of undefined (reading 'getUserMedia')\"",
+        "status": 1
+      },
+      {
+        "name": "[audio] Track without stream: removal due to direction changing and then add back using rollback",
+        "message": "promise_test: Unhandled rejection with value: object \"TypeError: Cannot read properties of undefined (reading 'getUserMedia')\"",
+        "status": 1
+      },
+      {
+        "name": "[video] Track with stream: removal due to disassociation in rollback and then add it back again",
+        "message": "promise_test: Unhandled rejection with value: object \"TypeError: Cannot read properties of undefined (reading 'getUserMedia')\"",
+        "status": 1
+      },
+      {
+        "name": "[video] Track without stream: removal due to disassociation in rollback and then add it back",
+        "message": "promise_test: Unhandled rejection with value: object \"TypeError: Cannot read properties of undefined (reading 'getUserMedia')\"",
+        "status": 1
+      },
+      {
+        "name": "[video] Track with stream: removal due to direction changing and then add back using rollback",
+        "message": "promise_test: Unhandled rejection with value: object \"TypeError: Cannot read properties of undefined (reading 'getUserMedia')\"",
+        "status": 1
+      },
+      {
+        "name": "[video] Track without stream: removal due to direction changing and then add back using rollback",
+        "message": "promise_test: Unhandled rejection with value: object \"TypeError: Cannot read properties of undefined (reading 'getUserMedia')\"",
+        "status": 1
+      }
+    ]
+  },
+  {
+    "test": "/webrtc/RTCCertificate.html",
+    "result": [
+      {
+        "name": "RTCPeerConnection({ certificates }) should generate offer SDP with fingerprint of all provided certificates",
+        "message": "assert_true: Expect fingerprint line to be found in SDP expected true got false",
+        "status": 1
+      }
+    ]
+  },
+  {
+    "test": "/webrtc/RTCConfiguration-iceServers.html",
+    "result": [
+      {
+        "name": "new RTCPeerConnection(config) - with turns server and empty string username, credential should succeed",
+        "message": "Failed to construct 'RTCPeerConnection': ICE server parsing failed: TURN server with empty username or password",
+        "status": 1
+      },
+      {
+        "name": "setConfiguration(config) - with turns server and empty string username, credential should succeed",
+        "message": "Failed to execute 'setConfiguration' on 'RTCPeerConnection': Could not update the PeerConnection with the given configuration.",
+        "status": 1
+      },
+      {
+        "name": "new RTCPeerConnection(config) - with turn server and empty string username, credential should succeed",
+        "message": "Failed to construct 'RTCPeerConnection': ICE server parsing failed: TURN server with empty username or password",
+        "status": 1
+      },
+      {
+        "name": "setConfiguration(config) - with turn server and empty string username, credential should succeed",
+        "message": "Failed to execute 'setConfiguration' on 'RTCPeerConnection': Could not update the PeerConnection with the given configuration.",
+        "status": 1
+      }
+    ]
+  },
+  {
+    "test": "/webrtc/RTCConfiguration-iceTransportPolicy.html",
+    "result": [
+      {
+        "name": "new RTCPeerConnection({ iceTransports: 'relay' }) should have no effect",
+        "message": "assert_equals: expected \"all\" but got \"relay\"",
+        "status": 1
+      },
+      {
+        "name": "new RTCPeerConnection({ iceTransports: 'invalid' }) should have no effect",
+        "message": "Failed to construct 'RTCPeerConnection': Failed to read the 'iceTransports' property from 'RTCConfiguration': The provided value 'invalid' is not a valid enum value of type RTCIceTransportPolicy.",
+        "status": 1
+      },
+      {
+        "name": "new RTCPeerConnection({ iceTransports: null }) should have no effect",
+        "message": "Failed to construct 'RTCPeerConnection': Failed to read the 'iceTransports' property from 'RTCConfiguration': The provided value 'null' is not a valid enum value of type RTCIceTransportPolicy.",
+        "status": 1
+      }
+    ]
+  },
+  {
+    "test": "/webrtc/RTCDataChannel-bufferedAmount.html",
+    "result": [
+      {
+        "name": "datachannel bufferedAmount should increase to size of blob sent",
+        "message": "promise_test: Unhandled rejection with value: object \"NotSupportedError: Failed to execute 'send' on 'RTCDataChannel': Blob support not implemented yet\"",
+        "status": 1
+      },
+      {
+        "name": "datachannel bufferedAmount should stay at zero for empty blob sent",
+        "message": "promise_test: Unhandled rejection with value: object \"NotSupportedError: Failed to execute 'send' on 'RTCDataChannel': Blob support not implemented yet\"",
+        "status": 1
+      },
+      {
+        "name": "datachannel bufferedAmount should increase by byte length for each message sent",
+        "message": "promise_test: Unhandled rejection with value: object \"NotSupportedError: Failed to execute 'send' on 'RTCDataChannel': Blob support not implemented yet\"",
+        "status": 1
+      },
+      {
+        "name": "negotiated datachannel bufferedAmount should increase to size of blob sent",
+        "message": "promise_test: Unhandled rejection with value: object \"NotSupportedError: Failed to execute 'send' on 'RTCDataChannel': Blob support not implemented yet\"",
+        "status": 1
+      },
+      {
+        "name": "negotiated datachannel bufferedAmount should stay at zero for empty blob sent",
+        "message": "promise_test: Unhandled rejection with value: object \"NotSupportedError: Failed to execute 'send' on 'RTCDataChannel': Blob support not implemented yet\"",
+        "status": 1
+      },
+      {
+        "name": "negotiated datachannel bufferedAmount should increase by byte length for each message sent",
+        "message": "promise_test: Unhandled rejection with value: object \"NotSupportedError: Failed to execute 'send' on 'RTCDataChannel': Blob support not implemented yet\"",
+        "status": 1
+      }
+    ]
+  },
+  {
+    "test": "/webrtc/RTCDataChannel-send-blob-order.html",
+    "result": [
+      {
+        "name": "Datachannel should send data following the order of the send call",
+        "message": "promise_test: Unhandled rejection with value: object \"NotSupportedError: Failed to execute 'send' on 'RTCDataChannel': Blob support not implemented yet\"",
+        "status": 1
+      },
+      {
+        "name": "Negotiated datachannel should send data following the order of the send call",
+        "message": "promise_test: Unhandled rejection with value: object \"NotSupportedError: Failed to execute 'send' on 'RTCDataChannel': Blob support not implemented yet\"",
+        "status": 1
+      }
+    ]
+  },
+  {
+    "test": "/webrtc/RTCDtlsTransport-state.html",
+    "result": [
+      {
+        "name": "close() causes the local transport to close immediately",
+        "message": "assert_false: close() should not see a statechange event on close expected false got true",
+        "status": 1
+      }
+    ]
+  },
+  {
+    "test": "/webrtc/RTCDTMFSender-ontonechange.https.html",
+    "result": [
+      {
+        "name": "Tone change event init optional parameters",
+        "message": "Failed to construct 'RTCDTMFToneChangeEvent': 2 arguments required, but only 1 present.",
+        "status": 1
+      }
+    ]
+  },
+  {
+    "test": "/webrtc/RTCError.html",
+    "result": [
+      {
+        "name": "RTCError httpRequestStatusCode should not be supported.",
+        "message": "assert_false: Should not be supported on the prototype expected false got true",
+        "status": 1
+      }
+    ]
+  },
+  {
+    "test": "/webrtc/RTCIceTransport.html",
+    "result": [
+      {
+        "name": "Two connected iceTransports should have matching local/remote candidates returned",
+        "message": "assert_true: Expect RTCIceRole to be either controlling or controlled, found null expected true got false",
+        "status": 1
+      },
+      {
+        "name": "RTCIceTransport should transition to \"gathering\" then \"complete\", after sLD",
+        "message": "assert_equals: expected \"gathering\" but got \"complete\"",
+        "status": 1
+      },
+      {
+        "name": "PC.close() should not cause the RTCIceTransport gathering state to transition to \"complete\"",
+        "message": "assert_equals: expected \"gathering\" but got \"complete\"",
+        "status": 1
+      },
+      {
+        "name": "RTCIceTransport should transition to \"gathering\", then \"complete\" after sLD (DataChannel case)",
+        "message": "assert_equals: expected \"gathering\" but got \"complete\"",
+        "status": 1
+      }
+    ]
+  },
+  {
+    "test": "/webrtc/RTCPeerConnection-addIceCandidate.html",
+    "result": [
+      {
+        "name": "addIceCandidate({\"candidate\":\"\",\"sdpMid\":null,\"sdpMLineIndex\":null}) adds a=end-of-candidates to both m-sections",
+        "message": "assert_true: Expect candidate line to be found between media lines m=audio and m=video expected true got false",
+        "status": 1
+      },
+      {
+        "name": "addIceCandidate(undefined) adds a=end-of-candidates to both m-sections",
+        "message": "assert_true: Expect candidate line to be found between media lines m=audio and m=video expected true got false",
+        "status": 1
+      },
+      {
+        "name": "addIceCandidate(null) adds a=end-of-candidates to both m-sections",
+        "message": "assert_true: Expect candidate line to be found between media lines m=audio and m=video expected true got false",
+        "status": 1
+      },
+      {
+        "name": "addIceCandidate({}) adds a=end-of-candidates to both m-sections",
+        "message": "assert_true: Expect candidate line to be found between media lines m=audio and m=video expected true got false",
+        "status": 1
+      },
+      {
+        "name": "addIceCandidate({}) in stable should work, and add a=end-of-candidates to both m-sections",
+        "message": "assert_true: Expect candidate line to be found between media lines m=audio and m=video expected true got false",
+        "status": 1
+      },
+      {
+        "name": "addIceCandidate({usernameFragment: usernameFragment1, sdpMid: sdpMid1}) should work, and add a=end-of-candidates to the first m-section",
+        "message": "assert_true: Expect candidate line to be found between media lines m=audio and m=video expected true got false",
+        "status": 1
+      },
+      {
+        "name": "addIceCandidate({usernameFragment: usernameFragment2, sdpMLineIndex: 1}) should work, and add a=end-of-candidates to the first m-section",
+        "message": "assert_true: expected true got false",
+        "status": 1
+      },
+      {
+        "name": "addIceCandidate({usernameFragment: \"no such ufrag\"}) should not work",
+        "message": "assert_unreached: Should have rejected: undefined Reached unreachable code",
+        "status": 1
+      },
+      {
+        "name": "Add with empty candidate string (end of candidates) should succeed",
+        "message": "assert_true: Expect candidate line to be found between media lines m=audio and m=video expected true got false",
+        "status": 1
+      },
+      {
+        "name": "Add candidate with invalid usernameFragment should reject with OperationError",
+        "message": "assert_unreached: Should have rejected: undefined Reached unreachable code",
+        "status": 1
+      },
+      {
+        "name": "Add candidate with sdpMid belonging to different usernameFragment should reject with OperationError",
+        "message": "assert_unreached: Should have rejected: undefined Reached unreachable code",
+        "status": 1
+      }
+    ]
+  },
+  {
+    "test": "/webrtc/RTCPeerConnection-addTcpIceCandidate.html",
+    "result": [
+      {
+        "name": "TCP candidate aimed at Fetch bad port 1719 ignored",
+        "message": "assert_unreached: Reached unreachable code",
+        "status": 1
+      },
+      {
+        "name": "TCP candidate aimed at Fetch bad port 1720 ignored",
+        "message": "assert_unreached: Reached unreachable code",
+        "status": 1
+      },
+      {
+        "name": "TCP candidate aimed at Fetch bad port 1723 ignored",
+        "message": "assert_unreached: Reached unreachable code",
+        "status": 1
+      },
+      {
+        "name": "TCP candidate aimed at Fetch bad port 2049 ignored",
+        "message": "assert_unreached: Reached unreachable code",
+        "status": 1
+      },
+      {
+        "name": "TCP candidate aimed at Fetch bad port 3659 ignored",
+        "message": "assert_unreached: Reached unreachable code",
+        "status": 1
+      },
+      {
+        "name": "TCP candidate aimed at Fetch bad port 4045 ignored",
+        "message": "assert_unreached: Reached unreachable code",
+        "status": 1
+      },
+      {
+        "name": "TCP candidate aimed at Fetch bad port 5060 ignored",
+        "message": "assert_unreached: Reached unreachable code",
+        "status": 1
+      },
+      {
+        "name": "TCP candidate aimed at Fetch bad port 5061 ignored",
+        "message": "assert_unreached: Reached unreachable code",
+        "status": 1
+      },
+      {
+        "name": "TCP candidate aimed at Fetch bad port 6000 ignored",
+        "message": "assert_unreached: Reached unreachable code",
+        "status": 1
+      },
+      {
+        "name": "TCP candidate aimed at Fetch bad port 6566 ignored",
+        "message": "assert_unreached: Reached unreachable code",
+        "status": 1
+      },
+      {
+        "name": "TCP candidate aimed at Fetch bad port 6665 ignored",
+        "message": "assert_unreached: Reached unreachable code",
+        "status": 1
+      },
+      {
+        "name": "TCP candidate aimed at Fetch bad port 6666 ignored",
+        "message": "assert_unreached: Reached unreachable code",
+        "status": 1
+      },
+      {
+        "name": "TCP candidate aimed at Fetch bad port 6667 ignored",
+        "message": "assert_unreached: Reached unreachable code",
+        "status": 1
+      },
+      {
+        "name": "TCP candidate aimed at Fetch bad port 6668 ignored",
+        "message": "assert_unreached: Reached unreachable code",
+        "status": 1
+      },
+      {
+        "name": "TCP candidate aimed at Fetch bad port 6669 ignored",
+        "message": "assert_unreached: Reached unreachable code",
+        "status": 1
+      },
+      {
+        "name": "TCP candidate aimed at Fetch bad port 6697 ignored",
+        "message": "assert_unreached: Reached unreachable code",
+        "status": 1
+      },
+      {
+        "name": "TCP candidate aimed at Fetch bad port 10080 ignored",
+        "message": "assert_unreached: Reached unreachable code",
+        "status": 1
+      },
+      {
+        "name": "TCP addIceCandidate aimed at Fetch bad port 2049 ignored",
+        "message": "assert_unreached: Reached unreachable code",
+        "status": 1
+      }
+    ]
+  },
+  {
+    "test": "/webrtc/RTCPeerConnection-addTrack.https.html",
+    "result": [
+      {
+        "name": "addTrack with existing sender with null track, same kind, and recvonly direction should reuse sender",
+        "message": "promise_test: Unhandled rejection with value: object \"Error: set_permission() is not implemented by testdriver-vendor.js\"",
+        "status": 1
+      }
+    ]
+  },
+  {
+    "test": "/webrtc/RTCPeerConnection-createDataChannel.html",
+    "result": [
+      {
+        "name": "createDataChannel with id 65535 and negotiated not set should succeed, but not set the channel's id",
+        "message": "Failed to execute 'createDataChannel' on 'RTCPeerConnection': RTCDataChannel cannot have id > 65534",
+        "status": 1
+      },
+      {
+        "name": "createDataChannel with id 65534 and negotiated true should succeed, and set the channel's id",
+        "message": "Failed to execute 'createDataChannel' on 'RTCPeerConnection': RTCDataChannel creation failed",
+        "status": 1
+      }
+    ]
+  },
+  {
+    "test": "/webrtc/RTCPeerConnection-createOffer.html",
+    "result": [
+      {
+        "name": "When media stream is added when createOffer() is running in parallel, the result offer should contain the new media stream",
+        "message": "assert_equals: Expect m=audio line to be found in offer SDP expected 1 but got 0",
+        "status": 1
+      },
+      {
+        "name": "createOffer() should fail when signaling state is not stable or have-local-offer",
+        "message": "assert_unreached: Should have rejected: undefined Reached unreachable code",
+        "status": 1
+      }
+    ]
+  },
+  {
+    "test": "/webrtc/RTCPeerConnection-generateCertificate.html",
+    "result": [
+      {
+        "name": "generateCertificate() with invalid range for expires should reject with TypeError",
+        "message": "assert_unreached: Should have rejected: undefined Reached unreachable code",
+        "status": 1
+      },
+      {
+        "name": "generateCertificate() with invalid type for expires should reject with TypeError",
+        "message": "assert_unreached: Should have rejected: undefined Reached unreachable code",
+        "status": 1
+      }
+    ]
+  },
+  {
+    "test": "/webrtc/RTCPeerConnection-iceConnectionState-disconnected.https.html",
+    "result": [
+      {
+        "name": "ICE restart when ICE is disconnected results in checking, then connected",
+        "message": "assert_equals: expected \"checking\" but got \"connected\"",
+        "status": 1
+      }
+    ]
+  },
+  {
+    "test": "/webrtc/RTCPeerConnectionIceEvent-constructor.html",
+    "result": [
+      {
+        "name": "RTCPeerConnectionIceEvent with no eventInitDict (default)",
+        "message": "assert_equals: expected (object) null but got (undefined) undefined",
+        "status": 1
+      },
+      {
+        "name": "RTCPeerConnectionIceEvent with empty object as eventInitDict (default)",
+        "message": "assert_equals: expected (object) null but got (undefined) undefined",
+        "status": 1
+      }
+    ]
+  },
+  {
+    "test": "/webrtc/RTCPeerConnection-iceGatheringState.html",
+    "result": [
+      {
+        "name": "local description should have a=end-of-candidates when gathering completes",
+        "message": "assert_true: expected true got false",
+        "status": 1
+      },
+      {
+        "name": "gathering state and candidate callbacks should fire in the correct order",
+        "message": "assert_not_equals: Global null candidate event should not fire yet got disallowed value null",
+        "status": 1
+      }
+    ]
+  },
+  {
+    "test": "/webrtc/RTCPeerConnection-mandatory-getStats.https.html",
+    "result": [
+      {
+        "name": "RTCIceCandidateStats's url",
+        "message": "assert_true: Is url present expected true got false",
+        "status": 1
+      }
+    ]
+  },
+  {
+    "test": "/webrtc/RTCPeerConnection-operations.https.html",
+    "result": [
+      {
+        "name": "createOffer must detect InvalidStateError synchronously when chain is empty (prerequisite)",
+        "message": "assert_equals: expected \"InvalidStateError\" but got \"Error\"",
+        "status": 1
+      },
+      {
+        "name": "createAnswer must detect InvalidStateError synchronously when chain is empty (prerequisite)",
+        "message": "assert_equals: promise rejected on same task expected \"rejected\" but got \"pending\"",
+        "status": 1
+      },
+      {
+        "name": "SLD(rollback) must detect InvalidStateError synchronously when chain is empty",
+        "message": "assert_equals: promise rejected on same task expected \"rejected\" but got \"pending\"",
+        "status": 1
+      },
+      {
+        "name": "addIceCandidate must detect InvalidStateError synchronously when chain is empty",
+        "message": "assert_equals: expected \"InvalidStateError\" but got \"Error\"",
+        "status": 1
+      },
+      {
+        "name": "setParameters must detect InvalidStateError synchronously always when transceiver is stopped",
+        "message": "assert_equals: promise rejected on same task expected \"rejected\" but got \"pending\"",
+        "status": 1
+      },
+      {
+        "name": "isOperationsChainEmpty detects empty in stable",
+        "message": "assert_true: Empty to start expected true got false",
+        "status": 1
+      },
+      {
+        "name": "isOperationsChainEmpty detects empty in have-local-offer",
+        "message": "assert_true: Empty to start expected true got false",
+        "status": 1
+      },
+      {
+        "name": "isOperationsChainEmpty detects empty in have-remote-offer",
+        "message": "assert_equals: isOperationsChainEmpty is working expected \"InvalidStateError\" but got \"Error\"",
+        "status": 1
+      },
+      {
+        "name": "createAnswer uses operations chain",
+        "message": "assert_equals: isOperationsChainEmpty is working expected \"InvalidStateError\" but got \"Error\"",
+        "status": 1
+      },
+      {
+        "name": "setLocalDescription uses operations chain",
+        "message": "assert_true: Empty before expected true got false",
+        "status": 1
+      },
+      {
+        "name": "setRemoteDescription uses operations chain",
+        "message": "assert_true: Empty before expected true got false",
+        "status": 1
+      },
+      {
+        "name": "addIceCandidate uses operations chain",
+        "message": "assert_equals: isOperationsChainEmpty is working expected \"InvalidStateError\" but got \"Error\"",
+        "status": 1
+      },
+      {
+        "name": "Firing of negotiationneeded does NOT use operations chain",
+        "message": "assert_true: Empty chain expected true got false",
+        "status": 1
+      },
+      {
+        "name": "replaceTrack uses operations chain",
+        "message": "assert_true: Empty chain expected true got false",
+        "status": 1
+      },
+      {
+        "name": "setParameters does NOT use the operations chain",
+        "message": "assert_true: Empty chain expected true got false",
+        "status": 1
+      },
+      {
+        "name": "pc.getStats does NOT use the operations chain",
+        "message": "assert_true: Empty chain expected true got false",
+        "status": 1
+      },
+      {
+        "name": "sender.getStats does NOT use the operations chain",
+        "message": "assert_true: Empty chain expected true got false",
+        "status": 1
+      },
+      {
+        "name": "receiver.getStats does NOT use the operations chain",
+        "message": "assert_true: Empty chain expected true got false",
+        "status": 1
+      },
+      {
+        "name": "Pack operations queue with implicit offer and answer",
+        "message": "promise_test: Unhandled rejection with value: object \"OperationError: Failed to execute 'setLocalDescription' on 'RTCPeerConnection': Failed to parse SessionDescription.  Expect line: v=\"",
+        "status": 1
+      }
+    ]
+  },
+  {
+    "test": "/webrtc/RTCPeerConnection-restartIce.https.html",
+    "result": [
+      {
+        "name": "restartIce() does not trigger negotiation ahead of initial negotiation",
+        "message": "assert_equals: No negotiationneeded event expected (undefined) undefined but got (object) object \"[object Event]\"",
+        "status": 1
+      },
+      {
+        "name": "restartIce() survives remote offer containing partial restart",
+        "message": "assert_false: Restarted 2 expected false got true",
+        "status": 1
+      },
+      {
+        "name": "restartIce() survives remote offer containing partial restart (perfect negotiation)",
+        "message": "assert_false: Restarted 2 expected false got true",
+        "status": 1
+      }
+    ]
+  },
+  {
+    "test": "/webrtc/RTCPeerConnection-setLocalDescription-offer.html",
+    "result": [
+      {
+        "name": "Set created offer other than last offer should reject with InvalidModificationError",
+        "message": "assert_unreached: Should have rejected: undefined Reached unreachable code",
+        "status": 1
+      }
+    ]
+  },
+  {
+    "test": "/webrtc/RTCPeerConnection-setLocalDescription-parameterless.https.html",
+    "result": [
+      {
+        "name": "Parameterless SLD() uses [[LastCreatedOffer]] if it is still valid",
+        "message": "assert_true: offerer.pendingLocalDescription.sdp == offer.sdp expected true got false",
+        "status": 1
+      },
+      {
+        "name": "Parameterless SLD() uses [[LastCreatedAnswer]] if it is still valid",
+        "message": "assert_true: answerer.currentLocalDescription.sdp == answer.sdp expected true got false",
+        "status": 1
+      },
+      {
+        "name": "RTCSessionDescription constructed without type throws TypeError",
+        "message": "assert_equals: expected \"TypeError\" but got \"ReferenceError\"",
+        "status": 1
+      }
+    ]
+  },
+  {
+    "test": "/webrtc/RTCPeerConnection-setLocalDescription-rollback.html",
+    "result": [
+      {
+        "name": "setLocalDescription(rollback) after setting a remote offer should reject with InvalidStateError",
+        "message": "assert_unreached: Should have rejected: undefined Reached unreachable code",
+        "status": 1
+      }
+    ]
+  },
+  {
+    "test": "/webrtc/RTCPeerConnection-setRemoteDescription.html",
+    "result": [
+      {
+        "name": "setRemoteDescription() with invalid SDP and stable state should reject with InvalidStateError",
+        "message": "assert_throws_dom: function \"() => { throw e }\" threw object \"OperationError: Failed to execute 'setRemoteDescription' on 'RTCPeerConnection': Failed to parse SessionDescription. invalid Expect line: v=\" that is not a DOMException InvalidStateError: property \"code\" is equal to 0, expected 11",
+        "status": 1
+      }
+    ]
+  },
+  {
+    "test": "/webrtc/RTCPeerConnection-setRemoteDescription-offer.html",
+    "result": [
+      {
+        "name": "setRemoteDescription(offer) with invalid SDP should reject with RTCError",
+        "message": "assert_equals: Expect error detail field to set to sdp-syntax-error expected (string) \"sdp-syntax-error\" but got (undefined) undefined",
+        "status": 1
+      },
+      {
+        "name": "setRemoteDescription(offer) from have-local-offer fires signalingstatechange twice",
+        "message": "assert_equals: expected null but got object \"[object RTCSessionDescription]\"",
+        "status": 1
+      },
+      {
+        "name": "setRemoteDescription(offer) in have-local-offer should update internal state with a queued task, in the right order",
+        "message": "assert_equals: pendingRemoteDescription should be updated before the signalingstatechange event expected null but got object \"[object RTCSessionDescription]\"",
+        "status": 1
+      },
+      {
+        "name": "Naive rollback approach is not glare-proof (control)",
+        "message": "assert_unreached: Should have rejected: undefined Reached unreachable code",
+        "status": 1
+      },
+      {
+        "name": "setRemoteDescription(invalidOffer) from have-local-offer does not undo rollback",
+        "message": "assert_unreached: State should have changed Reached unreachable code",
+        "status": 1
+      }
+    ]
+  },
+  {
+    "test": "/webrtc/RTCPeerConnection-setRemoteDescription-rollback.html",
+    "result": [
+      {
+        "name": "setRemoteDescription(rollback) after setting a local offer should reject with InvalidStateError",
+        "message": "assert_unreached: Should have rejected: undefined Reached unreachable code",
+        "status": 1
+      }
+    ]
+  },
+  {
+    "test": "/webrtc/RTCPeerConnection-setRemoteDescription-simulcast.https.html",
+    "result": [
+      {
+        "name": "createAnswer() attaches to an existing transceiver with a remote simulcast offer",
+        "message": "assert_equals: Expected exactly one transceiver expected 1 but got 2",
+        "status": 1
+      }
+    ]
+  },
+  {
+    "test": "/webrtc/RTCRtpParameters-codecs.html",
+    "result": [
+      {
+        "name": "setParameters() with codecs undefined should reject with InvalidModificationError (audio)",
+        "message": "promise_rejects_dom: function \"function() { throw e }\" threw object \"TypeError: Failed to execute 'setParameters' on 'RTCRtpSender': Failed to read the 'codecs' property from 'RTCRtpParameters': Required member is undefined.\" that is not a DOMException InvalidModificationError: property \"code\" is equal to undefined, expected 13",
+        "status": 1
+      },
+      {
+        "name": "RTCRtpSender.getParameters() should have codecs after negotiation (audio)",
+        "message": "assert_not_equals: got disallowed value 0",
+        "status": 1
+      },
+      {
+        "name": "RTCRtpReceiver.getParameters() should have codecs after negotiation (audio)",
+        "message": "assert_not_equals: got disallowed value 0",
+        "status": 1
+      },
+      {
+        "name": "RTCRtpReceiver.getParameters() codecs should match local SDP (audio, offerer)",
+        "message": "assert_not_equals: got disallowed value 0",
+        "status": 1
+      },
+      {
+        "name": "setParameters() with codecs undefined should reject with InvalidModificationError (video)",
+        "message": "promise_rejects_dom: function \"function() { throw e }\" threw object \"TypeError: Failed to execute 'setParameters' on 'RTCRtpSender': Failed to read the 'codecs' property from 'RTCRtpParameters': Required member is undefined.\" that is not a DOMException InvalidModificationError: property \"code\" is equal to undefined, expected 13",
+        "status": 1
+      },
+      {
+        "name": "RTCRtpSender.getParameters() should have codecs after negotiation (video)",
+        "message": "assert_not_equals: got disallowed value 0",
+        "status": 1
+      },
+      {
+        "name": "RTCRtpReceiver.getParameters() should have codecs after negotiation (video)",
+        "message": "assert_not_equals: got disallowed value 0",
+        "status": 1
+      },
+      {
+        "name": "RTCRtpReceiver.getParameters() codecs should match local SDP (video, offerer)",
+        "message": "assert_not_equals: got disallowed value 0",
+        "status": 1
+      },
+      {
+        "name": "RTCRtpSender.getParameters() codecs should match remote SDP (audio, no fmtp checks, offerer)",
+        "message": "promise_test: Unhandled rejection with value: object \"InvalidAccessError: Failed to execute 'setRemoteDescription' on 'RTCPeerConnection': Failed to set remote answer sdp: The m= section with mid='0' is invalid. RTCP-MUX is not enabled when it is required.\"",
+        "status": 1
+      },
+      {
+        "name": "RTCRtpSender.getParameters() codecs should match remote SDP (audio, no fmtp checks, answerer)",
+        "message": "promise_test: Unhandled rejection with value: object \"InvalidAccessError: Failed to execute 'setRemoteDescription' on 'RTCPeerConnection': Failed to set remote offer sdp: The m= section with mid='mid1' is invalid. RTCP-MUX is not enabled when it is required.\"",
+        "status": 1
+      },
+      {
+        "name": "RTCRtpSender.getParameters() codecs should match remote SDP (audio, with fmtp checks, offerer)",
+        "message": "promise_test: Unhandled rejection with value: object \"InvalidAccessError: Failed to execute 'setRemoteDescription' on 'RTCPeerConnection': Failed to set remote answer sdp: The m= section with mid='0' is invalid. RTCP-MUX is not enabled when it is required.\"",
+        "status": 1
+      },
+      {
+        "name": "RTCRtpSender.getParameters() codecs should match remote SDP (audio, with fmtp checks, answerer)",
+        "message": "promise_test: Unhandled rejection with value: object \"InvalidAccessError: Failed to execute 'setRemoteDescription' on 'RTCPeerConnection': Failed to set remote offer sdp: The m= section with mid='mid1' is invalid. RTCP-MUX is not enabled when it is required.\"",
+        "status": 1
+      },
+      {
+        "name": "RTCRtpSender.getParameters() codecs should match remote SDP (video, minimal fmtp checks, offerer)",
+        "message": "assert_equals: expected 7 but got 9",
+        "status": 1
+      },
+      {
+        "name": "RTCRtpSender.getParameters() codecs should match remote SDP (video, minimal fmtp checks, answerer)",
+        "message": "assert_equals: expected 7 but got 0",
+        "status": 1
+      },
+      {
+        "name": "RTCRtpSender.getParameters() codecs should match remote SDP (video, with fmtp checks, offerer)",
+        "message": "assert_equals: expected 7 but got 9",
+        "status": 1
+      },
+      {
+        "name": "RTCRtpSender.getParameters() codecs should match remote SDP (video, with fmtp checks, answerer)",
+        "message": "assert_equals: expected 7 but got 0",
+        "status": 1
+      }
+    ]
+  },
+  {
+    "test": "/webrtc/RTCRtpParameters-encodings.html",
+    "result": [
+      {
+        "name": "addTransceiver(video) with undefined sendEncodings should have default encoding parameter with active set to true and scaleResolutionDownBy set to 1",
+        "message": "assert_equals: expected (number) 1 but got (undefined) undefined",
+        "status": 1
+      },
+      {
+        "name": "addTransceiver(video) with empty list sendEncodings should have default encoding parameter with active set to true and scaleResolutionDownBy set to 1",
+        "message": "assert_equals: expected (number) 1 but got (undefined) undefined",
+        "status": 1
+      },
+      {
+        "name": "addTransceiver(video) should auto-set scaleResolutionDownBy to 1 when some encodings have it, but not all",
+        "message": "assert_equals: expected (number) 1 but got (undefined) undefined",
+        "status": 1
+      },
+      {
+        "name": "addTransceiver should auto-set scaleResolutionDownBy to powers of 2 (descending) when absent",
+        "message": "assert_equals: expected (number) 2 but got (undefined) undefined",
+        "status": 1
+      },
+      {
+        "name": "addTransceiver with duplicate rid and multiple encodings throws TypeError",
+        "message": "assert_throws_js: function \"() => pc.addTransceiver('video', { sendEncodings: [{rid: \"foo\"}, {rid: \"foo\"}] })\" did not throw",
+        "status": 1
+      },
+      {
+        "name": "addTransceiver with missing rid and multiple encodings throws TypeError",
+        "message": "assert_throws_js: function \"() => pc.addTransceiver('video', { sendEncodings: [{rid: \"foo\"}, {}] })\" threw object \"InvalidAccessError: Failed to execute 'addTransceiver' on 'RTCPeerConnection': RIDs must be provided for either all or none of the send encodings.\" (\"InvalidAccessError\") expected instance of function \"function TypeError() { [native code] }\" (\"TypeError\")",
+        "status": 1
+      },
+      {
+        "name": "addTransceiver with empty rid throws TypeError",
+        "message": "assert_throws_js: function \"() => pc.addTransceiver('video', { sendEncodings: [{rid: \"\"}] })\" did not throw",
+        "status": 1
+      },
+      {
+        "name": "addTransceiver with invalid rid characters throws TypeError",
+        "message": "assert_throws_js: function \"() => pc.addTransceiver('video', { sendEncodings: [{rid: \"foo-bar\"}] })\" threw object \"InvalidAccessError: Failed to execute 'addTransceiver' on 'RTCPeerConnection': Invalid RID value provided.\" (\"InvalidAccessError\") expected instance of function \"function TypeError() { [native code] }\" (\"TypeError\")",
+        "status": 1
+      },
+      {
+        "name": "setParameters() with encoding.scaleResolutionDownBy field set to less than 1.0 should reject with RangeError",
+        "message": "promise_rejects_js: function \"function() { throw e }\" threw object \"InvalidStateError: getParameters() needs to be called before setParameters().\" (\"InvalidStateError\") expected instance of function \"function RangeError() { [native code] }\" (\"RangeError\")",
+        "status": 1
+      },
+      {
+        "name": "setParameters() with missing encoding.scaleResolutionDownBy field should succeed, and set the value back to 1",
+        "message": "assert_equals: expected (number) 1 but got (undefined) undefined",
+        "status": 1
+      }
+    ]
+  },
+  {
+    "test": "/webrtc/RTCRtpParameters-transactionId.html",
+    "result": [
+      {
+        "name": "sender.getParameters() should return the same transaction ID if called back-to-back without relinquishing the event loop, even if the microtask queue runs",
+        "message": "assert_true: expected true got false",
+        "status": 1
+      },
+      {
+        "name": "sender.getParameters() should return the same transaction ID if called back-to-back without relinquishing the event loop, even if there is an intervening call to setParameters",
+        "message": "assert_true: expected true got false",
+        "status": 1
+      },
+      {
+        "name": "setParameters() when the event loop has been relinquished since the last getParameters() should reject with InvalidStateError",
+        "message": "assert_unreached: Should have rejected: undefined Reached unreachable code",
+        "status": 1
+      }
+    ]
+  },
+  {
+    "test": "/webrtc/RTCRtpReceiver-audio-jitterBufferTarget-stats.https.html",
+    "result": [
+      {
+        "name": "measure raising and lowering audio jitterBufferTarget",
+        "message": "assert_true: jitter buffer is not stabilised expected true got false",
+        "status": 1
+      }
+    ]
+  },
+  {
+    "test": "/webrtc/RTCRtpReceiver-getParameters.html",
+    "result": [
+      {
+        "name": "getParameters() with simulcast video receiver",
+        "message": "assert_greater_than: expected a number greater than 0 but got 0",
+        "status": 1
+      }
+    ]
+  },
+  {
+    "test": "/webrtc/RTCRtpReceiver-getStats.https.html",
+    "result": [
+      {
+        "name": "receiver.getStats() should work on a stopped transceiver but not have inbound-rtp objects",
+        "message": "assert_false: expected false got true",
+        "status": 1
+      }
+    ]
+  },
+  {
+    "test": "/webrtc/RTCRtpReceiver-video-jitterBufferTarget-stats.html",
+    "result": [
+      {
+        "name": "measure raising and lowering video jitterBufferTarget",
+        "message": "assert_true: jitterBuffer does not reach target expected true got false",
+        "status": 1
+      }
+    ]
+  },
+  {
+    "test": "/webrtc/RTCRtpSender-setParameters.html",
+    "result": [
+      {
+        "name": "setParameters() with already used parameters should work if the event loop has not been relinquished",
+        "message": "promise_test: Unhandled rejection with value: object \"InvalidStateError: Failed to execute 'setParameters' on 'RTCRtpSender': Failed to set parameters since getParameters() has never been called on this sender\"",
+        "status": 1
+      }
+    ]
+  },
+  {
+    "test": "/webrtc/RTCRtpTransceiver.https.html",
+    "result": [
+      {
+        "name": "checkRemoveTrackNegotiation",
+        "message": "assert_equals: pc2.setRemoteDescription(offer) should've added 2 tracks to receive stream expected 2 but got 0",
+        "status": 1
+      },
+      {
+        "name": "checkMute",
+        "message": "assert_true: expected true got false",
+        "status": 1
+      }
+    ]
+  },
+  {
+    "test": "/webrtc/RTCRtpTransceiver-setCodecPreferences.html",
+    "result": [
+      {
+        "name": "setCodecPreferences should accept audio codecs regardless of mimeType case",
+        "message": "promise_test: Unhandled rejection with value: object \"InvalidModificationError: Failed to execute 'setCodecPreferences' on 'RTCRtpTransceiver': Invalid codec\"",
+        "status": 1
+      },
+      {
+        "name": "setCodecPreferences should accept video codecs regardless of mimeType case",
+        "message": "promise_test: Unhandled rejection with value: object \"InvalidModificationError: Failed to execute 'setCodecPreferences' on 'RTCRtpTransceiver': Invalid codec\"",
+        "status": 1
+      }
+    ]
+  },
+  {
+    "test": "/webrtc/RTCRtpTransceiver-stopping.https.html",
+    "result": [
+      {
+        "name": "[audio] Remotely stopping a transceiver ends the track",
+        "message": "assert_equals: expected \"live\" but got \"ended\"",
+        "status": 1
+      },
+      {
+        "name": "[audio] Rollback when removing transceiver does end the track",
+        "message": "assert_equals: expected \"live\" but got \"ended\"",
+        "status": 1
+      },
+      {
+        "name": "[audio] Glare when transceiver is not removed does not end track",
+        "message": "promise_test: Unhandled rejection with value: object \"TypeError: Cannot read properties of undefined (reading 'getUserMedia')\"",
+        "status": 1
+      },
+      {
+        "name": "[video] Remotely stopping a transceiver ends the track",
+        "message": "assert_equals: expected \"live\" but got \"ended\"",
+        "status": 1
+      },
+      {
+        "name": "[video] Rollback when removing transceiver does end the track",
+        "message": "assert_equals: expected \"live\" but got \"ended\"",
+        "status": 1
+      },
+      {
+        "name": "[video] Glare when transceiver is not removed does not end track",
+        "message": "promise_test: Unhandled rejection with value: object \"TypeError: Cannot read properties of undefined (reading 'getUserMedia')\"",
+        "status": 1
+      }
+    ]
+  },
+  {
+    "test": "/webrtc/RTCCertificate-postMessage.html",
+    "result": [
+      {
+        "name": "Check cross-origin created RTCCertificate",
+        "message": "assert_throws_dom: function \"() => { new RTCPeerConnection({certificates: [certificate2]}) }\" did not throw",
+        "status": 1
+      }
+    ]
+  },
+  {
+    "test": "/webrtc/RTCDataChannel-close.html",
+    "result": [
+      {
+        "name": "Close peerconnection causes close event and error on many channels, negotiated datachannel",
+        "message": "promise_test: Unhandled rejection with value: object \"OperationError: Failed to execute 'createDataChannel' on 'RTCPeerConnection': RTCDataChannel creation failed\"",
+        "status": 1
+      }
+    ]
+  },
+  {
+    "test": "/webrtc/RTCDataChannel-send-close.html",
+    "result": [
+      {
+        "name": "Datachannel should be able to send and receive all blob messages on close",
+        "message": "assert_equals: expected \"OperationError\" but got \"NotSupportedError\"",
+        "status": 1
+      },
+      {
+        "name": "Negotiated datachannel should be able to send and receive all blob messages on close",
+        "message": "assert_equals: expected \"OperationError\" but got \"NotSupportedError\"",
+        "status": 1
+      }
+    ]
+  },
+  {
+    "test": "/webrtc/RTCDataChannel-send.html",
+    "result": [
+      {
+        "name": "Datachannel should be able to send Blob message and receive as ArrayBuffer",
+        "message": "promise_test: Unhandled rejection with value: object \"NotSupportedError: Failed to execute 'send' on 'RTCDataChannel': Blob support not implemented yet\"",
+        "status": 1
+      },
+      {
+        "name": "Datachannel should be able to send ArrayBuffer message and receive as Blob",
+        "message": "promise_test: Unhandled rejection with value: object \"NotSupportedError: Failed to set the 'binaryType' property on 'RTCDataChannel': Blob support not implemented yet\"",
+        "status": 1
+      },
+      {
+        "name": "Datachannel sending multiple messages with different types should succeed and be received",
+        "message": "assert_unreached: Unexpected promise rejection: NotSupportedError: Failed to execute 'send' on 'RTCDataChannel': Blob support not implemented yet Reached unreachable code",
+        "status": 1
+      },
+      {
+        "name": "Negotiated datachannel should be able to send Blob message and receive as ArrayBuffer",
+        "message": "promise_test: Unhandled rejection with value: object \"NotSupportedError: Failed to execute 'send' on 'RTCDataChannel': Blob support not implemented yet\"",
+        "status": 1
+      },
+      {
+        "name": "Negotiated datachannel should be able to send ArrayBuffer message and receive as Blob",
+        "message": "promise_test: Unhandled rejection with value: object \"NotSupportedError: Failed to set the 'binaryType' property on 'RTCDataChannel': Blob support not implemented yet\"",
+        "status": 1
+      },
+      {
+        "name": "Negotiated datachannel sending multiple messages with different types should succeed and be received",
+        "message": "assert_unreached: Unexpected promise rejection: NotSupportedError: Failed to execute 'send' on 'RTCDataChannel': Blob support not implemented yet Reached unreachable code",
+        "status": 1
+      }
+    ]
+  }
+]

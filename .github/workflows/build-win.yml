@@ -11,22 +11,21 @@ env:
 
 jobs:
   build-windows-x64:
-    runs-on: windows-2019
+    runs-on: windows-2022
     strategy:
       matrix:
-        node-version: [16.x]
+        node-version: [18]
 
     steps:
-      - uses: actions/checkout@v2
-      - uses: ilammy/msvc-dev-cmd@v1
+      - uses: actions/checkout@v4
       - name: Install OpenSSL
-        run: choco install openssl
+        run: choco install openssl -y
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
       - name: Build
-        run: set npm_config_cache= && set NPM_CONFIG_CACHE= && npm install --build-from-source
+        run: npm install --build-from-source
         env:
           CI: true
       # - name: Test
@@ -42,11 +41,11 @@ jobs:
     runs-on: windows-2019
     strategy:
       matrix:
-        node_version: [16.x]
+        node_version: [18]
         node_arch:
           - x86
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - uses: ilammy/msvc-dev-cmd@v1
         with:
           arch: x86
@@ -61,7 +60,7 @@ jobs:
           node-version: ${{ matrix.node_version }}
           node-arch: ${{ matrix.node_arch }}
       - name: Build
-        run: set npm_config_cache= && set NPM_CONFIG_CACHE= && npm install --build-from-source
+        run: npm install --build-from-source
         env:
           CI: true
       # - name: Test
@@ -72,3 +71,4 @@ jobs:
         run: node_modules/.bin/prebuild -r napi --upload -u ${{ secrets.GITHUB_TOKEN }}
         env:
           CI: true
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: true
