@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { expect, jest } from '@jest/globals';
 import { RTCPeerConnection, RTCDataChannel } from '../../src/polyfill/index';
 import { PeerConnection } from '../../src/lib/index';
@@ -112,13 +113,13 @@ describe('polyfill', () => {
 				expect(p2MessageMock.mock.calls.length).toBe(3);
 
 				// Analyze and compare received messages
-				expect(analyzeData(0, p1MessageMock.mock.calls[0][0])).toEqual(true);
-				expect(analyzeData(1, p1MessageMock.mock.calls[1][0])).toEqual(true);
-				expect(analyzeData(2, p1MessageMock.mock.calls[2][0])).toEqual(true);
+				expect(analyzeData(0, p1MessageMock.mock.calls[0][0] as any)).toEqual(true);
+				expect(analyzeData(1, p1MessageMock.mock.calls[1][0] as any)).toEqual(true);
+				expect(analyzeData(2, p1MessageMock.mock.calls[2][0] as any)).toEqual(true);
 
-				expect(analyzeData(0, p2MessageMock.mock.calls[0][0])).toEqual(true);
-				expect(analyzeData(1, p2MessageMock.mock.calls[1][0])).toEqual(true);
-				expect(analyzeData(2, p2MessageMock.mock.calls[2][0])).toEqual(true);
+				expect(analyzeData(0, p2MessageMock.mock.calls[0][0] as any)).toEqual(true);
+				expect(analyzeData(1, p2MessageMock.mock.calls[1][0] as any)).toEqual(true);
+				expect(analyzeData(2, p2MessageMock.mock.calls[2][0] as any)).toEqual(true);
 
 				done();
 			}
