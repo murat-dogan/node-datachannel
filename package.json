@@ -5,6 +5,16 @@
     "main": "./dist/cjs/lib/index.cjs",
     "module": "./dist/esm/lib/index.mjs",
     "types": "./dist/types/lib/index.d.ts",
+    "typesVersions": {
+        "*": {
+            "*": [
+                "dist/types/lib/index.d.ts"
+            ],
+            "polyfill": [
+                "dist/types/polyfill/index.d.ts"
+            ]
+        }
+    },
     "exports": {
         ".": {
             "types": "./dist/types/lib/index.d.ts",
