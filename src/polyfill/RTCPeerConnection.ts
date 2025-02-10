@@ -12,6 +12,7 @@ import RTCCertificate from './RTCCertificate';
 // extend RTCConfiguration with peerIdentity
 interface RTCConfiguration extends globalThis.RTCConfiguration {
     peerIdentity?: string;
+    peerConnection?: PeerConnection;
 }
 
 export default class RTCPeerConnection extends EventTarget implements globalThis.RTCPeerConnection {
@@ -121,7 +122,7 @@ export default class RTCPeerConnection extends EventTarget implements globalThis
 
         try {
             const peerIdentity = (config as any)?.peerIdentity ?? `peer-${getRandomString(7)}`;
-            this.#peerConnection = new PeerConnection(peerIdentity,
+            this.#peerConnection = config.peerConnection ?? new PeerConnection(peerIdentity,
                 {
                     ...config,
                     iceServers:

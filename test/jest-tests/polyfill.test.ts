@@ -1,5 +1,6 @@
-import { expect } from '@jest/globals';
+import { expect, jest } from '@jest/globals';
 import { RTCPeerConnection, RTCDataChannel } from '../../src/polyfill/index';
+import { PeerConnection } from '../../src/lib/index';
 
 describe('polyfill', () => {
     // Default is 5000 ms but we need more
@@ -212,4 +213,26 @@ describe('polyfill', () => {
 			};
 		});
 	});
+
+	test('it should accept a preconfigured PeerConnection', () => {
+		const peerConnection = new PeerConnection('Peer', {
+				iceServers: [],
+		});
+
+		// have to override write-only method in order to spy on it
+		const originalFunc = peerConnection.state.bind(peerConnection);
+		Object.defineProperty(peerConnection, 'state', {
+				value: originalFunc,
+				writable: true,
+				enumerable: true,
+		});
+
+		const spy = jest.spyOn(peerConnection, 'state');
+		const rtcPeerConnection = new RTCPeerConnection({
+				peerConnection,
+		});
+		const connectionState = rtcPeerConnection.connectionState;
+		expect(spy).toHaveBeenCalled();
+		expect(connectionState).toEqual(originalFunc());
+});
 });
