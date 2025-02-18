@@ -112,6 +112,6 @@
         "typescript": "5.4"
     },
     "dependencies": {
-        "prebuild-install": "^7.1.2"
+        "prebuild-install": "^7.1.3"
     }
 }
