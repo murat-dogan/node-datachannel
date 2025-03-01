@@ -16,12 +16,19 @@ export interface RtcConfig {
     bindAddress?: string;
     enableIceTcp?: boolean;
     enableIceUdpMux?: boolean;
+    disableAutoNegotiation?: boolean;
+    disableFingerprintVerification?: boolean;
+    disableAutoGathering?: boolean;
+    forceMediaTransport?: boolean;
     portRangeBegin?: number;
     portRangeEnd?: number;
     maxMessageSize?: number;
     mtu?: number;
     iceTransportPolicy?: TransportPolicy;
     disableFingerprintVerification?: boolean;
+    certificatePemFile?: string;
+    keyPemFile?: string;
+    keyPemPass?: string;
 }
 
 export const enum RelayType {
@@ -66,6 +73,27 @@ export const enum DescriptionType {
     Unspec = 'Unspec',
     Offer = 'Offer',
     Answer = 'Answer'
+}
+```
+
+**setLocalDescription: (sdp: string, init?: LocalDescriptionInit) => void**
+
+Set Local Description and optionally the ICE ufrag/pwd to use. These should not
+be set as they will be generated automatically as per the spec.
+```
+export interface LocalDescriptionInit {
+    iceUfrag?: string;
+    icePwd?: string;
+}
+```
+
+**remoteFingerprint: () => CertificateFingerprint**
+
+Returns the certificate fingerprint used by the remote peer
+```
+export interface CertificateFingerprint {
+    value: string;
+    algorithm: 'sha-1' | 'sha-224' | 'sha-256' | 'sha-384' | 'sha-512' | 'md5' | 'md2';
 }
 ```
 

@@ -50,6 +50,7 @@ add_library(${PROJECT_NAME} SHARED
     src/cpp/media-audio-wrapper.cpp
     src/cpp/media-video-wrapper.cpp
     src/cpp/data-channel-wrapper.cpp
+    src/cpp/ice-udp-mux-listener-wrapper.cpp
     src/cpp/peer-connection-wrapper.cpp
     src/cpp/thread-safe-callback.cpp
     src/cpp/web-socket-wrapper.cpp
