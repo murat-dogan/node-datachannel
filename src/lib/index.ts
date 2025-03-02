@@ -145,9 +145,12 @@ export const PeerConnection: {
     new(peerName: string, config: RtcConfig): PeerConnection
 } = nodeDataChannel.PeerConnection
 
-export class RtcpReceivingSession {
-    //
+export interface RtcpReceivingSession {
 }
+
+export const RtcpReceivingSession: {
+    new(): RtcpReceivingSession
+} = nodeDataChannel.RtcpReceivingSession
 
 export { WebSocketServer } from './websocket-server';
 export { WebSocket } from './websocket';
