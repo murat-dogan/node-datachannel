@@ -40,5 +40,11 @@ jobs:
 
       - name: Build
         run: |
-          node_modules/.bin/prebuild -r napi --backend cmake-js --arch arm64 --upload -u ${{ secrets.GITHUB_TOKEN }} -- --CDCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake --CDVCPKG_TARGET_TRIPLET=arm64-windows-static
+          node_modules/.bin/prebuild -r napi --backend cmake-js --arch arm64 --upload -u ${{ secrets.GITHUB_TOKEN }}
+        env:
+          CMAKE_TOOLCHAIN_FILE: C:/vcpkg/scripts/buildsystems/vcpkg.cmake
+          VCPKG_TARGET_TRIPLET: arm64-windows-static
+          OPENSSL_ROOT_DIR: C:/vcpkg/installed/arm64-windows-static
+          OPENSSL_LIBRARIES: C:/vcpkg/installed/arm64-windows-static/lib
+          OPENSSL_INCLUDE_DIR: C:/vcpkg/installed/arm64-windows-static/include
 
