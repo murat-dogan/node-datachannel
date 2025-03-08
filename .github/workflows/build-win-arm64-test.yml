@@ -34,7 +34,11 @@ jobs:
           C:\vcpkg\vcpkg install openssl:arm64-windows-static
         shell: cmd
 
-      - name: Build
+      - name: Install npm
         run: |
           npm install --ignore-scripts
-          # node_modules/.bin/prebuild -r napi --backend cmake-js --arch arm64 --upload -u ${{ secrets.GITHUB_TOKEN }} -- --CDCMAKE_TOOLCHAIN_FILE=c:\vcpkg\scripts\buildsystems\vcpkg.cmake --CDVCPKG_TARGET_TRIPLET=arm64-windows-static
+
+      - name: Build
+        run: |
+          node_modules/.bin/prebuild -r napi --backend cmake-js --arch arm64 --upload -u ${{ secrets.GITHUB_TOKEN }} -- --CDCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake --CDVCPKG_TARGET_TRIPLET=arm64-windows-static
+
