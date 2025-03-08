@@ -1,0 +1,52 @@
+name: Build - Win - Arm64
+
+on:
+  workflow_dispatch:
+  # push:
+  #   tags:
+  #     - v*
+
+env:
+  ACTIONS_ALLOW_UNSECURE_COMMANDS: true
+
+jobs:
+  build-windows-arm64:
+    runs-on: windows-2022
+    strategy:
+      matrix:
+        node-version: [18]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Set Up MSVC for ARM64 Cross Compilation
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: amd64_arm64  # Sets up cross-compilation from x64 to ARM64
+
+      - name: Install vcpkg
+        run: |
+          git clone https://github.com/microsoft/vcpkg.git C:\vcpkg
+          cd C:\vcpkg
+          .\bootstrap-vcpkg.bat
+        shell: cmd
+
+      - name: Install OpenSSL (Static) for Windows ARM64
+        run: |
+          C:\vcpkg\vcpkg install openssl:arm64-windows-static
+        shell: cmd
+
+      - name: Build
+        run: |
+          npm install --ignore-scripts
+          node_modules/.bin/prebuild -r napi --backend cmake-js --arch arm64 --upload -u ${{ secrets.GITHUB_TOKEN }} -- --CDCMAKE_TOOLCHAIN_FILE=c:\vcpkg\scripts\buildsystems\vcpkg.cmake --CDVCPKG_TARGET_TRIPLET=arm64-windows-static
+
+      - name: Upload
+        run: node_modules/.bin/prebuild -r napi --upload -u ${{ secrets.GITHUB_TOKEN }}
+        env:
+          CI: true
