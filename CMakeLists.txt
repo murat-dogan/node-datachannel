@@ -11,11 +11,9 @@ include_directories(${CMAKE_JS_INC})
 
 set(CMAKE_BUILD_TYPE Release)
 
+set(VCPKG_TARGET_TRIPLET "arm64-windows-static" CACHE STRING "VCPKG target triplet")
+
 if(WIN32)
-    # Read env var VCPKG_TARGET_TRIPLET and set for vcpkg
-    if(DEFINED ENV{VCPKG_TARGET_TRIPLET})
-        set(VCPKG_TARGET_TRIPLET $ENV{VCPKG_TARGET_TRIPLET})
-    endif()
     set(OPENSSL_MSVC_STATIC_RT TRUE)
     set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 endif()
