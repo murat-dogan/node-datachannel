@@ -10,22 +10,11 @@ env:
   ACTIONS_ALLOW_UNSECURE_COMMANDS: true
 
 jobs:
-  build-windows:
+  build-windows-arm64:
     runs-on: windows-2022
     strategy:
       matrix:
         node-version: [18]
-        arch: [x64, x86, arm64]
-        include:
-          - arch: x64
-            vcpkg_triplet: x64-windows-static
-            msvc_arch: amd64
-          - arch: x86
-            vcpkg_triplet: x86-windows-static
-            msvc_arch: amd64_x86
-          - arch: arm64
-            vcpkg_triplet: arm64-windows-static
-            msvc_arch: amd64_arm64
 
     steps:
       - uses: actions/checkout@v4
@@ -34,28 +23,26 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-          node-arch: ${{ matrix.arch }}
 
-      - name: Set Up MSVC for Cross Compilation
+      - name: Set Up MSVC for ARM64 Cross Compilation
         uses: ilammy/msvc-dev-cmd@v1
         with:
-          arch: ${{ matrix.msvc_arch }}
+          arch: amd64_arm64  # Sets up cross-compilation from x64 to ARM64
 
-      - name: Install vcpkg
+      - name: install vcpkg
         run: |
           git submodule update --init --recursive vcpkg
           .\vcpkg\bootstrap-vcpkg.bat
         shell: cmd
 
-      - name: Install npm dependencies
+      - name: Install npm
         run: |
           npm install --ignore-scripts
 
-      - name: Build for ${{ matrix.arch }}
+      - name: Build
         run: |
-           node_modules/.bin/prebuild -r napi --upload -u ${{ secrets.GITHUB_TOKEN }} --backend cmake-js -- --CDVCPKG_TARGET_TRIPLET=arm64-windows-static
+          node_modules/.bin/prebuild -r napi --backend cmake-js --arch arm64 --upload -u ${{ secrets.GITHUB_TOKEN }}
         env:
           CMAKE_TOOLCHAIN_FILE: ${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake
-          VCPKG_DEFAULT_TRIPLET: arm64-windows-static
-          VCPKG_ROOT: ${{ github.workspace }}/vcpkg
           VCPKG_TARGET_TRIPLET: arm64-windows-static
+          CI: true
