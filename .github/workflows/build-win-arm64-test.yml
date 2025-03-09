@@ -15,14 +15,14 @@ jobs:
     strategy:
       matrix:
         node-version: [18]
-        arch: [x64, x86, arm64]
+        arch: [arm64] # x64, x86, arm64
         include:
-          - arch: x64
-            vcpkg_triplet: x64-windows-static
-            msvc_arch: amd64
-          - arch: x86
-            vcpkg_triplet: x86-windows-static
-            msvc_arch: amd64_x86
+          # - arch: x64
+          #   vcpkg_triplet: x64-windows-static
+          #   msvc_arch: amd64
+          # - arch: x86
+          #   vcpkg_triplet: x86-windows-static
+          #   msvc_arch: amd64_x86
           - arch: arm64
             vcpkg_triplet: arm64-windows-static
             msvc_arch: amd64_arm64
@@ -59,6 +59,7 @@ jobs:
         run: |
            node_modules/.bin/prebuild -r napi --upload -u ${{ secrets.GITHUB_TOKEN }} --backend cmake-js
         env:
-          OPENSSL_ROOT_DIR: ${{ github.workspace }}/vcpkg/installed/${{ matrix.vcpkg_triplet }}
-          OPENSSL_LIBRARIES: ${{ github.workspace }}/vcpkg/installed/${{ matrix.vcpkg_triplet }}/lib
-          OPENSSL_INCLUDE_DIR: ${{ github.workspace }}/vcpkg/installed/${{ matrix.vcpkg_triplet }}/include
+          OPENSSL_ROOT_DIR: ${{ github.workspace }}\vcpkg\installed\${{ matrix.vcpkg_triplet }}
+          OPENSSL_LIBRARIES: ${{ github.workspace }}\vcpkg\installed\${{ matrix.vcpkg_triplet }}/lib
+          OPENSSL_INCLUDE_DIR: ${{ github.workspace }}\vcpkg\installed\${{ matrix.vcpkg_triplet }}/include
+          CI: true
