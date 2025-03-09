@@ -35,11 +35,6 @@ jobs:
           .\vcpkg\bootstrap-vcpkg.bat
         shell: cmd
 
-      # - name: Setup vcpkg
-      #   run: |
-      #     .\vcpkg\vcpkg install --triplet arm64-windows-static
-      #   shell: cmd
-
       - name: Install npm
         run: |
           npm install --ignore-scripts
@@ -50,7 +45,4 @@ jobs:
         env:
           CMAKE_TOOLCHAIN_FILE: ${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake
           VCPKG_TARGET_TRIPLET: arm64-windows-static
-          # OPENSSL_ROOT_DIR: ${{ github.workspace }}/vcpkg/installed/arm64-windows-static
-          # OPENSSL_LIBRARIES: ${{ github.workspace }}/vcpkg/installed/arm64-windows-static/lib
-          # OPENSSL_INCLUDE_DIR: ${{ github.workspace }}/vcpkg/installed/arm64-windows-static/include
           CI: true
