@@ -31,14 +31,14 @@ jobs:
 
       - name: install vcpkg
         run: |
-          git submodule update --init --recursive
+          git submodule update --init --recursive vcpkg
           .\vcpkg\bootstrap-vcpkg.bat
         shell: cmd
 
-      - name: Setup vcpkg
-        run: |
-          .\vcpkg\vcpkg install --triplet arm64-windows-static
-        shell: cmd
+      # - name: Setup vcpkg
+      #   run: |
+      #     .\vcpkg\vcpkg install --triplet arm64-windows-static
+      #   shell: cmd
 
       - name: Install npm
         run: |
@@ -46,16 +46,11 @@ jobs:
 
       - name: Build
         run: |
-          node_modules/.bin/prebuild -r napi --arch arm64 --backend cmake-js
+          node_modules/.bin/prebuild -r napi --backend cmake-js --arch arm64 --upload -u ${{ secrets.GITHUB_TOKEN }}
         env:
           CMAKE_TOOLCHAIN_FILE: ${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake
           VCPKG_TARGET_TRIPLET: arm64-windows-static
-          OPENSSL_ROOT_DIR: ${{ github.workspace }}/vcpkg/installed/arm64-windows-static
-          OPENSSL_LIBRARIES: ${{ github.workspace }}/vcpkg/installed/arm64-windows-static/lib
-          OPENSSL_INCLUDE_DIR: ${{ github.workspace }}/vcpkg/installed/arm64-windows-static/include
-          CI: true
-
-      - name: Upload
-        run: node_modules/.bin/prebuild -r napi --upload -u ${{ secrets.GITHUB_TOKEN }}
-        env:
+          # OPENSSL_ROOT_DIR: ${{ github.workspace }}/vcpkg/installed/arm64-windows-static
+          # OPENSSL_LIBRARIES: ${{ github.workspace }}/vcpkg/installed/arm64-windows-static/lib
+          # OPENSSL_INCLUDE_DIR: ${{ github.workspace }}/vcpkg/installed/arm64-windows-static/include
           CI: true
