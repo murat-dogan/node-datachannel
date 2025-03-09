@@ -43,7 +43,7 @@ jobs:
 
       - name: Build
         run: |
-          node_modules/.bin/prebuild -r napi --backend cmake-js --arch arm64 -- --CDCMAKE_TOOLCHAIN_FILE:FILEPATH=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake --DCVCPKG_TARGET_TRIPLET:STRING=arm64-windows-static
+          node_modules/.bin/prebuild -r napi --arch arm64 --backend cmake-js -- --CDCMAKE_TOOLCHAIN_FILE:FILEPATH=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake --CDCVCPKG_TARGET_TRIPLET:STRING=arm64-windows-static
 
       - name: Upload
         run: node_modules/.bin/prebuild -r napi --upload -u ${{ secrets.GITHUB_TOKEN }}
