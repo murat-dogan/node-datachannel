@@ -1,3 +1,6 @@
 [submodule "test/wpt-tests/wpt"]
 	path = test/wpt-tests/wpt
 	url = https://github.com/web-platform-tests/wpt.git
+[submodule "vcpkg"]
+	path = vcpkg
+	url = https://github.com/microsoft/vcpkg.git

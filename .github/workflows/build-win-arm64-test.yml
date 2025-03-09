@@ -29,10 +29,12 @@ jobs:
         with:
           arch: amd64_arm64  # Sets up cross-compilation from x64 to ARM64
 
-      - name: Install OpenSSL (Static) for Windows ARM64
-        run: |
-          C:\vcpkg\vcpkg install openssl:arm64-windows-static
-        shell: cmd
+      - name: Setup vcpkg
+        uses: lukka/run-vcpkg@v11
+        with:
+          runVcpkgInstall: true
+        env:
+          VCPKG_DEFAULT_TRIPLET: arm64-windows-static
 
       - name: Install npm
         run: |
@@ -40,11 +42,9 @@ jobs:
 
       - name: Build
         run: |
-          node_modules/.bin/prebuild -r napi --backend cmake-js --arch arm64 --upload -u ${{ secrets.GITHUB_TOKEN }}
-        env:
-          CMAKE_TOOLCHAIN_FILE: C:/vcpkg/scripts/buildsystems/vcpkg.cmake
-          VCPKG_TARGET_TRIPLET: arm64-windows-static
-          OPENSSL_ROOT_DIR: C:/vcpkg/installed/arm64-windows-static
-          OPENSSL_LIBRARIES: C:/vcpkg/installed/arm64-windows-static/lib
-          OPENSSL_INCLUDE_DIR: C:/vcpkg/installed/arm64-windows-static/include
+          node_modules/.bin/prebuild -r napi --backend cmake-js --arch arm64 -- --CDCMAKE_TOOLCHAIN_FILE:FILEPATH=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake --DCVCPKG_TARGET_TRIPLET:STRING=arm64-windows-static
 
+      - name: Upload
+        run: node_modules/.bin/prebuild -r napi --upload -u ${{ secrets.GITHUB_TOKEN }}
+        env:
+          CI: true
