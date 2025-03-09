@@ -32,11 +32,10 @@ jobs:
           arch: amd64_arm64  # Sets up cross-compilation from x64 to ARM64
 
       - name: Setup vcpkg
-        uses: lukka/run-vcpkg@v11
-        with:
-          runVcpkgInstall: true
-        env:
-          VCPKG_DEFAULT_TRIPLET: arm64-windows-static
+        run: |
+          .\vcpkg\bootstrap-vcpkg.bat
+          .\vcpkg\vcpkg install --triplet arm64-windows-static
+        shell: cmd
 
       - name: Install npm
         run: |
