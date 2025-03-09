@@ -31,9 +31,13 @@ jobs:
         with:
           arch: amd64_arm64  # Sets up cross-compilation from x64 to ARM64
 
-      - name: Setup vcpkg
+      - name: install vcpkg
         run: |
           .\vcpkg\bootstrap-vcpkg.bat
+        shell: cmd
+
+      - name: Setup vcpkg
+        run: |
           .\vcpkg\vcpkg install --triplet arm64-windows-static
         shell: cmd
 
@@ -43,8 +47,9 @@ jobs:
 
       - name: Build
         run: |
-          node_modules/.bin/prebuild -r napi --arch arm64 --backend cmake-js -- --CDCMAKE_TOOLCHAIN_FILE:FILEPATH=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake --CDCVCPKG_TARGET_TRIPLET:STRING=arm64-windows-static
-
+          node_modules/.bin/prebuild -r napi --arch arm64 --backend cmake-js -- --CDCMAKE_TOOLCHAIN_FILE:FILEPATH=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake --CDVCPKG_TARGET_TRIPLET:STRING=arm64-windows-static
+        env:
+          CI: true
       - name: Upload
         run: node_modules/.bin/prebuild -r napi --upload -u ${{ secrets.GITHUB_TOKEN }}
         env:
