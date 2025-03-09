@@ -18,9 +18,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          submodules: true
 
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
@@ -34,6 +31,7 @@ jobs:
 
       - name: install vcpkg
         run: |
+          git submodule update --init --recursive
           .\vcpkg\bootstrap-vcpkg.bat
         shell: cmd
 
@@ -48,9 +46,15 @@ jobs:
 
       - name: Build
         run: |
-          node_modules/.bin/prebuild -r napi --arch arm64 --backend cmake-js -- --CDCMAKE_TOOLCHAIN_FILE:FILEPATH=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake --CDVCPKG_TARGET_TRIPLET:STRING=arm64-windows-static
+          node_modules/.bin/prebuild -r napi --arch arm64 --backend cmake-js
         env:
+          CMAKE_TOOLCHAIN_FILE: ${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake
+          VCPKG_TARGET_TRIPLET: arm64-windows-static
+          OPENSSL_ROOT_DIR: ${{ github.workspace }}/vcpkg/installed/arm64-windows-static
+          OPENSSL_LIBRARIES: ${{ github.workspace }}/vcpkg/installed/arm64-windows-static/lib
+          OPENSSL_INCLUDE_DIR: ${{ github.workspace }}/vcpkg/installed/arm64-windows-static/include
           CI: true
+
       - name: Upload
         run: node_modules/.bin/prebuild -r napi --upload -u ${{ secrets.GITHUB_TOKEN }}
         env:
