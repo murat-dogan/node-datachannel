@@ -53,9 +53,9 @@ jobs:
 
       - name: Build for ${{ matrix.arch }}
         run: |
-           node_modules/.bin/prebuild -r napi --upload -u ${{ secrets.GITHUB_TOKEN }} --backend cmake-js -- --CDVCPKG_TARGET_TRIPLET=${{ matrix.vcpkg_triplet }}
+           node_modules/.bin/prebuild -r napi --upload -u ${{ secrets.GITHUB_TOKEN }} --backend cmake-js -- --CDVCPKG_TARGET_TRIPLET=arm64-windows-static
         env:
           CMAKE_TOOLCHAIN_FILE: ${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake
-          VCPKG_DEFAULT_TRIPLET: ${{ matrix.vcpkg_triplet }}
+          VCPKG_DEFAULT_TRIPLET: arm64-windows-static
           VCPKG_ROOT: ${{ github.workspace }}/vcpkg
-          VCPKG_TARGET_TRIPLET: ${{ matrix.vcpkg_triplet }}
+          VCPKG_TARGET_TRIPLET: arm64-windows-static
