@@ -6,7 +6,9 @@
   "overrides": [
     {
       "name": "openssl",
-      "version": "1.1.1n"
+      "version": "1.1.1n",
+      "default-features": false,
+      "features": ["static"]
     }
   ],
   "builtin-baseline": "300239058e33420acd153135b3f6e6b187828992"
