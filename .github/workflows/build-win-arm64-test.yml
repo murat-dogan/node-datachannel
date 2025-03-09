@@ -34,6 +34,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
+          node-arch: ${{ matrix.arch }}
 
       - name: Set Up MSVC for Cross Compilation
         uses: ilammy/msvc-dev-cmd@v1
@@ -44,7 +45,6 @@ jobs:
         run: |
           git submodule update --init --recursive vcpkg
           .\vcpkg\bootstrap-vcpkg.bat
-          .\vcpkg\vcpkg install --triplet ${{ matrix.vcpkg_triplet }}
         shell: cmd
 
       - name: Install npm dependencies
@@ -53,7 +53,4 @@ jobs:
 
       - name: Build for ${{ matrix.arch }}
         run: |
-          node_modules/.bin/prebuild -r napi --backend cmake-js -- --CDVCPKG_TARGET_TRIPLET=${{ matrix.vcpkg_triplet }} --upload -u ${{ secrets.GITHUB_TOKEN }}
-        env:
-          CMAKE_TOOLCHAIN_FILE: ${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake
-          CI: true
+          node_modules/.bin/prebuild -r napi --upload -u ${{ secrets.GITHUB_TOKEN }} --backend cmake-js -- --CDCMAKE_TOOLCHAIN_FILE:FILEPATH=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake --CDVCPKG_TARGET_TRIPLET=${{ matrix.vcpkg_triplet }}
