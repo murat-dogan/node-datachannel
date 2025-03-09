@@ -55,4 +55,5 @@ jobs:
           node_modules/.bin/prebuild -r napi --backend cmake-js --upload -u ${{ secrets.GITHUB_TOKEN }}
         env:
           CMAKE_TOOLCHAIN_FILE: ${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake
+          VCPKG_TARGET_TRIPLET: ${{ matrix.vcpkg_triplet }}
           CI: true
