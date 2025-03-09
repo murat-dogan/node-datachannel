@@ -44,6 +44,7 @@ jobs:
         run: |
           git submodule update --init --recursive vcpkg
           .\vcpkg\bootstrap-vcpkg.bat
+          .\vcpkg\vcpkg install --triplet ${{ matrix.vcpkg_triplet }}
         shell: cmd
 
       - name: Install npm dependencies
@@ -52,8 +53,7 @@ jobs:
 
       - name: Build for ${{ matrix.arch }}
         run: |
-          node_modules/.bin/prebuild -r napi --backend cmake-js --upload -u ${{ secrets.GITHUB_TOKEN }}
+          node_modules/.bin/prebuild -r napi --backend cmake-js -- --CDVCPKG_TARGET_TRIPLET=${{ matrix.vcpkg_triplet }} --upload -u ${{ secrets.GITHUB_TOKEN }}
         env:
           CMAKE_TOOLCHAIN_FILE: ${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake
-          VCPKG_TARGET_TRIPLET: ${{ matrix.vcpkg_triplet }}
           CI: true

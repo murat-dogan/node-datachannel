@@ -1,11 +1,7 @@
 {
   "name": "node-datachannel",
   "dependencies": [
-    {
-      "name": "openssl",
-      "default-features": false,
-      "features": ["static"]
-    }
+    "openssl"
   ],
   "overrides": [
     {
