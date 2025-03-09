@@ -34,7 +34,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-          architecture: ${{ matrix.arch }}
 
       - name: Set Up MSVC for Cross Compilation
         uses: ilammy/msvc-dev-cmd@v1
