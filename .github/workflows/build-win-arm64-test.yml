@@ -59,7 +59,7 @@ jobs:
         run: |
            node_modules/.bin/prebuild -r napi --upload -u ${{ secrets.GITHUB_TOKEN }} --backend cmake-js
         env:
-          OPENSSL_ROOT_DIR: ${{ github.workspace }}\vcpkg\installed\${{ matrix.vcpkg_triplet }}
-          OPENSSL_LIBRARIES: ${{ github.workspace }}\vcpkg\installed\${{ matrix.vcpkg_triplet }}/lib
-          OPENSSL_INCLUDE_DIR: ${{ github.workspace }}\vcpkg\installed\${{ matrix.vcpkg_triplet }}/include
+          OPENSSL_ROOT_DIR: ${{ github.workspace }}\vcpkg_installed\${{ matrix.vcpkg_triplet }}
+          OPENSSL_LIBRARIES: ${{ github.workspace }}\vcpkg_installed\${{ matrix.vcpkg_triplet }}\lib
+          OPENSSL_INCLUDE_DIR: ${{ github.workspace }}\vcpkg_installed\${{ matrix.vcpkg_triplet }}\include
           CI: true
