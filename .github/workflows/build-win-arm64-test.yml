@@ -15,7 +15,7 @@ jobs:
     strategy:
       matrix:
         node-version: [18]
-        arch: [x64, x86, arm64]
+        arch: [arm64]
         include:
           - arch: x64
             vcpkg_triplet: x64-windows-static
