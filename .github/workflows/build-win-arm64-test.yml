@@ -15,7 +15,7 @@ jobs:
     strategy:
       matrix:
         node-version: [18]
-        arch: [arm64]
+        arch: [x64, x86, arm64]
         include:
           - arch: x64
             vcpkg_triplet: x64-windows-static
@@ -53,4 +53,9 @@ jobs:
 
       - name: Build for ${{ matrix.arch }}
         run: |
-          node_modules/.bin/prebuild -r napi --upload -u ${{ secrets.GITHUB_TOKEN }} --backend cmake-js -- --CDCMAKE_TOOLCHAIN_FILE:FILEPATH=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake --CDVCPKG_TARGET_TRIPLET=${{ matrix.vcpkg_triplet }}
+           node_modules/.bin/prebuild -r napi --upload -u ${{ secrets.GITHUB_TOKEN }} --backend cmake-js -- --CDVCPKG_TARGET_TRIPLET=${{ matrix.vcpkg_triplet }}
+        env:
+          CMAKE_TOOLCHAIN_FILE: ${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake
+          VCPKG_DEFAULT_TRIPLET: ${{ matrix.vcpkg_triplet }}
+          VCPKG_ROOT: ${{ github.workspace }}/vcpkg
+          VCPKG_TARGET_TRIPLET: ${{ matrix.vcpkg_triplet }}
