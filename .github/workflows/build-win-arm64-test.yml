@@ -46,6 +46,11 @@ jobs:
           .\vcpkg\bootstrap-vcpkg.bat
         shell: cmd
 
+      - name: setup vcpkg
+        run: |
+          .\vcpkg\vcpkg install --triplet ${{ matrix.vcpkg_triplet }}
+        shell: cmd
+
       - name: Install npm dependencies
         run: |
           npm install --ignore-scripts
@@ -54,5 +59,6 @@ jobs:
         run: |
            node_modules/.bin/prebuild -r napi --upload -u ${{ secrets.GITHUB_TOKEN }} --backend cmake-js
         env:
-          CMAKE_TOOLCHAIN_FILE: ${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake
-          VCPKG_TARGET_TRIPLET: arm64-windows-static
+          OPENSSL_ROOT_DIR: ${{ github.workspace }}/vcpkg/installed/${{ matrix.vcpkg_triplet }}
+          OPENSSL_LIBRARIES: ${{ github.workspace }}/vcpkg/installed/${{ matrix.vcpkg_triplet }}/lib
+          OPENSSL_INCLUDE_DIR: ${{ github.workspace }}/vcpkg/installed/${{ matrix.vcpkg_triplet }}/include

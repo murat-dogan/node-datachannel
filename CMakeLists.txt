@@ -11,8 +11,6 @@ include_directories(${CMAKE_JS_INC})
 
 set(CMAKE_BUILD_TYPE Release)
 
-set(VCPKG_TARGET_TRIPLET "arm64-windows-static" CACHE STRING "VCPKG target triplet")
-
 if(WIN32)
     set(OPENSSL_MSVC_STATIC_RT TRUE)
     set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
