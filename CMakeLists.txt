@@ -12,6 +12,10 @@ include_directories(${CMAKE_JS_INC})
 set(CMAKE_BUILD_TYPE Release)
 
 if(WIN32)
+    # Read env var VCPKG_TARGET_TRIPLET and set for vcpkg
+    if(DEFINED ENV{VCPKG_TARGET_TRIPLET})
+        set(VCPKG_TARGET_TRIPLET $ENV{VCPKG_TARGET_TRIPLET})
+    endif()
     set(OPENSSL_MSVC_STATIC_RT TRUE)
     set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 endif()
