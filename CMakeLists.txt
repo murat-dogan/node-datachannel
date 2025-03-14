@@ -20,6 +20,11 @@ if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Android")
     set(CMAKE_C_FLAGS "-Wno-error=unused-but-set-variable -Wno-error=strict-prototypes")
 endif()
 
+# Add -frtti only for Linux and macOS
+if (NOT CMAKE_SYSTEM_NAME STREQUAL "Windows")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -frtti")
+endif()
+
 set(OPENSSL_USE_STATIC_LIBS TRUE)
 find_package(OpenSSL REQUIRED)
 
@@ -44,19 +49,29 @@ endif()
 
 add_library(${PROJECT_NAME} SHARED
     src/cpp/rtc-wrapper.cpp
-    src/cpp/media-direction.cpp
-    src/cpp/media-rtcpreceivingsession-wrapper.cpp
-    src/cpp/media-track-wrapper.cpp
-    src/cpp/media-audio-wrapper.cpp
-    src/cpp/media-video-wrapper.cpp
     src/cpp/data-channel-wrapper.cpp
     src/cpp/peer-connection-wrapper.cpp
     src/cpp/thread-safe-callback.cpp
-    src/cpp/web-socket-wrapper.cpp
-    src/cpp/web-socket-server-wrapper.cpp
     src/cpp/main.cpp
     ${CMAKE_JS_SRC}
 )
+
+if(NOT NO_MEDIA)
+    target_sources(${PROJECT_NAME} PRIVATE
+        src/cpp/media-direction.cpp
+        src/cpp/media-rtcpreceivingsession-wrapper.cpp
+        src/cpp/media-track-wrapper.cpp
+        src/cpp/media-audio-wrapper.cpp
+        src/cpp/media-video-wrapper.cpp
+    )
+endif()
+
+if(NOT NO_WEBSOCKET)
+    target_sources(${PROJECT_NAME} PRIVATE
+        src/cpp/web-socket-wrapper.cpp
+        src/cpp/web-socket-server-wrapper.cpp
+    )
+endif()
 
 set_target_properties(${PROJECT_NAME} PROPERTIES CXX_STANDARD 17)
 set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "" SUFFIX ".node")
