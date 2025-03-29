@@ -35,6 +35,7 @@ FetchContent_Declare(
 option(NO_MEDIA "Disable media transport support in libdatachannel" OFF)
 option(NO_WEBSOCKET "Disable WebSocket support in libdatachannel" OFF)
 
+set(FETCHCONTENT_QUIET OFF)
 FetchContent_GetProperties(libdatachannel)
 
 if(NOT libdatachannel)
