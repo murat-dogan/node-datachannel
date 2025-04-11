@@ -1,16 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import RTCIceCandidate from './RTCIceCandidate';
-import RTCPeerConnection from './RTCPeerConnection';
 
 export default class RTCIceTransport extends EventTarget implements globalThis.RTCIceTransport {
-    #pc: RTCPeerConnection = null;
+    #pc: globalThis.RTCPeerConnection = null;
     #extraFunctions = null;
 
-    ongatheringstatechange: ((this: RTCIceTransport, ev: Event) => any) | null = null;
-    onselectedcandidatepairchange: ((this: RTCIceTransport, ev: Event) => any) | null = null;
-    onstatechange: ((this: RTCIceTransport, ev: Event) => any) | null = null;
+    ongatheringstatechange: ((this: globalThis.RTCIceTransport, ev: Event) => any) | null = null;
+    onselectedcandidatepairchange: ((this: globalThis.RTCIceTransport, ev: Event) => any) | null = null;
+    onstatechange: ((this: globalThis.RTCIceTransport, ev: Event) => any) | null = null;
 
-    constructor(init: { pc: RTCPeerConnection, extraFunctions }) {
+    constructor(init: { pc: globalThis.RTCPeerConnection, extraFunctions }) {
         super();
         this.#pc = init.pc;
         this.#extraFunctions = init.extraFunctions;
@@ -50,7 +49,7 @@ export default class RTCIceTransport extends EventTarget implements globalThis.R
         return this.#pc ? this.#pc.iceConnectionState : 'new';
     }
 
-    getLocalCandidates(): RTCIceCandidate[] {
+    getLocalCandidates(): globalThis.RTCIceCandidate[] {
         return this.#pc ? this.#extraFunctions.localCandidates() : [];
     }
 
@@ -58,7 +57,7 @@ export default class RTCIceTransport extends EventTarget implements globalThis.R
         /** */
     }
 
-    getRemoteCandidates(): RTCIceCandidate[] {
+    getRemoteCandidates(): globalThis.RTCIceCandidate[] {
         return this.#pc ? this.#extraFunctions.remoteCandidates() : [];
     }
 

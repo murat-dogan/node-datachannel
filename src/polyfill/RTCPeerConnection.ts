@@ -23,27 +23,27 @@ export default class RTCPeerConnection extends EventTarget implements globalThis
     #peerConnection: PeerConnection;
     #localOffer: any;
     #localAnswer: any;
-    #dataChannels: Set<RTCDataChannel>;
+    #dataChannels: Set<globalThis.RTCDataChannel>;
     #dataChannelsClosed = 0;
-    #config: RTCConfiguration;
+    #config: globalThis.RTCConfiguration;
     #canTrickleIceCandidates: boolean | null;
-    #sctp: RTCSctpTransport;
+    #sctp: globalThis.RTCSctpTransport;
 
-    #localCandidates: RTCIceCandidate[] = [];
-    #remoteCandidates: RTCIceCandidate[] = [];
+    #localCandidates: globalThis.RTCIceCandidate[] = [];
+    #remoteCandidates: globalThis.RTCIceCandidate[] = [];
 
     // events
-    onconnectionstatechange: ((this: RTCPeerConnection, ev: Event) => any) | null;
-    ondatachannel: ((this: RTCPeerConnection, ev: RTCDataChannelEvent) => any) | null;
-    onicecandidate: ((this: RTCPeerConnection, ev: RTCPeerConnectionIceEvent) => any) | null;
-    onicecandidateerror: ((this: RTCPeerConnection, ev: Event) => any) | null;
-    oniceconnectionstatechange: ((this: RTCPeerConnection, ev: Event) => any) | null;
-    onicegatheringstatechange: ((this: RTCPeerConnection, ev: Event) => any) | null;
-    onnegotiationneeded: ((this: RTCPeerConnection, ev: Event) => any) | null;
-    onsignalingstatechange: ((this: RTCPeerConnection, ev: Event) => any) | null;
-    ontrack: ((this: RTCPeerConnection, ev: globalThis.RTCTrackEvent) => any) | null;
+    onconnectionstatechange: ((this: globalThis.RTCPeerConnection, ev: Event) => any) | null;
+    ondatachannel: ((this: globalThis.RTCPeerConnection, ev: globalThis.RTCDataChannelEvent) => any) | null;
+    onicecandidate: ((this: globalThis.RTCPeerConnection, ev: globalThis.RTCPeerConnectionIceEvent) => any) | null;
+    onicecandidateerror: ((this: globalThis.RTCPeerConnection, ev: Event) => any) | null;
+    oniceconnectionstatechange: ((this: globalThis.RTCPeerConnection, ev: Event) => any) | null;
+    onicegatheringstatechange: ((this: globalThis.RTCPeerConnection, ev: Event) => any) | null;
+    onnegotiationneeded: ((this: globalThis.RTCPeerConnection, ev: Event) => any) | null;
+    onsignalingstatechange: ((this: globalThis.RTCPeerConnection, ev: Event) => any) | null;
+    ontrack: ((this: globalThis.RTCPeerConnection, ev: globalThis.RTCTrackEvent) => any) | null;
 
-    private _checkConfiguration(config: RTCConfiguration): void {
+    private _checkConfiguration(config: globalThis.RTCConfiguration): void {
         if (config && config.iceServers === undefined) config.iceServers = [];
         if (config && config.iceTransportPolicy === undefined) config.iceTransportPolicy = 'all';
 
@@ -103,7 +103,7 @@ export default class RTCPeerConnection extends EventTarget implements globalThis
             throw new TypeError('IceTransportPolicy must be either "all" or "relay"');
     }
 
-    setConfiguration(config: RTCConfiguration): void {
+    setConfiguration(config: globalThis.RTCConfiguration): void {
         this._checkConfiguration(config);
         this.#config = config;
     }
@@ -203,10 +203,10 @@ export default class RTCPeerConnection extends EventTarget implements globalThis
             if (this.onicegatheringstatechange) this.onicegatheringstatechange(e);
         });
         this.addEventListener('datachannel', (e) => {
-            if (this.ondatachannel) this.ondatachannel(e as RTCDataChannelEvent);
+            if (this.ondatachannel) this.ondatachannel(e as globalThis.RTCDataChannelEvent);
         });
         this.addEventListener('icecandidate', (e) => {
-            if (this.onicecandidate) this.onicecandidate(e as RTCPeerConnectionIceEvent);
+            if (this.onicecandidate) this.onicecandidate(e as globalThis.RTCPeerConnectionIceEvent);
         });
 
         this.#sctp = new RTCSctpTransport({
@@ -218,10 +218,10 @@ export default class RTCPeerConnection extends EventTarget implements globalThis
                 maxMessageSize: (): number => {
                     return this.#peerConnection.maxMessageSize();
                 },
-                localCandidates: (): RTCIceCandidate[] => {
+                localCandidates: (): globalThis.RTCIceCandidate[] => {
                     return this.#localCandidates;
                 },
-                remoteCandidates: (): RTCIceCandidate[] => {
+                remoteCandidates: (): globalThis.RTCIceCandidate[] => {
                     return this.#remoteCandidates;
                 },
                 selectedCandidatePair: (): { local: SelectedCandidateInfo; remote: SelectedCandidateInfo } | null => {
@@ -251,31 +251,31 @@ export default class RTCPeerConnection extends EventTarget implements globalThis
         return this.#peerConnection.gatheringState();
     }
 
-    get currentLocalDescription(): RTCSessionDescription {
+    get currentLocalDescription(): globalThis.RTCSessionDescription {
         return new RTCSessionDescription(this.#peerConnection.localDescription() as any);
     }
 
-    get currentRemoteDescription(): RTCSessionDescription {
+    get currentRemoteDescription(): globalThis.RTCSessionDescription {
         return new RTCSessionDescription(this.#peerConnection.remoteDescription() as any);
     }
 
-    get localDescription(): RTCSessionDescription {
+    get localDescription(): globalThis.RTCSessionDescription {
         return new RTCSessionDescription(this.#peerConnection.localDescription() as any);
     }
 
-    get pendingLocalDescription(): RTCSessionDescription {
+    get pendingLocalDescription(): globalThis.RTCSessionDescription {
         return new RTCSessionDescription(this.#peerConnection.localDescription() as any);
     }
 
-    get pendingRemoteDescription(): RTCSessionDescription {
+    get pendingRemoteDescription():globalThis.RTCSessionDescription {
         return new RTCSessionDescription(this.#peerConnection.remoteDescription() as any);
     }
 
-    get remoteDescription(): RTCSessionDescription {
+    get remoteDescription(): globalThis.RTCSessionDescription {
         return new RTCSessionDescription(this.#peerConnection.remoteDescription() as any);
     }
 
-    get sctp(): RTCSctpTransport {
+    get sctp(): globalThis.RTCSctpTransport {
         return this.#sctp;
     }
 
@@ -350,7 +350,7 @@ export default class RTCPeerConnection extends EventTarget implements globalThis
     }
 
 
-    createDataChannel(label, opts = {}): RTCDataChannel {
+    createDataChannel(label, opts = {}): globalThis.RTCDataChannel {
         const channel = this.#peerConnection.createDataChannel(label, opts);
         const dataChannel = new RTCDataChannel(channel, opts);
 

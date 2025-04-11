@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { expect, jest } from '@jest/globals';
-import { RTCPeerConnection, RTCDataChannel } from '../../src/polyfill/index';
+import { RTCPeerConnection } from '../../src/polyfill/index';
 import { PeerConnection } from '../../src/lib/index';
 
 describe('polyfill', () => {
@@ -12,6 +12,12 @@ describe('polyfill', () => {
 			await RTCPeerConnection.generateCertificate();
 		}).rejects.toEqual(new DOMException('Not implemented'));
 	});
+
+	test('can assign polyfill to global type', () => {
+		// complication check to ensure the interface is implemented correctly
+		const pc: globalThis.RTCPeerConnection = new RTCPeerConnection()
+		expect(pc).toBeTruthy()
+	})
 
 	test('P2P Test', () => {
 		return new Promise<void>((done) => {
@@ -45,7 +51,7 @@ describe('polyfill', () => {
 			let dc2: RTCDataChannel = null;
 
 			// Creates a fixed binary data for testing
-			function createBinaryTestData(): Uint8Array {
+			function createBinaryTestData(): ArrayBufferView {
 				const binaryData = new Uint8Array(17);
 				const dv = new DataView(binaryData.buffer);
 				dv.setInt8(0, 123);
@@ -143,7 +149,12 @@ describe('polyfill', () => {
                 }
 
 				// Send the test message
-				dc1.send(current.data);
+				// workaround for https://github.com/microsoft/TypeScript-DOM-lib-generator/issues/1973
+				if (typeof current.data === 'string') {
+					dc1.send(current.data);
+				} else {
+					dc1.send(current.data);
+				}
 			}
 
 			// Set Callbacks

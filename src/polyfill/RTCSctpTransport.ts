@@ -1,15 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import RTCDtlsTransport from './RTCDtlsTransport';
-import RTCPeerConnection from './RTCPeerConnection';
 
 export default class RTCSctpTransport extends EventTarget implements globalThis.RTCSctpTransport {
-    #pc: RTCPeerConnection = null;
+    #pc: globalThis.RTCPeerConnection = null;
     #extraFunctions = null;
-    #transport: RTCDtlsTransport = null;
+    #transport: globalThis.RTCDtlsTransport = null;
 
-    onstatechange: ((this: RTCSctpTransport, ev: Event) => any) | null = null;
+    onstatechange: ((this: globalThis.RTCSctpTransport, ev: Event) => any) | null = null;
 
-    constructor(initial: { pc: RTCPeerConnection, extraFunctions }) {
+    constructor(initial: { pc: globalThis.RTCPeerConnection, extraFunctions }) {
         super();
         this.#pc = initial.pc;
         this.#extraFunctions = initial.extraFunctions;
@@ -49,7 +48,7 @@ export default class RTCSctpTransport extends EventTarget implements globalThis.
         return state;
     }
 
-    get transport(): RTCDtlsTransport {
+    get transport(): globalThis.RTCDtlsTransport {
         return this.#transport;
     }
 }
