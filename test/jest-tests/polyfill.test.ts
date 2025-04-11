@@ -13,6 +13,12 @@ describe('polyfill', () => {
 		}).rejects.toEqual(new DOMException('Not implemented'));
 	});
 
+	test('can assign polyfill to global type', () => {
+		// complication check to ensure the interface is implemented correctly
+		const pc: globalThis.RTCPeerConnection = new RTCPeerConnection()
+		expect(pc).toBeTruthy()
+	})
+
 	test('P2P Test', () => {
 		return new Promise<void>((done) => {
 			// Mocks
