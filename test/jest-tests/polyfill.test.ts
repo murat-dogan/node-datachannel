@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { expect, jest } from '@jest/globals';
-import { RTCPeerConnection, RTCDataChannel } from '../../src/polyfill/index';
+import { RTCPeerConnection } from '../../src/polyfill/index';
 import { PeerConnection } from '../../src/lib/index';
 
 describe('polyfill', () => {
@@ -45,7 +45,7 @@ describe('polyfill', () => {
 			let dc2: RTCDataChannel = null;
 
 			// Creates a fixed binary data for testing
-			function createBinaryTestData(): Uint8Array {
+			function createBinaryTestData(): ArrayBufferView {
 				const binaryData = new Uint8Array(17);
 				const dv = new DataView(binaryData.buffer);
 				dv.setInt8(0, 123);
@@ -143,7 +143,12 @@ describe('polyfill', () => {
                 }
 
 				// Send the test message
-				dc1.send(current.data);
+				// workaround for https://github.com/microsoft/TypeScript-DOM-lib-generator/issues/1973
+				if (typeof current.data === 'string') {
+					dc1.send(current.data);
+				} else {
+					dc1.send(current.data);
+				}
 			}
 
 			// Set Callbacks

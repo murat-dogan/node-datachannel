@@ -4,7 +4,7 @@ import { DataChannel } from '../lib/index';
 
 export default class RTCDataChannel extends EventTarget implements globalThis.RTCDataChannel {
     #dataChannel: DataChannel;
-    #readyState: RTCDataChannelState;
+    #readyState: globalThis.RTCDataChannelState;
     #bufferedAmountLowThreshold: number;
     #binaryType: BinaryType;
     #maxPacketLifeTime: number | null;
@@ -15,12 +15,12 @@ export default class RTCDataChannel extends EventTarget implements globalThis.RT
     #closeRequested = false;
 
     // events
-    onbufferedamountlow: ((this: RTCDataChannel, ev: Event) => any) | null;
-    onclose: ((this: RTCDataChannel, ev: Event) => any) | null;
-    onclosing: ((this: RTCDataChannel, ev: Event) => any) | null;
-    onerror: ((this: RTCDataChannel, ev: Event) => any) | null;
-    onmessage: ((this: RTCDataChannel, ev: MessageEvent) => any) | null;
-    onopen: ((this: RTCDataChannel, ev: Event) => any) | null;
+    onbufferedamountlow: ((this: globalThis.RTCDataChannel, ev: Event) => any) | null;
+    onclose: ((this: globalThis.RTCDataChannel, ev: Event) => any) | null;
+    onclosing: ((this: globalThis.RTCDataChannel, ev: Event) => any) | null;
+    onerror: ((this: globalThis.RTCDataChannel, ev: Event) => any) | null;
+    onmessage: ((this: globalThis.RTCDataChannel, ev: MessageEvent) => any) | null;
+    onopen: ((this: globalThis.RTCDataChannel, ev: Event) => any) | null;
 
     constructor(dataChannel: DataChannel, opts: globalThis.RTCDataChannelInit = {}) {
         super();
