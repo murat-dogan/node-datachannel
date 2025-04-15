@@ -2,6 +2,7 @@
 import { expect, jest } from '@jest/globals';
 import { RTCPeerConnection } from '../../src/polyfill/index';
 import { PeerConnection } from '../../src/lib/index';
+import { eventPromise } from '../fixtures/event-promise';
 
 describe('polyfill', () => {
     // Default is 5000 ms but we need more
@@ -224,6 +225,51 @@ describe('polyfill', () => {
 				nextSendTest();
 			};
 		});
+	});
+
+	test('it can access datachannel informational fields after closing', async () => {
+		const peer1 = new RTCPeerConnection();
+		const peer2 = new RTCPeerConnection();
+
+		const label = 'label'
+		const protocol = 'protocol'
+
+		const dc: RTCDataChannel = peer1.createDataChannel(label, {
+			protocol
+		});
+
+		// Actions
+		const peer1Offer = await peer1.createOffer();
+		await peer2.setRemoteDescription(peer1Offer);
+
+		const peer2Answer = await peer2.createAnswer();
+		await peer1.setRemoteDescription(peer2Answer);
+
+		peer1.addEventListener('icecandidate', (e: RTCPeerConnectionIceEvent) => {
+			peer2.addIceCandidate(e.candidate);
+		});
+
+		peer2.addEventListener('icecandidate', (e: RTCPeerConnectionIceEvent) => {
+			peer1.addIceCandidate(e.candidate);
+		});
+
+		await eventPromise(dc, 'open');
+
+		const id = dc.id;
+		expect(dc.label).toEqual(label);
+		expect(dc.protocol).toEqual(protocol);
+
+		peer1.close();
+		peer2.close();
+
+		if (dc.readyState !== 'closed') {
+			await eventPromise(dc, 'close');
+		}
+
+		expect(dc.readyState).toEqual('closed');
+		expect(dc.id).toEqual(id);
+		expect(dc.label).toEqual(label);
+		expect(dc.protocol).toEqual(protocol);
 	});
 
 	test('it should accept a preconfigured PeerConnection', () => {

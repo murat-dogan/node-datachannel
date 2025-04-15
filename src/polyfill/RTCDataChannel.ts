@@ -11,6 +11,9 @@ export default class RTCDataChannel extends EventTarget implements globalThis.RT
     #maxRetransmits: number | null;
     #negotiated: boolean;
     #ordered: boolean;
+    #id: number
+    #label: string
+    #protocol: string
 
     #closeRequested = false;
 
@@ -33,6 +36,9 @@ export default class RTCDataChannel extends EventTarget implements globalThis.RT
         this.#maxRetransmits = opts.maxRetransmits || null;
         this.#negotiated = opts.negotiated || false;
         this.#ordered = opts.ordered || true;
+        this.#id = this.#dataChannel.getId();
+        this.#label = this.#dataChannel.getLabel();
+        this.#protocol = this.#dataChannel.getProtocol();
 
         // forward dataChannel events
         this.#dataChannel.onOpen(() => {
@@ -131,11 +137,11 @@ export default class RTCDataChannel extends EventTarget implements globalThis.RT
     }
 
     get id(): number | null {
-        return this.#dataChannel.getId();
+        return this.#id;
     }
 
     get label(): string {
-        return this.#dataChannel.getLabel();
+        return this.#label;
     }
 
     get maxPacketLifeTime(): number | null {
@@ -155,7 +161,7 @@ export default class RTCDataChannel extends EventTarget implements globalThis.RT
     }
 
     get protocol(): string {
-        return this.#dataChannel.getProtocol();
+        return this.#protocol
     }
 
     get readyState(): globalThis.RTCDataChannelState {
