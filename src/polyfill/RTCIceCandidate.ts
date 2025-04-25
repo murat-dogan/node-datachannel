@@ -4,20 +4,20 @@
 
 
 export default class RTCIceCandidate implements globalThis.RTCIceCandidate {
-    #address: string | null;
+    #address: string | null = null;
     #candidate: string;
-    #component: globalThis.RTCIceComponent | null;
-    #foundation: string | null;
-    #port: number | null;
-    #priority: number | null;
-    #protocol: globalThis.RTCIceProtocol | null;
-    #relatedAddress: string | null;
-    #relatedPort: number | null;
-    #sdpMLineIndex: number | null;
-    #sdpMid: string | null;
-    #tcpType: globalThis.RTCIceTcpCandidateType | null;
-    #type: globalThis.RTCIceCandidateType | null;
-    #usernameFragment: string | null;
+    #component: globalThis.RTCIceComponent | null = null;
+    #foundation: string | null = null;
+    #port: number | null = null;
+    #priority: number | null = null;
+    #protocol: globalThis.RTCIceProtocol | null = null;
+    #relatedAddress: string | null = null;
+    #relatedPort: number | null = null;
+    #sdpMLineIndex: number | null = null;
+    #sdpMid: string | null = null;
+    #tcpType: globalThis.RTCIceTcpCandidateType | null = null;
+    #type: globalThis.RTCIceCandidateType | null = null;
+    #usernameFragment: string | null = null;
 
     constructor({ candidate, sdpMLineIndex, sdpMid, usernameFragment }: globalThis.RTCIceCandidateInit) {
         if (sdpMLineIndex == null && sdpMid == null)
@@ -30,12 +30,12 @@ export default class RTCIceCandidate implements globalThis.RTCIceCandidate {
 
         if (candidate) {
             const fields = candidate.split(' ');
-            this.#foundation = fields[0].replace('candidate:', ''); // remove text candidate:
+            this.#foundation = fields[0]!.replace('candidate:', ''); // remove text candidate:
             this.#component = fields[1] == '1' ? 'rtp' : 'rtcp';
             this.#protocol = fields[2] as globalThis.RTCIceProtocol;
-            this.#priority = parseInt(fields[3], 10);
-            this.#address = fields[4];
-            this.#port = parseInt(fields[5], 10);
+            this.#priority = parseInt(fields[3]!, 10);
+            this.#address = fields[4]!;
+            this.#port = parseInt(fields[5]!, 10);
             this.#type = fields[7] as globalThis.RTCIceCandidateType;
             this.#tcpType = null;
             this.#relatedAddress = null;
@@ -45,9 +45,9 @@ export default class RTCIceCandidate implements globalThis.RTCIceCandidate {
             for (let i = 8; i < fields.length; i++) {
                 const field = fields[i];
                 if (field === 'raddr') {
-                    this.#relatedAddress = fields[i + 1];
+                    this.#relatedAddress = fields[i + 1]!;
                 } else if (field === 'rport') {
-                    this.#relatedPort = parseInt(fields[i + 1], 10);
+                    this.#relatedPort = parseInt(fields[i + 1]!, 10);
                 }
 
                 if (this.#protocol === 'tcp' && field === 'tcptype') {
@@ -58,7 +58,7 @@ export default class RTCIceCandidate implements globalThis.RTCIceCandidate {
     }
 
     get address(): string | null {
-        return this.#address || null;
+        return this.#address ?? null;
     }
 
     get candidate(): string {
@@ -70,19 +70,19 @@ export default class RTCIceCandidate implements globalThis.RTCIceCandidate {
     }
 
     get foundation(): string | null {
-        return this.#foundation || null;
+        return this.#foundation ?? null;
     }
 
     get port(): number | null {
-        return this.#port || null;
+        return this.#port ?? null;
     }
 
     get priority(): number | null {
-        return this.#priority || null;
+        return this.#priority ?? null;
     }
 
     get protocol(): globalThis.RTCIceProtocol | null {
-        return this.#protocol || null;
+        return this.#protocol ?? null;
     }
 
     get relatedAddress(): string | null {
@@ -90,7 +90,7 @@ export default class RTCIceCandidate implements globalThis.RTCIceCandidate {
     }
 
     get relatedPort(): number | null {
-        return this.#relatedPort || null;
+        return this.#relatedPort ?? null;
     }
 
     get sdpMLineIndex(): number | null {
@@ -106,7 +106,7 @@ export default class RTCIceCandidate implements globalThis.RTCIceCandidate {
     }
 
     get type(): globalThis.RTCIceCandidateType | null {
-        return this.#type || null;
+        return this.#type ?? null;
     }
 
     get usernameFragment(): string | null {

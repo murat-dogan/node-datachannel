@@ -1,72 +1,66 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import RTCIceCandidate from './RTCIceCandidate';
+import RTCPeerConnection from './RTCPeerConnection';
 
 export default class RTCIceTransport extends EventTarget implements globalThis.RTCIceTransport {
-    #pc: globalThis.RTCPeerConnection = null;
-    #extraFunctions = null;
+    #pc: RTCPeerConnection;
 
-    ongatheringstatechange: ((this: globalThis.RTCIceTransport, ev: Event) => any) | null = null;
-    onselectedcandidatepairchange: ((this: globalThis.RTCIceTransport, ev: Event) => any) | null = null;
-    onstatechange: ((this: globalThis.RTCIceTransport, ev: Event) => any) | null = null;
+    ongatheringstatechange: globalThis.RTCIceTransport['ongatheringstatechange'] = null;
+    onselectedcandidatepairchange: globalThis.RTCIceTransport['onselectedcandidatepairchange'] = null;
+    onstatechange: globalThis.RTCIceTransport['onstatechange'] = null;
 
-    constructor(init: { pc: globalThis.RTCPeerConnection, extraFunctions }) {
+    constructor({ pc }: { pc: RTCPeerConnection }) {
         super();
-        this.#pc = init.pc;
-        this.#extraFunctions = init.extraFunctions;
+        this.#pc = pc;
 
         // forward peerConnection events
-        this.#pc.addEventListener('icegatheringstatechange', () => {
-            this.dispatchEvent(new Event('gatheringstatechange'));
+        pc.addEventListener('icegatheringstatechange', () => {
+            const e = new Event('gatheringstatechange')
+            this.dispatchEvent(e)
+            this.ongatheringstatechange?.(e)
         });
-        this.#pc.addEventListener('iceconnectionstatechange', () => {
-            this.dispatchEvent(new Event('statechange'));
-        });
-
-        // forward events to properties
-        this.addEventListener('gatheringstatechange', (e) => {
-            if (this.ongatheringstatechange) this.ongatheringstatechange(e);
-        });
-        this.addEventListener('statechange', (e) => {
-            if (this.onstatechange) this.onstatechange(e);
+        pc.addEventListener('iceconnectionstatechange', () => {
+            const e = new Event('statechange')
+            this.dispatchEvent(e)
+            this.onstatechange?.(e)
         });
     }
 
-    get component(): globalThis.RTCIceComponent {
+    get component(): globalThis.RTCIceComponent | null {
         const cp = this.getSelectedCandidatePair();
-        if (!cp) return null;
+        if (!cp?.local) return null;
         return cp.local.component;
     }
 
     get gatheringState(): globalThis.RTCIceGatheringState {
-        return this.#pc ? this.#pc.iceGatheringState : 'new';
+        return this.#pc.iceGatheringState;
     }
 
-    get role(): string {
-        return this.#pc.localDescription.type == 'offer' ? 'controlling' : 'controlled';
+    get role(): globalThis.RTCIceRole {
+        return this.#pc.localDescription!.type == 'offer' ? 'controlling' : 'controlled';
     }
 
     get state(): globalThis.RTCIceTransportState {
-        return this.#pc ? this.#pc.iceConnectionState : 'new';
+        return this.#pc.iceConnectionState;
     }
 
     getLocalCandidates(): globalThis.RTCIceCandidate[] {
-        return this.#pc ? this.#extraFunctions.localCandidates() : [];
+        return this.#pc.localCandidates;
     }
 
-    getLocalParameters(): any {
-        /** */
+    getLocalParameters(): RTCIceParameters | null {
+        return new RTCIceParameters(new RTCIceCandidate({ candidate: this.#pc.getSelectedCandidatePair()!.local.candidate, sdpMLineIndex: 0 }))
     }
 
     getRemoteCandidates(): globalThis.RTCIceCandidate[] {
-        return this.#pc ? this.#extraFunctions.remoteCandidates() : [];
+        return this.#pc.remoteCandidates;
     }
 
-    getRemoteParameters(): any {
-        /** */
+    getRemoteParameters(): RTCIceParameters | null {
+        return new RTCIceParameters(new RTCIceCandidate({ candidate: this.#pc.getSelectedCandidatePair()!.remote.candidate, sdpMLineIndex: 0 }))
     }
 
     getSelectedCandidatePair(): globalThis.RTCIceCandidatePair | null {
-        const cp = this.#extraFunctions.selectedCandidatePair();
+        const cp = this.#pc.getSelectedCandidatePair();
         if (!cp) return null;
         return {
             local: new RTCIceCandidate({
@@ -78,5 +72,15 @@ export default class RTCIceTransport extends EventTarget implements globalThis.R
                 sdpMid: cp.remote.mid,
             }),
         };
+    }
+}
+
+
+export class RTCIceParameters implements globalThis.RTCIceParameters {
+    usernameFragment = ''
+    password = ''
+    constructor ({ usernameFragment, password = '' }) {
+        this.usernameFragment = usernameFragment
+        this.password = password
     }
 }
