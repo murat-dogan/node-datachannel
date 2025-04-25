@@ -1,3 +1,6 @@
+import RTCDataChannel from "./RTCDataChannel";
+import RTCError from "./RTCError";
+
 export class RTCPeerConnectionIceEvent extends Event implements globalThis.RTCPeerConnectionIceEvent {
     #candidate: globalThis.RTCIceCandidate;
 

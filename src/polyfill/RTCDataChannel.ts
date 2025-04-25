@@ -2,6 +2,7 @@ import * as exceptions from './Exception';
 import { DataChannel } from '../lib/index';
 import RTCPeerConnection from './RTCPeerConnection';
 import { RTCErrorEvent } from './Events';
+import RTCError from './RTCError';
 
 export default class RTCDataChannel extends EventTarget implements globalThis.RTCDataChannel {
     #dataChannel: DataChannel;
@@ -15,12 +16,12 @@ export default class RTCDataChannel extends EventTarget implements globalThis.RT
     #pc: RTCPeerConnection;
 
     // events
-    onbufferedamountlow: globalThis.RTCDataChannel['onbufferedamountlow'];
-    onclose: globalThis.RTCDataChannel['onclose'];
-    onclosing: globalThis.RTCDataChannel['onclosing'];
-    onerror: globalThis.RTCDataChannel['onerror'];
-    onmessage: globalThis.RTCDataChannel['onmessage'];
-    onopen: globalThis.RTCDataChannel['onopen']
+    onbufferedamountlow: globalThis.RTCDataChannel['onbufferedamountlow'] = null;
+    onclose: globalThis.RTCDataChannel['onclose'] = null;
+    onclosing: globalThis.RTCDataChannel['onclosing'] = null;
+    onerror: globalThis.RTCDataChannel['onerror'] = null;
+    onmessage: globalThis.RTCDataChannel['onmessage'] = null;
+    onopen: globalThis.RTCDataChannel['onopen'] = null;
 
     constructor(dataChannel: DataChannel, opts: globalThis.RTCDataChannelInit = {}, pc: RTCPeerConnection) {
         super();

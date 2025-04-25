@@ -3,8 +3,8 @@ import nodeDataChannel from '../src/lib/index';
 
 nodeDataChannel.initLogger('Info');
 
-let dc1: RTCDataChannel = null;
-let dc2: RTCDataChannel = null;
+let dc1: RTCDataChannel | null = null;
+let dc2: RTCDataChannel | null = null;
 
 const peer1 = new RTCPeerConnection({
     peerIdentity: 'peer1',
@@ -22,7 +22,7 @@ peer1.onicegatheringstatechange = (): void => {
     console.log('Peer1 GatheringState:', peer1.iceGatheringState);
 };
 peer1.onicecandidate = (e): void => {
-    console.log('Peer1 Candidate:', e.candidate.candidate);
+    console.log('Peer1 Candidate:', e.candidate!.candidate);
     peer2.addIceCandidate(e.candidate);
 };
 
@@ -42,12 +42,12 @@ peer2.onicegatheringstatechange = (): void => {
     console.log('Peer2 GatheringState:', peer2.iceGatheringState);
 };
 peer2.onicecandidate = (e): void => {
-    console.log('Peer2 Candidate:', e.candidate.candidate);
+    console.log('Peer2 Candidate:', e.candidate!.candidate);
     peer1.addIceCandidate(e.candidate);
 };
 peer2.ondatachannel = (dce): void => {
     console.log('Peer2 Got DataChannel: ', dce.channel.label);
-    dc2 = dce.channel;
+    dc2 = dce.channel as RTCDataChannel;
     dc2.onmessage = (msg): void => {
         console.log('Peer2 Received Msg:', msg.data.toString());
     };

@@ -2,10 +2,10 @@ import RTCDtlsTransport from './RTCDtlsTransport';
 import RTCPeerConnection from './RTCPeerConnection';
 
 export default class RTCSctpTransport extends EventTarget implements globalThis.RTCSctpTransport {
-    #pc: RTCPeerConnection = null;
-    #transport: globalThis.RTCDtlsTransport = null;
+    #pc: RTCPeerConnection;
+    #transport: globalThis.RTCDtlsTransport;
 
-    onstatechange: globalThis.RTCSctpTransport['onstatechange'];
+    onstatechange: globalThis.RTCSctpTransport['onstatechange'] = null;
 
     constructor({ pc }: { pc: RTCPeerConnection }) {
         super();
@@ -26,7 +26,7 @@ export default class RTCSctpTransport extends EventTarget implements globalThis.
     }
 
     get maxMessageSize(): number {
-        if (this.state !== 'connected') return null;
+        if (this.state !== 'connected') return 0;
         return this.#pc.maxMessageSize ?? 65536;
     }
 

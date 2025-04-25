@@ -1,36 +1,38 @@
-import RTCPeerConnection from './RTCPeerConnection.ts';
-import RTCSessionDescription from './RTCSessionDescription.ts';
-import RTCIceCandidate from './RTCIceCandidate.ts';
-import RTCIceTransport from './RTCIceTransport.ts';
-import RTCDataChannel from './RTCDataChannel.ts';
-import RTCSctpTransport from './RTCSctpTransport.ts';
-import RTCDtlsTransport from './RTCDtlsTransport.ts';
-import RTCCertificate from './RTCCertificate.ts';
-import RTCError from './RTCError.ts';
-export * from './Events.ts';
-import * as Events from './Events.ts';
+import RTCCertificate from './RTCCertificate';
+import RTCDataChannel from './RTCDataChannel';
+import RTCDtlsTransport from './RTCDtlsTransport';
+import RTCIceCandidate from './RTCIceCandidate';
+import RTCIceTransport from './RTCIceTransport';
+import RTCPeerConnection from './RTCPeerConnection';
+import RTCSctpTransport from './RTCSctpTransport';
+import RTCSessionDescription from './RTCSessionDescription';
+import { RTCDataChannelEvent, RTCPeerConnectionIceEvent } from './Events';
+import RTCError from './RTCError';
 
 export {
-  RTCPeerConnection,
-  RTCSessionDescription,
-  RTCIceCandidate,
-  RTCIceTransport,
-  RTCDataChannel,
-  RTCSctpTransport,
-  RTCDtlsTransport,
-  RTCCertificate,
-  RTCError,
-}
+    RTCCertificate,
+    RTCDataChannel,
+    RTCDtlsTransport,
+    RTCIceCandidate,
+    RTCIceTransport,
+    RTCPeerConnection,
+    RTCSctpTransport,
+    RTCSessionDescription,
+    RTCDataChannelEvent,
+    RTCPeerConnectionIceEvent,
+    RTCError,
+};
 
 export default {
-  RTCPeerConnection,
-  RTCSessionDescription,
-  RTCIceCandidate,
-  RTCIceTransport,
-  RTCDataChannel,
-  RTCSctpTransport,
-  RTCDtlsTransport,
-  RTCCertificate,
-  RTCError,
-  ...Events
-}
+    RTCCertificate,
+    RTCDataChannel,
+    RTCDtlsTransport,
+    RTCIceCandidate,
+    RTCIceTransport,
+    RTCPeerConnection,
+    RTCSctpTransport,
+    RTCSessionDescription,
+    RTCDataChannelEvent,
+    RTCPeerConnectionIceEvent,
+    RTCError,
+};

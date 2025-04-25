@@ -79,19 +79,19 @@ describe('polyfill', () => {
 			let currentIndex: number = -1;
 
 			// We run this function to analyze the data just after receiving it from the datachannel.
-			function analyzeData(idx: number, data: string|Buffer|ArrayBuffer): boolean {
+			async function analyzeData(idx: number, data: string|Blob|ArrayBuffer): Promise<boolean> {
 				switch(idx){
 					case 0: // binaryType is not used here because data is a string ("Hello").
 						return (data as string)==testMessages[idx].data;
 					case 1: // binaryType is "arraybuffer" and data is expected to be an ArrayBuffer.
 						return analyzeBinaryTestData(data as ArrayBufferLike);
 					case 2: // binaryType is "blob" and data is expected to be a Buffer.
-						return analyzeBinaryTestData((data as Buffer).buffer);
+						return analyzeBinaryTestData(await (data as Blob).arrayBuffer());
 				}
 				return false;
 			}
 
-			function finalizeTest(): void {
+			async function finalizeTest(): Promise<void> {
 				peer1.close();
 				peer2.close();
 
@@ -119,25 +119,25 @@ describe('polyfill', () => {
 				expect(p2MessageMock.mock.calls.length).toBe(3);
 
 				// Analyze and compare received messages
-				expect(analyzeData(0, p1MessageMock.mock.calls[0][0] as any)).toEqual(true);
-				expect(analyzeData(1, p1MessageMock.mock.calls[1][0] as any)).toEqual(true);
-				expect(analyzeData(2, p1MessageMock.mock.calls[2][0] as any)).toEqual(true);
+				expect(await analyzeData(0, p1MessageMock.mock.calls[0][0] as any)).toEqual(true);
+				expect(await analyzeData(1, p1MessageMock.mock.calls[1][0] as any)).toEqual(true);
+				expect(await analyzeData(2, p1MessageMock.mock.calls[2][0] as any)).toEqual(true);
 
-				expect(analyzeData(0, p2MessageMock.mock.calls[0][0] as any)).toEqual(true);
-				expect(analyzeData(1, p2MessageMock.mock.calls[1][0] as any)).toEqual(true);
-				expect(analyzeData(2, p2MessageMock.mock.calls[2][0] as any)).toEqual(true);
+				expect(await analyzeData(0, p2MessageMock.mock.calls[0][0] as any)).toEqual(true);
+				expect(await analyzeData(1, p2MessageMock.mock.calls[1][0] as any)).toEqual(true);
+				expect(await analyzeData(2, p2MessageMock.mock.calls[2][0] as any)).toEqual(true);
 
 				done();
 			}
 
 			// starts the next message-sending test
-			function nextSendTest(): void {
+			async function nextSendTest(): Promise<void> {
 				// Get the next test data
 				const current = testMessages[++currentIndex];
 
 				// If finished, quit
 				if (!current){
-					finalizeTest();
+					await finalizeTest();
 					return;
 				}
 

@@ -58,7 +58,7 @@ export default class RTCError extends DOMException implements globalThis.RTCErro
         return this.#sdpLineNumber;
     }
 
-    get httpRequestStatusCode (): number {
+    get httpRequestStatusCode (): number | null {
         return this.#httpRequestStatusCode ?? null
     }
 

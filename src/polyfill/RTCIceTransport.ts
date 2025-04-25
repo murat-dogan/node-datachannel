@@ -2,11 +2,11 @@ import RTCIceCandidate from './RTCIceCandidate';
 import RTCPeerConnection from './RTCPeerConnection';
 
 export default class RTCIceTransport extends EventTarget implements globalThis.RTCIceTransport {
-    #pc: RTCPeerConnection = null;
+    #pc: RTCPeerConnection;
 
-    ongatheringstatechange: globalThis.RTCIceTransport['ongatheringstatechange'];
-    onselectedcandidatepairchange: globalThis.RTCIceTransport['onselectedcandidatepairchange'];
-    onstatechange: globalThis.RTCIceTransport['onstatechange'];
+    ongatheringstatechange: globalThis.RTCIceTransport['ongatheringstatechange'] = null;
+    onselectedcandidatepairchange: globalThis.RTCIceTransport['onselectedcandidatepairchange'] = null;
+    onstatechange: globalThis.RTCIceTransport['onstatechange'] = null;
 
     constructor({ pc }: { pc: RTCPeerConnection }) {
         super();
@@ -25,7 +25,7 @@ export default class RTCIceTransport extends EventTarget implements globalThis.R
         });
     }
 
-    get component(): globalThis.RTCIceComponent {
+    get component(): globalThis.RTCIceComponent | null {
         const cp = this.getSelectedCandidatePair();
         if (!cp?.local) return null;
         return cp.local.component;
@@ -36,7 +36,7 @@ export default class RTCIceTransport extends EventTarget implements globalThis.R
     }
 
     get role(): globalThis.RTCIceRole {
-        return this.#pc.localDescription.type == 'offer' ? 'controlling' : 'controlled';
+        return this.#pc.localDescription!.type == 'offer' ? 'controlling' : 'controlled';
     }
 
     get state(): globalThis.RTCIceTransportState {
@@ -48,7 +48,7 @@ export default class RTCIceTransport extends EventTarget implements globalThis.R
     }
 
     getLocalParameters(): RTCIceParameters | null {
-        return new RTCIceParameters(new RTCIceCandidate({ candidate: this.#pc.getSelectedCandidatePair().local.candidate, sdpMLineIndex: 0 }))
+        return new RTCIceParameters(new RTCIceCandidate({ candidate: this.#pc.getSelectedCandidatePair()!.local.candidate, sdpMLineIndex: 0 }))
     }
 
     getRemoteCandidates(): globalThis.RTCIceCandidate[] {
@@ -56,7 +56,7 @@ export default class RTCIceTransport extends EventTarget implements globalThis.R
     }
 
     getRemoteParameters(): RTCIceParameters | null {
-        return new RTCIceParameters(new RTCIceCandidate({ candidate: this.#pc.getSelectedCandidatePair().remote.candidate, sdpMLineIndex: 0 }))
+        return new RTCIceParameters(new RTCIceCandidate({ candidate: this.#pc.getSelectedCandidatePair()!.remote.candidate, sdpMLineIndex: 0 }))
     }
 
     getSelectedCandidatePair(): globalThis.RTCIceCandidatePair | null {
