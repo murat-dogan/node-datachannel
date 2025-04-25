@@ -1,4 +1,5 @@
 import RTCIceCandidate from './RTCIceCandidate';
+import RTCPeerConnection from './RTCPeerConnection';
 
 export default class RTCIceTransport extends EventTarget implements globalThis.RTCIceTransport {
     #pc: RTCPeerConnection = null;
@@ -42,7 +43,7 @@ export default class RTCIceTransport extends EventTarget implements globalThis.R
         return this.#pc.iceConnectionState;
     }
 
-    getLocalCandidates(): RTCIceCandidate[] {
+    getLocalCandidates(): globalThis.RTCIceCandidate[] {
         return this.#pc.localCandidates;
     }
 
@@ -50,7 +51,7 @@ export default class RTCIceTransport extends EventTarget implements globalThis.R
         return new RTCIceParameters(new RTCIceCandidate({ candidate: this.#pc.getSelectedCandidatePair().local.candidate, sdpMLineIndex: 0 }))
     }
 
-    getRemoteCandidates(): RTCIceCandidate[] {
+    getRemoteCandidates(): globalThis.RTCIceCandidate[] {
         return this.#pc.remoteCandidates;
     }
 

@@ -5,7 +5,7 @@ import { RTCErrorEvent } from './Events';
 
 export default class RTCDataChannel extends EventTarget implements globalThis.RTCDataChannel {
     #dataChannel: DataChannel;
-    #readyState: RTCDataChannelState;
+    #readyState: globalThis.RTCDataChannelState;
     #bufferedAmountLowThreshold: number = 0;
     #binaryType: BinaryType = 'blob';
     #maxPacketLifeTime: number | null;

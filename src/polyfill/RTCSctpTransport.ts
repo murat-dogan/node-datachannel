@@ -1,8 +1,9 @@
 import RTCDtlsTransport from './RTCDtlsTransport';
+import RTCPeerConnection from './RTCPeerConnection';
 
 export default class RTCSctpTransport extends EventTarget implements globalThis.RTCSctpTransport {
     #pc: RTCPeerConnection = null;
-    #transport: RTCDtlsTransport = null;
+    #transport: globalThis.RTCDtlsTransport = null;
 
     onstatechange: globalThis.RTCSctpTransport['onstatechange'];
 
