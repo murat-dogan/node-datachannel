@@ -1,5 +1,7 @@
-import { expect } from '@jest/globals';
-import { RTCPeerConnection, RTCDataChannel } from '../../src/polyfill/index';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { expect, jest } from '@jest/globals';
+import { RTCPeerConnection } from '../../src/polyfill/index';
+import { PeerConnection } from '../../src/lib/index';
 
 describe('polyfill', () => {
     // Default is 5000 ms but we need more
@@ -10,6 +12,12 @@ describe('polyfill', () => {
 			await RTCPeerConnection.generateCertificate();
 		}).rejects.toEqual(new DOMException('Not implemented'));
 	});
+
+	test('can assign polyfill to global type', () => {
+		// complication check to ensure the interface is implemented correctly
+		const pc: globalThis.RTCPeerConnection = new RTCPeerConnection()
+		expect(pc).toBeTruthy()
+	})
 
 	test('P2P Test', () => {
 		return new Promise<void>((done) => {
@@ -43,7 +51,7 @@ describe('polyfill', () => {
 			let dc2: RTCDataChannel = null;
 
 			// Creates a fixed binary data for testing
-			function createBinaryTestData(): Uint8Array {
+			function createBinaryTestData(): ArrayBufferView {
 				const binaryData = new Uint8Array(17);
 				const dv = new DataView(binaryData.buffer);
 				dv.setInt8(0, 123);
@@ -111,13 +119,13 @@ describe('polyfill', () => {
 				expect(p2MessageMock.mock.calls.length).toBe(3);
 
 				// Analyze and compare received messages
-				expect(analyzeData(0, p1MessageMock.mock.calls[0][0])).toEqual(true);
-				expect(analyzeData(1, p1MessageMock.mock.calls[1][0])).toEqual(true);
-				expect(analyzeData(2, p1MessageMock.mock.calls[2][0])).toEqual(true);
+				expect(analyzeData(0, p1MessageMock.mock.calls[0][0] as any)).toEqual(true);
+				expect(analyzeData(1, p1MessageMock.mock.calls[1][0] as any)).toEqual(true);
+				expect(analyzeData(2, p1MessageMock.mock.calls[2][0] as any)).toEqual(true);
 
-				expect(analyzeData(0, p2MessageMock.mock.calls[0][0])).toEqual(true);
-				expect(analyzeData(1, p2MessageMock.mock.calls[1][0])).toEqual(true);
-				expect(analyzeData(2, p2MessageMock.mock.calls[2][0])).toEqual(true);
+				expect(analyzeData(0, p2MessageMock.mock.calls[0][0] as any)).toEqual(true);
+				expect(analyzeData(1, p2MessageMock.mock.calls[1][0] as any)).toEqual(true);
+				expect(analyzeData(2, p2MessageMock.mock.calls[2][0] as any)).toEqual(true);
 
 				done();
 			}
@@ -141,7 +149,12 @@ describe('polyfill', () => {
                 }
 
 				// Send the test message
-				dc1.send(current.data);
+				// workaround for https://github.com/microsoft/TypeScript-DOM-lib-generator/issues/1973
+				if (typeof current.data === 'string') {
+					dc1.send(current.data);
+				} else {
+					dc1.send(current.data);
+				}
 			}
 
 			// Set Callbacks
@@ -212,4 +225,26 @@ describe('polyfill', () => {
 			};
 		});
 	});
+
+	test('it should accept a preconfigured PeerConnection', () => {
+		const peerConnection = new PeerConnection('Peer', {
+				iceServers: [],
+		});
+
+		// have to override write-only method in order to spy on it
+		const originalFunc = peerConnection.state.bind(peerConnection);
+		Object.defineProperty(peerConnection, 'state', {
+				value: originalFunc,
+				writable: true,
+				enumerable: true,
+		});
+
+		const spy = jest.spyOn(peerConnection, 'state');
+		const rtcPeerConnection = new RTCPeerConnection({
+				peerConnection,
+		});
+		const connectionState = rtcPeerConnection.connectionState;
+		expect(spy).toHaveBeenCalled();
+		expect(connectionState).toEqual(originalFunc());
+});
 });

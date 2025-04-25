@@ -186,6 +186,8 @@ export default class RTCDataChannel extends EventTarget implements globalThis.RT
             data.arrayBuffer().then((ab) => {
                 this.#dataChannel.sendMessageBinary( process?.versions?.bun ? Buffer.from(ab) : new Uint8Array(ab));
             });
+        } else if (data instanceof Uint8Array) {
+            this.#dataChannel.sendMessageBinary(data);
         } else {
             if (data.byteLength > this.#dataChannel.maxMessageSize()) throw new TypeError('Max message size exceeded.')
             this.#dataChannel.sendMessageBinary( process?.versions?.bun ? Buffer.from(data as ArrayBuffer) : new Uint8Array(data as ArrayBuffer));

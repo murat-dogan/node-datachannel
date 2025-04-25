@@ -1,5 +1,4 @@
 import RTCIceCandidate from './RTCIceCandidate';
-import RTCPeerConnection from './RTCPeerConnection';
 
 export default class RTCIceTransport extends EventTarget implements globalThis.RTCIceTransport {
     #pc: RTCPeerConnection = null;

@@ -1,8 +1,7 @@
 import RTCIceTransport from './RTCIceTransport';
-import RTCPeerConnection from './RTCPeerConnection';
 
 export default class RTCDtlsTransport extends EventTarget implements globalThis.RTCDtlsTransport {
-    #pc: RTCPeerConnection = null;
+    #pc: globalThis.RTCPeerConnection = null;
     #iceTransport = null;
 
     onstatechange: globalThis.RTCDtlsTransport['onstatechange'];
@@ -22,11 +21,11 @@ export default class RTCDtlsTransport extends EventTarget implements globalThis.
         });
     }
 
-    get iceTransport(): RTCIceTransport {
+    get iceTransport(): globalThis.RTCIceTransport {
         return this.#iceTransport;
     }
 
-    get state(): RTCDtlsTransportState {
+    get state(): globalThis.RTCDtlsTransportState {
         // reduce state from new, connecting, connected, disconnected, failed, closed, unknown
         // to RTCDtlsTRansport states new, connecting, connected, closed, failed
         if (this.#pc.connectionState === 'disconnected') return 'closed'

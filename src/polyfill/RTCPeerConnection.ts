@@ -10,6 +10,7 @@ import RTCCertificate from './RTCCertificate';
 // extend RTCConfiguration with peerIdentity
 interface RTCConfiguration extends globalThis.RTCConfiguration {
     peerIdentity?: string;
+    peerConnection?: PeerConnection;
 }
 
 export default class RTCPeerConnection extends EventTarget implements globalThis.RTCPeerConnection {
@@ -27,8 +28,8 @@ export default class RTCPeerConnection extends EventTarget implements globalThis
     #sctp: RTCSctpTransport;
     #announceNegotiation: boolean | null = null;
 
-    #localCandidates: RTCIceCandidate[] = [];
-    #remoteCandidates: RTCIceCandidate[] = [];
+    #localCandidates: globalThis.RTCIceCandidate[] = [];
+    #remoteCandidates: globalThis.RTCIceCandidate[] = [];
 
     // events
     onconnectionstatechange: globalThis.RTCPeerConnection['onconnectionstatechange'];
@@ -92,7 +93,7 @@ export default class RTCPeerConnection extends EventTarget implements globalThis
 
         try {
             const peerIdentity = config?.peerIdentity ?? `peer-${getRandomString(7)}`;
-            this.#peerConnection = new PeerConnection(peerIdentity,
+            this.#peerConnection = config.peerConnection ?? new PeerConnection(peerIdentity,
                 {
                     ...this.#config,
                     iceServers:
@@ -189,11 +190,11 @@ export default class RTCPeerConnection extends EventTarget implements globalThis
         this.#sctp = new RTCSctpTransport({ pc: this });
     }
 
-    get localCandidates (): RTCIceCandidate[] {
+    get localCandidates (): globalThis.RTCIceCandidate[] {
         return this.#localCandidates
     }
     
-    get remoteCandidates (): RTCIceCandidate[] {
+    get remoteCandidates (): globalThis.RTCIceCandidate[] {
         return this.#remoteCandidates
     }
 
@@ -245,7 +246,7 @@ export default class RTCPeerConnection extends EventTarget implements globalThis
         return this.#nullableDescription(this.#peerConnection.remoteDescription())
     }
 
-    get sctp(): RTCSctpTransport {
+    get sctp(): globalThis.RTCSctpTransport {
         return this.#sctp;
     }
 

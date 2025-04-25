@@ -1,9 +1,15 @@
 #include "rtc-wrapper.h"
 #include "peer-connection-wrapper.h"
 #include "data-channel-wrapper.h"
+
+#if RTC_ENABLE_MEDIA == 1
 #include "media-track-wrapper.h"
+#endif
+
+#if RTC_ENABLE_WEBSOCKET == 1
 #include "web-socket-wrapper.h"
 #include "web-socket-server-wrapper.h"
+#endif
 
 #include "plog/Log.h"
 
@@ -18,6 +24,7 @@ Napi::Object RtcWrapper::Init(Napi::Env env, Napi::Object exports)
     exports.Set("cleanup", Napi::Function::New(env, &RtcWrapper::cleanup));
     exports.Set("preload", Napi::Function::New(env, &RtcWrapper::preload));
     exports.Set("setSctpSettings", Napi::Function::New(env, &RtcWrapper::setSctpSettings));
+    exports.Set("getLibraryVersion", Napi::Function::New(env, &RtcWrapper::getLibraryVersion));
 
     return exports;
 }
@@ -117,9 +124,15 @@ void RtcWrapper::cleanup(const Napi::CallbackInfo &info)
     {
         PeerConnectionWrapper::CloseAll();
         DataChannelWrapper::CloseAll();
+
+#if RTC_ENABLE_MEDIA == 1
         TrackWrapper::CloseAll();
+#endif
+
+#if RTC_ENABLE_WEBSOCKET == 1
         WebSocketWrapper::CloseAll();
         WebSocketServerWrapper::StopAll();
+#endif
 
         const auto timeout = std::chrono::seconds(10);
         if (rtc::Cleanup().wait_for(std::chrono::seconds(timeout)) == std::future_status::timeout)
@@ -128,8 +141,14 @@ void RtcWrapper::cleanup(const Napi::CallbackInfo &info)
         // Cleanup the instances
         PeerConnectionWrapper::CleanupAll();
         DataChannelWrapper::CleanupAll();
+
+#if RTC_ENABLE_MEDIA == 1
         TrackWrapper::CleanupAll();
+#endif
+
+#if RTC_ENABLE_WEBSOCKET == 1
         WebSocketWrapper::CleanupAll();
+#endif
 
         if (logCallback)
             logCallback.reset();
@@ -171,4 +190,12 @@ void RtcWrapper::setSctpSettings(const Napi::CallbackInfo &info)
         settings.delayedSackTime = std::chrono::milliseconds(config.Get("delayedSackTime").As<Napi::Number>().Uint32Value());
 
     rtc::SetSctpSettings(settings);
+}
+
+
+Napi::Value RtcWrapper::getLibraryVersion(const Napi::CallbackInfo &info)
+{
+    PLOG_DEBUG << "getLibraryVersion() called";
+    Napi::Env env = info.Env();
+    return Napi::String::New(info.Env(), RTC_VERSION);
 }

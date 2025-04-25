@@ -1,17 +1,13 @@
-import RTCDataChannel from './RTCDataChannel';
-import RTCIceCandidate from './RTCIceCandidate';
-
-
 export class RTCPeerConnectionIceEvent extends Event implements globalThis.RTCPeerConnectionIceEvent {
-    #candidate: RTCIceCandidate;
+    #candidate: globalThis.RTCIceCandidate;
 
-    constructor(candidate: RTCIceCandidate) {
+    constructor(candidate: globalThis.RTCIceCandidate) {
         super('icecandidate');
 
         this.#candidate = candidate;
     }
 
-    get candidate(): RTCIceCandidate {
+    get candidate(): globalThis.RTCIceCandidate {
         return this.#candidate;
     }
 
@@ -21,7 +17,7 @@ export class RTCPeerConnectionIceEvent extends Event implements globalThis.RTCPe
 }
 
 export class RTCDataChannelEvent extends Event implements globalThis.RTCDataChannelEvent {
-    #channel: RTCDataChannel;
+    #channel: globalThis.RTCDataChannel;
 
     // type is defined as a consturctor, but always overwritten, interesting spec
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -35,7 +31,7 @@ export class RTCDataChannelEvent extends Event implements globalThis.RTCDataChan
         this.#channel = init.channel;
     }
 
-    get channel(): RTCDataChannel {
+    get channel(): globalThis.RTCDataChannel {
         return this.#channel;
     }
 }

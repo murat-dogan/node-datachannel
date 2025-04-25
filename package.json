@@ -1,10 +1,20 @@
 {
     "name": "node-datachannel",
-    "version": "0.24.0",
+    "version": "0.26.0",
     "description": "WebRTC For Node.js and Electron. libdatachannel node bindings.",
     "main": "./dist/cjs/lib/index.cjs",
     "module": "./dist/esm/lib/index.mjs",
     "types": "./dist/types/lib/index.d.ts",
+    "typesVersions": {
+        "*": {
+            "*": [
+                "dist/types/lib/index.d.ts"
+            ],
+            "polyfill": [
+                "dist/types/polyfill/index.d.ts"
+            ]
+        }
+    },
     "exports": {
         ".": {
             "types": "./dist/types/lib/index.d.ts",
@@ -24,8 +34,8 @@
     },
     "scripts": {
         "install": "prebuild-install -r napi || (npm install --ignore-scripts --production=false && npm run _prebuild)",
-        "install:nice": "npm run clean && npm install --ignore-scripts --production=false && cmake-js build --CDUSE_NICE=1",
-        "install:gnu": "npm run clean && npm install --ignore-scripts --production=false && cmake-js build --CDUSE_GNUTLS=1",
+        "install:nice": "npm run clean && npm install --ignore-scripts --production=false && cmake-js configure --CDUSE_NICE=1 && cmake-js build",
+        "install:gnu": "npm run clean && npm install --ignore-scripts --production=false && cmake-js configure --CDUSE_GNUTLS=1 && cmake-js build",
         "build": "npm run compile && npm run build:tsc",
         "compile": "cmake-js build",
         "compile:debug": "cmake-js build -D",
@@ -103,6 +113,6 @@
         "typescript": "5.4"
     },
     "dependencies": {
-        "prebuild-install": "^7.1.2"
+        "prebuild-install": "^7.1.3"
     }
 }

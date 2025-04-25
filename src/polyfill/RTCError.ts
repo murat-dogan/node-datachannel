@@ -9,7 +9,7 @@ const RTCErrorDetailType = [
 ]
 
 export default class RTCError extends DOMException implements globalThis.RTCError {
-    #errorDetail: RTCErrorDetailType;
+    #errorDetail: globalThis.RTCErrorDetailType;
     #receivedAlert: number | null;
     #sctpCauseCode: number | null;
     #sdpLineNumber: number | null;
