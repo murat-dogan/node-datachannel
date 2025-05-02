@@ -1,12 +1,17 @@
 ARG version=3.16
 ARG node_version=18
+
+# Accept build args
+ARG gcc_install
+
 FROM node:${node_version}-alpine${version}
+
 RUN apk add \
     build-base \
     openssl-libs-static \
     openssl-dev \
     cmake \
     ninja \
-    $gcc_install
+    ${gcc_install}
 
 WORKDIR /usr/app/
