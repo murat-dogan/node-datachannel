@@ -12,6 +12,7 @@ RUN apk add \
     openssl-dev \
     cmake \
     ninja \
+    clang lld \
     ${gcc_install}
 
 WORKDIR /usr/app/
