@@ -87,9 +87,6 @@ jobs:
           sudo apt update
           sudo apt install -y podman
 
-      - name: List installed libc on host system
-        run: apt list --installed | grep libc6-dev || true
-
       - name: Prepare build container
         run: >
           sudo podman build
