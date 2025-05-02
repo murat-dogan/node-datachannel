@@ -6,6 +6,8 @@ ARG gcc_install
 
 FROM node:${node_version}-${version}
 
+RUN echo ${gcc_install}
+
 RUN apt update
 RUN apt install -y --no-install-recommends \
     build-essential \
