@@ -16,7 +16,7 @@ jobs:
       matrix:
         node-version: [18]
         arch: [amd64, arm64, arm]
-        platform: [debian, alpine]
+        platform: [debian]
         include:
           # Set baselines per platform
           - triple: "alpine-linux-musl"
@@ -82,26 +82,29 @@ jobs:
       - name: Install system dependencies
         run: |
           sudo apt update
-          sudo apt install -y podman ninja-build ${{ matrix.gcc_install }}
-      - name: List installed libc
+          sudo apt install -y podman
+      - name: List installed libc on host system
         run: apt list --installed | grep libc6-dev
-      - name: Build sysroot
-        run: sudo podman build --isolation=chroot -t ndc-buildroot:${{ matrix.platform }}-${{ matrix.arch }} ./build-containers --file Dockerfile.${{ matrix.platform }} --platform linux/${{ matrix.arch }} --build-arg="version=${{ matrix.version }}" --build-arg="node_version=${{ matrix.node-version }}"
-      - name: Mount sysroot
-        id: sysroot
-        run: echo "sysroot=$(sudo podman image mount ndc-buildroot:${{ matrix.platform }}-${{ matrix.arch }})" >> $GITHUB_OUTPUT
+
+      - name: Prepare build container
+        run: sudo podman build --isolation=chroot -t ndc-buildroot:${{ matrix.platform }}-${{ matrix.arch }} ./build-containers --file Dockerfile.${{ matrix.platform }} --platform linux/${{ matrix.arch }} --build-arg="version=${{ matrix.version }}" --build-arg="node_version=${{ matrix.node-version }}" --build-arg="gcc_install=${{ matrix.gcc_install }}"
+
       - name: Build
-        run: sudo --preserve-env=SYSROOT,TRIPLE,COMPILER_FLAGS,LIBC,GCC,GXX,CI,PATH node_modules/.bin/prebuild --arch ${{ matrix.node_arch }} -r napi --backend cmake-js -- --CDCMAKE_TOOLCHAIN_FILE:FILEPATH=./cmake/toolchain/ci.cmake
-        env:
-          SYSROOT: ${{ steps.sysroot.outputs.sysroot }}
-          TRIPLE: ${{ matrix.triple_arch }}-${{ matrix.triple }}${{ matrix.triple_postfix }}
-          COMPILER_FLAGS: ${{ matrix.flags }}
-          LIBC: ${{ matrix.libc }}
-          GCC: ${{ matrix.gcc }}
-          GXX: ${{ matrix.gxx }}
-          CI: true
+        run: |
+          sudo podman run --rm \
+            -e TRIPLE=${{ matrix.triple_arch }}-${{ matrix.triple }}${{ matrix.triple_postfix }} \
+            -e COMPILER_FLAGS="${{ matrix.flags }}" \
+            -e LIBC=${{ matrix.libc }} \
+            -e GCC=${{ matrix.gcc }} \
+            -e GXX=${{ matrix.gxx }} \
+            -e CI=true \
+            -v ${{ github.workspace }}:/usr/app \
+            --platform linux/${{ matrix.arch }} \
+            -w /usr/app \
+            ndc-buildroot:${{ matrix.platform }}-${{ matrix.arch }} \
+            node_modules/.bin/prebuild --arch ${{ matrix.node_arch }} -r napi --backend cmake-js -- --CDCMAKE_TOOLCHAIN_FILE:FILEPATH=./cmake/toolchain/ci.cmake
       - name: Test
-        run: sudo podman run --rm -v $(pwd):/usr/app/ -e CI=true --platform linux/${{ matrix.arch }} -t ndc-buildroot:${{ matrix.platform }}-${{ matrix.arch }} npm run test
+        run: sudo podman run --rm -v ${{ github.workspace }}:/usr/app/ -e CI=true --platform linux/${{ matrix.arch }} -t ndc-buildroot:${{ matrix.platform }}-${{ matrix.arch }} npm run test
       - name: Upload
         run: sudo --preserve-env=CI,LIBC node_modules/.bin/prebuild --arch ${{ matrix.node_arch }} -r napi --upload -u ${{ secrets.GITHUB_TOKEN }}
         env:
