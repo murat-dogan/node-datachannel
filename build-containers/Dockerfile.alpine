@@ -12,7 +12,7 @@ RUN apk add \
     libc-dev \
     python3 \
     make \
-    musl-dev
+    musl-dev \
     openssl-libs-static \
     openssl-dev \
     cmake \
