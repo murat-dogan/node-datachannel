@@ -85,6 +85,7 @@ jobs:
       - name: Prepare build container
         run: >
           sudo podman build
+          --isolation=chroot
           -t ndc-buildroot:${{ matrix.platform }}-${{ matrix.arch }}
           ./build-containers
           --file Dockerfile.${{ matrix.platform }}
