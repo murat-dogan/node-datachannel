@@ -1,0 +1,18 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            // On first run clean build folder.
+            // Sometimes it has still Release config
+            "type": "lldb",
+            "request": "launch",
+            "name": "test-app",
+            "preLaunchTask": "npm: build:debug",
+            "program": "/home/murat/.nvm/versions/node/v20.11.1/bin/node",
+            "cwd": "${workspaceFolder}/test/leak-test",
+            "args": [
+                "${workspaceFolder}/test/leak-test/index.js"
+            ]
+        }
+    ]
+}
