@@ -103,6 +103,17 @@ void DataChannelWrapper::doCleanup()
 {
     PLOG_DEBUG << "doCleanup() called";
     mOnClosedCallback.reset();
+
+    // For close there are 3 cases:
+    // 1. Close was called from JS
+    // 2. Close was called from RTC
+    // 3. Close was not called from JS or RTC (we are destroying the object)
+    // This could be coming from rtc (case 2)
+    mDataChannelPtr.reset();
+    mOnOpenCallback.reset();
+    mOnErrorCallback.reset();
+    mOnBufferedAmountLowCallback.reset();
+    mOnMessageCallback.reset();
     instances.erase(this);
 }
 
