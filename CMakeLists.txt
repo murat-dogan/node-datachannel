@@ -9,8 +9,6 @@ add_definitions(-DNAPI_VERSION=8)
 
 include_directories(${CMAKE_JS_INC})
 
-set(CMAKE_BUILD_TYPE Release)
-
 if(WIN32)
     set(OPENSSL_MSVC_STATIC_RT TRUE)
     set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
@@ -79,6 +77,13 @@ add_library(${PROJECT_NAME} SHARED ${SRC_FILES})
 
 set_target_properties(${PROJECT_NAME} PROPERTIES CXX_STANDARD 17)
 set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "" SUFFIX ".node")
+
+# Set the output directory for all build types
+# set_target_properties(${PROJECT_NAME} PROPERTIES
+#     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/binary
+#     LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/binary
+#     ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/binary
+# )
 
 target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_SOURCE_DIR}/node_modules/node-addon-api
