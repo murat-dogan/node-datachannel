@@ -11,7 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "node-datachannel": "file:..",
+    "node-datachannel": "file:../..",
     "until-death": "^1.0.0",
     "why-is-node-running": "^3.2.2"
   }
