@@ -4,6 +4,7 @@ export default class RTCError extends DOMException implements globalThis.RTCErro
   #sctpCauseCode: number | null;
   #sdpLineNumber: number | null;
   #sentAlert: number | null;
+  #httpRequestStatusCode: number | null;
 
   constructor(init: globalThis.RTCErrorInit, message?: string) {
     super(message, 'OperationError');
@@ -28,6 +29,7 @@ export default class RTCError extends DOMException implements globalThis.RTCErro
     this.#sctpCauseCode = init.sctpCauseCode ?? null;
     this.#sdpLineNumber = init.sdpLineNumber ?? null;
     this.#sentAlert = init.sentAlert ?? null;
+    this.#httpRequestStatusCode = init.httpRequestStatusCode ?? null;
   }
 
   get errorDetail(): globalThis.RTCErrorDetailType {
@@ -52,6 +54,10 @@ export default class RTCError extends DOMException implements globalThis.RTCErro
 
   set sctpCauseCode(_value) {
     throw new TypeError('Cannot set sctpCauseCode, it is read-only');
+  }
+
+  get httpRequestStatusCode(): number | null {
+    return this.#httpRequestStatusCode;
   }
 
   get sdpLineNumber(): number | null {

@@ -1,20 +1,20 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import RTCIceTransport from './RTCIceTransport';
+import RTCPeerConnection from './RTCPeerConnection';
 
 export default class RTCDtlsTransport extends EventTarget implements globalThis.RTCDtlsTransport {
-  #pc: globalThis.RTCPeerConnection = null;
+  #pc: RTCPeerConnection = null;
   #iceTransport = null;
 
   onstatechange: globalThis.RTCDtlsTransport['onstatechange'] = null;
   onerror: globalThis.RTCDtlsTransport['onstatechange'] = null;
 
-  constructor(init: { pc: globalThis.RTCPeerConnection; extraFunctions }) {
+  constructor(init: { pc: RTCPeerConnection }) {
     super();
     this.#pc = init.pc;
 
     this.#iceTransport = new RTCIceTransport({
-      pc: init.pc,
-      extraFunctions: init.extraFunctions,
+      pc: init.pc
     });
 
     // forward peerConnection events

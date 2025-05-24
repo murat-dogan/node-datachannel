@@ -11,12 +11,21 @@ export default class RTCSessionDescription implements globalThis.RTCSessionDescr
   #sdp: string;
 
   constructor(init: globalThis.RTCSessionDescriptionInit) {
-    this.#type = init ? init.type : null;
-    this.#sdp = init ? init.sdp : null;
+    this.#type = init?.type;
+    this.#sdp = init?.sdp ?? '';
   }
 
   get type(): globalThis.RTCSdpType {
     return this.#type;
+  }
+
+  set type(type) {
+    if (type !== 'offer' && type !== 'answer' && type !== 'pranswer' && type !== 'rollback') {
+      throw new TypeError(
+        `Failed to set the 'type' property on 'RTCSessionDescription': The provided value '${type}' is not a valid enum value of type RTCSdpType.`,
+      );
+    }
+    this.#type = type;
   }
 
   get sdp(): string {

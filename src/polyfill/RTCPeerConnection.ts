@@ -21,13 +21,14 @@ export default class RTCPeerConnection extends EventTarget implements globalThis
   }
 
   #peerConnection: PeerConnection;
-  #localOffer: any;
-  #localAnswer: any;
+  #localOffer: ReturnType<typeof createDeferredPromise>;
+  #localAnswer: ReturnType<typeof createDeferredPromise>;
   #dataChannels: Set<globalThis.RTCDataChannel>;
   #dataChannelsClosed = 0;
   #config: globalThis.RTCConfiguration;
-  #canTrickleIceCandidates: boolean | null;
+  #canTrickleIceCandidates: boolean | null = null;
   #sctp: globalThis.RTCSctpTransport;
+  #announceNegotiation = false;
 
   #localCandidates: globalThis.RTCIceCandidate[] = [];
   #remoteCandidates: globalThis.RTCIceCandidate[] = [];
@@ -170,11 +171,11 @@ export default class RTCPeerConnection extends EventTarget implements globalThis
 
     this.#peerConnection.onLocalDescription((sdp, type) => {
       if (type === 'offer') {
-        this.#localOffer.resolve({ sdp, type });
+        this.#localOffer.resolve(new RTCSessionDescription({ sdp, type }));
       }
 
       if (type === 'answer') {
-        this.#localAnswer.resolve({ sdp, type });
+        this.#localAnswer.resolve(new RTCSessionDescription({ sdp, type }));
       }
     });
 
@@ -207,30 +208,41 @@ export default class RTCPeerConnection extends EventTarget implements globalThis
     this.addEventListener('icecandidate', (e) => {
       this.onicecandidate?.(e as globalThis.RTCPeerConnectionIceEvent);
     });
+    this.addEventListener('track', (e) => {
+      this.ontrack?.(e as RTCTrackEvent);
+    });
+    this.addEventListener('negotiationneeded', (e) => {
+      this.#announceNegotiation = true;
+      this.onnegotiationneeded?.(e);
+    });
 
     this.#sctp = new RTCSctpTransport({
       pc: this,
-      extraFunctions: {
-        maxDataChannelId: (): number => {
-          return this.#peerConnection.maxDataChannelId();
-        },
-        maxMessageSize: (): number => {
-          return this.#peerConnection.maxMessageSize();
-        },
-        localCandidates: (): globalThis.RTCIceCandidate[] => {
-          return this.#localCandidates;
-        },
-        remoteCandidates: (): globalThis.RTCIceCandidate[] => {
-          return this.#remoteCandidates;
-        },
-        selectedCandidatePair: (): {
-          local: SelectedCandidateInfo;
-          remote: SelectedCandidateInfo;
-        } | null => {
-          return this.#peerConnection.getSelectedCandidatePair();
-        },
-      },
     });
+  }
+
+  // Extra FUnctions
+  get ext_maxDataChannelId(): number {
+    return this.#peerConnection.maxDataChannelId();
+  }
+
+  get ext_maxMessageSize(): number {
+    return this.#peerConnection.maxMessageSize();
+  }
+
+  get ext_localCandidates(): globalThis.RTCIceCandidate[] {
+    return this.#localCandidates;
+  }
+
+  get ext_remoteCandidates(): globalThis.RTCIceCandidate[] {
+    return this.#remoteCandidates;
+  }
+
+  selectedCandidatePair(): {
+    local: SelectedCandidateInfo;
+    remote: SelectedCandidateInfo;
+  } | null {
+    return this.#peerConnection.getSelectedCandidatePair();
   }
 
   get canTrickleIceCandidates(): boolean | null {
@@ -349,7 +361,7 @@ export default class RTCPeerConnection extends EventTarget implements globalThis
     return this.#localAnswer;
   }
 
-  createDataChannel(label, opts = {}): RTCDataChannel {
+  createDataChannel(label: string, opts: globalThis.RTCDataChannelInit = {}): RTCDataChannel {
     const channel = this.#peerConnection.createDataChannel(label, opts);
     const dataChannel = new RTCDataChannel(channel, opts);
 
@@ -359,6 +371,11 @@ export default class RTCPeerConnection extends EventTarget implements globalThis
       this.#dataChannels.delete(dataChannel);
       this.#dataChannelsClosed++;
     });
+
+    if (this.#announceNegotiation == null) {
+      this.#announceNegotiation = false;
+      this.dispatchEvent(new Event('negotiationneeded'));
+    }
 
     return dataChannel;
   }
@@ -379,7 +396,7 @@ export default class RTCPeerConnection extends EventTarget implements globalThis
     throw new DOMException('Not implemented');
   }
 
-  getStats(): Promise<globalThis.RTCStatsReport> {
+  getStats(): Promise<globalThis.RTCStatsReport> | any {
     return new Promise((resolve) => {
       const report = new Map();
       const cp = this.#peerConnection?.getSelectedCandidatePair();
@@ -497,7 +514,7 @@ function createDeferredPromise(): any {
   return promise;
 }
 
-function getRandomString(length): string {
+function getRandomString(length: number): string {
   return Math.random()
     .toString(36)
     .substring(2, 2 + length);
