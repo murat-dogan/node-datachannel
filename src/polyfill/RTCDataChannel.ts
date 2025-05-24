@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as exceptions from './Exception';
 import { DataChannel } from '../lib/index';
+import { RTCErrorEvent } from './Events';
 
 export default class RTCDataChannel extends EventTarget implements globalThis.RTCDataChannel {
   #dataChannel: DataChannel;
@@ -61,7 +62,7 @@ export default class RTCDataChannel extends EventTarget implements globalThis.RT
 
     this.#dataChannel.onError((msg) => {
       this.dispatchEvent(
-        new globalThis.RTCErrorEvent('error', {
+        new RTCErrorEvent('error', {
           error: new RTCError(
             {
               errorDetail: 'data-channel-failure',
@@ -93,7 +94,7 @@ export default class RTCDataChannel extends EventTarget implements globalThis.RT
       if (this.onbufferedamountlow) this.onbufferedamountlow(e);
     });
     this.addEventListener('error', (e) => {
-      if (this.onerror) this.onerror(e);
+      if (this.onerror) this.onerror(e as RTCErrorEvent);
     });
     this.addEventListener('close', (e) => {
       if (this.onclose) this.onclose(e);

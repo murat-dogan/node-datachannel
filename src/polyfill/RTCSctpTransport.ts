@@ -1,21 +1,19 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import RTCDtlsTransport from './RTCDtlsTransport';
+import RTCPeerConnection from './RTCPeerConnection';
 
 export default class RTCSctpTransport extends EventTarget implements globalThis.RTCSctpTransport {
-  #pc: globalThis.RTCPeerConnection = null;
-  #extraFunctions = null;
+  #pc: RTCPeerConnection = null;
   #transport: globalThis.RTCDtlsTransport = null;
 
   onstatechange: globalThis.RTCSctpTransport['onstatechange'] = null;
 
-  constructor(initial: { pc: globalThis.RTCPeerConnection; extraFunctions }) {
+  constructor(initial: { pc: RTCPeerConnection }) {
     super();
     this.#pc = initial.pc;
-    this.#extraFunctions = initial.extraFunctions;
 
     this.#transport = new RTCDtlsTransport({
-      pc: initial.pc,
-      extraFunctions: initial.extraFunctions,
+      pc: initial.pc
     });
 
     this.#pc.addEventListener('connectionstatechange', () => {
@@ -27,12 +25,12 @@ export default class RTCSctpTransport extends EventTarget implements globalThis.
 
   get maxChannels(): number | null {
     if (this.state !== 'connected') return null;
-    return this.#pc ? this.#extraFunctions.maxDataChannelId() : 0;
+    return this.#pc.ext_maxDataChannelId;
   }
 
   get maxMessageSize(): number {
     if (this.state !== 'connected') return null;
-    return this.#pc ? this.#extraFunctions.maxMessageSize() : 0;
+    return this.#pc?.ext_maxMessageSize ?? 65536;;
   }
 
   get state(): globalThis.RTCSctpTransportState {

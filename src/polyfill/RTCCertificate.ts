@@ -1,6 +1,6 @@
 export default class RTCCertificate implements globalThis.RTCCertificate {
-  #expires: number;
-  #fingerprints: globalThis.RTCDtlsFingerprint[];
+  #expires: number = 0;
+  #fingerprints: globalThis.RTCDtlsFingerprint[] = [];
 
   constructor() {
     this.#expires = null;
@@ -13,5 +13,9 @@ export default class RTCCertificate implements globalThis.RTCCertificate {
 
   getFingerprints(): globalThis.RTCDtlsFingerprint[] {
     return this.#fingerprints;
+  }
+
+  getAlgorithm(): string {
+    return '';
   }
 }
