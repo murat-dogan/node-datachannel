@@ -34,7 +34,8 @@ export default class RTCPeerConnection extends EventTarget implements globalThis
 
   // events
   onconnectionstatechange: globalThis.RTCPeerConnection['onconnectionstatechange'] = null;
-  ondatachannel: globalThis.RTCPeerConnection['ondatachannel'] = null;
+  // For ondatachannel we need to define type manually
+  ondatachannel: ((this: globalThis.RTCPeerConnection, ev: RTCDataChannelEvent) => any) | null;
   onicecandidate: globalThis.RTCPeerConnection['onicecandidate'] = null;
   onicecandidateerror: globalThis.RTCPeerConnection['onicecandidateerror'] = null;
   oniceconnectionstatechange: globalThis.RTCPeerConnection['oniceconnectionstatechange'] = null;
@@ -201,7 +202,7 @@ export default class RTCPeerConnection extends EventTarget implements globalThis
       this.onicegatheringstatechange?.(e);
     });
     this.addEventListener('datachannel', (e) => {
-      this.ondatachannel?.(e as globalThis.RTCDataChannelEvent);
+      this.ondatachannel?.(e as RTCDataChannelEvent);
     });
     this.addEventListener('icecandidate', (e) => {
       this.onicecandidate?.(e as globalThis.RTCPeerConnectionIceEvent);
@@ -348,7 +349,7 @@ export default class RTCPeerConnection extends EventTarget implements globalThis
     return this.#localAnswer;
   }
 
-  createDataChannel(label, opts = {}): globalThis.RTCDataChannel {
+  createDataChannel(label, opts = {}): RTCDataChannel {
     const channel = this.#peerConnection.createDataChannel(label, opts);
     const dataChannel = new RTCDataChannel(channel, opts);
 

@@ -1,3 +1,5 @@
+import RTCDataChannel from './RTCDataChannel';
+
 export class RTCPeerConnectionIceEvent
   extends Event
   implements globalThis.RTCPeerConnectionIceEvent
@@ -16,17 +18,17 @@ export class RTCPeerConnectionIceEvent
 }
 
 export class RTCDataChannelEvent extends Event implements globalThis.RTCDataChannelEvent {
-  #channel: globalThis.RTCDataChannel;
+  #channel: RTCDataChannel;
 
   constructor(type: string, eventInitDict: globalThis.RTCDataChannelEventInit) {
     super(type);
 
     if (type && !eventInitDict.channel) throw new TypeError('channel member is required');
 
-    this.#channel = eventInitDict?.channel as globalThis.RTCDataChannel;
+    this.#channel = eventInitDict?.channel as RTCDataChannel;
   }
 
-  get channel(): globalThis.RTCDataChannel {
+  get channel(): RTCDataChannel {
     return this.#channel;
   }
 }
