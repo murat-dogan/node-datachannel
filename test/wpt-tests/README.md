@@ -28,7 +28,7 @@ https://web-platform.test:8443/tools/runner/index.html \*
 
 OR
 
-> npm run wpt:server  (Let this run)
+> npm run wpt:server (Let this run)
 
 > npm run wpt:test (In an other console)
 
@@ -43,4 +43,3 @@ Contributions are welcome!
 # Latest Test Results
 
 Please check [last-test-results.md](./last-test-results.md) page
-

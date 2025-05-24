@@ -1,29 +1,32 @@
-export class RTCPeerConnectionIceEvent extends Event implements globalThis.RTCPeerConnectionIceEvent {
-    #candidate: globalThis.RTCIceCandidate;
+export class RTCPeerConnectionIceEvent
+  extends Event
+  implements globalThis.RTCPeerConnectionIceEvent
+{
+  #candidate: globalThis.RTCIceCandidate;
 
-    constructor(candidate: globalThis.RTCIceCandidate) {
-        super('icecandidate');
+  constructor(candidate: globalThis.RTCIceCandidate) {
+    super('icecandidate');
 
-        this.#candidate = candidate;
-    }
+    this.#candidate = candidate;
+  }
 
-    get candidate(): globalThis.RTCIceCandidate {
-        return this.#candidate;
-    }
+  get candidate(): globalThis.RTCIceCandidate {
+    return this.#candidate;
+  }
 }
 
 export class RTCDataChannelEvent extends Event implements globalThis.RTCDataChannelEvent {
-    #channel: globalThis.RTCDataChannel;
+  #channel: globalThis.RTCDataChannel;
 
-    constructor(type: string, eventInitDict: globalThis.RTCDataChannelEventInit) {
-        super(type);
+  constructor(type: string, eventInitDict: globalThis.RTCDataChannelEventInit) {
+    super(type);
 
-        if (type && !eventInitDict.channel) throw new TypeError('channel member is required');
+    if (type && !eventInitDict.channel) throw new TypeError('channel member is required');
 
-        this.#channel = eventInitDict?.channel as globalThis.RTCDataChannel;
-    }
+    this.#channel = eventInitDict?.channel as globalThis.RTCDataChannel;
+  }
 
-    get channel(): globalThis.RTCDataChannel {
-        return this.#channel;
-    }
+  get channel(): globalThis.RTCDataChannel {
+    return this.#channel;
+  }
 }

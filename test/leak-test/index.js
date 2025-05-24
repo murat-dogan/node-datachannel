@@ -3,7 +3,7 @@
 
 import why from 'why-is-node-running';
 import { RTCPeerConnection } from 'node-datachannel/polyfill';
-import {initLogger} from 'node-datachannel';
+import { initLogger } from 'node-datachannel';
 
 initLogger('Error');
 
@@ -71,7 +71,7 @@ await Promise.all(
         // all data has been echoed back to us
         if (received === send) {
           // this makes no difference
-        //   channel.close();
+          //   channel.close();
           resolve();
         }
       });

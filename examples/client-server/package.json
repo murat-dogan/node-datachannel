@@ -1,17 +1,17 @@
 {
-    "name": "client",
-    "version": "1.0.0",
-    "description": "",
-    "main": "client.js",
-    "type": "module",
-    "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1"
-    },
-    "keywords": [],
-    "author": "",
-    "license": "ISC",
-    "dependencies": {
-        "node-datachannel": "file:../..",
-        "yargs": "^16.2.0"
-    }
+  "name": "client",
+  "version": "1.0.0",
+  "description": "",
+  "main": "client.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "node-datachannel": "file:../..",
+    "yargs": "^16.2.0"
+  }
 }

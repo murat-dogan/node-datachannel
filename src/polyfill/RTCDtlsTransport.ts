@@ -12,7 +12,10 @@ export default class RTCDtlsTransport extends EventTarget implements globalThis.
     super();
     this.#pc = init.pc;
 
-    this.#iceTransport = new RTCIceTransport({ pc: init.pc, extraFunctions: init.extraFunctions });
+    this.#iceTransport = new RTCIceTransport({
+      pc: init.pc,
+      extraFunctions: init.extraFunctions,
+    });
 
     // forward peerConnection events
     this.#pc.addEventListener('connectionstatechange', () => {

@@ -11,8 +11,8 @@ import RTCCertificate from './RTCCertificate';
 
 // extend RTCConfiguration with peerIdentity
 interface RTCConfiguration extends globalThis.RTCConfiguration {
-    peerIdentity?: string;
-    peerConnection?: PeerConnection;
+  peerIdentity?: string;
+  peerConnection?: PeerConnection;
 }
 
 export default class RTCPeerConnection extends EventTarget implements globalThis.RTCPeerConnection {
@@ -312,7 +312,10 @@ export default class RTCPeerConnection extends EventTarget implements globalThis
     try {
       this.#peerConnection.addRemoteCandidate(candidate.candidate, candidate.sdpMid ?? '0');
       this.#remoteCandidates.push(
-        new RTCIceCandidate({ candidate: candidate.candidate, sdpMid: candidate.sdpMid ?? '0' }),
+        new RTCIceCandidate({
+          candidate: candidate.candidate,
+          sdpMid: candidate.sdpMid ?? '0',
+        }),
       );
     } catch (error) {
       if (!error || !error.message) throw new exceptions.NotFoundError('Unknown error');
@@ -481,20 +484,20 @@ export default class RTCPeerConnection extends EventTarget implements globalThis
 }
 
 function createDeferredPromise(): any {
-    let resolve: any, reject: any;
+  let resolve: any, reject: any;
 
-    const promise = new Promise(function (_resolve, _reject) {
-        resolve = _resolve;
-        reject = _reject;
-    });
+  const promise = new Promise(function (_resolve, _reject) {
+    resolve = _resolve;
+    reject = _reject;
+  });
 
-    (promise as any).resolve = resolve;
-    (promise as any).reject = reject;
-    return promise;
+  (promise as any).resolve = resolve;
+  (promise as any).reject = reject;
+  return promise;
 }
 
 function getRandomString(length): string {
-    return Math.random()
-        .toString(36)
-        .substring(2, 2 + length);
+  return Math.random()
+    .toString(36)
+    .substring(2, 2 + length);
 }

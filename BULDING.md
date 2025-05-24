@@ -1,8 +1,9 @@
 # Build
 
 ## Requirements
-* cmake >= V3.14
-* [libdatachannel dependencies](https://github.com/paullouisageneau/libdatachannel/blob/master/README.md#dependencies)
+
+- cmake >= V3.14
+- [libdatachannel dependencies](https://github.com/paullouisageneau/libdatachannel/blob/master/README.md#dependencies)
 
 ## Building from source
 
@@ -13,6 +14,7 @@
 ```
 
 Other Options
+
 ```sh
 # Use GnuTLS instead of OpenSSL (Default False)
 > npm run install-gnu-tls

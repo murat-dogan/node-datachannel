@@ -7,26 +7,26 @@
 //   };
 
 export default class RTCSessionDescription implements globalThis.RTCSessionDescriptionInit {
-    #type: globalThis.RTCSdpType;
-    #sdp: string;
+  #type: globalThis.RTCSdpType;
+  #sdp: string;
 
-    constructor(init: globalThis.RTCSessionDescriptionInit) {
-        this.#type = init ? init.type : null;
-        this.#sdp = init ? init.sdp : null;
-    }
+  constructor(init: globalThis.RTCSessionDescriptionInit) {
+    this.#type = init ? init.type : null;
+    this.#sdp = init ? init.sdp : null;
+  }
 
-    get type(): globalThis.RTCSdpType {
-        return this.#type;
-    }
+  get type(): globalThis.RTCSdpType {
+    return this.#type;
+  }
 
-    get sdp(): string {
-        return this.#sdp;
-    }
+  get sdp(): string {
+    return this.#sdp;
+  }
 
-    toJSON(): globalThis.RTCSessionDescriptionInit {
-        return {
-            sdp: this.#sdp,
-            type: this.#type,
-        };
-    }
+  toJSON(): globalThis.RTCSessionDescriptionInit {
+    return {
+      sdp: this.#sdp,
+      type: this.#type,
+    };
+  }
 }
