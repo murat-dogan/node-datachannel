@@ -23,3 +23,10 @@ Other Options
 # libnice-dev packet should be installed. (eg. sudo apt install libnice-dev)
 > npm run install-nice
 ```
+
+Compile without Media and Websocket
+```sh
+npx cmake-js clean
+npx cmake-js configure --CDNO_MEDIA=ON --CDNO_WEBSOCKET=ON
+npx cmake-js build
+```
