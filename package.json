@@ -1,6 +1,6 @@
 {
   "name": "node-datachannel",
-  "version": "0.27.0",
+  "version": "0.28.0",
   "description": "WebRTC For Node.js and Electron. libdatachannel node bindings.",
   "main": "./dist/cjs/lib/index.cjs",
   "module": "./dist/esm/lib/index.mjs",
