@@ -1,7 +1,17 @@
 ARG version=bullseye
 ARG node_version=18
+
+# Accept build args
+ARG gcc_install
+
 FROM node:${node_version}-${version}
+
 RUN apt update
-RUN apt install -y build-essential libssl-dev
+RUN apt install -y --no-install-recommends \
+    build-essential \
+    libssl-dev \
+    cmake \
+    ninja-build \
+    ${gcc_install}
 
 WORKDIR /usr/app/

@@ -7,26 +7,35 @@
 //   };
 
 export default class RTCSessionDescription implements globalThis.RTCSessionDescriptionInit {
-    #type: globalThis.RTCSdpType;
-    #sdp: string;
+  #type: globalThis.RTCSdpType;
+  #sdp: string;
 
-    constructor(init: globalThis.RTCSessionDescriptionInit) {
-        this.#type = init ? init.type : null;
-        this.#sdp = init ? init.sdp : null;
-    }
+  constructor(init: globalThis.RTCSessionDescriptionInit) {
+    this.#type = init?.type;
+    this.#sdp = init?.sdp ?? '';
+  }
 
-    get type(): globalThis.RTCSdpType {
-        return this.#type;
-    }
+  get type(): globalThis.RTCSdpType {
+    return this.#type;
+  }
 
-    get sdp(): string {
-        return this.#sdp;
+  set type(type) {
+    if (type !== 'offer' && type !== 'answer' && type !== 'pranswer' && type !== 'rollback') {
+      throw new TypeError(
+        `Failed to set the 'type' property on 'RTCSessionDescription': The provided value '${type}' is not a valid enum value of type RTCSdpType.`,
+      );
     }
+    this.#type = type;
+  }
 
-    toJSON(): globalThis.RTCSessionDescriptionInit {
-        return {
-            sdp: this.#sdp,
-            type: this.#type,
-        };
-    }
+  get sdp(): string {
+    return this.#sdp;
+  }
+
+  toJSON(): globalThis.RTCSessionDescriptionInit {
+    return {
+      sdp: this.#sdp,
+      type: this.#type,
+    };
+  }
 }

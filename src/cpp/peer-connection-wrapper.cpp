@@ -1,8 +1,11 @@
 #include "peer-connection-wrapper.h"
 #include "data-channel-wrapper.h"
+
+#if RTC_ENABLE_MEDIA == 1
 #include "media-track-wrapper.h"
 #include "media-video-wrapper.h"
 #include "media-audio-wrapper.h"
+#endif
 
 #include "plog/Log.h"
 
@@ -44,7 +47,11 @@ Napi::Object PeerConnectionWrapper::Init(Napi::Env env, Napi::Object exports)
             InstanceMethod("remoteFingerprint", &PeerConnectionWrapper::remoteFingerprint),
             InstanceMethod("addRemoteCandidate", &PeerConnectionWrapper::addRemoteCandidate),
             InstanceMethod("createDataChannel", &PeerConnectionWrapper::createDataChannel),
+
+#if RTC_ENABLE_MEDIA == 1
             InstanceMethod("addTrack", &PeerConnectionWrapper::addTrack),
+            InstanceMethod("onTrack", &PeerConnectionWrapper::onTrack),
+#endif
             InstanceMethod("hasMedia", &PeerConnectionWrapper::hasMedia),
             InstanceMethod("state", &PeerConnectionWrapper::state),
             InstanceMethod("iceState", &PeerConnectionWrapper::iceState),
@@ -57,7 +64,6 @@ Napi::Object PeerConnectionWrapper::Init(Napi::Env env, Napi::Object exports)
             InstanceMethod("onSignalingStateChange", &PeerConnectionWrapper::onSignalingStateChange),
             InstanceMethod("onGatheringStateChange", &PeerConnectionWrapper::onGatheringStateChange),
             InstanceMethod("onDataChannel", &PeerConnectionWrapper::onDataChannel),
-            InstanceMethod("onTrack", &PeerConnectionWrapper::onTrack),
             InstanceMethod("bytesSent", &PeerConnectionWrapper::bytesSent),
             InstanceMethod("bytesReceived", &PeerConnectionWrapper::bytesReceived),
             InstanceMethod("rtt", &PeerConnectionWrapper::rtt),
@@ -1115,6 +1121,7 @@ std::string PeerConnectionWrapper::candidateTransportTypeToString(const rtc::Can
     }
 }
 
+#if RTC_ENABLE_MEDIA == 1
 Napi::Value PeerConnectionWrapper::addTrack(const Napi::CallbackInfo &info)
 {
     PLOG_DEBUG << "addTrack() called";
@@ -1198,6 +1205,7 @@ void PeerConnectionWrapper::onTrack(const Napi::CallbackInfo &info)
                 args = {instance};
             }); });
 }
+#endif
 
 Napi::Value PeerConnectionWrapper::hasMedia(const Napi::CallbackInfo &info)
 {

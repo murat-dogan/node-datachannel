@@ -17,7 +17,7 @@ export default [
   bundle({
     plugins: [
       replace({
-        include: "src/lib/node-datachannel.ts",
+        include: 'src/lib/node-datachannel.ts',
         preventAssignment: true,
         "require('../../build": "require('../../../build",
       }),

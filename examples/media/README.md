@@ -29,6 +29,6 @@ gst-launch-1.0 -e udpsrc address=127.0.0.1 port=5000 caps="application/x-rtp" ! 
 
 ## Requirements
 
--   GStreamer 1.0
--   gstreamer1.0-libav (sudo apt-get install gstreamer1.0-libav)
--   h264enc (sudo apt-get install h264enc)
+- GStreamer 1.0
+- gstreamer1.0-libav (sudo apt-get install gstreamer1.0-libav)
+- h264enc (sudo apt-get install h264enc)

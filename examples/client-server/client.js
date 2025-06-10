@@ -89,15 +89,10 @@ function createPeerConnection(peerId) {
     ws.sendMessage(JSON.stringify({ id: peerId, type, description }));
   });
   peerConnection.onLocalCandidate((candidate, mid) => {
-    ws.sendMessage(
-      JSON.stringify({ id: peerId, type: 'candidate', candidate, mid }),
-    );
+    ws.sendMessage(JSON.stringify({ id: peerId, type: 'candidate', candidate, mid }));
   });
   peerConnection.onDataChannel((dc) => {
-    console.log(
-      'DataChannel from ' + peerId + ' received with label "',
-      dc.getLabel() + '"',
-    );
+    console.log('DataChannel from ' + peerId + ' received with label "', dc.getLabel() + '"');
     dc.onMessage((msg) => {
       console.log('Message from ' + peerId + ' received:', msg);
     });
@@ -109,8 +104,7 @@ function createPeerConnection(peerId) {
 
 function randomId(length) {
   var result = '';
-  var characters =
-    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   var charactersLength = characters.length;
   for (var i = 0; i < length; i++) {
     result += characters.charAt(Math.floor(Math.random() * charactersLength));

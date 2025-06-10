@@ -2,6 +2,9 @@ build
 dist
 prebuilds
 node_modules
-.vscode
+.vscode/*
+!.vscode/tasks.json
+!.vscode/launch.json
 tmp
 coverage
+vcpkg_installed

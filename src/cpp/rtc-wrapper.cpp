@@ -1,9 +1,15 @@
 #include "rtc-wrapper.h"
 #include "peer-connection-wrapper.h"
 #include "data-channel-wrapper.h"
+
+#if RTC_ENABLE_MEDIA == 1
 #include "media-track-wrapper.h"
+#endif
+
+#if RTC_ENABLE_WEBSOCKET == 1
 #include "web-socket-wrapper.h"
 #include "web-socket-server-wrapper.h"
+#endif
 
 #include "plog/Log.h"
 
@@ -118,9 +124,15 @@ void RtcWrapper::cleanup(const Napi::CallbackInfo &info)
     {
         PeerConnectionWrapper::CloseAll();
         DataChannelWrapper::CloseAll();
+
+#if RTC_ENABLE_MEDIA == 1
         TrackWrapper::CloseAll();
+#endif
+
+#if RTC_ENABLE_WEBSOCKET == 1
         WebSocketWrapper::CloseAll();
         WebSocketServerWrapper::StopAll();
+#endif
 
         const auto timeout = std::chrono::seconds(10);
         if (rtc::Cleanup().wait_for(std::chrono::seconds(timeout)) == std::future_status::timeout)
@@ -129,8 +141,14 @@ void RtcWrapper::cleanup(const Napi::CallbackInfo &info)
         // Cleanup the instances
         PeerConnectionWrapper::CleanupAll();
         DataChannelWrapper::CleanupAll();
+
+#if RTC_ENABLE_MEDIA == 1
         TrackWrapper::CleanupAll();
+#endif
+
+#if RTC_ENABLE_WEBSOCKET == 1
         WebSocketWrapper::CleanupAll();
+#endif
 
         if (logCallback)
             logCallback.reset();
