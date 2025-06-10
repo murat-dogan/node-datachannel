@@ -4,7 +4,7 @@
     "moduleResolution": "NodeNext",
     "rootDir": ".",
     "outDir": "./dist",
-    "module": "NodeNext",
+    "module": "NodeNext"
   },
   "include": ["index.ts"],
   "exclude": ["node_modules", "dist"]

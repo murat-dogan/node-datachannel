@@ -34,9 +34,9 @@ For rebuilding native addon;
 
 ### Package the App
 
--   cd examples/electron-demo
--   npm install
--   npm run package
+- cd examples/electron-demo
+- npm install
+- npm run package
 
 Now the app is built and ready to be used in folder `out`.
 
@@ -44,15 +44,15 @@ Now the app is built and ready to be used in folder `out`.
 
 In another terminal, start signaling server as below;
 
--   cd examples/client-server
--   npm install
--   node signaling-server.js
+- cd examples/client-server
+- npm install
+- node signaling-server.js
 
 Now signaling server is ready and running.
 
 ### Start App
 
--   Start 2 instances of the application
--   Copy ID of one instance
--   Paste the copied ID to the other instance
--   Click Connect
+- Start 2 instances of the application
+- Copy ID of one instance
+- Paste the copied ID to the other instance
+- Click Connect

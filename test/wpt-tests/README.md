@@ -28,9 +28,9 @@ https://web-platform.test:8443/tools/runner/index.html \*
 
 OR
 
-> npm run:wpt  (Let this run)
+> npm run wpt:server (Let this run)
 
-> npm run:test (In an other console)
+> npm run wpt:test (In an other console)
 
 The files that tested are listed in `wpt-test-list.js`. The commented lines need still to be one-by-one tested and uncommented.
 
@@ -43,4 +43,3 @@ Contributions are welcome!
 # Latest Test Results
 
 Please check [last-test-results.md](./last-test-results.md) page
-

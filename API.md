@@ -6,8 +6,8 @@
 
 let pc = new PeerConnection(peerName[,options])
 
--   peerName `<string>` Peer name to use for logs etc..
--   options `<Object>` WebRTC Config Options
+- peerName `<string>` Peer name to use for logs etc..
+- options `<Object>` WebRTC Config Options
 
 ```
 export interface RtcConfig {
@@ -77,8 +77,8 @@ Add remote candidate info
 
 Create new data-channel
 
--   label `<string>` Data channel name
--   config `<Object>` Data channel options
+- label `<string>` Data channel name
+- config `<Object>` Data channel options
 
 ```
 export interface DataChannelInitConfig {

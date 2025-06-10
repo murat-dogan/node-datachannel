@@ -30,15 +30,12 @@ peerConnection.onGatheringStateChange((state) => {
     console.log(JSON.stringify(desc));
     console.log('\n\n');
     console.log('## Expect RTP video traffic on localhost:5000');
-    rl.question(
-      '## Please copy/paste the answer provided by the browser: \n',
-      (sdp) => {
-        let sdpObj = JSON.parse(sdp);
-        peerConnection.setRemoteDescription(sdpObj.sdp, sdpObj.type);
-        console.log(track.isOpen());
-        rl.close();
-      },
-    );
+    rl.question('## Please copy/paste the answer provided by the browser: \n', (sdp) => {
+      let sdpObj = JSON.parse(sdp);
+      peerConnection.setRemoteDescription(sdpObj.sdp, sdpObj.type);
+      console.log(track.isOpen());
+      rl.close();
+    });
   }
 });
 

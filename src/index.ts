@@ -5,6 +5,5 @@
 import n from './lib/index';
 import p from './polyfill/index';
 
-
 export const nodeDataChannel = n;
 export const polyfill = p;

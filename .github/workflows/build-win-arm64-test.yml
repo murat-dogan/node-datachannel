@@ -27,7 +27,7 @@ jobs:
       - name: Set Up MSVC for ARM64 Cross Compilation
         uses: ilammy/msvc-dev-cmd@v1
         with:
-          arch: amd64_arm64  # Sets up cross-compilation from x64 to ARM64
+          arch: amd64_arm64 # Sets up cross-compilation from x64 to ARM64
 
       - name: Install vcpkg
         run: |

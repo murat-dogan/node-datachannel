@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
   <head>
     <meta charset="UTF-8" />
@@ -16,14 +16,14 @@
     <br />
     <br />
     <h2>Messages</h2>
-    <input id="new-message" type="text" placeholder="Message to Send" width="100px"/>
+    <input id="new-message" type="text" placeholder="Message to Send" width="100px" />
     <button onclick="sendMessage()">Send</button>
     <br />
     <br />
-    <input id="sendRandom" type="checkbox" onclick="sendRandomMessage()">Send Random Messages</input> Every <input id="randomInterval" type="number" value="1000" min="1" step="100" /> ms
+    <input id="sendRandom" type="checkbox" onclick="sendRandomMessage()" />Send Random Messages
+    Every <input id="randomInterval" type="number" value="1000" min="1" step="100" /> ms
     <br />
     <br />
     <textarea id="messages" rows="10" cols="80" readonly></textarea>
-
   </body>
 </html>

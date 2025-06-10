@@ -29,30 +29,30 @@
 import './index.css';
 
 window.connect = () => {
-    const remoteId = document.getElementById('remote-id').value;
-    if (remoteId && remoteId.length > 2) {
-        // disable connect button
-        document.getElementById('connect').disabled = true;
-        document.getElementById('remote-id').disabled = true;
+  const remoteId = document.getElementById('remote-id').value;
+  if (remoteId && remoteId.length > 2) {
+    // disable connect button
+    document.getElementById('connect').disabled = true;
+    document.getElementById('remote-id').disabled = true;
 
-        window.electron.connect(remoteId);
-    }
+    window.electron.connect(remoteId);
+  }
 };
 
 window.sendMessage = () => {
-    const remoteId = document.getElementById('remote-id').value;
-    if (remoteId && remoteId.length > 2) {
-        let msg = document.getElementById('new-message').value;
-        if (msg && msg.length > 0) {
-            document.getElementById('new-message').value = '';
-            document.getElementById('messages').value += 'me> ' + msg + '\n';
-            window.electron.sendMessage(remoteId, msg);
-        }
+  const remoteId = document.getElementById('remote-id').value;
+  if (remoteId && remoteId.length > 2) {
+    let msg = document.getElementById('new-message').value;
+    if (msg && msg.length > 0) {
+      document.getElementById('new-message').value = '';
+      document.getElementById('messages').value += 'me> ' + msg + '\n';
+      window.electron.sendMessage(remoteId, msg);
     }
+  }
 };
 
 window.sendRandomMessage = () => {
-    let enabled = document.getElementById('sendRandom').checked;
-    let interval = document.getElementById('randomInterval').value;
-    window.electron.sendRandomMessage(enabled, interval);
+  let enabled = document.getElementById('sendRandom').checked;
+  let interval = document.getElementById('randomInterval').value;
+  window.electron.sendRandomMessage(enabled, interval);
 };

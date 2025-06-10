@@ -4,25 +4,26 @@
 const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('electron', {
-    connect: (remoteId) => ipcRenderer.send('connect', remoteId),
-    sendMessage: (remoteId, msg) => ipcRenderer.send('send-message', remoteId, msg),
-    sendRandomMessage: (enabled, interval) => ipcRenderer.send('send-random-message', enabled, interval),
+  connect: (remoteId) => ipcRenderer.send('connect', remoteId),
+  sendMessage: (remoteId, msg) => ipcRenderer.send('send-message', remoteId, msg),
+  sendRandomMessage: (enabled, interval) =>
+    ipcRenderer.send('send-random-message', enabled, interval),
 });
 
 ipcRenderer.on('my-id', (e, myId) => {
-    document.getElementById('my-id').innerHTML = myId;
+  document.getElementById('my-id').innerHTML = myId;
 });
 
 ipcRenderer.on('message', (e, remoteId, msg) => {
-    document.getElementById('messages').value += remoteId + '> ' + msg + '\n';
+  document.getElementById('messages').value += remoteId + '> ' + msg + '\n';
 });
 
 ipcRenderer.on('connect', (e, remoteId) => {
-    document.getElementById('connect').disabled = true;
-    document.getElementById('remote-id').disabled = true;
-    document.getElementById('remote-id').value = remoteId;
+  document.getElementById('connect').disabled = true;
+  document.getElementById('remote-id').disabled = true;
+  document.getElementById('remote-id').value = remoteId;
 });
 
 ipcRenderer.on('state-update', (e, state) => {
-    document.getElementById('state').innerHTML = state;
+  document.getElementById('state').innerHTML = state;
 });
