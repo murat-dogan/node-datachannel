@@ -50,6 +50,7 @@ endif()
 set(SRC_FILES
    src/cpp/rtc-wrapper.cpp
     src/cpp/data-channel-wrapper.cpp
+    src/cpp/ice-udp-mux-listener-wrapper.cpp
     src/cpp/peer-connection-wrapper.cpp
     src/cpp/thread-safe-callback.cpp
     src/cpp/main.cpp

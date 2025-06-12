@@ -44,6 +44,7 @@ Napi::Object PeerConnectionWrapper::Init(Napi::Env env, Napi::Object exports)
             InstanceMethod("setRemoteDescription", &PeerConnectionWrapper::setRemoteDescription),
             InstanceMethod("localDescription", &PeerConnectionWrapper::localDescription),
             InstanceMethod("remoteDescription", &PeerConnectionWrapper::remoteDescription),
+            InstanceMethod("remoteFingerprint", &PeerConnectionWrapper::remoteFingerprint),
             InstanceMethod("addRemoteCandidate", &PeerConnectionWrapper::addRemoteCandidate),
             InstanceMethod("createDataChannel", &PeerConnectionWrapper::createDataChannel),
 
@@ -220,6 +221,10 @@ PeerConnectionWrapper::PeerConnectionWrapper(const Napi::CallbackInfo &info) : N
     if (config.Get("disableAutoNegotiation").IsBoolean())
         rtcConfig.disableAutoNegotiation = config.Get("disableAutoNegotiation").As<Napi::Boolean>();
 
+    // disableAutoGathering option
+    if (config.Get("disableAutoGathering").IsBoolean())
+        rtcConfig.disableAutoGathering = config.Get("disableAutoGathering").As<Napi::Boolean>();
+
     // forceMediaTransport option
     if (config.Get("forceMediaTransport").IsBoolean())
         rtcConfig.forceMediaTransport = config.Get("forceMediaTransport").As<Napi::Boolean>();
@@ -255,6 +260,17 @@ PeerConnectionWrapper::PeerConnectionWrapper(const Napi::CallbackInfo &info) : N
     // Allow skipping fingerprint validation
     if (config.Get("disableFingerprintVerification").IsBoolean()) {
         rtcConfig.disableFingerprintVerification = config.Get("disableFingerprintVerification").As<Napi::Boolean>();
+    }
+
+    // Specify certificate to use if set
+    if (config.Get("certificatePemFile").IsString()) {
+        rtcConfig.certificatePemFile = config.Get("certificatePemFile").As<Napi::String>().ToString();
+    }
+    if (config.Get("keyPemFile").IsString()) {
+        rtcConfig.keyPemFile = config.Get("keyPemFile").As<Napi::String>().ToString();
+    }
+    if (config.Get("keyPemPass").IsString()) {
+        rtcConfig.keyPemPass = config.Get("keyPemPass").As<Napi::String>().ToString();
     }
 
     // Create peer-connection
@@ -337,6 +353,7 @@ void PeerConnectionWrapper::setLocalDescription(const Napi::CallbackInfo &info)
     }
 
     rtc::Description::Type type = rtc::Description::Type::Unspec;
+    rtc::LocalDescriptionInit init;
 
     // optional
     if (length > 0)
@@ -362,7 +379,29 @@ void PeerConnectionWrapper::setLocalDescription(const Napi::CallbackInfo &info)
             type = rtc::Description::Type::Rollback;
     }
 
-    mRtcPeerConnPtr->setLocalDescription(type);
+    // optional
+    if (length > 1)
+    {
+        PLOG_DEBUG << "setLocalDescription() called with LocalDescriptionInit";
+
+        if (info[1].IsObject())
+        {
+            PLOG_DEBUG << "setLocalDescription() called with LocalDescriptionInit as object";
+            Napi::Object obj = info[1].As<Napi::Object>();
+
+            if (obj.Get("iceUfrag").IsString()) {
+                PLOG_DEBUG << "setLocalDescription() has ufrag";
+                init.iceUfrag = obj.Get("iceUfrag").As<Napi::String>();
+            }
+
+            if (obj.Get("icePwd").IsString()) {
+                PLOG_DEBUG << "setLocalDescription() has password";
+                init.icePwd = obj.Get("icePwd").As<Napi::String>();
+            }
+        }
+    }
+
+    mRtcPeerConnPtr->setLocalDescription(type, init);
 }
 
 void PeerConnectionWrapper::setRemoteDescription(const Napi::CallbackInfo &info)
@@ -1008,7 +1047,34 @@ Napi::Value PeerConnectionWrapper::maxMessageSize(const Napi::CallbackInfo &info
 
     try
     {
-        return Napi::Number::New(env, mRtcPeerConnPtr->remoteMaxMessageSize());
+        return Napi::Array::New(env, mRtcPeerConnPtr->remoteMaxMessageSize());
+    }
+    catch (std::exception &ex)
+    {
+        Napi::Error::New(env, std::string("libdatachannel error: ") + ex.what()).ThrowAsJavaScriptException();
+        return Napi::Number::New(info.Env(), 0);
+    }
+}
+
+Napi::Value PeerConnectionWrapper::remoteFingerprint(const Napi::CallbackInfo &info)
+{
+    PLOG_DEBUG << "remoteFingerprints() called";
+    Napi::Env env = info.Env();
+
+    if (!mRtcPeerConnPtr)
+    {
+        return Napi::Number::New(info.Env(), 0);
+    }
+
+    try
+    {
+        auto fingerprint = mRtcPeerConnPtr->remoteFingerprint();
+
+        Napi::Object fingerprintObject = Napi::Object::New(env);
+        fingerprintObject.Set("value", fingerprint.value);
+        fingerprintObject.Set("algorithm", rtc::CertificateFingerprint::AlgorithmIdentifier(fingerprint.algorithm));
+
+        return fingerprintObject;
     }
     catch (std::exception &ex)
     {
