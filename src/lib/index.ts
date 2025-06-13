@@ -16,6 +16,7 @@ import {
   SelectedCandidateInfo,
 } from './types';
 import { WebSocket } from './websocket';
+import type { CertificateFingerprint, IceUdpMuxRequest, LocalDescriptionInit } from './types';
 
 export function preload(): void {
   nodeDataChannel.preload();
@@ -136,10 +137,11 @@ export const DataChannel: {
 
 export interface PeerConnection {
   close(): void;
-  setLocalDescription(type?: DescriptionType): void;
+  setLocalDescription(type?: DescriptionType, init?: LocalDescriptionInit): void;
   setRemoteDescription(sdp: string, type: DescriptionType): void;
   localDescription(): { type: DescriptionType; sdp: string } | null;
   remoteDescription(): { type: DescriptionType; sdp: string } | null;
+  remoteFingerprint(): CertificateFingerprint;
   addRemoteCandidate(candidate: string, mid: string): void;
   createDataChannel(label: string, config?: DataChannelInitConfig): DataChannel;
   addTrack(media: Video | Audio): Track;
@@ -170,6 +172,16 @@ export const PeerConnection: {
   new (peerName: string, config: RtcConfig): PeerConnection;
 } = nodeDataChannel.PeerConnection;
 
+export interface IceUdpMuxListener {
+    address?: string;
+    port: number;
+    stop(): void;
+    onUnhandledStunRequest(cb: (req: IceUdpMuxRequest) => void): void;
+}
+export const IceUdpMuxListener: {
+    new(port: number, address?: string): IceUdpMuxListener
+} = nodeDataChannel.IceUdpMuxListener
+
 export interface RtcpReceivingSession {}
 
 export const RtcpReceivingSession: {
@@ -196,6 +208,7 @@ export default {
   WebSocket,
   WebSocketServer,
   DataChannelStream,
+  IceUdpMuxListener,
 };
 
 // Types

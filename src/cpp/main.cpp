@@ -2,6 +2,7 @@
 #include "rtc-wrapper.h"
 #include "peer-connection-wrapper.h"
 #include "data-channel-wrapper.h"
+#include "ice-udp-mux-listener-wrapper.h"
 
 #if RTC_ENABLE_MEDIA == 1
 #include "media-rtcpreceivingsession-wrapper.h"
@@ -27,6 +28,7 @@ Napi::Object InitAll(Napi::Env env, Napi::Object exports)
 #endif
 
     DataChannelWrapper::Init(env, exports);
+    IceUdpMuxListenerWrapper::Init(env, exports);
     PeerConnectionWrapper::Init(env, exports);
 
 #if RTC_ENABLE_WEBSOCKET == 1

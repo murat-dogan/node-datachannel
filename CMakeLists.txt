@@ -32,7 +32,7 @@ include(FetchContent)
 FetchContent_Declare(
     libdatachannel
     GIT_REPOSITORY https://github.com/paullouisageneau/libdatachannel.git
-    GIT_TAG "aa57f4285936a878fb96f4f84085ee84d20c3397" # v0.22.2+
+    GIT_TAG "v0.23.0"
 )
 
 option(NO_MEDIA "Disable media transport support in libdatachannel" OFF)
@@ -50,6 +50,7 @@ endif()
 set(SRC_FILES
    src/cpp/rtc-wrapper.cpp
     src/cpp/data-channel-wrapper.cpp
+    src/cpp/ice-udp-mux-listener-wrapper.cpp
     src/cpp/peer-connection-wrapper.cpp
     src/cpp/thread-safe-callback.cpp
     src/cpp/main.cpp

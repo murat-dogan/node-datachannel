@@ -73,6 +73,10 @@ export interface RtcConfig {
   mtu?: number;
   iceTransportPolicy?: TransportPolicy;
   disableFingerprintVerification?: boolean;
+  disableAutoGathering?: boolean;
+  certificatePemFile?: string;
+  keyPemFile?: string;
+  keyPemPass?: string;
 }
 
 // Lowercase to match the description type string from libdatachannel
@@ -113,6 +117,11 @@ export type RTCSignalingState =
   | 'have-remote-pranswer'
   | 'stable';
 
+export interface LocalDescriptionInit {
+  iceUfrag?: string;
+  icePwd?: string;
+}
+
 export interface DataChannelInitConfig {
   protocol?: string;
   negotiated?: boolean;
@@ -120,6 +129,17 @@ export interface DataChannelInitConfig {
   unordered?: boolean; // Reliability
   maxPacketLifeTime?: number; // Reliability
   maxRetransmits?: number; // Reliability
+}
+
+export interface CertificateFingerprint {
+    /**
+     * @see https://developer.mozilla.org/en-US/docs/Web/API/RTCCertificate/getFingerprints#value
+     */
+    value: string;
+    /**
+     * @see https://developer.mozilla.org/en-US/docs/Web/API/RTCCertificate/getFingerprints#algorithm
+     */
+    algorithm: 'sha-1' | 'sha-224' | 'sha-256' | 'sha-384' | 'sha-512' | 'md5' | 'md2';
 }
 
 export interface SelectedCandidateInfo {
@@ -134,3 +154,9 @@ export interface SelectedCandidateInfo {
 
 // Must be same as rtc enum class Direction
 export type Direction = 'SendOnly' | 'RecvOnly' | 'SendRecv' | 'Inactive' | 'Unknown';
+
+export interface IceUdpMuxRequest {
+    ufrag: string;
+    host: string;
+    port: number;
+}

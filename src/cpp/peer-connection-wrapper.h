@@ -38,6 +38,7 @@ public:
   Napi::Value iceState(const Napi::CallbackInfo &info);
   Napi::Value signalingState(const Napi::CallbackInfo &info);
   Napi::Value gatheringState(const Napi::CallbackInfo &info);
+  Napi::Value remoteFingerprint(const Napi::CallbackInfo &info);
 
   // Callbacks
   void onLocalDescription(const Napi::CallbackInfo &info);
