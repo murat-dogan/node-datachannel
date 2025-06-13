@@ -95,6 +95,7 @@ export default class RTCDataChannel extends EventTarget implements globalThis.RT
     this.addEventListener('message', (e) => this.onmessage?.(e as MessageEvent));
     this.addEventListener('error', (e) => this.onerror?.(e as RTCErrorEvent));
     this.addEventListener('close', (e) => this.onclose?.(e));
+    this.addEventListener('closing', (e) => this.onclosing?.(e));
     this.addEventListener('bufferedamountlow', (e) => this.onbufferedamountlow?.(e));
   }
 
