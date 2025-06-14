@@ -354,6 +354,13 @@ export default class RTCPeerConnection extends EventTarget implements globalThis
   }
 
   close(): void {
+    for (const dc of this.#dataChannels) {
+      if (dc.readyState !== 'closed') {
+        dc.close();
+      }
+    }
+    this.#dataChannels.clear();
+
     this.#peerConnection.close();
   }
 
