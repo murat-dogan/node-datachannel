@@ -16,8 +16,6 @@ export default class RTCDataChannel extends EventTarget implements globalThis.RT
   #label: string;
   #protocol: string;
 
-  #closeRequested = false;
-
   // events
   onbufferedamountlow: globalThis.RTCDataChannel['onbufferedamountlow'] = null;
   onclose: globalThis.RTCDataChannel['onclose'] = null;
@@ -49,14 +47,18 @@ export default class RTCDataChannel extends EventTarget implements globalThis.RT
 
     this.#dataChannel.onClosed(() => {
       // Simulate closing event
-      if (!this.#closeRequested) {
+      if (this.#readyState === 'closed') return;
+
+      if (this.#readyState !== 'closing') {
         this.#readyState = 'closing';
         this.dispatchEvent(new Event('closing'));
       }
 
       setImmediate(() => {
-        this.#readyState = 'closed';
-        this.dispatchEvent(new Event('close'));
+        if (this.#readyState !== 'closed') {
+          this.#readyState = 'closed';
+          this.dispatchEvent(new Event('close'));
+        }
       });
     });
 
@@ -79,32 +81,22 @@ export default class RTCDataChannel extends EventTarget implements globalThis.RT
 
     this.#dataChannel.onMessage((data) => {
       if (ArrayBuffer.isView(data)) {
-        if (this.binaryType == 'arraybuffer') data = data.buffer;
-        else data = Buffer.from(data.buffer);
+        data =
+          this.binaryType === 'arraybuffer'
+            ? (data.buffer as ArrayBuffer)
+            : Buffer.from(data.buffer);
       }
 
       this.dispatchEvent(new MessageEvent('message', { data }));
     });
 
     // forward events to properties
-    this.addEventListener('message', (e) => {
-      if (this.onmessage) this.onmessage(e as MessageEvent);
-    });
-    this.addEventListener('bufferedamountlow', (e) => {
-      if (this.onbufferedamountlow) this.onbufferedamountlow(e);
-    });
-    this.addEventListener('error', (e) => {
-      if (this.onerror) this.onerror(e as RTCErrorEvent);
-    });
-    this.addEventListener('close', (e) => {
-      if (this.onclose) this.onclose(e);
-    });
-    this.addEventListener('closing', (e) => {
-      if (this.onclosing) this.onclosing(e);
-    });
-    this.addEventListener('open', (e) => {
-      if (this.onopen) this.onopen(e);
-    });
+    this.addEventListener('open', (e) => this.onopen?.(e));
+    this.addEventListener('message', (e) => this.onmessage?.(e as MessageEvent));
+    this.addEventListener('error', (e) => this.onerror?.(e as RTCErrorEvent));
+    this.addEventListener('close', (e) => this.onclose?.(e));
+    this.addEventListener('closing', (e) => this.onclosing?.(e));
+    this.addEventListener('bufferedamountlow', (e) => this.onbufferedamountlow?.(e));
   }
 
   set binaryType(type) {
@@ -168,7 +160,7 @@ export default class RTCDataChannel extends EventTarget implements globalThis.RT
     return this.#readyState;
   }
 
-  send(data): void {
+  send(data: string | Blob | ArrayBuffer | ArrayBufferView): void {
     if (this.#readyState !== 'open') {
       throw new exceptions.InvalidStateError(
         "Failed to execute 'send' on 'RTCDataChannel': RTCDataChannel.readyState is not 'open'",
@@ -198,7 +190,15 @@ export default class RTCDataChannel extends EventTarget implements globalThis.RT
   }
 
   close(): void {
-    this.#closeRequested = true;
+    if (this.#readyState === 'closing' || this.#readyState === 'closed') {
+      throw new exceptions.InvalidStateError(
+        "Failed to execute 'close' on 'RTCDataChannel': The DataChannel is already closing or has been closed",
+      );
+    }
+
+    this.#readyState = 'closing';
+    this.dispatchEvent(new Event('closing'));
+
     setImmediate(() => {
       this.#dataChannel.close();
     });
