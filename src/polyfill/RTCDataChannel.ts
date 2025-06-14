@@ -161,42 +161,31 @@ export default class RTCDataChannel extends EventTarget implements globalThis.RT
   }
 
   send(data: string | Blob | ArrayBuffer | ArrayBufferView): void {
-    if (this.#readyState !== 'open' || !this.#dataChannel.isOpen()) {
+    if (this.#readyState !== 'open') {
       throw new exceptions.InvalidStateError(
         "Failed to execute 'send' on 'RTCDataChannel': RTCDataChannel.readyState is not 'open'",
       );
     }
 
-    try {
-      // Needs network error, type error implemented
-      if (typeof data === 'string') {
-        this.#dataChannel.sendMessage(data);
-      } else if (data instanceof Blob) {
-        data.arrayBuffer().then((ab) => {
-          if (process?.versions?.bun) {
-            this.#dataChannel.sendMessageBinary(Buffer.from(ab));
-          } else {
-            this.#dataChannel.sendMessageBinary(new Uint8Array(ab));
-          }
-        });
-      } else if (data instanceof Uint8Array) {
-        this.#dataChannel.sendMessageBinary(data);
-      } else {
+    // Needs network error, type error implemented
+    if (typeof data === 'string') {
+      this.#dataChannel.sendMessage(data);
+    } else if (data instanceof Blob) {
+      data.arrayBuffer().then((ab) => {
         if (process?.versions?.bun) {
-          this.#dataChannel.sendMessageBinary(Buffer.from(data as ArrayBuffer));
+          this.#dataChannel.sendMessageBinary(Buffer.from(ab));
         } else {
-          this.#dataChannel.sendMessageBinary(new Uint8Array(data as ArrayBuffer));
+          this.#dataChannel.sendMessageBinary(new Uint8Array(ab));
         }
+      });
+    } else if (data instanceof Uint8Array) {
+      this.#dataChannel.sendMessageBinary(data);
+    } else {
+      if (process?.versions?.bun) {
+        this.#dataChannel.sendMessageBinary(Buffer.from(data));
+      } else {
+        this.#dataChannel.sendMessageBinary(new Uint8Array(data));
       }
-    } catch (error: any) {
-      if (error?.message?.includes('DataChannel is closed')) {
-        this.#readyState = 'closed';
-        this.dispatchEvent(new Event('close'));
-        throw new exceptions.InvalidStateError(
-          "Failed to execute 'send' on 'RTCDataChannel': RTCDataChannel.send failed because the DataChannel is closed",
-        );
-      }
-      throw error;
     }
   }
 
