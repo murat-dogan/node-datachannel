@@ -190,11 +190,7 @@ export default class RTCDataChannel extends EventTarget implements globalThis.RT
   }
 
   close(): void {
-    if (this.#readyState === 'closing' || this.#readyState === 'closed') {
-      throw new exceptions.InvalidStateError(
-        "Failed to execute 'close' on 'RTCDataChannel': The DataChannel is already closing or has been closed",
-      );
-    }
+    if (this.#readyState === 'closing' || this.#readyState === 'closed') return;
 
     this.#readyState = 'closing';
     this.dispatchEvent(new Event('closing'));
