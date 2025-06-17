@@ -182,9 +182,9 @@ export default class RTCDataChannel extends EventTarget implements globalThis.RT
       this.#dataChannel.sendMessageBinary(data);
     } else {
       if (process?.versions?.bun) {
-        this.#dataChannel.sendMessageBinary(Buffer.from(data));
+        this.#dataChannel.sendMessageBinary(Buffer.from(data as ArrayBuffer));
       } else {
-        this.#dataChannel.sendMessageBinary(new Uint8Array(data));
+        this.#dataChannel.sendMessageBinary(new Uint8Array(data as ArrayBuffer));
       }
     }
   }
