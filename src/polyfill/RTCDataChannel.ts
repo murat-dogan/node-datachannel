@@ -191,7 +191,9 @@ export default class RTCDataChannel extends EventTarget implements globalThis.RT
     this.dispatchEvent(new Event('closing'));
 
     setImmediate(() => {
-      this.#dataChannel.close();
+      if (this.#readyState !== 'closed') {
+        this.#dataChannel.close();
+      }
     });
   }
 }
