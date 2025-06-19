@@ -16,6 +16,8 @@ export default class RTCDataChannel extends EventTarget implements globalThis.RT
   #label: string;
   #protocol: string;
 
+  #closeRequested = false;
+
   // events
   onbufferedamountlow: globalThis.RTCDataChannel['onbufferedamountlow'] = null;
   onclose: globalThis.RTCDataChannel['onclose'] = null;
@@ -48,8 +50,21 @@ export default class RTCDataChannel extends EventTarget implements globalThis.RT
     this.#dataChannel.onClosed(() => {
       if (this.#readyState === 'closed') return;
 
-      this.#readyState = 'closed';
-      this.dispatchEvent(new Event('close'));
+      if (!this.#closeRequested) {
+        // if close was not requested, we emit 'closing' before 'close' to match the spec behavior
+        this.#readyState = 'closing';
+        this.dispatchEvent(new Event('closing'));
+      } else {
+        // close was requested, so we skip 'closing' event to match the spec behavior
+        this.#readyState = 'closing';
+      }
+
+      setImmediate(() => {
+        if (this.#readyState !== 'closed') {
+          this.#readyState = 'closed';
+          this.dispatchEvent(new Event('close'));
+        }
+      });
     });
 
     this.#dataChannel.onError((msg) => {
@@ -182,13 +197,11 @@ export default class RTCDataChannel extends EventTarget implements globalThis.RT
   close(): void {
     if (this.#readyState === 'closing' || this.#readyState === 'closed') return;
 
+    this.#closeRequested = true;
     this.#readyState = 'closing';
-    this.dispatchEvent(new Event('closing'));
 
     setImmediate(() => {
-      if (this.#readyState !== 'closed') {
-        this.#dataChannel.close();
-      }
+      this.#dataChannel.close();
     });
   }
 }
