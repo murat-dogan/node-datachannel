@@ -2,3 +2,6 @@ test/wpt-tests/wpt
 vcpkg
 out
 .webpack
+build
+dist
+prebuilds

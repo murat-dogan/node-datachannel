@@ -173,14 +173,14 @@ export const PeerConnection: {
 } = nodeDataChannel.PeerConnection;
 
 export interface IceUdpMuxListener {
-    address?: string;
-    port: number;
-    stop(): void;
-    onUnhandledStunRequest(cb: (req: IceUdpMuxRequest) => void): void;
+  address?: string;
+  port: number;
+  stop(): void;
+  onUnhandledStunRequest(cb: (req: IceUdpMuxRequest) => void): void;
 }
 export const IceUdpMuxListener: {
-    new(port: number, address?: string): IceUdpMuxListener
-} = nodeDataChannel.IceUdpMuxListener
+  new (port: number, address?: string): IceUdpMuxListener;
+} = nodeDataChannel.IceUdpMuxListener;
 
 export interface RtcpReceivingSession {}
 

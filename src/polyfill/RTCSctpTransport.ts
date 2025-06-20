@@ -13,7 +13,7 @@ export default class RTCSctpTransport extends EventTarget implements globalThis.
     this.#pc = initial.pc;
 
     this.#transport = new RTCDtlsTransport({
-      pc: initial.pc
+      pc: initial.pc,
     });
 
     this.#pc.addEventListener('connectionstatechange', () => {
@@ -30,7 +30,7 @@ export default class RTCSctpTransport extends EventTarget implements globalThis.
 
   get maxMessageSize(): number {
     if (this.state !== 'connected') return null;
-    return this.#pc?.ext_maxMessageSize ?? 65536;;
+    return this.#pc?.ext_maxMessageSize ?? 65536;
   }
 
   get state(): globalThis.RTCSctpTransportState {

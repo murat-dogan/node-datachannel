@@ -25,6 +25,7 @@ Other Options
 ```
 
 Compile without Media and Websocket
+
 ```sh
 npx cmake-js clean
 npx cmake-js configure --CDNO_MEDIA=ON --CDNO_WEBSOCKET=ON

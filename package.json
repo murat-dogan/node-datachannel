@@ -50,7 +50,8 @@
     "wpt:server": "cd test/wpt-tests/wpt && ./wpt serve",
     "wpt:test": "ts-node test/wpt-tests/index.ts",
     "_prebuild": "prebuild -r napi --backend cmake-js",
-    "prepack": "npm run build:tsc"
+    "prepack": "npm run build:tsc",
+    "prettier": "prettier --write ."
   },
   "binary": {
     "napi_versions": [

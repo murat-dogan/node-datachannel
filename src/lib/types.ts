@@ -132,14 +132,14 @@ export interface DataChannelInitConfig {
 }
 
 export interface CertificateFingerprint {
-    /**
-     * @see https://developer.mozilla.org/en-US/docs/Web/API/RTCCertificate/getFingerprints#value
-     */
-    value: string;
-    /**
-     * @see https://developer.mozilla.org/en-US/docs/Web/API/RTCCertificate/getFingerprints#algorithm
-     */
-    algorithm: 'sha-1' | 'sha-224' | 'sha-256' | 'sha-384' | 'sha-512' | 'md5' | 'md2';
+  /**
+   * @see https://developer.mozilla.org/en-US/docs/Web/API/RTCCertificate/getFingerprints#value
+   */
+  value: string;
+  /**
+   * @see https://developer.mozilla.org/en-US/docs/Web/API/RTCCertificate/getFingerprints#algorithm
+   */
+  algorithm: 'sha-1' | 'sha-224' | 'sha-256' | 'sha-384' | 'sha-512' | 'md5' | 'md2';
 }
 
 export interface SelectedCandidateInfo {
@@ -156,7 +156,7 @@ export interface SelectedCandidateInfo {
 export type Direction = 'SendOnly' | 'RecvOnly' | 'SendRecv' | 'Inactive' | 'Unknown';
 
 export interface IceUdpMuxRequest {
-    ufrag: string;
-    host: string;
-    port: number;
+  ufrag: string;
+  host: string;
+  port: number;
 }

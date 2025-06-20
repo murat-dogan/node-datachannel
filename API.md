@@ -80,6 +80,7 @@ export const enum DescriptionType {
 
 Set Local Description and optionally the ICE ufrag/pwd to use. These should not
 be set as they will be generated automatically as per the spec.
+
 ```
 export interface LocalDescriptionInit {
     iceUfrag?: string;
@@ -90,6 +91,7 @@ export interface LocalDescriptionInit {
 **remoteFingerprint: () => CertificateFingerprint**
 
 Returns the certificate fingerprint used by the remote peer
+
 ```
 export interface CertificateFingerprint {
     value: string;
