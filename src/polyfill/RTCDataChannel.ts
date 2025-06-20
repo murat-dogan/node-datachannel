@@ -176,23 +176,35 @@ export default class RTCDataChannel extends EventTarget implements globalThis.RT
     }
 
     // Needs network error, type error implemented
-    if (typeof data === 'string') {
-      this.#dataChannel.sendMessage(data);
-    } else if (data instanceof Blob) {
-      data.arrayBuffer().then((ab) => {
-        if (process?.versions?.bun) {
-          this.#dataChannel.sendMessageBinary(Buffer.from(ab));
-        } else {
-          this.#dataChannel.sendMessageBinary(new Uint8Array(ab));
-        }
-      });
-    } else if (data instanceof Uint8Array) {
-      this.#dataChannel.sendMessageBinary(data);
-    } else {
-      if (process?.versions?.bun) {
-        this.#dataChannel.sendMessageBinary(Buffer.from(data));
+    try {
+      if (typeof data === 'string') {
+        this.#dataChannel.sendMessage(data);
+      } else if (data instanceof Blob) {
+        data.arrayBuffer().then((ab) => {
+          if (process?.versions?.bun) {
+            this.#dataChannel.sendMessageBinary(Buffer.from(ab));
+          } else {
+            this.#dataChannel.sendMessageBinary(new Uint8Array(ab));
+          }
+        });
+      } else if (data instanceof Uint8Array) {
+        this.#dataChannel.sendMessageBinary(data);
       } else {
-        this.#dataChannel.sendMessageBinary(new Uint8Array(data));
+        if (process?.versions?.bun) {
+          this.#dataChannel.sendMessageBinary(Buffer.from(data));
+        } else {
+          this.#dataChannel.sendMessageBinary(new Uint8Array(data));
+        }
+      }
+    } catch (error) {
+      //If error contains "DataChannel is closed" throw InvalidStateError
+      if (error instanceof Error && error.message.includes('DataChannel is closed')) {
+        throw new exceptions.InvalidStateError(
+          "Failed to execute 'send' on 'RTCDataChannel': RTCDataChannel.readyState is not 'open'",
+        );
+      } else {
+        // Otherwise throw the error
+        throw error;
       }
     }
   }
