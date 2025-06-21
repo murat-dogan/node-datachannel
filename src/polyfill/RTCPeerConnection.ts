@@ -356,7 +356,12 @@ export default class RTCPeerConnection extends EventTarget implements globalThis
   close(): void {
     for (const dc of this.#dataChannels) {
       if (dc.readyState !== 'closed' && dc.readyState !== 'closing') {
-        dc.close();
+        Object.defineProperty(dc, 'readyState', {
+          value: 'closed',
+          writable: false,
+          enumerable: true,
+          configurable: true,
+        });
       }
     }
 
