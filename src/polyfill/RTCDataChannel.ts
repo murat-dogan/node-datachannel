@@ -54,9 +54,6 @@ export default class RTCDataChannel extends EventTarget implements globalThis.RT
         // if close was not requested, we emit 'closing' before 'close' to match the spec behavior
         this.#readyState = 'closing';
         this.dispatchEvent(new Event('closing'));
-      } else {
-        // close was requested, so we skip 'closing' event to match the spec behavior
-        this.#readyState = 'closing';
       }
 
       setImmediate(() => {
