@@ -6,12 +6,15 @@ ARG gcc_install
 
 FROM node:${node_version}-${version}
 
-RUN apt update
-RUN apt install -y --no-install-recommends \
-    build-essential \
-    libssl-dev \
-    cmake \
-    ninja-build \
-    ${gcc_install}
+RUN echo "deb http://deb.debian.org/debian bullseye-backports main" >> /etc/apt/sources.list && \
+    apt update && \
+    apt install -y --no-install-recommends \
+        build-essential \
+        libssl-dev \
+        ninja-build \
+        ${gcc_install} && \
+    apt install -y -t bullseye-backports cmake && \
+    apt clean && \
+    rm -rf /var/lib/apt/lists/*
 
 WORKDIR /usr/app/
