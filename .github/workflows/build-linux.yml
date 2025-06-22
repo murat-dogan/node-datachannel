@@ -28,7 +28,7 @@ jobs:
             gxx: clang++
           - platform: debian
             triple: linux-gnu
-            version: bookworm
+            version: bullseye
             # libc intentionally not set (prebuild requirement)
 
           # Arch-specific baselines
