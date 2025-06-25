@@ -30,7 +30,7 @@ export default class RTCDataChannel extends EventTarget implements globalThis.RT
     super();
 
     this.#dataChannel = dataChannel;
-    this.#binaryType = 'blob';
+    this.#binaryType = 'arraybuffer';
     this.#readyState = this.#dataChannel.isOpen() ? 'open' : 'connecting';
     this.#bufferedAmountLowThreshold = 0;
     this.#maxPacketLifeTime = opts.maxPacketLifeTime ?? null;
@@ -77,10 +77,29 @@ export default class RTCDataChannel extends EventTarget implements globalThis.RT
       this.dispatchEvent(new Event('bufferedamountlow'));
     });
 
-    this.#dataChannel.onMessage((data) => {
-      if (ArrayBuffer.isView(data)) {
-        if (this.binaryType == 'arraybuffer') data = data.buffer;
-        else data = Buffer.from(data.buffer);
+    this.#dataChannel.onMessage((message) => {
+      if (typeof message === 'string') {
+        this.dispatchEvent(new MessageEvent('message', { data: message }));
+        return
+      }
+
+      let data: Blob | ArrayBuffer;
+
+      if (message instanceof ArrayBuffer) {
+        data = message;
+      } else {
+        data = message.buffer;
+
+        if (message.byteOffset !== 0 || message.byteLength !== message.buffer.byteLength) {
+          // message is view on underlying buffer, must create new
+          // ArrayBuffer that only contains message data
+          data = new ArrayBuffer(message.byteLength);
+          new Uint8Array(data, 0, message.byteLength).set(message);
+        }
+      }
+
+      if (this.#binaryType === 'blob') {
+        data = new Blob([data]);
       }
 
       this.dispatchEvent(new MessageEvent('message', { data }));
