@@ -6,7 +6,7 @@ import { eventPromise } from '../fixtures/event-promise';
 
 // Polyfill for Promise.withResolvers for Node < 20
 if (!Promise.withResolvers) {
-  (Promise as any).withResolvers = function <T> (): any {
+  (Promise as any).withResolvers = function <T>(): any {
     let resolve: (value: T | PromiseLike<T>) => void;
     let reject: (reason?: any) => void;
     const promise = new Promise<T>((res, rej) => {
@@ -76,7 +76,12 @@ describe('polyfill', () => {
     // Compares the received binary data to the expected value of the fixed binary data
     function analyzeBinaryTestData(binaryData: ArrayBufferLike): boolean {
       const dv = new DataView(binaryData);
-      return (dv.getInt8(0)==123 && dv.getFloat32(1)==Math.fround(123.456) && dv.getUint32(5)==987654321 && dv.getFloat64(9)==789.012);
+      return (
+        dv.getInt8(0) == 123 &&
+        dv.getFloat32(1) == Math.fround(123.456) &&
+        dv.getUint32(5) == 987654321 &&
+        dv.getFloat64(9) == 789.012
+      );
     }
 
     // We will set the "binaryType" and then send/receive the "data" from the datachannel in each test, and then compare them.
@@ -86,17 +91,17 @@ describe('polyfill', () => {
       { binaryType: 'arraybuffer', data: createBinaryTestData() },
       { binaryType: 'arraybuffer', data: createBinaryTestData(new ArrayBuffer(100)) },
       { binaryType: 'arraybuffer', data: createBinaryTestData(new ArrayBuffer(100), 50) },
-      { binaryType: 'blob', data: new Blob([createBinaryTestData()]) }
+      { binaryType: 'blob', data: new Blob([createBinaryTestData()]) },
     ];
 
-    const testMessageCount = Object.keys(testMessages).length
+    const testMessageCount = Object.keys(testMessages).length;
 
     // Index of the message in testMessages that we are currently testing.
     let currentIndex: number = -1;
 
     // We run this function to analyze the data just after receiving it from the datachannel.
     async function analyzeData(idx: number, data: Blob | ArrayBuffer): Promise<boolean> {
-      switch(idx){
+      switch (idx) {
         case 0: // binaryType is not used here because data is a string ("Hello").
           return new TextDecoder().decode(data as ArrayBuffer) === 'Hello';
         case 1: // binaryType is "arraybuffer" and data is expected to be an ArrayBuffer.
@@ -115,7 +120,7 @@ describe('polyfill', () => {
       peer1.close();
       peer2.close();
 
-              // State Callbacks
+      // State Callbacks
       expect(p1ConnectionStateMock.mock.calls.length).toBeGreaterThanOrEqual(1);
       expect(p2ConnectionStateMock.mock.calls.length).toBeGreaterThanOrEqual(1);
       expect(p1IceConnectionStateMock.mock.calls.length).toBeGreaterThanOrEqual(1);
@@ -123,7 +128,7 @@ describe('polyfill', () => {
       expect(p1IceGatheringStateMock.mock.calls.length).toBeGreaterThanOrEqual(1);
       expect(p2IceGatheringStateMock.mock.calls.length).toBeGreaterThanOrEqual(1);
 
-              // SDP
+      // SDP
       expect(p1SDPMock.mock.calls.length).toBe(1);
       expect(p2SDPMock.mock.calls.length).toBe(1);
 
@@ -151,15 +156,15 @@ describe('polyfill', () => {
       const current = testMessages[++currentIndex];
 
       if (!current) {
-        return
+        return;
       }
 
       // Assign the binaryType value
       dc1.binaryType = current.binaryType as BinaryType;
 
       // dc2 also is initialized ?
-      if(dc2){
-          dc2.binaryType = current.binaryType as BinaryType;
+      if (dc2) {
+        dc2.binaryType = current.binaryType as BinaryType;
       }
 
       // Send the test message
@@ -212,53 +217,48 @@ describe('polyfill', () => {
     };
 
     // Actions
-    peer1
-      .createOffer()
-      .then((desc) => {
-        p1SDPMock();
-        peer2.setRemoteDescription(desc);
-      })
-      //.catch((err) => console.error(err));
+    peer1.createOffer().then((desc) => {
+      p1SDPMock();
+      peer2.setRemoteDescription(desc);
+    });
+    //.catch((err) => console.error(err));
 
-    peer2
-      .createAnswer()
-      .then((answerDesc) => {
-        p2SDPMock();
-        peer1.setRemoteDescription(answerDesc);
-      })
-      //.catch((err) => console.error('Couldn't create answer', err));
+    peer2.createAnswer().then((answerDesc) => {
+      p2SDPMock();
+      peer1.setRemoteDescription(answerDesc);
+    });
+    //.catch((err) => console.error('Couldn't create answer', err));
 
-    const sentAll = Promise.withResolvers<void>()
+    const sentAll = Promise.withResolvers<void>();
 
     dc1 = peer1.createDataChannel('test-p2p');
     dc1.onopen = (): void => {
       p1DCMock();
 
-      nextSendTest()
-        .catch(err => {
-          sentAll.reject(err)
-        });
+      nextSendTest().catch((err) => {
+        sentAll.reject(err);
+      });
     };
-    dc1.onmessage = (msg): void => { // peer2 sends all messages back to peer1
+    dc1.onmessage = (msg): void => {
+      // peer2 sends all messages back to peer1
       p1MessageMock(msg.data);
 
       if (p1MessageMock.mock.calls.length === testMessageCount) {
         finalizeTest()
           .then(() => {
-            sentAll.resolve()
+            sentAll.resolve();
           })
-          .catch(err => {
-            sentAll.reject(err)
+          .catch((err) => {
+            sentAll.reject(err);
           });
       } else {
-        nextSendTest()
-        .catch(err => {
-          sentAll.reject(err)
+        nextSendTest().catch((err) => {
+          sentAll.reject(err);
         });
       }
     };
 
-    await sentAll.promise
+    await sentAll.promise;
   });
 
   test('it can access datachannel informational fields after closing', async () => {

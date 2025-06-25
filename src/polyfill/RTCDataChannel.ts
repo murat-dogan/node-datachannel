@@ -3,7 +3,7 @@ import * as exceptions from './Exception';
 import { DataChannel } from '../lib/index';
 import { RTCErrorEvent } from './Events';
 
-const encoder = new TextEncoder()
+const encoder = new TextEncoder();
 
 export default class RTCDataChannel extends EventTarget implements globalThis.RTCDataChannel {
   #dataChannel: DataChannel;
@@ -88,14 +88,14 @@ export default class RTCDataChannel extends EventTarget implements globalThis.RT
 
       if (message instanceof ArrayBuffer) {
         data = message;
-      } else  {
+      } else {
         data = message.buffer;
 
         if (message.byteOffset !== 0 || message.byteLength !== message.buffer.byteLength) {
           // message is view on underlying buffer, must create new
           // ArrayBuffer that only contains message data
-          data = new ArrayBuffer(message.byteLength)
-          new Uint8Array(data, 0, message.byteLength).set(message)
+          data = new ArrayBuffer(message.byteLength);
+          new Uint8Array(data, 0, message.byteLength).set(message);
         }
       }
 
