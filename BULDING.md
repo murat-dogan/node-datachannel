@@ -2,7 +2,7 @@
 
 ## Requirements
 
-- cmake >= V3.14
+- cmake >= V3.21
 - [libdatachannel dependencies](https://github.com/paullouisageneau/libdatachannel/blob/master/README.md#dependencies)
 
 ## Building from source
