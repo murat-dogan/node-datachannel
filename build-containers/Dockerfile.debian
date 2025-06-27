@@ -13,7 +13,7 @@ RUN echo "deb http://deb.debian.org/debian bullseye-backports main" >> /etc/apt/
         libssl-dev \
         ninja-build \
         ${gcc_install} && \
-    apt install -y -t bullseye-backports cmake && \
+    apt install -y --no-install-recommends -t bullseye-backports cmake && \
     apt clean && \
     rm -rf /var/lib/apt/lists/*
 
