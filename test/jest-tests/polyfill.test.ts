@@ -115,10 +115,9 @@ describe('polyfill', () => {
         case 4: // binaryType is "arraybuffer" and data was created from a view on a larger ArrayBuffer with an offset
           return analyzeBinaryTestData(data as ArrayBufferLike);
         case 5: // binaryType is "blob" and data is expected to be a string ("Hello").
-          return data === 'Hello'
+          return data === 'Hello';
         case 6: // binaryType is "blob" and data is expected to be a Blob.
           return analyzeBinaryTestData(await (data as Blob).arrayBuffer());
-
       }
       return false;
     }

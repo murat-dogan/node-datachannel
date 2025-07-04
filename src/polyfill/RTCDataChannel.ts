@@ -80,7 +80,7 @@ export default class RTCDataChannel extends EventTarget implements globalThis.RT
     this.#dataChannel.onMessage((message) => {
       if (typeof message === 'string') {
         this.dispatchEvent(new MessageEvent('message', { data: message }));
-        return
+        return;
       }
 
       let data: Blob | ArrayBuffer;
