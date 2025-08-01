@@ -6,7 +6,7 @@ ARG gcc_install
 
 FROM node:${node_version}-${version}
 
-RUN echo "deb http://deb.debian.org/debian bullseye-backports main" >> /etc/apt/sources.list && \
+RUN echo "deb https://archive.debian.org/debian bullseye-backports main" >> /etc/apt/sources.list && \
     apt update && \
     apt install -y --no-install-recommends \
         build-essential \
