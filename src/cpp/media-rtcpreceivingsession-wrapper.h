@@ -1,16 +1,11 @@
 #ifndef MEDIA_RTCPRECEIVINGSESSION_WRAPPER_H
 #define MEDIA_RTCPRECEIVINGSESSION_WRAPPER_H
 
-#include <iostream>
-#include <string>
-#include <variant>
 #include <memory>
 #include <unordered_set>
 
 #include <napi.h>
 #include <rtc/rtc.hpp>
-
-#include "thread-safe-callback.h"
 
 class RtcpReceivingSessionWrapper : public Napi::ObjectWrap<RtcpReceivingSessionWrapper>
 {

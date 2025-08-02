@@ -1,5 +1,4 @@
 #include "data-channel-wrapper.h"
-
 #include "plog/Log.h"
 
 Napi::FunctionReference DataChannelWrapper::constructor = Napi::FunctionReference();

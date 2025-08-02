@@ -1,9 +1,6 @@
 #ifndef MEDIA_TRACK_WRAPPER_H
 #define MEDIA_TRACK_WRAPPER_H
 
-#include <iostream>
-#include <string>
-#include <variant>
 #include <memory>
 #include <unordered_set>
 

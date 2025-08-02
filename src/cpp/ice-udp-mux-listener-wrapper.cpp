@@ -3,7 +3,6 @@
 #include "plog/Log.h"
 
 #include <cctype>
-#include <sstream>
 
 Napi::FunctionReference IceUdpMuxListenerWrapper::constructor = Napi::FunctionReference();
 std::unordered_set<IceUdpMuxListenerWrapper *> IceUdpMuxListenerWrapper::instances;

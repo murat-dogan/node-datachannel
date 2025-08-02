@@ -1,4 +1,5 @@
 #include "web-socket-server-wrapper.h"
+#include "web-socket-wrapper.h"
 
 #include "plog/Log.h"
 

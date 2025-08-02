@@ -1,9 +1,7 @@
 #ifndef PEER_CONNECTION_WRAPPER_H
 #define PEER_CONNECTION_WRAPPER_H
 
-#include <iostream>
 #include <string>
-#include <variant>
 #include <memory>
 #include <unordered_set>
 

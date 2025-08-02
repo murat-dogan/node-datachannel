@@ -1,9 +1,7 @@
 #ifndef DATA_CHANNEL_WRAPPER_H
 #define DATA_CHANNEL_WRAPPER_H
 
-#include <iostream>
 #include <string>
-#include <variant>
 #include <memory>
 #include <unordered_set>
 

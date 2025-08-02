@@ -1,9 +1,6 @@
 #ifndef RTC_WRAPPER_H
 #define RTC_WRAPPER_H
 
-#include <iostream>
-#include <string>
-
 #include <napi.h>
 
 #include "rtc/rtc.hpp"

@@ -6,8 +6,6 @@
 #include <napi.h>
 #include <rtc/rtc.hpp>
 
-#include "thread-safe-callback.h"
-
 class VideoWrapper : public Napi::ObjectWrap<VideoWrapper>
 {
 public:
