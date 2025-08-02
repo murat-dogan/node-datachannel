@@ -51,7 +51,8 @@
     "wpt:test": "ts-node test/wpt-tests/index.ts",
     "_prebuild": "prebuild -r napi --backend cmake-js",
     "prepack": "npm run build:tsc",
-    "prettier": "prettier --write ."
+    "prettier": "prettier --write .",
+    "format-cpp": "find src/cpp \\( -name \"*.h\" -o -name \"*.cpp\" \\) -exec clang-format -i \"{}\" \\; "
   },
   "binary": {
     "napi_versions": [

@@ -18,25 +18,25 @@
 
 Napi::Object InitAll(Napi::Env env, Napi::Object exports)
 {
-    RtcWrapper::Init(env, exports);
+  RtcWrapper::Init(env, exports);
 
 #if RTC_ENABLE_MEDIA == 1
-    RtcpReceivingSessionWrapper::Init(env, exports);
-    TrackWrapper::Init(env, exports);
-    VideoWrapper::Init(env, exports);
-    AudioWrapper::Init(env, exports);
+  RtcpReceivingSessionWrapper::Init(env, exports);
+  TrackWrapper::Init(env, exports);
+  VideoWrapper::Init(env, exports);
+  AudioWrapper::Init(env, exports);
 #endif
 
-    DataChannelWrapper::Init(env, exports);
-    IceUdpMuxListenerWrapper::Init(env, exports);
-    PeerConnectionWrapper::Init(env, exports);
+  DataChannelWrapper::Init(env, exports);
+  IceUdpMuxListenerWrapper::Init(env, exports);
+  PeerConnectionWrapper::Init(env, exports);
 
 #if RTC_ENABLE_WEBSOCKET == 1
-    WebSocketWrapper::Init(env, exports);
-    WebSocketServerWrapper::Init(env, exports);
+  WebSocketWrapper::Init(env, exports);
+  WebSocketServerWrapper::Init(env, exports);
 #endif
 
-    return exports;
+  return exports;
 }
 
 NODE_API_MODULE(nodeDataChannel, InitAll)

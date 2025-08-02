@@ -1,0 +1,17 @@
+BasedOnStyle: LLVM
+
+# Indentation
+NamespaceIndentation: All
+
+# Braces
+BreakBeforeBraces: Allman
+
+#include
+SortIncludes: false
+
+# Line Length
+ColumnLimit: 120
+
+# Line Breaks
+AlwaysBreakTemplateDeclarations: true
+LambdaBodyIndentation: OuterScope
