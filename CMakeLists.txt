@@ -4,6 +4,10 @@ cmake_policy(SET CMP0042 NEW)
 
 project(node_datachannel VERSION 0.29.0)
 
+# compile_commands.json
+# -----------------------------------
+set(CMAKE_EXPORT_COMPILE_COMMANDS True)
+
 # -Dnapi_build_version=8
 add_definitions(-DNAPI_VERSION=8)
 
