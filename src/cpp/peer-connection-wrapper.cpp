@@ -1087,7 +1087,7 @@ Napi::Value PeerConnectionWrapper::maxMessageSize(const Napi::CallbackInfo &info
 
   try
   {
-    return Napi::Array::New(env, mRtcPeerConnPtr->remoteMaxMessageSize());
+    return Napi::Number::New(env, mRtcPeerConnPtr->remoteMaxMessageSize());
   }
   catch (std::exception &ex)
   {
