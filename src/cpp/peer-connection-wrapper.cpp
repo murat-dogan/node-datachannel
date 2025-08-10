@@ -193,7 +193,7 @@ PeerConnectionWrapper::PeerConnectionWrapper(const Napi::CallbackInfo &info)
     if (proxyServer.Get("username").IsString())
       username = proxyServer.Get("username").As<Napi::String>().ToString();
     if (proxyServer.Get("password").IsString())
-      username = proxyServer.Get("password").As<Napi::String>().ToString();
+      password = proxyServer.Get("password").As<Napi::String>().ToString();
 
     rtcConfig.proxyServer = rtc::ProxyServer(type, ip, port, username, password);
   }
