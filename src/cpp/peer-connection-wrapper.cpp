@@ -503,7 +503,7 @@ void PeerConnectionWrapper::addRemoteCandidate(const Napi::CallbackInfo &info)
   try
   {
     std::string candidate = info[0].As<Napi::String>().ToString();
-    std::string mid = info[0].As<Napi::String>().ToString();
+    std::string mid = info[1].As<Napi::String>().ToString();
     mRtcPeerConnPtr->addRemoteCandidate(rtc::Candidate(candidate, mid));
   }
   catch (std::exception &ex)
