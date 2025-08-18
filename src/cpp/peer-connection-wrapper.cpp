@@ -582,7 +582,7 @@ Napi::Value PeerConnectionWrapper::createDataChannel(const Napi::CallbackInfo &i
         Napi::TypeError::New(env, "Wrong DataChannel Init Config (unordered)").ThrowAsJavaScriptException();
         return info.Env().Null();
       }
-      init.reliability.unordered = !initConfig.Get("unordered").As<Napi::Boolean>();
+      init.reliability.unordered = initConfig.Get("unordered").As<Napi::Boolean>();
     }
 
     if (!initConfig.Get("maxPacketLifeTime").IsUndefined() && !initConfig.Get("maxPacketLifeTime").IsNull() &&
