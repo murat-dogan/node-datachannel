@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { SelectedCandidateInfo } from '../lib/types';
+import { DataChannelInitConfig, SelectedCandidateInfo } from '../lib/types';
 import { PeerConnection } from '../lib/index';
 import RTCSessionDescription from './RTCSessionDescription';
 import RTCDataChannel from './RTCDataChannel';
@@ -362,7 +362,13 @@ export default class RTCPeerConnection extends EventTarget implements globalThis
   }
 
   createDataChannel(label: string, opts: globalThis.RTCDataChannelInit = {}): RTCDataChannel {
-    const channel = this.#peerConnection.createDataChannel(label, opts);
+    const nativeOpts: DataChannelInitConfig = {
+      ...opts,
+      // libdatachannel uses "unordered", opposite of RTCDataChannelInit.ordered
+      unordered: opts.ordered === false ? true : false,
+    };
+
+    const channel = this.#peerConnection.createDataChannel(label, nativeOpts);
     const dataChannel = new RTCDataChannel(channel, opts);
 
     // ensure we can close all channels when shutting down
