@@ -46,6 +46,6 @@ jobs:
           npx cmake-js build
 
       - name: Upload
-        run: npx prebuild --arch arm64 -r napi --upload -u ${{ secrets.GITHUB_TOKEN }}
+        run: npx prebuild --backend cmake-js --arch arm64 -r napi --upload -u ${{ secrets.GITHUB_TOKEN }}
         env:
           CI: true
