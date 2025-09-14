@@ -29,11 +29,9 @@ jobs:
         with:
           arch: amd64_arm64 # Sets up cross-compilation from x64 to ARM64
 
-      - name: Install vcpkg
+      - name: Setup vcpkg
         run: |
-          git clone https://github.com/microsoft/vcpkg.git C:\vcpkg
-          cd C:\vcpkg
-          .\bootstrap-vcpkg.bat
+          C:\vcpkg\bootstrap-vcpkg.bat
         shell: cmd
 
       - name: Install OpenSSL (Static) for Windows ARM64
