@@ -193,7 +193,7 @@ PeerConnectionWrapper::PeerConnectionWrapper(const Napi::CallbackInfo &info)
     if (proxyServer.Get("username").IsString())
       username = proxyServer.Get("username").As<Napi::String>().ToString();
     if (proxyServer.Get("password").IsString())
-      username = proxyServer.Get("password").As<Napi::String>().ToString();
+      password = proxyServer.Get("password").As<Napi::String>().ToString();
 
     rtcConfig.proxyServer = rtc::ProxyServer(type, ip, port, username, password);
   }
@@ -503,7 +503,7 @@ void PeerConnectionWrapper::addRemoteCandidate(const Napi::CallbackInfo &info)
   try
   {
     std::string candidate = info[0].As<Napi::String>().ToString();
-    std::string mid = info[0].As<Napi::String>().ToString();
+    std::string mid = info[1].As<Napi::String>().ToString();
     mRtcPeerConnPtr->addRemoteCandidate(rtc::Candidate(candidate, mid));
   }
   catch (std::exception &ex)
@@ -582,7 +582,7 @@ Napi::Value PeerConnectionWrapper::createDataChannel(const Napi::CallbackInfo &i
         Napi::TypeError::New(env, "Wrong DataChannel Init Config (unordered)").ThrowAsJavaScriptException();
         return info.Env().Null();
       }
-      init.reliability.unordered = !initConfig.Get("unordered").As<Napi::Boolean>();
+      init.reliability.unordered = initConfig.Get("unordered").As<Napi::Boolean>();
     }
 
     if (!initConfig.Get("maxPacketLifeTime").IsUndefined() && !initConfig.Get("maxPacketLifeTime").IsNull() &&
@@ -1087,7 +1087,7 @@ Napi::Value PeerConnectionWrapper::maxMessageSize(const Napi::CallbackInfo &info
 
   try
   {
-    return Napi::Array::New(env, mRtcPeerConnPtr->remoteMaxMessageSize());
+    return Napi::Number::New(env, mRtcPeerConnPtr->remoteMaxMessageSize());
   }
   catch (std::exception &ex)
   {
