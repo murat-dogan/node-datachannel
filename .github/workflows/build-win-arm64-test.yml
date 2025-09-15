@@ -29,17 +29,17 @@ jobs:
         with:
           arch: amd64_arm64 # Sets up cross-compilation from x64 to ARM64
 
-      # - name: Setup vcpkg
-      #   run: |
-      #     C:\vcpkg\bootstrap-vcpkg.bat
-      #   shell: cmd
+      - name: Setup vcpkg
+        run: |
+          C:\vcpkg\bootstrap-vcpkg.bat
+        shell: cmd
 
-      # - name: Install OpenSSL (Static) for Windows ARM64
-      #   run: |
-      #     C:\vcpkg\vcpkg install openssl:arm64-windows-static
-      #   shell: cmd
+      - name: Install OpenSSL (Static) for Windows ARM64
+        run: |
+          C:\vcpkg\vcpkg install openssl:arm64-windows-static
+        shell: cmd
 
-      - name: Install
+      - name: NPM Install
         run: |
           npm install --ignore-scripts
         shell: cmd
