@@ -14,7 +14,7 @@ jobs:
     runs-on: windows-2022
     strategy:
       matrix:
-        node-version: [20]
+        node-version: [18]
 
     steps:
       - uses: actions/checkout@v4
@@ -46,7 +46,7 @@ jobs:
 
       - name: Build
         run: |
-          npx prebuild -r napi --arch arm64 --backend cmake-js -- --CDCMAKE_TOOLCHAIN_FILE="c:\\vcpkg\\scripts\\buildsystems\\vcpkg.cmake" --CDVCPKG_TARGET_TRIPLET=arm64-windows-static
+          npx prebuild -r napi --arch arm64 --backend cmake-js -- --CDCMAKE_TOOLCHAIN_FILE="c:\vcpkg\scripts\buildsystems\vcpkg.cmake" --CDVCPKG_TARGET_TRIPLET=arm64-windows-static
         shell: cmd
 
       - name: Upload
