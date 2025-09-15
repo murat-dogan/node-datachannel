@@ -42,10 +42,11 @@ jobs:
       - name: Build
         run: |
           npm install --ignore-scripts
-          npx cmake-js configure --arch arm64 --CDVCPKG_TARGET_TRIPLET=arm64-windows-static --CDCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake
-          npx cmake-js build
+          npx prebuild -r napi --arch arm64 --backend cmake-js -- --CDCMAKE_TOOLCHAIN_FILE="c:\vcpkg\scripts\buildsystems\vcpkg.cmake" --CDVCPKG_TARGET_TRIPLET=arm64-windows-static
+        shell: cmd
 
       - name: Upload
         run: npx prebuild --backend cmake-js --arch arm64 -r napi --upload -u ${{ secrets.GITHUB_TOKEN }}
         env:
           CI: true
+        shell: cmd
