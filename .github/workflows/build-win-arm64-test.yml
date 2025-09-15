@@ -14,7 +14,7 @@ jobs:
     runs-on: windows-2022
     strategy:
       matrix:
-        node-version: [18]
+        node-version: [20]
 
     steps:
       - uses: actions/checkout@v4
@@ -29,20 +29,24 @@ jobs:
         with:
           arch: amd64_arm64 # Sets up cross-compilation from x64 to ARM64
 
-      - name: Setup vcpkg
-        run: |
-          C:\vcpkg\bootstrap-vcpkg.bat
-        shell: cmd
+      # - name: Setup vcpkg
+      #   run: |
+      #     C:\vcpkg\bootstrap-vcpkg.bat
+      #   shell: cmd
 
-      - name: Install OpenSSL (Static) for Windows ARM64
+      # - name: Install OpenSSL (Static) for Windows ARM64
+      #   run: |
+      #     C:\vcpkg\vcpkg install openssl:arm64-windows-static
+      #   shell: cmd
+
+      - name: Install
         run: |
-          C:\vcpkg\vcpkg install openssl:arm64-windows-static
+          npm install --ignore-scripts
         shell: cmd
 
       - name: Build
         run: |
-          npm install --ignore-scripts
-          npx prebuild -r napi --arch arm64 --backend cmake-js -- --CDCMAKE_TOOLCHAIN_FILE="c:\vcpkg\scripts\buildsystems\vcpkg.cmake" --CDVCPKG_TARGET_TRIPLET=arm64-windows-static
+          npx prebuild -r napi --arch arm64 --backend cmake-js -- --CDCMAKE_TOOLCHAIN_FILE="c:\\vcpkg\\scripts\\buildsystems\\vcpkg.cmake" --CDVCPKG_TARGET_TRIPLET=arm64-windows-static
         shell: cmd
 
       - name: Upload
