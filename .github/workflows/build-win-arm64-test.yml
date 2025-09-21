@@ -29,11 +29,9 @@ jobs:
         with:
           arch: amd64_arm64 # Sets up cross-compilation from x64 to ARM64
 
-      - name: Install vcpkg
+      - name: Setup vcpkg
         run: |
-          git clone https://github.com/microsoft/vcpkg.git C:\vcpkg
-          cd C:\vcpkg
-          .\bootstrap-vcpkg.bat
+          C:\vcpkg\bootstrap-vcpkg.bat
         shell: cmd
 
       - name: Install OpenSSL (Static) for Windows ARM64
@@ -41,12 +39,18 @@ jobs:
           C:\vcpkg\vcpkg install openssl:arm64-windows-static
         shell: cmd
 
-      - name: Build
+      - name: NPM Install
         run: |
           npm install --ignore-scripts
-          node_modules/.bin/prebuild -r napi --backend cmake-js --arch arm64 --upload -u ${{ secrets.GITHUB_TOKEN }} -- --CDCMAKE_TOOLCHAIN_FILE=c:\vcpkg\scripts\buildsystems\vcpkg.cmake --CDVCPKG_TARGET_TRIPLET=arm64-windows-static
+        shell: cmd
+
+      - name: Build
+        run: |
+          npx prebuild -r napi --arch arm64 --backend cmake-js -- --CDCMAKE_TOOLCHAIN_FILE="c:\vcpkg\scripts\buildsystems\vcpkg.cmake" --CDVCPKG_TARGET_TRIPLET=arm64-windows-static
+        shell: cmd
 
       - name: Upload
-        run: node_modules/.bin/prebuild -r napi --upload -u ${{ secrets.GITHUB_TOKEN }}
+        run: npx prebuild --backend cmake-js --arch arm64 -r napi --upload -u ${{ secrets.GITHUB_TOKEN }}
         env:
           CI: true
+        shell: cmd
