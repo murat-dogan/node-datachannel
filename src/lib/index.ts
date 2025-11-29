@@ -189,10 +189,11 @@ export interface RtpPacketizationConfig {
   playoutDelayMin: number,
   playoutDelayMax: number,
   timestamp: number,
+  get clockRate(): number
 }
 
 export const RtpPacketizationConfig: {
-  new(ssrc: number, cname: string, payloadType: number, clockRate: number, videoOrientationId?: number)
+  new(ssrc: number, cname: string, payloadType: number, clockRate: number, videoOrientationId?: number): RtpPacketizationConfig
 } = nodeDataChannel.RtpPacketizationConfig
 
 export interface MediaHandler {
@@ -211,13 +212,17 @@ export const RtcpNackResponder: {
   new (maxSize?: number): RtcpNackResponder
 } = nodeDataChannel.RtcpNackResponder;
 
-export interface RtcpSrReporter extends MediaHandler {}
+export interface RtcpSrReporter extends MediaHandler {
+  get rtpConfig(): RtpPacketizationConfig
+}
 
 export const RtcpSrReporter: {
   new (rtpConfig: RtpPacketizationConfig): RtcpSrReporter
 } = nodeDataChannel.RtcpSrReporter;
 
-export interface RtpPacketizer extends MediaHandler {}
+export interface RtpPacketizer extends MediaHandler {
+  get rtpConfig(): RtpPacketizationConfig
+}
 
 export const RtpPacketizer: {
   new (rtpConfig: RtpPacketizationConfig): RtpPacketizer
