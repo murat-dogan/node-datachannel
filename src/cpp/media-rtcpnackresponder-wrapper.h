@@ -14,7 +14,7 @@ public:
   static Napi::Object Init(Napi::Env env, Napi::Object exports);
   RtcpNackResponderWrapper(const Napi::CallbackInfo &info);
   ~RtcpNackResponderWrapper();
-  std::shared_ptr<rtc::RtcpNackResponder> getSessionInstance();
+  std::shared_ptr<rtc::RtcpNackResponder> getResponderInstance();
 
   // Functions
 
@@ -22,7 +22,7 @@ public:
 
 private:
   static std::unordered_set<RtcpNackResponderWrapper *> instances;
-  std::shared_ptr<rtc::RtcpNackResponder> mSessionPtr = nullptr;
+  std::shared_ptr<rtc::RtcpNackResponder> mResponderPtr = nullptr;
 };
 
 #endif // MEDIA_RTCPNACKRESPONDER_WRAPPER_H

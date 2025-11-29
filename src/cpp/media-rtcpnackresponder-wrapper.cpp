@@ -38,14 +38,14 @@ RtcpNackResponderWrapper::RtcpNackResponderWrapper(const Napi::CallbackInfo &inf
     }
     maxSize = info[0].As<Napi::Number>().Int64Value();
   }
-  mSessionPtr = std::make_unique<rtc::RtcpNackResponder>(maxSize);
+  mResponderPtr = std::make_unique<rtc::RtcpNackResponder>(maxSize);
   instances.insert(this);
 }
 
 RtcpNackResponderWrapper::~RtcpNackResponderWrapper()
 {
-  mSessionPtr.reset();
+  mResponderPtr.reset();
   instances.erase(this);
 }
 
-std::shared_ptr<rtc::RtcpNackResponder> RtcpNackResponderWrapper::getSessionInstance() { return mSessionPtr; }
+std::shared_ptr<rtc::RtcpNackResponder> RtcpNackResponderWrapper::getResponderInstance() { return mResponderPtr; }
