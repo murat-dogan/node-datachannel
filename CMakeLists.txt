@@ -71,6 +71,7 @@ if(NOT NO_MEDIA)
         src/cpp/media-rtcpreceivingsession-wrapper.cpp
         src/cpp/media-rtcpsrreporter-wrapper.cpp
         src/cpp/media-rtppacketizationconfig-wrapper.cpp
+        src/cpp/media-rtppacketizer-wrapper.cpp
         src/cpp/media-track-wrapper.cpp
         src/cpp/media-audio-wrapper.cpp
         src/cpp/media-video-wrapper.cpp
