@@ -1,5 +1,6 @@
 #include "media-av1rtppacketizer-wrapper.h"
 #include "media-rtppacketizationconfig-wrapper.h"
+#include "media-mediahandler-helper.h"
 
 Napi::FunctionReference AV1RtpPacketizerWrapper::constructor = Napi::FunctionReference();
 std::unordered_set<AV1RtpPacketizerWrapper *> AV1RtpPacketizerWrapper::instances;
@@ -9,9 +10,10 @@ Napi::Object AV1RtpPacketizerWrapper::Init(Napi::Env env, Napi::Object exports)
   Napi::HandleScope scope(env);
 
   Napi::Function func = Napi::ObjectWrap<AV1RtpPacketizerWrapper>::DefineClass(env, "AV1RtpPacketizer",
-                                                                                   {
-                                                                                       // Instance Methods
-                                                                                   });
+    {
+      // Instance Methods
+      InstanceMethod("addToChain", &AV1RtpPacketizerWrapper::addToChain)
+    });
 
   // If this is not the first call, we don't want to reassign the constructor (hot-reload problem)
   if (constructor.IsEmpty())
@@ -79,3 +81,21 @@ AV1RtpPacketizerWrapper::~AV1RtpPacketizerWrapper()
 }
 
 std::shared_ptr<rtc::AV1RtpPacketizer> AV1RtpPacketizerWrapper::getPacketizerInstance() { return mPacketizerPtr; }
+
+void AV1RtpPacketizerWrapper::addToChain(const Napi::CallbackInfo &info)
+{
+  auto env = info.Env();
+  if (info.Length() < 1 || !info[0].IsObject())
+  {
+    Napi::TypeError::New(env, "Expected a MediaHandler instance").ThrowAsJavaScriptException();
+    return;
+  }
+  auto mediaHandler = asMediaHandler(info[0].As<Napi::Object>());
+  if (!mediaHandler)
+  {
+    Napi::TypeError::New(env, "Expected a MediaHandler instance. If this error is unexpected, please report a bug!")
+      .ThrowAsJavaScriptException();
+    return;
+  }
+  mPacketizerPtr->addToChain(mediaHandler);
+}

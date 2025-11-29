@@ -1,4 +1,5 @@
 #include "media-rtcpreceivingsession-wrapper.h"
+#include "media-mediahandler-helper.h"
 
 Napi::FunctionReference RtcpReceivingSessionWrapper::constructor = Napi::FunctionReference();
 std::unordered_set<RtcpReceivingSessionWrapper *> RtcpReceivingSessionWrapper::instances;
@@ -8,9 +9,10 @@ Napi::Object RtcpReceivingSessionWrapper::Init(Napi::Env env, Napi::Object expor
   Napi::HandleScope scope(env);
 
   Napi::Function func = Napi::ObjectWrap<RtcpReceivingSessionWrapper>::DefineClass(env, "RtcpReceivingSession",
-                                                                                   {
-                                                                                       // Instance Methods
-                                                                                   });
+    {
+      // Instance Methods
+      InstanceMethod("addToChain", &RtcpReceivingSessionWrapper::addToChain),
+    });
 
   // If this is not the first call, we don't want to reassign the constructor (hot-reload problem)
   if (constructor.IsEmpty())
@@ -38,3 +40,21 @@ RtcpReceivingSessionWrapper::~RtcpReceivingSessionWrapper()
 }
 
 std::shared_ptr<rtc::RtcpReceivingSession> RtcpReceivingSessionWrapper::getSessionInstance() { return mSessionPtr; }
+
+void RtcpReceivingSessionWrapper::addToChain(const Napi::CallbackInfo &info)
+{
+  auto env = info.Env();
+  if (info.Length() < 1 || !info[0].IsObject())
+  {
+    Napi::TypeError::New(env, "Expected a MediaHandler instance").ThrowAsJavaScriptException();
+    return;
+  }
+  auto mediaHandler = asMediaHandler(info[0].As<Napi::Object>());
+  if (!mediaHandler)
+  {
+    Napi::TypeError::New(env, "Expected a MediaHandler instance. If this error is unexpected, please report a bug!")
+        .ThrowAsJavaScriptException();
+    return;
+  }
+  mSessionPtr->addToChain(mediaHandler);
+}

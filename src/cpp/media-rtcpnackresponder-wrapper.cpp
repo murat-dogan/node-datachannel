@@ -1,4 +1,5 @@
 #include "media-rtcpnackresponder-wrapper.h"
+#include "media-mediahandler-helper.h"
 
 Napi::FunctionReference RtcpNackResponderWrapper::constructor = Napi::FunctionReference();
 std::unordered_set<RtcpNackResponderWrapper *> RtcpNackResponderWrapper::instances;
@@ -8,9 +9,10 @@ Napi::Object RtcpNackResponderWrapper::Init(Napi::Env env, Napi::Object exports)
   Napi::HandleScope scope(env);
 
   Napi::Function func = Napi::ObjectWrap<RtcpNackResponderWrapper>::DefineClass(env, "RtcpNackResponder",
-                                                                                   {
-                                                                                       // Instance Methods
-                                                                                   });
+    {
+      // Instance Methods
+      InstanceMethod("addToChain", &RtcpNackResponderWrapper::addToChain),
+    });
 
   // If this is not the first call, we don't want to reassign the constructor (hot-reload problem)
   if (constructor.IsEmpty())
@@ -49,3 +51,21 @@ RtcpNackResponderWrapper::~RtcpNackResponderWrapper()
 }
 
 std::shared_ptr<rtc::RtcpNackResponder> RtcpNackResponderWrapper::getResponderInstance() { return mResponderPtr; }
+
+void RtcpNackResponderWrapper::addToChain(const Napi::CallbackInfo &info)
+{
+  auto env = info.Env();
+  if (info.Length() < 1 || !info[0].IsObject())
+  {
+    Napi::TypeError::New(env, "Expected a MediaHandler instance").ThrowAsJavaScriptException();
+    return;
+  }
+  auto mediaHandler = asMediaHandler(info[0].As<Napi::Object>());
+  if (!mediaHandler)
+  {
+    Napi::TypeError::New(env, "Expected a MediaHandler instance. If this error is unexpected, please report a bug!")
+        .ThrowAsJavaScriptException();
+    return;
+  }
+  mResponderPtr->addToChain(mediaHandler);
+}

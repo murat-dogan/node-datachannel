@@ -1,5 +1,6 @@
 #include "media-h265rtppacketizer-wrapper.h"
 #include "media-rtppacketizationconfig-wrapper.h"
+#include "media-mediahandler-helper.h"
 
 Napi::FunctionReference H265RtpPacketizerWrapper::constructor = Napi::FunctionReference();
 std::unordered_set<H265RtpPacketizerWrapper *> H265RtpPacketizerWrapper::instances;
@@ -9,9 +10,10 @@ Napi::Object H265RtpPacketizerWrapper::Init(Napi::Env env, Napi::Object exports)
   Napi::HandleScope scope(env);
 
   Napi::Function func = Napi::ObjectWrap<H265RtpPacketizerWrapper>::DefineClass(env, "H265RtpPacketizer",
-                                                                                   {
-                                                                                       // Instance Methods
-                                                                                   });
+    {
+      // Instance Methods
+      InstanceMethod("addToChain", &H265RtpPacketizerWrapper::addToChain),
+    });
 
   // If this is not the first call, we don't want to reassign the constructor (hot-reload problem)
   if (constructor.IsEmpty())
@@ -79,3 +81,21 @@ H265RtpPacketizerWrapper::~H265RtpPacketizerWrapper()
 }
 
 std::shared_ptr<rtc::H265RtpPacketizer> H265RtpPacketizerWrapper::getPacketizerInstance() { return mPacketizerPtr; }
+
+void H265RtpPacketizerWrapper::addToChain(const Napi::CallbackInfo &info)
+{
+  auto env = info.Env();
+  if (info.Length() < 1 || !info[0].IsObject())
+  {
+    Napi::TypeError::New(env, "Expected a MediaHandler instance").ThrowAsJavaScriptException();
+    return;
+  }
+  auto mediaHandler = asMediaHandler(info[0].As<Napi::Object>());
+  if (!mediaHandler)
+  {
+    Napi::TypeError::New(env, "Expected a MediaHandler instance. If this error is unexpected, please report a bug!")
+        .ThrowAsJavaScriptException();
+    return;
+  }
+  mPacketizerPtr->addToChain(mediaHandler);
+}

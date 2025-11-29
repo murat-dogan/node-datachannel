@@ -17,7 +17,7 @@ public:
   std::shared_ptr<rtc::AV1RtpPacketizer> getPacketizerInstance();
 
   // Functions
-
+  void addToChain(const Napi::CallbackInfo &info);
   // Callbacks
 
 private:

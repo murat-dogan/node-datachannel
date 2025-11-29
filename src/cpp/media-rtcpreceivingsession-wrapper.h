@@ -17,6 +17,7 @@ public:
   std::shared_ptr<rtc::RtcpReceivingSession> getSessionInstance();
 
   // Functions
+  void addToChain(const Napi::CallbackInfo &info);
 
   // Callbacks
 

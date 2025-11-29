@@ -17,6 +17,7 @@ public:
   std::shared_ptr<rtc::H265RtpPacketizer> getPacketizerInstance();
 
   // Functions
+  void addToChain(const Napi::CallbackInfo &info);
 
   // Callbacks
 
