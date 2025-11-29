@@ -1,4 +1,5 @@
 #include "media-h264rtppacketizer-wrapper.h"
+#include "media-h26xseparator.h"
 #include "media-rtppacketizationconfig-wrapper.h"
 #include "media-mediahandler-helper.h"
 
@@ -37,14 +38,20 @@ H264RtpPacketizerWrapper::H264RtpPacketizerWrapper(const Napi::CallbackInfo &inf
     return;
   }
 
-  rtc::NalUnit::Separator separator;
-  if (!info[0].IsNumber())
+  if (!info[0].IsString())
   {
-    Napi::TypeError::New(env, "separator must be a number").ThrowAsJavaScriptException();
+    Napi::TypeError::New(env, "separator must be \"Length\", \"ShortStartSequence\", \"LongStartSequence\" or \"StartSequence\"")
+      .ThrowAsJavaScriptException();
     return;
   }
-  // Not gonna bother with checking enum values
-  separator = static_cast<rtc::NalUnit::Separator>(info[0].As<Napi::Number>().Uint32Value());
+  auto separatorOpt = strToSeparator(info[0].As<Napi::String>().Utf8Value());  
+  if (!separatorOpt.has_value())
+  {
+    Napi::TypeError::New(env, "separator must be \"Length\", \"ShortStartSequence\", \"LongStartSequence\" or \"StartSequence\"")
+      .ThrowAsJavaScriptException();
+    return;
+  }
+  auto separator = separatorOpt.value();
 
   if (!info[1].IsObject())
   {

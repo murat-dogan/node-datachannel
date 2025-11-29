@@ -1,4 +1,5 @@
 #include "media-av1rtppacketizer-wrapper.h"
+#include "media-av1packetization.h"
 #include "media-rtppacketizationconfig-wrapper.h"
 #include "media-mediahandler-helper.h"
 
@@ -37,14 +38,20 @@ AV1RtpPacketizerWrapper::AV1RtpPacketizerWrapper(const Napi::CallbackInfo &info)
     return;
   }
 
-  rtc::AV1RtpPacketizer::Packetization packetization;
-  if (!info[0].IsNumber())
+  if (!info[0].IsString())
   {
-    Napi::TypeError::New(env, "packetization must be a number").ThrowAsJavaScriptException();
+    Napi::TypeError::New(env, "packetization must be \"Obu\" or \"TemporalUnit\"")
+      .ThrowAsJavaScriptException();
     return;
   }
-  // Not gonna bother with checking enum values
-  packetization = static_cast<rtc::AV1RtpPacketizer::Packetization>(info[0].As<Napi::Number>().Uint32Value());
+  auto packetizationOpt = strToPacketization(info[0].As<Napi::String>().Utf8Value());
+  if (!packetizationOpt.has_value())
+  {
+    Napi::TypeError::New(env, "packetization must be \"Obu\" or \"TemporalUnit\"")
+      .ThrowAsJavaScriptException();
+    return;
+  }
+  auto packetization = packetizationOpt.value();
 
   if (!info[1].IsObject())
   {
