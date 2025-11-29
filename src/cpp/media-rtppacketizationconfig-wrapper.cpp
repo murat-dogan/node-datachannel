@@ -22,6 +22,10 @@ Napi::Object RtpPacketizationConfigWrapper::Init(Napi::Env env, Napi::Object exp
         &RtpPacketizationConfigWrapper::getPlayoutDelayMax,
         &RtpPacketizationConfigWrapper::setPlayoutDelayMax
       ),
+      InstanceAccessor("timestamp",
+        &RtpPacketizationConfigWrapper::getTimestamp,
+        &RtpPacketizationConfigWrapper::setTimestamp
+      ),
     });
 
   // If this is not the first call, we don't want to reassign the constructor (hot-reload problem)
@@ -141,4 +145,18 @@ void RtpPacketizationConfigWrapper::setPlayoutDelayMax(const Napi::CallbackInfo 
     return;
   }
   mConfigPtr->playoutDelayMax = val.As<Napi::Number>().Uint32Value();
+}
+Napi::Value RtpPacketizationConfigWrapper::getTimestamp(const Napi::CallbackInfo &info)
+{
+  return Napi::Number::New(info.Env(), mConfigPtr->timestamp);
+}
+void RtpPacketizationConfigWrapper::setTimestamp(const Napi::CallbackInfo &info, const Napi::Value &val)
+{
+  auto env = info.Env();
+  if (!val.IsNumber())
+  {
+    Napi::TypeError::New(env, "Expected a number").ThrowAsJavaScriptException();
+    return;
+  }
+  mConfigPtr->timestamp = val.As<Napi::Number>().Uint32Value();
 }

@@ -23,6 +23,8 @@ public:
   void setPlayoutDelayMin(const Napi::CallbackInfo& info, const Napi::Value &val);
   Napi::Value getPlayoutDelayMax(const Napi::CallbackInfo& info);
   void setPlayoutDelayMax(const Napi::CallbackInfo& info, const Napi::Value &val);
+  Napi::Value getTimestamp(const Napi::CallbackInfo& info);
+  void setTimestamp(const Napi::CallbackInfo& info, const Napi::Value &val);
   // Callbacks
 
 private:

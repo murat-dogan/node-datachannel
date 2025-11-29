@@ -188,6 +188,7 @@ export interface RtpPacketizationConfig {
   playoutDelayId: number,
   playoutDelayMin: number,
   playoutDelayMax: number,
+  timestamp: number,
 }
 
 export const RtpPacketizationConfig: {
