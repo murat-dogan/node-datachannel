@@ -184,7 +184,11 @@ export const IceUdpMuxListener: {
   new (port: number, address?: string): IceUdpMuxListener;
 } = nodeDataChannel.IceUdpMuxListener;
 
-export interface RtpPacketizationConfig {}
+export interface RtpPacketizationConfig {
+  playoutDelayId: number,
+  playoutDelayMin: number,
+  playoutDelayMax: number,
+}
 
 export const RtpPacketizationConfig: {
   new(ssrc: number, cname: string, payloadType: number, clockRate: number, videoOrientationId?: number)
