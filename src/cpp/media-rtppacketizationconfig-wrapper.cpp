@@ -26,6 +26,10 @@ Napi::Object RtpPacketizationConfigWrapper::Init(Napi::Env env, Napi::Object exp
         &RtpPacketizationConfigWrapper::getTimestamp,
         &RtpPacketizationConfigWrapper::setTimestamp
       ),
+      InstanceAccessor("clockRate",
+        &RtpPacketizationConfigWrapper::getClockRate,
+        nullptr
+      ),
     });
 
   // If this is not the first call, we don't want to reassign the constructor (hot-reload problem)
@@ -159,4 +163,8 @@ void RtpPacketizationConfigWrapper::setTimestamp(const Napi::CallbackInfo &info,
     return;
   }
   mConfigPtr->timestamp = val.As<Napi::Number>().Uint32Value();
+}
+Napi::Value RtpPacketizationConfigWrapper::getClockRate(const Napi::CallbackInfo &info)
+{
+  return Napi::Number::New(info.Env(), mConfigPtr->clockRate);
 }
