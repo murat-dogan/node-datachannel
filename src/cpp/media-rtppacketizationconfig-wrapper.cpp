@@ -8,9 +8,21 @@ Napi::Object RtpPacketizationConfigWrapper::Init(Napi::Env env, Napi::Object exp
   Napi::HandleScope scope(env);
 
   Napi::Function func = Napi::ObjectWrap<RtpPacketizationConfigWrapper>::DefineClass(env, "RtpPacketizationConfig",
-                                                                                   {
-                                                                                       // Instance Methods
-                                                                                   });
+    {
+      // Instance Methods
+      InstanceAccessor("playoutDelayId",
+        &RtpPacketizationConfigWrapper::getPlayoutDelayId,
+        &RtpPacketizationConfigWrapper::setPlayoutDelayId
+      ),
+      InstanceAccessor("playoutDelayMin",
+        &RtpPacketizationConfigWrapper::getPlayoutDelayMin,
+        &RtpPacketizationConfigWrapper::setPlayoutDelayMin
+      ),
+      InstanceAccessor("playoutDelayMax",
+        &RtpPacketizationConfigWrapper::getPlayoutDelayMax,
+        &RtpPacketizationConfigWrapper::setPlayoutDelayMax
+      ),
+    });
 
   // If this is not the first call, we don't want to reassign the constructor (hot-reload problem)
   if (constructor.IsEmpty())
@@ -87,3 +99,46 @@ RtpPacketizationConfigWrapper::~RtpPacketizationConfigWrapper()
 }
 
 std::shared_ptr<rtc::RtpPacketizationConfig> RtpPacketizationConfigWrapper::getConfigInstance() { return mConfigPtr; }
+
+Napi::Value RtpPacketizationConfigWrapper::getPlayoutDelayId(const Napi::CallbackInfo &info)
+{
+  return Napi::Number::New(info.Env(), mConfigPtr->playoutDelayId);
+}
+void RtpPacketizationConfigWrapper::setPlayoutDelayId(const Napi::CallbackInfo &info, const Napi::Value &val)
+{
+  auto env = info.Env();
+  if (!val.IsNumber())
+  {
+    Napi::TypeError::New(env, "Expected a number").ThrowAsJavaScriptException();
+    return;
+  }
+  mConfigPtr->playoutDelayId = val.As<Napi::Number>().Uint32Value();
+}
+Napi::Value RtpPacketizationConfigWrapper::getPlayoutDelayMin(const Napi::CallbackInfo &info)
+{
+  return Napi::Number::New(info.Env(), mConfigPtr->playoutDelayMin);
+}
+void RtpPacketizationConfigWrapper::setPlayoutDelayMin(const Napi::CallbackInfo &info, const Napi::Value &val)
+{
+  auto env = info.Env();
+  if (!val.IsNumber())
+  {
+    Napi::TypeError::New(env, "Expected a number").ThrowAsJavaScriptException();
+    return;
+  }
+  mConfigPtr->playoutDelayMin = val.As<Napi::Number>().Uint32Value();
+}
+Napi::Value RtpPacketizationConfigWrapper::getPlayoutDelayMax(const Napi::CallbackInfo &info)
+{
+  return Napi::Number::New(info.Env(), mConfigPtr->playoutDelayMax);
+}
+void RtpPacketizationConfigWrapper::setPlayoutDelayMax(const Napi::CallbackInfo &info, const Napi::Value &val)
+{
+  auto env = info.Env();
+  if (!val.IsNumber())
+  {
+    Napi::TypeError::New(env, "Expected a number").ThrowAsJavaScriptException();
+    return;
+  }
+  mConfigPtr->playoutDelayMax = val.As<Napi::Number>().Uint32Value();
+}

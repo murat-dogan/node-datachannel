@@ -17,7 +17,12 @@ public:
   std::shared_ptr<rtc::RtpPacketizationConfig> getConfigInstance();
 
   // Functions
-
+  Napi::Value getPlayoutDelayId(const Napi::CallbackInfo& info);
+  void setPlayoutDelayId(const Napi::CallbackInfo& info, const Napi::Value &val);
+  Napi::Value getPlayoutDelayMin(const Napi::CallbackInfo& info);
+  void setPlayoutDelayMin(const Napi::CallbackInfo& info, const Napi::Value &val);
+  Napi::Value getPlayoutDelayMax(const Napi::CallbackInfo& info);
+  void setPlayoutDelayMax(const Napi::CallbackInfo& info, const Napi::Value &val);
   // Callbacks
 
 private:
