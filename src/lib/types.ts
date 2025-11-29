@@ -160,3 +160,9 @@ export interface IceUdpMuxRequest {
   host: string;
   port: number;
 }
+
+// Same as rtc::NalUnit::Separator
+export type NalUnitSeparator = 'Length' | 'ShortStartSequence' | 'LongStartSequence' | 'Sequence';
+
+// Same as rtc::AV1RtpPacketizer::Packetization
+export type ObuPacketization = 'Obu' | 'TemporalUnit';
