@@ -64,7 +64,7 @@ RtpPacketizationConfigWrapper::RtpPacketizationConfigWrapper(const Napi::Callbac
     Napi::TypeError::New(env, "cname must be a string").ThrowAsJavaScriptException();
     return;
   }
-  cname = info[0].As<Napi::String>().Utf8Value();
+  cname = info[1].As<Napi::String>().Utf8Value();
 
   uint8_t payloadType;
   if (!info[2].IsNumber())
