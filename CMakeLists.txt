@@ -67,6 +67,7 @@ if(NOT NO_MEDIA)
         src/cpp/media-direction.cpp
         src/cpp/media-h264rtppacketizer-wrapper.cpp
         src/cpp/media-h265rtppacketizer-wrapper.cpp
+        src/cpp/media-mediahandler-helper.cpp
         src/cpp/media-rtcpnackresponder-wrapper.cpp
         src/cpp/media-rtcpreceivingsession-wrapper.cpp
         src/cpp/media-rtcpsrreporter-wrapper.cpp
