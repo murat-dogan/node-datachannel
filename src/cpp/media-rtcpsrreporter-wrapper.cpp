@@ -13,6 +13,8 @@ Napi::Object RtcpSrReporterWrapper::Init(Napi::Env env, Napi::Object exports)
     {
       // Instance Methods
       InstanceMethod("addToChain", &RtcpSrReporterWrapper::addToChain),
+      // Accessors
+      InstanceAccessor("rtpConfig", &RtcpSrReporterWrapper::getRtpPacketizationConfig, nullptr),
     });
 
   // If this is not the first call, we don't want to reassign the constructor (hot-reload problem)
@@ -43,6 +45,9 @@ RtcpSrReporterWrapper::RtcpSrReporterWrapper(const Napi::CallbackInfo &info)
     Napi::TypeError::New(env, "Expected a RtpPacketizationConfig object").ThrowAsJavaScriptException();
     return;
   }
+  // store original JS object so we can return it later
+  mRtpConfigObject = Napi::Persistent(obj);
+  mRtpConfigObject.SuppressDestruct();
   auto config = RtpPacketizationConfigWrapper::Unwrap(obj);
   mReporterPtr = std::make_unique<rtc::RtcpSrReporter>(config->getConfigInstance());
   instances.insert(this);
@@ -51,6 +56,7 @@ RtcpSrReporterWrapper::RtcpSrReporterWrapper(const Napi::CallbackInfo &info)
 RtcpSrReporterWrapper::~RtcpSrReporterWrapper()
 {
   mReporterPtr.reset();
+  mRtpConfigObject.Reset();
   instances.erase(this);
 }
 
@@ -72,4 +78,19 @@ void RtcpSrReporterWrapper::addToChain(const Napi::CallbackInfo &info)
     return;
   }
   mReporterPtr->addToChain(mediaHandler);
+}
+
+Napi::Value RtcpSrReporterWrapper::getRtpPacketizationConfig(const Napi::CallbackInfo &info)
+{
+  Napi::Env env = info.Env();
+  if (!mReporterPtr)
+  {
+    Napi::Error::New(env, "getRtpPacketizationConfig() called on destroyed reporter").ThrowAsJavaScriptException();
+    return env.Null();
+  }
+
+  if (mRtpConfigObject.IsEmpty())
+    return env.Null();
+
+  return mRtpConfigObject.Value();
 }

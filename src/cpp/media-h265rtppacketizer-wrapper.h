@@ -17,6 +17,7 @@ public:
   std::shared_ptr<rtc::H265RtpPacketizer> getPacketizerInstance();
 
   // Functions
+  Napi::Value getRtpPacketizationConfig(const Napi::CallbackInfo &info);
   void addToChain(const Napi::CallbackInfo &info);
 
   // Callbacks
@@ -24,6 +25,7 @@ public:
 private:
   static std::unordered_set<H265RtpPacketizerWrapper *> instances;
   std::shared_ptr<rtc::H265RtpPacketizer> mPacketizerPtr = nullptr;
+  Napi::ObjectReference mRtpConfigObject;
 };
 
 #endif // MEDIA_H265RTPPACKETIZER_WRAPPER_H

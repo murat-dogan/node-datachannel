@@ -17,12 +17,14 @@ public:
   std::shared_ptr<rtc::AV1RtpPacketizer> getPacketizerInstance();
 
   // Functions
+  Napi::Value getRtpPacketizationConfig(const Napi::CallbackInfo &info);
   void addToChain(const Napi::CallbackInfo &info);
   // Callbacks
 
 private:
   static std::unordered_set<AV1RtpPacketizerWrapper *> instances;
   std::shared_ptr<rtc::AV1RtpPacketizer> mPacketizerPtr = nullptr;
+  Napi::ObjectReference mRtpConfigObject;
 };
 
 #endif // MEDIA_AV1RTPPACKETIZER_WRAPPER_H

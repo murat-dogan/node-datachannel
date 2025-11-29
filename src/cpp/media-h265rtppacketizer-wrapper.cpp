@@ -14,6 +14,8 @@ Napi::Object H265RtpPacketizerWrapper::Init(Napi::Env env, Napi::Object exports)
     {
       // Instance Methods
       InstanceMethod("addToChain", &H265RtpPacketizerWrapper::addToChain),
+      // Accessors
+      InstanceAccessor("rtpConfig", &H265RtpPacketizerWrapper::getRtpPacketizationConfig, nullptr),
     });
 
   // If this is not the first call, we don't want to reassign the constructor (hot-reload problem)
@@ -64,6 +66,9 @@ H265RtpPacketizerWrapper::H265RtpPacketizerWrapper(const Napi::CallbackInfo &inf
     Napi::TypeError::New(env, "rtpConfig must be a RtpPacketizationConfig instance").ThrowAsJavaScriptException();
     return;
   }
+  // store original JS object so we can return it later
+  mRtpConfigObject = Napi::Persistent(obj);
+  mRtpConfigObject.SuppressDestruct();
   auto rtpConfig = RtpPacketizationConfigWrapper::Unwrap(obj)->getConfigInstance();
 
   size_t maxFragmentSize = rtc::RtpPacketizer::DefaultMaxFragmentSize;
@@ -84,6 +89,7 @@ H265RtpPacketizerWrapper::H265RtpPacketizerWrapper(const Napi::CallbackInfo &inf
 H265RtpPacketizerWrapper::~H265RtpPacketizerWrapper()
 {
   mPacketizerPtr.reset();
+  mRtpConfigObject.Reset();
   instances.erase(this);
 }
 
@@ -105,4 +111,19 @@ void H265RtpPacketizerWrapper::addToChain(const Napi::CallbackInfo &info)
     return;
   }
   mPacketizerPtr->addToChain(mediaHandler);
+}
+
+Napi::Value H265RtpPacketizerWrapper::getRtpPacketizationConfig(const Napi::CallbackInfo &info)
+{
+  Napi::Env env = info.Env();
+  if (!mPacketizerPtr)
+  {
+    Napi::Error::New(env, "getRtpPacketizationConfig() called on destroyed packetizer").ThrowAsJavaScriptException();
+    return env.Null();
+  }
+
+  if (mRtpConfigObject.IsEmpty())
+    return env.Null();
+
+  return mRtpConfigObject.Value();
 }

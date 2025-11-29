@@ -13,7 +13,9 @@ Napi::Object AV1RtpPacketizerWrapper::Init(Napi::Env env, Napi::Object exports)
   Napi::Function func = Napi::ObjectWrap<AV1RtpPacketizerWrapper>::DefineClass(env, "AV1RtpPacketizer",
     {
       // Instance Methods
-      InstanceMethod("addToChain", &AV1RtpPacketizerWrapper::addToChain)
+      InstanceMethod("addToChain", &AV1RtpPacketizerWrapper::addToChain),
+      // Accessors
+      InstanceAccessor("rtpConfig", &AV1RtpPacketizerWrapper::getRtpPacketizationConfig, nullptr),
     });
 
   // If this is not the first call, we don't want to reassign the constructor (hot-reload problem)
@@ -64,6 +66,9 @@ AV1RtpPacketizerWrapper::AV1RtpPacketizerWrapper(const Napi::CallbackInfo &info)
     Napi::TypeError::New(env, "rtpConfig must be a RtpPacketizationConfig instance").ThrowAsJavaScriptException();
     return;
   }
+  // store original JS object so we can return it later
+  mRtpConfigObject = Napi::Persistent(obj);
+  mRtpConfigObject.SuppressDestruct();
   auto rtpConfig = RtpPacketizationConfigWrapper::Unwrap(obj)->getConfigInstance();
 
   size_t maxFragmentSize = rtc::RtpPacketizer::DefaultMaxFragmentSize;
@@ -84,6 +89,7 @@ AV1RtpPacketizerWrapper::AV1RtpPacketizerWrapper(const Napi::CallbackInfo &info)
 AV1RtpPacketizerWrapper::~AV1RtpPacketizerWrapper()
 {
   mPacketizerPtr.reset();
+  mRtpConfigObject.Reset();
   instances.erase(this);
 }
 
@@ -105,4 +111,19 @@ void AV1RtpPacketizerWrapper::addToChain(const Napi::CallbackInfo &info)
     return;
   }
   mPacketizerPtr->addToChain(mediaHandler);
+}
+
+Napi::Value AV1RtpPacketizerWrapper::getRtpPacketizationConfig(const Napi::CallbackInfo &info)
+{
+  Napi::Env env = info.Env();
+  if (!mPacketizerPtr)
+  {
+    Napi::Error::New(env, "getRtpPacketizationConfig() called on destroyed packetizer").ThrowAsJavaScriptException();
+    return env.Null();
+  }
+
+  if (mRtpConfigObject.IsEmpty())
+    return env.Null();
+
+  return mRtpConfigObject.Value();
 }

@@ -18,12 +18,14 @@ public:
 
   // Functions
   void addToChain(const Napi::CallbackInfo &info);
+  Napi::Value getRtpPacketizationConfig(const Napi::CallbackInfo &info);
 
   // Callbacks
 
 private:
   static std::unordered_set<RtcpSrReporterWrapper *> instances;
   std::shared_ptr<rtc::RtcpSrReporter> mReporterPtr = nullptr;
+  Napi::ObjectReference mRtpConfigObject;
 };
 
 #endif // MEDIA_RTCPSRREPORTER_WRAPPER_H
