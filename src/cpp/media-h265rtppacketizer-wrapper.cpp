@@ -1,7 +1,5 @@
 #include "media-h265rtppacketizer-wrapper.h"
 #include "media-rtppacketizationconfig-wrapper.h"
-#include "napi.h"
-#include "rtc/nalunit.hpp"
 
 Napi::FunctionReference H265RtpPacketizerWrapper::constructor = Napi::FunctionReference();
 std::unordered_set<H265RtpPacketizerWrapper *> H265RtpPacketizerWrapper::instances;
