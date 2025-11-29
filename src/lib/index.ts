@@ -226,19 +226,19 @@ export const RtpPacketizer: {
 export interface H264RtpPacketizer extends RtpPacketizer {}
 
 export const H264RtpPacketizer: {
-  new (separator: NalUnitSeparator, rtpConfig: RtpPacketizationConfig, maxFragmentSize?: number)
+  new (separator: NalUnitSeparator, rtpConfig: RtpPacketizationConfig, maxFragmentSize?: number): H264RtpPacketizer
 } = nodeDataChannel.H264RtpPacketizer
 
 export interface H265RtpPacketizer extends RtpPacketizer {}
 
 export const H265RtpPacketizer: {
-  new (separator: NalUnitSeparator, rtpConfig: RtpPacketizationConfig, maxFragmentSize?: number)
+  new (separator: NalUnitSeparator, rtpConfig: RtpPacketizationConfig, maxFragmentSize?: number): H265RtpPacketizer
 } = nodeDataChannel.H265RtpPacketizer
 
 export interface AV1RtpPacketizer extends RtpPacketizer {}
 
 export const AV1RtpPacketizer: {
-  new (packetization: ObuPacketization, rtpConfig: RtpPacketizationConfig, maxFragmentSize?: number)
+  new (packetization: ObuPacketization, rtpConfig: RtpPacketizationConfig, maxFragmentSize?: number): AV1RtpPacketizer
 } = nodeDataChannel.AV1RtpPacketizer
 
 export { WebSocketServer } from './websocket-server';
