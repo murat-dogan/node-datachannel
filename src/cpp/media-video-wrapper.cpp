@@ -147,6 +147,22 @@ void VideoWrapper::addH264Codec(const Napi::CallbackInfo &info)
   mVideoPtr->addH264Codec(payloadType, profile);
 }
 
+void VideoWrapper::addH265Codec(const Napi::CallbackInfo &info)
+{
+  Napi::Env env = info.Env();
+  int length = info.Length();
+
+  if (length < 1 || !info[0].IsNumber())
+  {
+    Napi::TypeError::New(env, "We expect (Number) as param").ThrowAsJavaScriptException();
+    return;
+  }
+
+  int payloadType = info[0].As<Napi::Number>().ToNumber();
+
+  mVideoPtr->addH265Codec(payloadType);
+}
+
 void VideoWrapper::addVP8Codec(const Napi::CallbackInfo &info)
 {
   Napi::Env env = info.Env();
@@ -178,6 +194,23 @@ void VideoWrapper::addVP9Codec(const Napi::CallbackInfo &info)
 
   mVideoPtr->addVP9Codec(payloadType);
 }
+
+void VideoWrapper::addAV1Codec(const Napi::CallbackInfo &info)
+{
+  Napi::Env env = info.Env();
+  int length = info.Length();
+
+  if (length < 1 || !info[0].IsNumber())
+  {
+    Napi::TypeError::New(env, "We expect (Number) as param").ThrowAsJavaScriptException();
+    return;
+  }
+
+  int payloadType = info[0].As<Napi::Number>().ToNumber();
+
+  mVideoPtr->addAV1Codec(payloadType);
+}
+
 
 Napi::Value VideoWrapper::direction(const Napi::CallbackInfo &info)
 {

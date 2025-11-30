@@ -65,8 +65,10 @@ export const Audio: {
 export interface Video {
   addVideoCodec(payloadType: number, codec: string, profile?: string): void;
   addH264Codec(payloadType: number, profile?: string): void;
+  addH265Codec(payloadType: number): void;
   addVP8Codec(payloadType: number): void;
   addVP9Codec(payloadType: number): void;
+  addAV1Codec(payloadType: number): void;
   direction(): Direction;
   generateSdp(eol: string, addr: string, port: number): string;
   mid(): string;
