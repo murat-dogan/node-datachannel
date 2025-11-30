@@ -12,10 +12,12 @@ Napi::Object VideoWrapper::Init(Napi::Env env, Napi::Object exports)
       Napi::ObjectWrap<VideoWrapper>::DefineClass(env, "Video",
                                                   {
                                                       InstanceValue("media-type-video", Napi::Boolean::New(env, true)),
-                                                      InstanceMethod("addH264Codec", &VideoWrapper::addH264Codec),
                                                       InstanceMethod("addVideoCodec", &VideoWrapper::addVideoCodec),
+                                                      InstanceMethod("addH264Codec", &VideoWrapper::addH264Codec),
+                                                      InstanceMethod("addH265Codec", &VideoWrapper::addH265Codec),
                                                       InstanceMethod("addVP8Codec", &VideoWrapper::addVP8Codec),
                                                       InstanceMethod("addVP9Codec", &VideoWrapper::addVP9Codec),
+                                                      InstanceMethod("addAV1Codec", &VideoWrapper::addAV1Codec),
                                                       InstanceMethod("direction", &VideoWrapper::direction),
                                                       InstanceMethod("generateSdp", &VideoWrapper::generateSdp),
                                                       InstanceMethod("mid", &VideoWrapper::mid),
