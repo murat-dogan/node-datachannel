@@ -45,7 +45,7 @@ peerConnection.onGatheringStateChange((state) => {
   }
 });
 
-let video = new nodeDataChannel.Video('video', 'RecvOnly');
+let video = new nodeDataChannel.Video('video', 'SendOnly');
 video.addH264Codec(96);
 video.setBitrate(3000);
 
@@ -53,12 +53,14 @@ let rtpConfig = new nodeDataChannel.RtpPacketizationConfig(12345, "", 96, 90000)
 let packetizer = new nodeDataChannel.H264RtpPacketizer("StartSequence", rtpConfig);
 let track = peerConnection.addTrack(video);
 track.setMediaHandler(packetizer);
-track.onOpen(() => {
+track.onOpen(async () => {
   let timestamp = 0;
   let i = 0;
-  setInterval(async () => {
+  let framesAwaited = await frames;
+  setInterval(() => {
+    console.log(`Sending frame ${i}`)
     rtpConfig.timestamp = rtpConfig.clockRate * timestamp;
-    track.sendMessageBinary((await frames)[i++]);
+    track.sendMessageBinary(framesAwaited[i++ % 3]);
     timestamp += 0.5;
   }, 500);
 })

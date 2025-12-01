@@ -9,7 +9,7 @@
     <textarea cols="50" rows="50"></textarea>
     <button>Submit</button>
 
-    <video id="remoteVideo" autoplay playsinline muted></video>
+    <video width="640" height="360" id="remoteVideo" autoplay playsinline muted></video>
 
     <script>
       document.querySelector('button').addEventListener('click', async () => {
@@ -31,13 +31,15 @@
             alert('Please paste the answer in the application.');
           }
         };
-        await rtc.setRemoteDescription(offer);
 
         rtc.ontrack = (event) => {
+          console.log(event);
           const elem = /** @type {HTMLVideoElement} */ (document.getElementById("remoteVideo"))
           elem.srcObject = event.streams[0];
+          elem.play().catch(console.error);
         }
 
+        await rtc.setRemoteDescription(offer);
         let answer = await rtc.createAnswer();
         await rtc.setLocalDescription(answer);
       });
