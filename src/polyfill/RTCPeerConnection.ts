@@ -36,7 +36,7 @@ export default class RTCPeerConnection extends EventTarget implements globalThis
   // events
   onconnectionstatechange: globalThis.RTCPeerConnection['onconnectionstatechange'] = null;
   // For ondatachannel we need to define type manually
-  ondatachannel: ((this: globalThis.RTCPeerConnection, ev: globalThis.RTCDataChannelEvent) => any) | null;
+  ondatachannel: ((this: globalThis.RTCPeerConnection, ev: RTCDataChannelEvent) => any) | null;
   onicecandidate: globalThis.RTCPeerConnection['onicecandidate'] = null;
   onicecandidateerror: globalThis.RTCPeerConnection['onicecandidateerror'] = null;
   oniceconnectionstatechange: globalThis.RTCPeerConnection['oniceconnectionstatechange'] = null;
