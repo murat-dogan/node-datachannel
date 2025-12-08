@@ -6,7 +6,7 @@ This is an example copy/paste demo to send H264 frames from the application to t
 
 ## How to use
 
-Open main.html in your browser (you must open it either as HTTPS or as a domain of http://localhost).
+Open main.html in your browser.
 
 Start the application and copy its offer into the text box of the web page.
 
