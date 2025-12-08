@@ -2,7 +2,6 @@
 #include "media-mediahandler-helper.h"
 
 Napi::FunctionReference RtcpReceivingSessionWrapper::constructor = Napi::FunctionReference();
-std::unordered_set<RtcpReceivingSessionWrapper *> RtcpReceivingSessionWrapper::instances;
 
 Napi::Object RtcpReceivingSessionWrapper::Init(Napi::Env env, Napi::Object exports)
 {
@@ -30,13 +29,11 @@ RtcpReceivingSessionWrapper::RtcpReceivingSessionWrapper(const Napi::CallbackInf
 {
   Napi::Env env = info.Env();
   mSessionPtr = std::make_unique<rtc::RtcpReceivingSession>();
-  instances.insert(this);
 }
 
 RtcpReceivingSessionWrapper::~RtcpReceivingSessionWrapper()
 {
   mSessionPtr.reset();
-  instances.erase(this);
 }
 
 std::shared_ptr<rtc::RtcpReceivingSession> RtcpReceivingSessionWrapper::getSessionInstance() { return mSessionPtr; }

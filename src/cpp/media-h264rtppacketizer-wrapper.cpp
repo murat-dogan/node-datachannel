@@ -4,7 +4,6 @@
 #include "media-mediahandler-helper.h"
 
 Napi::FunctionReference H264RtpPacketizerWrapper::constructor = Napi::FunctionReference();
-std::unordered_set<H264RtpPacketizerWrapper *> H264RtpPacketizerWrapper::instances;
 
 Napi::Object H264RtpPacketizerWrapper::Init(Napi::Env env, Napi::Object exports)
 {
@@ -46,7 +45,7 @@ H264RtpPacketizerWrapper::H264RtpPacketizerWrapper(const Napi::CallbackInfo &inf
       .ThrowAsJavaScriptException();
     return;
   }
-  auto separatorOpt = strToSeparator(info[0].As<Napi::String>().Utf8Value());  
+  auto separatorOpt = strToSeparator(info[0].As<Napi::String>().Utf8Value());
   if (!separatorOpt.has_value())
   {
     Napi::TypeError::New(env, "separator must be \"Length\", \"ShortStartSequence\", \"LongStartSequence\" or \"StartSequence\"")
@@ -83,14 +82,12 @@ H264RtpPacketizerWrapper::H264RtpPacketizerWrapper(const Napi::CallbackInfo &inf
   }
 
   mPacketizerPtr = std::make_unique<rtc::H264RtpPacketizer>(separator, rtpConfig, maxFragmentSize);
-  instances.insert(this);
 }
 
 H264RtpPacketizerWrapper::~H264RtpPacketizerWrapper()
 {
   mPacketizerPtr.reset();
   mRtpConfigObject.Reset();
-  instances.erase(this);
 }
 
 std::shared_ptr<rtc::H264RtpPacketizer> H264RtpPacketizerWrapper::getPacketizerInstance() { return mPacketizerPtr; }

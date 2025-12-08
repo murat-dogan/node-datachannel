@@ -4,7 +4,6 @@
 #include "media-mediahandler-helper.h"
 
 Napi::FunctionReference AV1RtpPacketizerWrapper::constructor = Napi::FunctionReference();
-std::unordered_set<AV1RtpPacketizerWrapper *> AV1RtpPacketizerWrapper::instances;
 
 Napi::Object AV1RtpPacketizerWrapper::Init(Napi::Env env, Napi::Object exports)
 {
@@ -83,14 +82,12 @@ AV1RtpPacketizerWrapper::AV1RtpPacketizerWrapper(const Napi::CallbackInfo &info)
   }
 
   mPacketizerPtr = std::make_unique<rtc::AV1RtpPacketizer>(packetization, rtpConfig, maxFragmentSize);
-  instances.insert(this);
 }
 
 AV1RtpPacketizerWrapper::~AV1RtpPacketizerWrapper()
 {
   mPacketizerPtr.reset();
   mRtpConfigObject.Reset();
-  instances.erase(this);
 }
 
 std::shared_ptr<rtc::AV1RtpPacketizer> AV1RtpPacketizerWrapper::getPacketizerInstance() { return mPacketizerPtr; }

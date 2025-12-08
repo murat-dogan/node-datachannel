@@ -1,7 +1,6 @@
 #include "media-rtppacketizationconfig-wrapper.h"
 
 Napi::FunctionReference RtpPacketizationConfigWrapper::constructor = Napi::FunctionReference();
-std::unordered_set<RtpPacketizationConfigWrapper *> RtpPacketizationConfigWrapper::instances;
 
 Napi::Object RtpPacketizationConfigWrapper::Init(Napi::Env env, Napi::Object exports)
 {
@@ -97,13 +96,11 @@ RtpPacketizationConfigWrapper::RtpPacketizationConfigWrapper(const Napi::Callbac
     videoOrientationId = info[4].As<Napi::Number>().Uint32Value();
   }
   mConfigPtr = std::make_unique<rtc::RtpPacketizationConfig>(ssrc, cname, payloadType, clockRate, videoOrientationId);
-  instances.insert(this);
 }
 
 RtpPacketizationConfigWrapper::~RtpPacketizationConfigWrapper()
 {
   mConfigPtr.reset();
-  instances.erase(this);
 }
 
 std::shared_ptr<rtc::RtpPacketizationConfig> RtpPacketizationConfigWrapper::getConfigInstance() { return mConfigPtr; }

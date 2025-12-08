@@ -22,7 +22,6 @@ public:
   // Callbacks
 
 private:
-  static std::unordered_set<RtcpNackResponderWrapper *> instances;
   std::shared_ptr<rtc::RtcpNackResponder> mResponderPtr = nullptr;
 };
 

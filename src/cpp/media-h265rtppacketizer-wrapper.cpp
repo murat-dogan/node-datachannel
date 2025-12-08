@@ -4,7 +4,6 @@
 #include "media-mediahandler-helper.h"
 
 Napi::FunctionReference H265RtpPacketizerWrapper::constructor = Napi::FunctionReference();
-std::unordered_set<H265RtpPacketizerWrapper *> H265RtpPacketizerWrapper::instances;
 
 Napi::Object H265RtpPacketizerWrapper::Init(Napi::Env env, Napi::Object exports)
 {
@@ -83,14 +82,12 @@ H265RtpPacketizerWrapper::H265RtpPacketizerWrapper(const Napi::CallbackInfo &inf
   }
 
   mPacketizerPtr = std::make_unique<rtc::H265RtpPacketizer>(separator, rtpConfig, maxFragmentSize);
-  instances.insert(this);
 }
 
 H265RtpPacketizerWrapper::~H265RtpPacketizerWrapper()
 {
   mPacketizerPtr.reset();
   mRtpConfigObject.Reset();
-  instances.erase(this);
 }
 
 std::shared_ptr<rtc::H265RtpPacketizer> H265RtpPacketizerWrapper::getPacketizerInstance() { return mPacketizerPtr; }

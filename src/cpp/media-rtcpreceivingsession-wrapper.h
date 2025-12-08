@@ -22,7 +22,6 @@ public:
   // Callbacks
 
 private:
-  static std::unordered_set<RtcpReceivingSessionWrapper *> instances;
   std::shared_ptr<rtc::RtcpReceivingSession> mSessionPtr = nullptr;
 };
 

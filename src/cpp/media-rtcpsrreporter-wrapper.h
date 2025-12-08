@@ -23,7 +23,6 @@ public:
   // Callbacks
 
 private:
-  static std::unordered_set<RtcpSrReporterWrapper *> instances;
   std::shared_ptr<rtc::RtcpSrReporter> mReporterPtr = nullptr;
   Napi::ObjectReference mRtpConfigObject;
 };

@@ -2,7 +2,6 @@
 #include "media-mediahandler-helper.h"
 
 Napi::FunctionReference RtcpNackResponderWrapper::constructor = Napi::FunctionReference();
-std::unordered_set<RtcpNackResponderWrapper *> RtcpNackResponderWrapper::instances;
 
 Napi::Object RtcpNackResponderWrapper::Init(Napi::Env env, Napi::Object exports)
 {
@@ -41,13 +40,11 @@ RtcpNackResponderWrapper::RtcpNackResponderWrapper(const Napi::CallbackInfo &inf
     maxSize = info[0].As<Napi::Number>().Int64Value();
   }
   mResponderPtr = std::make_unique<rtc::RtcpNackResponder>(maxSize);
-  instances.insert(this);
 }
 
 RtcpNackResponderWrapper::~RtcpNackResponderWrapper()
 {
   mResponderPtr.reset();
-  instances.erase(this);
 }
 
 std::shared_ptr<rtc::RtcpNackResponder> RtcpNackResponderWrapper::getResponderInstance() { return mResponderPtr; }

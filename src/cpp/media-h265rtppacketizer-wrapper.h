@@ -23,7 +23,6 @@ public:
   // Callbacks
 
 private:
-  static std::unordered_set<H265RtpPacketizerWrapper *> instances;
   std::shared_ptr<rtc::H265RtpPacketizer> mPacketizerPtr = nullptr;
   Napi::ObjectReference mRtpConfigObject;
 };

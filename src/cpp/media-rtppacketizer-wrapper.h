@@ -23,7 +23,6 @@ public:
   // Callbacks
 
 private:
-  static std::unordered_set<RtpPacketizerWrapper *> instances;
   std::shared_ptr<rtc::RtpPacketizer> mPacketizerPtr = nullptr;
   Napi::ObjectReference mRtpConfigObject;
 };

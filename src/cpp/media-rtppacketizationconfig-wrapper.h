@@ -29,7 +29,6 @@ public:
   // Callbacks
 
 private:
-  static std::unordered_set<RtpPacketizationConfigWrapper *> instances;
   std::shared_ptr<rtc::RtpPacketizationConfig> mConfigPtr = nullptr;
 };
 

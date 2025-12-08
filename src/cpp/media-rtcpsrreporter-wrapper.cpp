@@ -3,7 +3,6 @@
 #include "media-mediahandler-helper.h"
 
 Napi::FunctionReference RtcpSrReporterWrapper::constructor = Napi::FunctionReference();
-std::unordered_set<RtcpSrReporterWrapper *> RtcpSrReporterWrapper::instances;
 
 Napi::Object RtcpSrReporterWrapper::Init(Napi::Env env, Napi::Object exports)
 {
@@ -50,14 +49,12 @@ RtcpSrReporterWrapper::RtcpSrReporterWrapper(const Napi::CallbackInfo &info)
   mRtpConfigObject.SuppressDestruct();
   auto config = RtpPacketizationConfigWrapper::Unwrap(obj);
   mReporterPtr = std::make_unique<rtc::RtcpSrReporter>(config->getConfigInstance());
-  instances.insert(this);
 }
 
 RtcpSrReporterWrapper::~RtcpSrReporterWrapper()
 {
   mReporterPtr.reset();
   mRtpConfigObject.Reset();
-  instances.erase(this);
 }
 
 std::shared_ptr<rtc::RtcpSrReporter> RtcpSrReporterWrapper::getReporterInstance() { return mReporterPtr; }
