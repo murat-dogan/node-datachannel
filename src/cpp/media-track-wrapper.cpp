@@ -1,6 +1,6 @@
 #include "media-track-wrapper.h"
 #include "media-direction.h"
-#include "media-rtcpreceivingsession-wrapper.h"
+#include "media-mediahandler-helper.h"
 
 #include "plog/Log.h"
 
@@ -292,9 +292,14 @@ void TrackWrapper::setMediaHandler(const Napi::CallbackInfo &info)
     return;
   }
 
-  RtcpReceivingSessionWrapper *handler =
-      Napi::ObjectWrap<RtcpReceivingSessionWrapper>::Unwrap(info[0].As<Napi::Object>());
-  mTrackPtr->setMediaHandler(handler->getSessionInstance());
+  std::shared_ptr<rtc::MediaHandler> handler = asMediaHandler(info[0].As<Napi::Object>());
+  if (!handler)
+  {
+    Napi::TypeError::New(env, "MediaHandler class instance expected. If this error is unexpected, please report a bug!")
+      .ThrowAsJavaScriptException();
+    return;
+  }
+  mTrackPtr->setMediaHandler(handler);
 }
 
 void TrackWrapper::onOpen(const Napi::CallbackInfo &info)

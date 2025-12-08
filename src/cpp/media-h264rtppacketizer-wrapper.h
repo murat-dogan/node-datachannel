@@ -1,0 +1,30 @@
+#ifndef MEDIA_H264RTPPACKETIZER_WRAPPER_H
+#define MEDIA_H264RTPPACKETIZER_WRAPPER_H
+
+#include <memory>
+#include <unordered_set>
+
+#include <napi.h>
+#include <rtc/rtc.hpp>
+
+class H264RtpPacketizerWrapper : public Napi::ObjectWrap<H264RtpPacketizerWrapper>
+{
+public:
+  static Napi::FunctionReference constructor;
+  static Napi::Object Init(Napi::Env env, Napi::Object exports);
+  H264RtpPacketizerWrapper(const Napi::CallbackInfo &info);
+  ~H264RtpPacketizerWrapper();
+  std::shared_ptr<rtc::H264RtpPacketizer> getPacketizerInstance();
+
+  // Functions
+  Napi::Value getRtpPacketizationConfig(const Napi::CallbackInfo &info);
+  void addToChain(const Napi::CallbackInfo &info);
+
+  // Callbacks
+
+private:
+  std::shared_ptr<rtc::H264RtpPacketizer> mPacketizerPtr = nullptr;
+  Napi::ObjectReference mRtpConfigObject;
+};
+
+#endif // MEDIA_H264RTPPACKETIZER_WRAPPER_H

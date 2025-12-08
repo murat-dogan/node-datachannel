@@ -7,6 +7,8 @@ import {
   DescriptionType,
   Direction,
   LogLevel,
+  NalUnitSeparator,
+  ObuPacketization,
   RtcConfig,
   RTCIceConnectionState,
   RTCIceGatheringState,
@@ -63,8 +65,10 @@ export const Audio: {
 export interface Video {
   addVideoCodec(payloadType: number, codec: string, profile?: string): void;
   addH264Codec(payloadType: number, profile?: string): void;
+  addH265Codec(payloadType: number): void;
   addVP8Codec(payloadType: number): void;
   addVP9Codec(payloadType: number): void;
+  addAV1Codec(payloadType: number): void;
   direction(): Direction;
   generateSdp(eol: string, addr: string, port: number): string;
   mid(): string;
@@ -102,7 +106,7 @@ export interface Track {
   requestBitrate(bitRate: number): boolean;
   setBufferedAmountLowThreshold(newSize: number): void;
   requestKeyframe(): boolean;
-  setMediaHandler(handler: RtcpReceivingSession): void;
+  setMediaHandler(handler: MediaHandler): void;
   onOpen(cb: () => void): void;
   onClosed(cb: () => void): void;
   onError(cb: (err: string) => void): void;
@@ -182,11 +186,67 @@ export const IceUdpMuxListener: {
   new (port: number, address?: string): IceUdpMuxListener;
 } = nodeDataChannel.IceUdpMuxListener;
 
-export interface RtcpReceivingSession {}
+export interface RtpPacketizationConfig {
+  playoutDelayId: number,
+  playoutDelayMin: number,
+  playoutDelayMax: number,
+  timestamp: number,
+  get clockRate(): number
+}
+
+export const RtpPacketizationConfig: {
+  new(ssrc: number, cname: string, payloadType: number, clockRate: number, videoOrientationId?: number): RtpPacketizationConfig
+} = nodeDataChannel.RtpPacketizationConfig
+
+export interface MediaHandler {
+  addToChain(handler: MediaHandler): void
+}
+
+export interface RtcpReceivingSession extends MediaHandler {}
 
 export const RtcpReceivingSession: {
   new (): RtcpReceivingSession;
 } = nodeDataChannel.RtcpReceivingSession;
+
+export interface RtcpNackResponder extends MediaHandler {}
+
+export const RtcpNackResponder: {
+  new (maxSize?: number): RtcpNackResponder
+} = nodeDataChannel.RtcpNackResponder;
+
+export interface RtcpSrReporter extends MediaHandler {
+  get rtpConfig(): RtpPacketizationConfig
+}
+
+export const RtcpSrReporter: {
+  new (rtpConfig: RtpPacketizationConfig): RtcpSrReporter
+} = nodeDataChannel.RtcpSrReporter;
+
+export interface RtpPacketizer extends MediaHandler {
+  get rtpConfig(): RtpPacketizationConfig
+}
+
+export const RtpPacketizer: {
+  new (rtpConfig: RtpPacketizationConfig): RtpPacketizer
+} = nodeDataChannel.RtpPacketizer;
+
+export interface H264RtpPacketizer extends RtpPacketizer {}
+
+export const H264RtpPacketizer: {
+  new (separator: NalUnitSeparator, rtpConfig: RtpPacketizationConfig, maxFragmentSize?: number): H264RtpPacketizer
+} = nodeDataChannel.H264RtpPacketizer
+
+export interface H265RtpPacketizer extends RtpPacketizer {}
+
+export const H265RtpPacketizer: {
+  new (separator: NalUnitSeparator, rtpConfig: RtpPacketizationConfig, maxFragmentSize?: number): H265RtpPacketizer
+} = nodeDataChannel.H265RtpPacketizer
+
+export interface AV1RtpPacketizer extends RtpPacketizer {}
+
+export const AV1RtpPacketizer: {
+  new (packetization: ObuPacketization, rtpConfig: RtpPacketizationConfig, maxFragmentSize?: number): AV1RtpPacketizer
+} = nodeDataChannel.AV1RtpPacketizer
 
 export { WebSocketServer } from './websocket-server';
 export { WebSocket } from './websocket';
@@ -200,6 +260,13 @@ export default {
   setSctpSettings,
   getLibraryVersion,
   RtcpReceivingSession,
+  RtcpNackResponder,
+  RtcpSrReporter,
+  RtpPacketizationConfig,
+  RtpPacketizer,
+  H264RtpPacketizer,
+  H265RtpPacketizer,
+  AV1RtpPacketizer,
   Track,
   Video,
   Audio,

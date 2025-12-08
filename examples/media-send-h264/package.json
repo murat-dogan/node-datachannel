@@ -1,0 +1,16 @@
+{
+  "name": "media-send-h264",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "## Example sending H264 frames to browser",
+  "main": "media.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "node-datachannel": "file:../.."
+  }
+}

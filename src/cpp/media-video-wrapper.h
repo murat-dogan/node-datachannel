@@ -19,8 +19,10 @@ public:
   // Functions
   void addVideoCodec(const Napi::CallbackInfo &info);
   void addH264Codec(const Napi::CallbackInfo &info);
+  void addH265Codec(const Napi::CallbackInfo &info);
   void addVP8Codec(const Napi::CallbackInfo &info);
   void addVP9Codec(const Napi::CallbackInfo &info);
+  void addAV1Codec(const Napi::CallbackInfo &info);
 
   // class Entry
   Napi::Value direction(const Napi::CallbackInfo &info);
