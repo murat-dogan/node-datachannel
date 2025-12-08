@@ -10,6 +10,7 @@ const external = (id) => {
 const bundle = (config) => ({
   ...config,
   input: 'src/index.ts',
+  external: ['events','stream'] // <-- suppresses the warning for these built-in modules
 });
 
 export default [
