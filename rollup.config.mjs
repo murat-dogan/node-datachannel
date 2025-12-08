@@ -10,7 +10,6 @@ const external = (id) => {
 const bundle = (config) => ({
   ...config,
   input: 'src/index.ts',
-  external,
 });
 
 export default [
