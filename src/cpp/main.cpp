@@ -8,6 +8,7 @@
 #include "media-av1rtppacketizer-wrapper.h"
 #include "media-h264rtppacketizer-wrapper.h"
 #include "media-h265rtppacketizer-wrapper.h"
+#include "media-pacinghandler-wrapper.h"
 #include "media-rtcpnackresponder-wrapper.h"
 #include "media-rtcpreceivingsession-wrapper.h"
 #include "media-rtcpsrreporter-wrapper.h"
@@ -31,6 +32,7 @@ Napi::Object InitAll(Napi::Env env, Napi::Object exports)
   AV1RtpPacketizerWrapper::Init(env, exports);
   H264RtpPacketizerWrapper::Init(env, exports);
   H265RtpPacketizerWrapper::Init(env, exports);
+  PacingHandlerWrapper::Init(env, exports);
   RtcpNackResponderWrapper::Init(env, exports);
   RtcpReceivingSessionWrapper::Init(env, exports);
   RtcpSrReporterWrapper::Init(env, exports);
