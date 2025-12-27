@@ -11,6 +11,7 @@ env:
 
 jobs:
   build-windows:
+    name: Windows ${{ matrix.arch }}
     runs-on: windows-2022
     strategy:
       matrix:
@@ -39,7 +40,7 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      - name: Set Up MSVC for ARM64 Cross Compilation
+      - name: Setup MSVC
         uses: ilammy/msvc-dev-cmd@v1
         with:
           arch: ${{ matrix.msvc_arch }}
