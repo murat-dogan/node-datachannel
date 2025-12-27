@@ -1,5 +1,6 @@
 #include "media-pacinghandler-wrapper.h"
 #include "media-mediahandler-helper.h"
+#include <chrono>
 
 Napi::FunctionReference PacingHandlerWrapper::constructor = Napi::FunctionReference();
 
@@ -47,7 +48,9 @@ PacingHandlerWrapper::PacingHandlerWrapper(const Napi::CallbackInfo &info)
   auto bitsPerSecond = info[0].As<Napi::Number>().DoubleValue();
   auto sendInterval = info[1].As<Napi::Number>().Uint32Value();
 
-  mHandlerPtr = std::make_unique<rtc::PacingHandler>(bitsPerSecond, sendInterval);
+  mHandlerPtr = std::make_unique<rtc::PacingHandler>(
+    bitsPerSecond, std::chrono::milliseconds(sendInterval)
+  );
 }
 
 PacingHandlerWrapper::~PacingHandlerWrapper()
