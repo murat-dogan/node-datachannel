@@ -265,6 +265,7 @@ export default {
   preload,
   setSctpSettings,
   getLibraryVersion,
+  PacingHandler,
   RtcpReceivingSession,
   RtcpNackResponder,
   RtcpSrReporter,
