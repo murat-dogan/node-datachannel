@@ -10,65 +10,63 @@ env:
   ACTIONS_ALLOW_UNSECURE_COMMANDS: true
 
 jobs:
-  build-windows-x64:
+  build-windows:
+    name: Windows ${{ matrix.arch }}
     runs-on: windows-2022
     strategy:
       matrix:
-        node-version: [18]
+        include:
+          - arch: x64
+            node_arch: x64
+            msvc_arch: x64
+            vcpkg_triplet: x64-windows-static
+            node_version: 18
+          - arch: x86
+            node_arch: x86
+            msvc_arch: x86
+            vcpkg_triplet: x86-windows-static
+            node_version: 18
+          - arch: arm64
+            node_arch: arm64
+            msvc_arch: amd64_arm64
+            vcpkg_triplet: arm64-windows-static
+            node_version: 18
 
     steps:
       - uses: actions/checkout@v4
-      - name: Install OpenSSL
-        run: choco install openssl -y --version=3.5.4
+
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.node-version }}
-      - name: Build
-        run: npm install --build-from-source
-        env:
-          CI: true
-      # - name: Test
-      #   run: npm run test
-      #   env:
-      #     CI: true
-      - name: Upload
-        run: node_modules/.bin/prebuild -r napi --upload -u ${{ secrets.GITHUB_TOKEN }}
-        env:
-          CI: true
 
-  build-windows-x86:
-    runs-on: windows-2022
-    strategy:
-      matrix:
-        node_version: [18]
-        node_arch:
-          - x86
-    steps:
-      - uses: actions/checkout@v4
-      - uses: ilammy/msvc-dev-cmd@v1
+      - name: Setup MSVC
+        uses: ilammy/msvc-dev-cmd@v1
         with:
-          arch: x86
+          arch: ${{ matrix.msvc_arch }}
+
+      - name: Setup vcpkg
+        run: |
+          C:\vcpkg\bootstrap-vcpkg.bat
+        shell: cmd
+
       - name: Install OpenSSL
-        # openssl v3.1.1 [Approved]
-        # openssl package files install completed. Performing other installation steps.
-        # ERROR: 32-bit installation is not supported for openssl
-        run: choco install openssl --x86=true --version=1.1.1.2100
-      - name: Use Node.js ${{ matrix.node_version }}
-        uses: aminya/setup-node@x86
-        with:
-          node-version: ${{ matrix.node_version }}
-          node-arch: ${{ matrix.node_arch }}
+        run: |
+          C:\vcpkg\vcpkg install openssl:${{ matrix.vcpkg_triplet }}
+        shell: cmd
+
+      - name: NPM Install
+        run: |
+          npm install --ignore-scripts
+        shell: cmd
+
       - name: Build
-        run: npm install --build-from-source
-        env:
-          CI: true
-      # - name: Test
-      #   run: npm run test
-      #   env:
-      #     CI: true
+        run: |
+          npx prebuild -r napi --arch ${{ matrix.arch }} --backend cmake-js -- --CDCMAKE_TOOLCHAIN_FILE="C:\vcpkg\scripts\buildsystems\vcpkg.cmake" --CDVCPKG_TARGET_TRIPLET=${{ matrix.vcpkg_triplet }}
+        shell: cmd
+
       - name: Upload
-        run: node_modules/.bin/prebuild -r napi --upload -u ${{ secrets.GITHUB_TOKEN }}
+        run: npx prebuild --backend cmake-js --arch ${{ matrix.arch }} -r napi --upload -u ${{ secrets.GITHUB_TOKEN }}
         env:
           CI: true
-          ACTIONS_ALLOW_UNSECURE_COMMANDS: true
+        shell: cmd
