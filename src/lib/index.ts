@@ -202,6 +202,12 @@ export interface MediaHandler {
   addToChain(handler: MediaHandler): void
 }
 
+export interface PacingHandler extends MediaHandler {}
+
+export const PacingHandler: {
+  new (bitsPerSecond: number, sendInterval: number): PacingHandler;
+} = nodeDataChannel.PacingHandler;
+
 export interface RtcpReceivingSession extends MediaHandler {}
 
 export const RtcpReceivingSession: {
@@ -259,6 +265,7 @@ export default {
   preload,
   setSctpSettings,
   getLibraryVersion,
+  PacingHandler,
   RtcpReceivingSession,
   RtcpNackResponder,
   RtcpSrReporter,
