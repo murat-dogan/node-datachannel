@@ -3,6 +3,7 @@ import { expect, jest } from '@jest/globals';
 import { RTCPeerConnection } from '../../src/polyfill/index';
 import { PeerConnection } from '../../src/lib/index';
 import { eventPromise } from '../fixtures/event-promise';
+import { connect } from '../fixtures/connect';
 
 // Polyfill for Promise.withResolvers for Node < 20
 if (!Promise.withResolvers) {
@@ -327,5 +328,102 @@ describe('polyfill', () => {
     const connectionState = rtcPeerConnection.connectionState;
     expect(spy).toHaveBeenCalled();
     expect(connectionState).toEqual(originalFunc());
+  });
+
+  test('it should send lots of data', async () => {
+    const chunkSize = 1024;
+    const count = 1024 * 10;
+    const bytes = chunkSize * count;
+    let received = 0;
+
+    const peer1 = new RTCPeerConnection();
+    const peer2 = new RTCPeerConnection();
+
+    await connect(peer1, peer2);
+
+    const receivedAllMessages = Promise.withResolvers<void>();
+
+    const incomingChannelPromise = Promise.withResolvers<RTCDataChannel>();
+    let incomingChannel
+
+    peer2.ondatachannel = async (evt): Promise<void> => {
+      // prevent gc of channel
+      incomingChannelPromise.resolve(evt.channel)
+      incomingChannel = evt.channel;
+
+      incomingChannel.onmessage = (evt): void => {
+        received += evt.data.byteLength;
+
+        if (received === bytes) {
+          receivedAllMessages.resolve();
+        }
+      }
+    };
+
+    const outgoingChannel = peer1.createDataChannel('');
+    await eventPromise(outgoingChannel, 'open')
+
+    for (let i = 0; i < count; i++) {
+      outgoingChannel.send(new Uint8Array(chunkSize));
+    }
+
+    outgoingChannel.close();
+
+    await Promise.any([
+      receivedAllMessages.promise,
+      incomingChannelPromise.promise.then(channel => {
+        return eventPromise(channel, 'close')
+      })
+    ]);
+
+    expect(received).toEqual(bytes);
+
+    peer1.close();
+    peer2.close();
+  });
+
+  test('it should receive lots of data', async () => {
+    const chunkSize = 1024;
+    const count = 1024 * 10;
+    const bytes = chunkSize * count;
+
+    const peer1 = new RTCPeerConnection();
+    const peer2 = new RTCPeerConnection();
+
+    await connect(peer1, peer2);
+
+    const receivedAllMessages = Promise.withResolvers<void>();
+
+    peer2.ondatachannel = async (evt): Promise<void> => {
+      const channel = evt.channel;
+      channel.bufferedAmountLowThreshold = 0;
+
+      for (let i = 0; i < count; i++) {
+        channel.send(new Uint8Array(chunkSize));
+      }
+
+      channel.close();
+    };
+
+    const dc = peer1.createDataChannel('');
+    let received = 0;
+
+    dc.onmessage = (evt): void => {
+      received += evt.data.byteLength;
+
+      if (received === bytes) {
+        receivedAllMessages.resolve();
+      }
+    };
+
+    await Promise.any([
+      receivedAllMessages.promise,
+      eventPromise(dc, 'close')
+    ]);
+
+    expect(received).toEqual(bytes);
+
+    peer1.close();
+    peer2.close();
   });
 });
