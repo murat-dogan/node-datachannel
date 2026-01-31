@@ -158,7 +158,7 @@ Napi::Value TrackWrapper::sendMessage(const Napi::CallbackInfo &info)
 
   try
   {
-    return Napi::Boolean::New(info.Env(), mTrackPtr->send(info[0].As<Napi::String>().ToString()));
+    return Napi::Boolean::New(info.Env(), mTrackPtr->send(info[0].As<Napi::String>().Utf8Value()));
   }
   catch (std::exception &ex)
   {

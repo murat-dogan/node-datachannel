@@ -60,7 +60,7 @@ AudioWrapper::AudioWrapper(const Napi::CallbackInfo &info) : Napi::ObjectWrap<Au
       Napi::TypeError::New(env, "mid (String) expected").ThrowAsJavaScriptException();
       return;
     }
-    mid = info[0].As<Napi::String>().ToString();
+    mid = info[0].As<Napi::String>().Utf8Value();
   }
 
   // ootional
@@ -72,7 +72,7 @@ AudioWrapper::AudioWrapper(const Napi::CallbackInfo &info) : Napi::ObjectWrap<Au
       return;
     }
 
-    std::string dirAsStr = info[1].As<Napi::String>().ToString();
+    std::string dirAsStr = info[1].As<Napi::String>().Utf8Value();
     dir = strToDirection(dirAsStr);
   }
 
@@ -101,7 +101,7 @@ void AudioWrapper::addAudioCodec(const Napi::CallbackInfo &info)
   }
 
   int payloadType = info[0].As<Napi::Number>().ToNumber();
-  std::string codec = info[1].As<Napi::String>().ToString();
+  std::string codec = info[1].As<Napi::String>().Utf8Value();
   std::optional<std::string> profile = std::nullopt;
 
   if (length > 2)
@@ -111,7 +111,7 @@ void AudioWrapper::addAudioCodec(const Napi::CallbackInfo &info)
       Napi::TypeError::New(env, "profile (String) expected").ThrowAsJavaScriptException();
       return;
     }
-    profile = info[2].As<Napi::String>().ToString();
+    profile = info[2].As<Napi::String>().Utf8Value();
   }
 
   mAudioPtr->addAudioCodec(payloadType, codec, profile);
@@ -138,7 +138,7 @@ void AudioWrapper::addOpusCodec(const Napi::CallbackInfo &info)
       Napi::TypeError::New(env, "profile (String) expected").ThrowAsJavaScriptException();
       return;
     }
-    profile = info[1].As<Napi::String>().ToString();
+    profile = info[1].As<Napi::String>().Utf8Value();
   }
 
   mAudioPtr->addOpusCodec(payloadType, profile);
@@ -161,8 +161,8 @@ Napi::Value AudioWrapper::generateSdp(const Napi::CallbackInfo &info)
     return Napi::String::New(env, "");
   }
 
-  std::string eol = info[0].As<Napi::String>().ToString();
-  std::string addr = info[1].As<Napi::String>().ToString();
+  std::string eol = info[0].As<Napi::String>().Utf8Value();
+  std::string addr = info[1].As<Napi::String>().Utf8Value();
   uint16_t port = info[2].As<Napi::Number>().Uint32Value();
 
   return Napi::String::New(env, mAudioPtr->generateSdp(eol, addr, port));
@@ -185,7 +185,7 @@ void AudioWrapper::setDirection(const Napi::CallbackInfo &info)
     return;
   }
 
-  std::string dirAsStr = info[0].As<Napi::String>().ToString();
+  std::string dirAsStr = info[0].As<Napi::String>().Utf8Value();
   rtc::Description::Direction dir = strToDirection(dirAsStr);
   mAudioPtr->setDirection(dir);
 }
@@ -207,7 +207,7 @@ void AudioWrapper::removeFormat(const Napi::CallbackInfo &info)
     return;
   }
 
-  std::string fmt = info[0].As<Napi::String>().ToString();
+  std::string fmt = info[0].As<Napi::String>().Utf8Value();
 
   mAudioPtr->removeFormat(fmt);
 }
@@ -236,7 +236,7 @@ void AudioWrapper::addSSRC(const Napi::CallbackInfo &info)
       Napi::TypeError::New(env, "name as String expected").ThrowAsJavaScriptException();
       return;
     }
-    name = info[1].As<Napi::String>().ToString();
+    name = info[1].As<Napi::String>().Utf8Value();
   }
 
   if (length > 2)
@@ -246,7 +246,7 @@ void AudioWrapper::addSSRC(const Napi::CallbackInfo &info)
       Napi::TypeError::New(env, "msid as String expected").ThrowAsJavaScriptException();
       return;
     }
-    msid = info[2].As<Napi::String>().ToString();
+    msid = info[2].As<Napi::String>().Utf8Value();
   }
 
   if (length > 3)
@@ -256,7 +256,7 @@ void AudioWrapper::addSSRC(const Napi::CallbackInfo &info)
       Napi::TypeError::New(env, "trackID as String expected").ThrowAsJavaScriptException();
       return;
     }
-    trackID = info[3].As<Napi::String>().ToString();
+    trackID = info[3].As<Napi::String>().Utf8Value();
   }
 
   mAudioPtr->addSSRC(ssrc, name, msid, trackID);
@@ -304,7 +304,7 @@ void AudioWrapper::replaceSSRC(const Napi::CallbackInfo &info)
       Napi::TypeError::New(env, "name as String expected").ThrowAsJavaScriptException();
       return;
     }
-    name = info[2].As<Napi::String>().ToString();
+    name = info[2].As<Napi::String>().Utf8Value();
   }
 
   if (length > 3)
@@ -314,7 +314,7 @@ void AudioWrapper::replaceSSRC(const Napi::CallbackInfo &info)
       Napi::TypeError::New(env, "msid as String expected").ThrowAsJavaScriptException();
       return;
     }
-    msid = info[3].As<Napi::String>().ToString();
+    msid = info[3].As<Napi::String>().Utf8Value();
   }
 
   if (length > 4)
@@ -324,7 +324,7 @@ void AudioWrapper::replaceSSRC(const Napi::CallbackInfo &info)
       Napi::TypeError::New(env, "trackID as String expected").ThrowAsJavaScriptException();
       return;
     }
-    trackID = info[4].As<Napi::String>().ToString();
+    trackID = info[4].As<Napi::String>().Utf8Value();
   }
 
   mAudioPtr->replaceSSRC(oldSsrc, ssrc, name, msid, trackID);
@@ -451,7 +451,7 @@ void AudioWrapper::parseSdpLine(const Napi::CallbackInfo &info)
     return;
   }
 
-  std::string line = info[0].As<Napi::String>().ToString();
+  std::string line = info[0].As<Napi::String>().Utf8Value();
 
   mAudioPtr->parseSdpLine(line);
 }

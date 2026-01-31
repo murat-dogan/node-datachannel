@@ -125,7 +125,7 @@ WebSocketWrapper::WebSocketWrapper(const Napi::CallbackInfo &info) : Napi::Objec
     uint16_t port = proxyServer.Get("port").As<Napi::Number>().Uint32Value();
 
     // Type
-    std::string strType = proxyServer.Get("type").As<Napi::String>().ToString();
+    std::string strType = proxyServer.Get("type").As<Napi::String>().Utf8Value();
     rtc::ProxyServer::Type type = rtc::ProxyServer::Type::Http;
 
     if (strType == "Socks5")
@@ -136,9 +136,9 @@ WebSocketWrapper::WebSocketWrapper(const Napi::CallbackInfo &info) : Napi::Objec
     std::string password = "";
 
     if (proxyServer.Get("username").IsString())
-      username = proxyServer.Get("username").As<Napi::String>().ToString();
+      username = proxyServer.Get("username").As<Napi::String>().Utf8Value();
     if (proxyServer.Get("password").IsString())
-      password = proxyServer.Get("password").As<Napi::String>().ToString();
+      password = proxyServer.Get("password").As<Napi::String>().Utf8Value();
 
     webSocketConfig.proxyServer = rtc::ProxyServer(type, ip, port, username, password);
   }
@@ -153,7 +153,7 @@ WebSocketWrapper::WebSocketWrapper(const Napi::CallbackInfo &info) : Napi::Objec
     Napi::Array protocols = config.Get("protocols").As<Napi::Array>();
     for (uint32_t i = 0; i < protocols.Length(); i++)
     {
-      webSocketConfig.protocols.push_back(protocols.Get(i).ToString());
+      webSocketConfig.protocols.push_back(protocols.Get(i).Utf8Value());
     }
   }
 
@@ -195,7 +195,7 @@ WebSocketWrapper::WebSocketWrapper(const Napi::CallbackInfo &info) : Napi::Objec
       Napi::TypeError::New(info.Env(), "caCertificatePemFile must be a string").ThrowAsJavaScriptException();
       return;
     }
-    webSocketConfig.caCertificatePemFile = config.Get("caCertificatePemFile").ToString();
+    webSocketConfig.caCertificatePemFile = config.Get("caCertificatePemFile").Utf8Value();
   }
 
   if (config.Has("certificatePemFile"))
@@ -205,7 +205,7 @@ WebSocketWrapper::WebSocketWrapper(const Napi::CallbackInfo &info) : Napi::Objec
       Napi::TypeError::New(info.Env(), "certificatePemFile must be a string").ThrowAsJavaScriptException();
       return;
     }
-    webSocketConfig.certificatePemFile = config.Get("certificatePemFile").ToString();
+    webSocketConfig.certificatePemFile = config.Get("certificatePemFile").Utf8Value();
   }
 
   if (config.Has("keyPemFile"))
@@ -215,7 +215,7 @@ WebSocketWrapper::WebSocketWrapper(const Napi::CallbackInfo &info) : Napi::Objec
       Napi::TypeError::New(info.Env(), "keyPemFile must be a string").ThrowAsJavaScriptException();
       return;
     }
-    webSocketConfig.keyPemFile = config.Get("keyPemFile").ToString();
+    webSocketConfig.keyPemFile = config.Get("keyPemFile").Utf8Value();
   }
 
   if (config.Has("keyPemPass"))
@@ -225,7 +225,7 @@ WebSocketWrapper::WebSocketWrapper(const Napi::CallbackInfo &info) : Napi::Objec
       Napi::TypeError::New(info.Env(), "keyPemPass must be a string").ThrowAsJavaScriptException();
       return;
     }
-    webSocketConfig.keyPemPass = config.Get("keyPemPass").ToString();
+    webSocketConfig.keyPemPass = config.Get("keyPemPass").Utf8Value();
   }
 
   if (config.Has("maxMessageSize"))
@@ -339,7 +339,7 @@ void WebSocketWrapper::open(const Napi::CallbackInfo &info)
 
   try
   {
-    mWebSocketPtr->open(info[0].As<Napi::String>().ToString());
+    mWebSocketPtr->open(info[0].As<Napi::String>().Utf8Value());
   }
   catch (std::exception &ex)
   {
@@ -382,7 +382,7 @@ Napi::Value WebSocketWrapper::sendMessage(const Napi::CallbackInfo &info)
 
   try
   {
-    return Napi::Boolean::New(info.Env(), mWebSocketPtr->send(info[0].As<Napi::String>().ToString()));
+    return Napi::Boolean::New(info.Env(), mWebSocketPtr->send(info[0].As<Napi::String>().Utf8Value()));
   }
   catch (std::exception &ex)
   {

@@ -59,7 +59,7 @@ IceUdpMuxListenerWrapper::IceUdpMuxListenerWrapper(const Napi::CallbackInfo &inf
   if (length > 1 && info[1].IsString())
   {
     // Address
-    mAddress = info[1].As<Napi::String>().ToString();
+    mAddress = info[1].As<Napi::String>().Utf8Value();
   }
 
   iceUdpMuxListenerPtr = std::make_unique<rtc::IceUdpMuxListener>(mPort, mAddress);

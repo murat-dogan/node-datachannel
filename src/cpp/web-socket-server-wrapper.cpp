@@ -97,7 +97,7 @@ WebSocketServerWrapper::WebSocketServerWrapper(const Napi::CallbackInfo &info)
       Napi::TypeError::New(info.Env(), "certificatePemFile must be a string").ThrowAsJavaScriptException();
       return;
     }
-    webSocketServerConfig.certificatePemFile = config.Get("certificatePemFile").ToString();
+    webSocketServerConfig.certificatePemFile = config.Get("certificatePemFile").Utf8Value();
   }
 
   // Key PEM File
@@ -108,7 +108,7 @@ WebSocketServerWrapper::WebSocketServerWrapper(const Napi::CallbackInfo &info)
       Napi::TypeError::New(info.Env(), "keyPemFile must be a string").ThrowAsJavaScriptException();
       return;
     }
-    webSocketServerConfig.keyPemFile = config.Get("keyPemFile").ToString();
+    webSocketServerConfig.keyPemFile = config.Get("keyPemFile").Utf8Value();
   }
 
   // Key PEM Pass
@@ -119,7 +119,7 @@ WebSocketServerWrapper::WebSocketServerWrapper(const Napi::CallbackInfo &info)
       Napi::TypeError::New(info.Env(), "keyPemPass must be a string").ThrowAsJavaScriptException();
       return;
     }
-    webSocketServerConfig.keyPemPass = config.Get("keyPemPass").ToString();
+    webSocketServerConfig.keyPemPass = config.Get("keyPemPass").Utf8Value();
   }
 
   // Bind Address
@@ -130,7 +130,7 @@ WebSocketServerWrapper::WebSocketServerWrapper(const Napi::CallbackInfo &info)
       Napi::TypeError::New(info.Env(), "bindAddress must be a string").ThrowAsJavaScriptException();
       return;
     }
-    webSocketServerConfig.bindAddress = config.Get("bindAddress").ToString();
+    webSocketServerConfig.bindAddress = config.Get("bindAddress").Utf8Value();
   }
 
   // Connection Timeout

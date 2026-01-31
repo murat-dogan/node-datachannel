@@ -65,7 +65,7 @@ VideoWrapper::VideoWrapper(const Napi::CallbackInfo &info) : Napi::ObjectWrap<Vi
       Napi::TypeError::New(env, "mid (String) expected").ThrowAsJavaScriptException();
       return;
     }
-    mid = info[0].As<Napi::String>().ToString();
+    mid = info[0].As<Napi::String>().Utf8Value();
   }
 
   // ootional
@@ -77,7 +77,7 @@ VideoWrapper::VideoWrapper(const Napi::CallbackInfo &info) : Napi::ObjectWrap<Vi
       return;
     }
 
-    std::string dirAsStr = info[1].As<Napi::String>().ToString();
+    std::string dirAsStr = info[1].As<Napi::String>().Utf8Value();
     dir = strToDirection(dirAsStr);
   }
 
@@ -106,7 +106,7 @@ void VideoWrapper::addVideoCodec(const Napi::CallbackInfo &info)
   }
 
   int payloadType = info[0].As<Napi::Number>().ToNumber();
-  std::string codec = info[1].As<Napi::String>().ToString();
+  std::string codec = info[1].As<Napi::String>().Utf8Value();
   std::optional<std::string> profile = std::nullopt;
 
   if (length > 2)
@@ -116,7 +116,7 @@ void VideoWrapper::addVideoCodec(const Napi::CallbackInfo &info)
       Napi::TypeError::New(env, "profile (String) expected").ThrowAsJavaScriptException();
       return;
     }
-    profile = info[2].As<Napi::String>().ToString();
+    profile = info[2].As<Napi::String>().Utf8Value();
   }
 
   mVideoPtr->addVideoCodec(payloadType, codec, profile);
@@ -143,7 +143,7 @@ void VideoWrapper::addH264Codec(const Napi::CallbackInfo &info)
       Napi::TypeError::New(env, "profile (String) expected").ThrowAsJavaScriptException();
       return;
     }
-    profile = info[1].As<Napi::String>().ToString();
+    profile = info[1].As<Napi::String>().Utf8Value();
   }
 
   mVideoPtr->addH264Codec(payloadType, profile);
@@ -231,8 +231,8 @@ Napi::Value VideoWrapper::generateSdp(const Napi::CallbackInfo &info)
     return Napi::String::New(env, "");
   }
 
-  std::string eol = info[0].As<Napi::String>().ToString();
-  std::string addr = info[1].As<Napi::String>().ToString();
+  std::string eol = info[0].As<Napi::String>().Utf8Value();
+  std::string addr = info[1].As<Napi::String>().Utf8Value();
   uint16_t port = info[2].As<Napi::Number>().Uint32Value();
 
   return Napi::String::New(env, mVideoPtr->generateSdp(eol, addr, port));
@@ -255,7 +255,7 @@ void VideoWrapper::setDirection(const Napi::CallbackInfo &info)
     return;
   }
 
-  std::string dirAsStr = info[0].As<Napi::String>().ToString();
+  std::string dirAsStr = info[0].As<Napi::String>().Utf8Value();
   rtc::Description::Direction dir = strToDirection(dirAsStr);
   mVideoPtr->setDirection(dir);
 }
@@ -277,7 +277,7 @@ void VideoWrapper::removeFormat(const Napi::CallbackInfo &info)
     return;
   }
 
-  std::string fmt = info[0].As<Napi::String>().ToString();
+  std::string fmt = info[0].As<Napi::String>().Utf8Value();
 
   mVideoPtr->removeFormat(fmt);
 }
@@ -306,7 +306,7 @@ void VideoWrapper::addSSRC(const Napi::CallbackInfo &info)
       Napi::TypeError::New(env, "name as String expected").ThrowAsJavaScriptException();
       return;
     }
-    name = info[1].As<Napi::String>().ToString();
+    name = info[1].As<Napi::String>().Utf8Value();
   }
 
   if (length > 2)
@@ -316,7 +316,7 @@ void VideoWrapper::addSSRC(const Napi::CallbackInfo &info)
       Napi::TypeError::New(env, "msid as String expected").ThrowAsJavaScriptException();
       return;
     }
-    msid = info[2].As<Napi::String>().ToString();
+    msid = info[2].As<Napi::String>().Utf8Value();
   }
 
   if (length > 3)
@@ -326,7 +326,7 @@ void VideoWrapper::addSSRC(const Napi::CallbackInfo &info)
       Napi::TypeError::New(env, "trackID as String expected").ThrowAsJavaScriptException();
       return;
     }
-    trackID = info[3].As<Napi::String>().ToString();
+    trackID = info[3].As<Napi::String>().Utf8Value();
   }
 
   mVideoPtr->addSSRC(ssrc, name, msid, trackID);
@@ -374,7 +374,7 @@ void VideoWrapper::replaceSSRC(const Napi::CallbackInfo &info)
       Napi::TypeError::New(env, "name as String expected").ThrowAsJavaScriptException();
       return;
     }
-    name = info[2].As<Napi::String>().ToString();
+    name = info[2].As<Napi::String>().Utf8Value();
   }
 
   if (length > 3)
@@ -384,7 +384,7 @@ void VideoWrapper::replaceSSRC(const Napi::CallbackInfo &info)
       Napi::TypeError::New(env, "msid as String expected").ThrowAsJavaScriptException();
       return;
     }
-    msid = info[3].As<Napi::String>().ToString();
+    msid = info[3].As<Napi::String>().Utf8Value();
   }
 
   if (length > 4)
@@ -394,7 +394,7 @@ void VideoWrapper::replaceSSRC(const Napi::CallbackInfo &info)
       Napi::TypeError::New(env, "trackID as String expected").ThrowAsJavaScriptException();
       return;
     }
-    trackID = info[4].As<Napi::String>().ToString();
+    trackID = info[4].As<Napi::String>().Utf8Value();
   }
 
   mVideoPtr->replaceSSRC(oldSsrc, ssrc, name, msid, trackID);
@@ -520,7 +520,7 @@ void VideoWrapper::parseSdpLine(const Napi::CallbackInfo &info)
     return;
   }
 
-  std::string line = info[0].As<Napi::String>().ToString();
+  std::string line = info[0].As<Napi::String>().Utf8Value();
 
   mVideoPtr->parseSdpLine(line);
 }

@@ -179,7 +179,7 @@ Napi::Value DataChannelWrapper::sendMessage(const Napi::CallbackInfo &info)
 
   try
   {
-    return Napi::Boolean::New(info.Env(), mDataChannelPtr->send(info[0].As<Napi::String>().ToString()));
+    return Napi::Boolean::New(info.Env(), mDataChannelPtr->send(info[0].As<Napi::String>().Utf8Value()));
   }
   catch (std::exception &ex)
   {

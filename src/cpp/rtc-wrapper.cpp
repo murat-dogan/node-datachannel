@@ -55,7 +55,7 @@ void RtcWrapper::initLogger(const Napi::CallbackInfo &info)
     return;
   }
 
-  std::string logLevelStr = info[0].As<Napi::String>().ToString();
+  std::string logLevelStr = info[0].As<Napi::String>().Utf8Value();
   rtc::LogLevel logLevel = rtc::LogLevel::None;
 
   if (logLevelStr == "Verbose")

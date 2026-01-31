@@ -95,7 +95,7 @@ PeerConnectionWrapper::PeerConnectionWrapper(const Napi::CallbackInfo &info)
   }
 
   // Peer Name
-  mPeerName = info[0].As<Napi::String>().ToString();
+  mPeerName = info[0].As<Napi::String>().Utf8Value();
 
   // Peer Config
   rtc::Configuration rtcConfig;
@@ -113,7 +113,7 @@ PeerConnectionWrapper::PeerConnectionWrapper(const Napi::CallbackInfo &info)
     {
       try
       {
-        rtcConfig.iceServers.emplace_back(iceServers.Get(i).As<Napi::String>().ToString());
+        rtcConfig.iceServers.emplace_back(iceServers.Get(i).As<Napi::String>().Utf8Value());
       }
       catch (std::exception &ex)
       {
@@ -180,7 +180,7 @@ PeerConnectionWrapper::PeerConnectionWrapper(const Napi::CallbackInfo &info)
     uint16_t port = proxyServer.Get("port").As<Napi::Number>().Uint32Value();
 
     // Type
-    std::string strType = proxyServer.Get("type").As<Napi::String>().ToString();
+    std::string strType = proxyServer.Get("type").As<Napi::String>().Utf8Value();
     rtc::ProxyServer::Type type = rtc::ProxyServer::Type::Http;
 
     if (strType == "Socks5")
@@ -191,16 +191,16 @@ PeerConnectionWrapper::PeerConnectionWrapper(const Napi::CallbackInfo &info)
     std::string password = "";
 
     if (proxyServer.Get("username").IsString())
-      username = proxyServer.Get("username").As<Napi::String>().ToString();
+      username = proxyServer.Get("username").As<Napi::String>().Utf8Value();
     if (proxyServer.Get("password").IsString())
-      password = proxyServer.Get("password").As<Napi::String>().ToString();
+      password = proxyServer.Get("password").As<Napi::String>().Utf8Value();
 
     rtcConfig.proxyServer = rtc::ProxyServer(type, ip, port, username, password);
   }
 
   // bind address, libjuice only
   if (config.Get("bindAddress").IsString())
-    rtcConfig.bindAddress = config.Get("bindAddress").As<Napi::String>().ToString();
+    rtcConfig.bindAddress = config.Get("bindAddress").As<Napi::String>().Utf8Value();
 
   // Port Ranges
   if (config.Get("portRangeBegin").IsNumber())
@@ -244,7 +244,7 @@ PeerConnectionWrapper::PeerConnectionWrapper(const Napi::CallbackInfo &info)
       Napi::TypeError::New(env, "Invalid ICE transport policy, expected string").ThrowAsJavaScriptException();
       return;
     }
-    std::string strPolicy = config.Get("iceTransportPolicy").As<Napi::String>().ToString();
+    std::string strPolicy = config.Get("iceTransportPolicy").As<Napi::String>().Utf8Value();
     if (strPolicy == "all")
       rtcConfig.iceTransportPolicy = rtc::TransportPolicy::All;
     else if (strPolicy == "relay")
@@ -265,15 +265,15 @@ PeerConnectionWrapper::PeerConnectionWrapper(const Napi::CallbackInfo &info)
   // Specify certificate to use if set
   if (config.Get("certificatePemFile").IsString())
   {
-    rtcConfig.certificatePemFile = config.Get("certificatePemFile").As<Napi::String>().ToString();
+    rtcConfig.certificatePemFile = config.Get("certificatePemFile").As<Napi::String>().Utf8Value();
   }
   if (config.Get("keyPemFile").IsString())
   {
-    rtcConfig.keyPemFile = config.Get("keyPemFile").As<Napi::String>().ToString();
+    rtcConfig.keyPemFile = config.Get("keyPemFile").As<Napi::String>().Utf8Value();
   }
   if (config.Get("keyPemPass").IsString())
   {
-    rtcConfig.keyPemPass = config.Get("keyPemPass").As<Napi::String>().ToString();
+    rtcConfig.keyPemPass = config.Get("keyPemPass").As<Napi::String>().Utf8Value();
   }
 
   // Create peer-connection
@@ -368,7 +368,7 @@ void PeerConnectionWrapper::setLocalDescription(const Napi::CallbackInfo &info)
       Napi::TypeError::New(env, "type (String) expected").ThrowAsJavaScriptException();
       return;
     }
-    std::string typeStr = info[0].As<Napi::String>().ToString();
+    std::string typeStr = info[0].As<Napi::String>().Utf8Value();
 
     // Accept uppercase first letter for backward compatibility
     if (typeStr.size() > 0)
@@ -429,8 +429,8 @@ void PeerConnectionWrapper::setRemoteDescription(const Napi::CallbackInfo &info)
     return;
   }
 
-  std::string sdp = info[0].As<Napi::String>().ToString();
-  std::string type = info[1].As<Napi::String>().ToString();
+  std::string sdp = info[0].As<Napi::String>().Utf8Value();
+  std::string type = info[1].As<Napi::String>().Utf8Value();
 
   try
   {
@@ -502,8 +502,8 @@ void PeerConnectionWrapper::addRemoteCandidate(const Napi::CallbackInfo &info)
 
   try
   {
-    std::string candidate = info[0].As<Napi::String>().ToString();
-    std::string mid = info[1].As<Napi::String>().ToString();
+    std::string candidate = info[0].As<Napi::String>().Utf8Value();
+    std::string mid = info[1].As<Napi::String>().Utf8Value();
     mRtcPeerConnPtr->addRemoteCandidate(rtc::Candidate(candidate, mid));
   }
   catch (std::exception &ex)
@@ -616,7 +616,7 @@ Napi::Value PeerConnectionWrapper::createDataChannel(const Napi::CallbackInfo &i
 
   try
   {
-    std::string label = info[0].As<Napi::String>().ToString();
+    std::string label = info[0].As<Napi::String>().Utf8Value();
     std::shared_ptr<rtc::DataChannel> dataChannel = mRtcPeerConnPtr->createDataChannel(label, std::move(init));
     auto instance = DataChannelWrapper::constructor.New(
         {Napi::External<std::shared_ptr<rtc::DataChannel>>::New(info.Env(), &dataChannel)});
