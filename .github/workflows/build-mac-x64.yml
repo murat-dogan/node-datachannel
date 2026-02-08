@@ -11,7 +11,7 @@ env:
 
 jobs:
   build-macos:
-    runs-on: macos-14
+    runs-on: macos-13
     strategy:
       matrix:
         node-version: [18]
