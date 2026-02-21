@@ -34,6 +34,7 @@
   },
   "scripts": {
     "install": "prebuild-install -r napi || (npm install --ignore-scripts --production=false && npm run _prebuild)",
+    "rebuild": "prebuild-install -r napi || cmake-js rebuild",
     "install:nice": "npm run clean && npm install --ignore-scripts --production=false && cmake-js configure --CDUSE_NICE=1 && cmake-js build",
     "install:gnu": "npm run clean && npm install --ignore-scripts --production=false && cmake-js configure --CDUSE_GNUTLS=1 && cmake-js build",
     "build": "npm run compile && npm run build:tsc",
