@@ -23,8 +23,8 @@ import type { CertificateFingerprint, IceUdpMuxRequest, LocalDescriptionInit } f
 export function preload(): void {
   nodeDataChannel.preload();
 }
-export function initLogger(level: LogLevel): void {
-  nodeDataChannel.initLogger(level);
+export function initLogger(level: LogLevel, cb?: (level: LogLevel, message: string) => void): void {
+  nodeDataChannel.initLogger(level, cb);
 }
 export function cleanup(): void {
   nodeDataChannel.cleanup();
