@@ -145,6 +145,7 @@ void IceUdpMuxListenerWrapper::onUnhandledStunRequest(const Napi::CallbackInfo &
           {
         Napi::Object reqObj = Napi::Object::New(env);
         reqObj.Set("ufrag", request.remoteUfrag.c_str());
+        reqObj.Set("localUfrag", request.localUfrag.c_str());
         reqObj.Set("host", request.remoteAddress.c_str());
         reqObj.Set("port", request.remotePort);
 
