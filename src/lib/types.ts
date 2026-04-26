@@ -157,6 +157,7 @@ export type Direction = 'SendOnly' | 'RecvOnly' | 'SendRecv' | 'Inactive' | 'Unk
 
 export interface IceUdpMuxRequest {
   ufrag: string;
+  localUfrag: string;
   host: string;
   port: number;
 }
