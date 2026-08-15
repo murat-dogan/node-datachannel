@@ -52,6 +52,12 @@ const PLATFORMS = {
     cpu: ['x64'],
     description: 'Prebuilt native binary for node-datachannel (Windows x64)',
   },
+  'android-arm64': {
+    name: '@node-datachannel/android-arm64',
+    os: ['android'],
+    cpu: ['arm64'],
+    description: 'Prebuilt native binary for node-datachannel (Android Termux / Bionic arm64)',
+  },
 };
 
 function packageTarget(targetKey, binaryPath) {

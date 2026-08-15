@@ -35,6 +35,7 @@
   "scripts": {
     "build": "npm run compile && npm run build:tsc",
     "compile": "cmake-js build",
+    "rebuild": "cmake-js rebuild",
     "build:debug": "npm run compile:debug && npm run build:tsc",
     "compile:debug": "cmake-js configure -D && cmake-js build -D",
     "build:tsc": "rimraf dist && rollup -c",
@@ -116,12 +117,13 @@
     "detect-libc": "^2.0.4"
   },
   "optionalDependencies": {
-    "@node-datachannel/darwin-arm64": "0.32.3",
-    "@node-datachannel/darwin-x64": "0.32.3",
-    "@node-datachannel/linux-arm64-gnu": "0.32.3",
-    "@node-datachannel/linux-arm64-musl": "0.32.3",
-    "@node-datachannel/linux-x64-gnu": "0.32.3",
-    "@node-datachannel/linux-x64-musl": "0.32.3",
-    "@node-datachannel/win32-x64-msvc": "0.32.3"
+    "@node-datachannel/android-arm64": "0.33.0",
+    "@node-datachannel/darwin-arm64": "0.33.0",
+    "@node-datachannel/darwin-x64": "0.33.0",
+    "@node-datachannel/linux-arm64-gnu": "0.33.0",
+    "@node-datachannel/linux-arm64-musl": "0.33.0",
+    "@node-datachannel/linux-x64-gnu": "0.33.0",
+    "@node-datachannel/linux-x64-musl": "0.33.0",
+    "@node-datachannel/win32-x64-msvc": "0.33.0"
   }
 }

@@ -20,10 +20,10 @@ npm install node-datachannel
 
 `node-datachannel` targets N-API version 8 and supports Node.js **v18.20 and above** (including Node.js 20, 22, and 24+). Prebuilt binaries are distributed automatically via platform-specific npm packages (`optionalDependencies`).
 
-| Architecture | Linux (glibc) | Linux (musl / Alpine) | macOS (Apple Silicon / Intel) | Windows |
-| :--- | :---: | :---: | :---: | :---: |
-| **x64** | `@node-datachannel/linux-x64-gnu` | `@node-datachannel/linux-x64-musl` | `@node-datachannel/darwin-x64` | `@node-datachannel/win32-x64-msvc` |
-| **arm64** | `@node-datachannel/linux-arm64-gnu` | `@node-datachannel/linux-arm64-musl` | `@node-datachannel/darwin-arm64` | - |
+| Architecture | Linux (glibc) | Linux (musl / Alpine) | macOS (Apple Silicon / Intel) | Windows | Android (Termux / Bionic) |
+| :--- | :---: | :---: | :---: | :---: | :---: |
+| **x64** | `@node-datachannel/linux-x64-gnu` | `@node-datachannel/linux-x64-musl` | `@node-datachannel/darwin-x64` | `@node-datachannel/win32-x64-msvc` | - |
+| **arm64** | `@node-datachannel/linux-arm64-gnu` | `@node-datachannel/linux-arm64-musl` | `@node-datachannel/darwin-arm64` | - | `@node-datachannel/android-arm64` |
 
 ## Electron
 

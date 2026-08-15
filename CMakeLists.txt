@@ -18,8 +18,8 @@ if(WIN32)
     set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 endif()
 
-if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Android")
-    set(CMAKE_C_FLAGS "-Wno-error=unused-but-set-variable -Wno-error=strict-prototypes")
+if(ANDROID OR CMAKE_SYSTEM_NAME STREQUAL "Android")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-error=unused-but-set-variable -Wno-error=strict-prototypes")
 endif()
 
 # Add -frtti only for Linux and macOS
@@ -125,7 +125,7 @@ set(LINK_LIBRARIES
 
 if(APPLE)
 #
-elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL "Android")
+elseif(ANDROID OR CMAKE_SYSTEM_NAME STREQUAL "Android")
     list(APPEND LINK_LIBRARIES -static-libgcc)
 elseif(UNIX)
     list(APPEND LINK_LIBRARIES -static-libgcc -static-libstdc++)

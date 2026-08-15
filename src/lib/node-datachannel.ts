@@ -18,6 +18,8 @@ function getPackageName(): string | null {
     if (arch === 'x64') return '@node-datachannel/darwin-x64';
   } else if (platform === 'win32') {
     if (arch === 'x64') return '@node-datachannel/win32-x64-msvc';
+  } else if (platform === 'android') {
+    if (arch === 'arm64') return '@node-datachannel/android-arm64';
   }
   return null;
 }
