@@ -129,22 +129,26 @@ jobs:
 
   build-mac-x64:
     name: macOS (darwin-x64)
-    runs-on: macos-13
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Install OpenSSL
-        run: HOMEBREW_NO_INSTALL_CLEANUP=1 brew reinstall openssl@3
       - name: Use Node.js 18
         uses: actions/setup-node@v4
         with:
           node-version: 18
       - name: Install Dependencies
         run: npm install --ignore-scripts
-      - name: Build
-        run: npx cmake-js build
-        env:
-          OPENSSL_ROOT_DIR: /usr/local/opt/openssl@3
-          OPENSSL_LIBRARIES: /usr/local/opt/openssl@3/lib
+      - name: Build OpenSSL for macOS x64
+        run: |
+          git clone --depth 1 -b openssl-3.3.1 https://github.com/openssl/openssl.git _openssl_src
+          cd _openssl_src
+          ./Configure darwin64-x86_64-cc no-shared no-unit-test no-tests --prefix=$(pwd)/../_openssl_x64 --libdir=lib
+          make -j$(sysctl -n hw.ncpu)
+          make install_sw
+          cd ..
+      - name: Build x64 Addon
+        run: |
+          npx cmake-js build --arch=x64 --CDCMAKE_OSX_ARCHITECTURES=x86_64 --CDOPENSSL_ROOT_DIR="$(pwd)/_openssl_x64" --CDOPENSSL_USE_STATIC_LIBS=TRUE
       - name: Package Platform
         run: node scripts/prepare-platform-packages.js darwin-x64
       - name: Upload Artifact
