@@ -1,0 +1,59 @@
+name: Close All Dependabot PRs
+
+on:
+  workflow_dispatch:
+
+permissions:
+  pull-requests: write
+  contents: write
+
+jobs:
+  close-prs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Close open Dependabot PRs
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const pulls = await github.rest.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              per_page: 100
+            });
+            
+            const dependabotPulls = pulls.data.filter(p => 
+              p.user && (p.user.login.includes('dependabot') || p.user.login.includes('[bot]'))
+            );
+            
+            console.log(`Found ${dependabotPulls.length} open dependabot PRs to close.`);
+            
+            for (const pr of dependabotPulls) {
+              console.log(`Closing PR #${pr.number}: ${pr.title}`);
+              try {
+                await github.rest.pulls.update({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  pull_number: pr.number,
+                  state: 'closed'
+                });
+                
+                // Delete the branch if possible
+                if (pr.head.ref) {
+                  try {
+                    await github.rest.git.deleteRef({
+                      owner: context.repo.owner,
+                      repo: context.repo.repo,
+                      ref: `heads/${pr.head.ref}`
+                    });
+                    console.log(`Deleted branch: ${pr.head.ref}`);
+                  } catch (e) {
+                    console.log(`Could not delete branch ${pr.head.ref}: ${e.message}`);
+                  }
+                }
+              } catch (err) {
+                console.error(`Failed to close PR #${pr.number}: ${err.message}`);
+              }
+            }
+            console.log('Finished closing Dependabot PRs.');

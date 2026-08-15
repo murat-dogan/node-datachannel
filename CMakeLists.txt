@@ -139,7 +139,9 @@ endif()
 
 target_link_libraries(${PROJECT_NAME} PRIVATE ${LINK_LIBRARIES})
 
-if(UNIX AND NOT APPLE)
+if(ANDROID OR CMAKE_SYSTEM_NAME STREQUAL "Android")
+    target_link_options(${PROJECT_NAME} PRIVATE -Wl,-z,undefs)
+elseif(UNIX AND NOT APPLE)
     target_compile_options(${PROJECT_NAME} PRIVATE -fvisibility=hidden -fvisibility-inlines-hidden)
     target_link_options(${PROJECT_NAME} PRIVATE -Wl,--exclude-libs,ALL)
 endif()
