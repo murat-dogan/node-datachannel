@@ -113,6 +113,7 @@ endif()
 target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_JS_INC}
     ${CMAKE_SOURCE_DIR}/node_modules/node-addon-api
+    ${CMAKE_SOURCE_DIR}/node_modules/node-api-headers/include
     ${CMAKE_BINARY_DIR}/_deps/libdatachannel-src/include
     ${CMAKE_BINARY_DIR}/_deps/libdatachannel-src/deps/plog
 )

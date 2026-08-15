@@ -30,7 +30,7 @@ jobs:
           cd _openssl_src
           export ANDROID_NDK_ROOT=$ANDROID_NDK_HOME
           export PATH=$ANDROID_NDK_ROOT/toolchains/llvm/prebuilt/linux-x86_64/bin:$PATH
-          ./Configure android-arm64 -D__ANDROID_API__=24 no-shared no-unit-test no-tests --prefix=$(pwd)/../_openssl_android
+          ./Configure android-arm64 -D__ANDROID_API__=24 no-shared no-unit-test no-tests --prefix=$(pwd)/../_openssl_android --libdir=lib
           make -j$(nproc)
           make install_sw
           cd ..
@@ -43,9 +43,12 @@ jobs:
             -DANDROID_PLATFORM=android-24 \
             -DANDROID_STL=c++_static \
             -DCMAKE_BUILD_TYPE=Release \
-            -DOPENSSL_ROOT_DIR=$(pwd)/_openssl_android \
-            -DOPENSSL_USE_STATIC_LIBS=TRUE \
-            -DCMAKE_JS_INC=$(pwd)/node_modules/node-addon-api
+            -DCMAKE_FIND_ROOT_PATH="$(pwd)/_openssl_android" \
+            -DCMAKE_FIND_ROOT_PATH_MODE_PACKAGE=BOTH \
+            -DCMAKE_FIND_ROOT_PATH_MODE_LIBRARY=BOTH \
+            -DCMAKE_FIND_ROOT_PATH_MODE_INCLUDE=BOTH \
+            -DOPENSSL_ROOT_DIR="$(pwd)/_openssl_android" \
+            -DOPENSSL_USE_STATIC_LIBS=TRUE
           cmake --build build-android --config Release -j$(nproc)
 
       - name: Package Platform
