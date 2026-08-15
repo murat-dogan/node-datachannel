@@ -2,12 +2,6 @@ name: Build - Win
 
 on:
   workflow_dispatch:
-  # push:
-  #   tags:
-  #     - v*
-
-env:
-  ACTIONS_ALLOW_UNSECURE_COMMANDS: true
 
 jobs:
   build-windows:
@@ -21,24 +15,14 @@ jobs:
             msvc_arch: x64
             vcpkg_triplet: x64-windows-static
             node_version: 18
-          - arch: x86
-            node_arch: x86
-            msvc_arch: x86
-            vcpkg_triplet: x86-windows-static
-            node_version: 18
-          - arch: arm64
-            node_arch: arm64
-            msvc_arch: amd64_arm64
-            vcpkg_triplet: arm64-windows-static
-            node_version: 18
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v6
+      - name: Use Node.js ${{ matrix.node_version }}
+        uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: ${{ matrix.node_version }}
 
       - name: Setup MSVC
         uses: ilammy/msvc-dev-cmd@v1
@@ -62,11 +46,16 @@ jobs:
 
       - name: Build
         run: |
-          npx prebuild -r napi --arch ${{ matrix.arch }} --backend cmake-js -- --CDCMAKE_TOOLCHAIN_FILE="C:\vcpkg\scripts\buildsystems\vcpkg.cmake" --CDVCPKG_TARGET_TRIPLET=${{ matrix.vcpkg_triplet }}
+          npx cmake-js build --CDCMAKE_TOOLCHAIN_FILE="C:\vcpkg\scripts\buildsystems\vcpkg.cmake" --CDVCPKG_TARGET_TRIPLET=${{ matrix.vcpkg_triplet }}
         shell: cmd
 
-      - name: Upload
-        run: npx prebuild --backend cmake-js --arch ${{ matrix.arch }} -r napi --upload -u ${{ secrets.GITHUB_TOKEN }}
-        env:
-          CI: true
+      - name: Package Platform
+        run: |
+          node scripts/prepare-platform-packages.js win32-x64-msvc
         shell: cmd
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: package-win32-x64-msvc
+          path: npm/win32-x64-msvc

@@ -9,3 +9,5 @@ test
 build-containers
 examples
 cmake
+npm
+scripts

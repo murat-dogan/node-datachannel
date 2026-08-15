@@ -1,0 +1,226 @@
+name: Release & Publish
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-linux:
+    name: Linux (${{ matrix.platform }}-${{ matrix.node_arch }})
+    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        node-version: [18]
+        arch: [amd64, arm64]
+        platform: [debian, alpine]
+        include:
+          - platform: alpine
+            triple: alpine-linux-musl
+            version: 3.16
+            libc: musl
+            gcc_install: clang lld
+            gcc: clang
+            gxx: clang++
+            libc_suffix: musl
+          - platform: debian
+            triple: linux-gnu
+            version: bullseye
+            libc_suffix: gnu
+          - arch: amd64
+            triple_arch: x86_64
+            node_arch: x64
+          - arch: arm64
+            triple_arch: aarch64
+            node_arch: arm64
+            flags: -march=armv8-a -fPIC
+          - arch: amd64
+            platform: debian
+            gcc_install: gcc g++
+            gcc: gcc
+            gxx: g++
+          - arch: arm64
+            platform: debian
+            gcc_install: gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
+            gcc: aarch64-linux-gnu-gcc
+            gxx: aarch64-linux-gnu-g++
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install dependencies
+        run: npm install --ignore-scripts
+
+      - if: matrix.arch != 'amd64'
+        name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: ${{ matrix.arch }}
+
+      - name: Install system dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y podman
+
+      - name: Prepare build container
+        run: >
+          sudo podman build
+          --isolation=chroot
+          -t ndc-buildroot:${{ matrix.platform }}-${{ matrix.arch }}
+          ./build-containers
+          --file Dockerfile.${{ matrix.platform }}
+          --platform linux/${{ matrix.arch }}
+          --build-arg version=${{ matrix.version }}
+          --build-arg node_version=${{ matrix.node-version }}
+          --build-arg gcc_install="${{ matrix.gcc_install }}"
+
+      - name: Build
+        run: |
+          sudo podman run --rm \
+            -e TRIPLE=${{ matrix.triple_arch }}-${{ matrix.triple }}${{ matrix.triple_postfix }} \
+            -e COMPILER_FLAGS="${{ matrix.flags }}" \
+            -e LIBC=${{ matrix.libc }} \
+            -e GCC=${{ matrix.gcc }} \
+            -e GXX=${{ matrix.gxx }} \
+            -e CI=true \
+            -v ${{ github.workspace }}:/usr/app \
+            --platform linux/${{ matrix.arch }} \
+            -w /usr/app \
+            ndc-buildroot:${{ matrix.platform }}-${{ matrix.arch }} \
+            npx cmake-js build --CDCMAKE_TOOLCHAIN_FILE:FILEPATH=./cmake/toolchain/ci.cmake
+
+      - name: Package Platform
+        run: node scripts/prepare-platform-packages.js linux-${{ matrix.node_arch }}-${{ matrix.libc_suffix }}
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: package-linux-${{ matrix.node_arch }}-${{ matrix.libc_suffix }}
+          path: npm/linux-${{ matrix.node_arch }}-${{ matrix.libc_suffix }}
+
+  build-mac-arm64:
+    name: macOS (darwin-arm64)
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install OpenSSL
+        run: HOMEBREW_NO_INSTALL_CLEANUP=1 brew reinstall openssl@3
+      - name: Use Node.js 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+      - name: Install Dependencies
+        run: npm install --ignore-scripts
+      - name: Build
+        run: npx cmake-js build
+        env:
+          OPENSSL_ROOT_DIR: /opt/homebrew/opt/openssl@3
+          OPENSSL_LIBRARIES: /opt/homebrew/opt/openssl@3/lib
+      - name: Package Platform
+        run: node scripts/prepare-platform-packages.js darwin-arm64
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: package-darwin-arm64
+          path: npm/darwin-arm64
+
+  build-mac-x64:
+    name: macOS (darwin-x64)
+    runs-on: macos-13
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install OpenSSL
+        run: HOMEBREW_NO_INSTALL_CLEANUP=1 brew reinstall openssl@3
+      - name: Use Node.js 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+      - name: Install Dependencies
+        run: npm install --ignore-scripts
+      - name: Build
+        run: npx cmake-js build
+        env:
+          OPENSSL_ROOT_DIR: /usr/local/opt/openssl@3
+          OPENSSL_LIBRARIES: /usr/local/opt/openssl@3/lib
+      - name: Package Platform
+        run: node scripts/prepare-platform-packages.js darwin-x64
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: package-darwin-x64
+          path: npm/darwin-x64
+
+  build-win:
+    name: Windows (win32-x64)
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+      - name: Setup MSVC
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+      - name: Setup vcpkg & OpenSSL
+        run: |
+          C:\vcpkg\bootstrap-vcpkg.bat
+          C:\vcpkg\vcpkg install openssl:x64-windows-static
+        shell: cmd
+      - name: Install Dependencies
+        run: npm install --ignore-scripts
+        shell: cmd
+      - name: Build
+        run: npx cmake-js build --CDCMAKE_TOOLCHAIN_FILE="C:\vcpkg\scripts\buildsystems\vcpkg.cmake" --CDVCPKG_TARGET_TRIPLET=x64-windows-static
+        shell: cmd
+      - name: Package Platform
+        run: node scripts/prepare-platform-packages.js win32-x64-msvc
+        shell: cmd
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: package-win32-x64-msvc
+          path: npm/win32-x64-msvc
+
+  publish:
+    name: Publish All Packages to NPM
+    needs: [build-linux, build-mac-arm64, build-mac-x64, build-win]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js 24.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24.x'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Download all platform artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: npm-artifacts
+
+      - name: Publish Platform Packages
+        run: |
+          for dir in npm-artifacts/package-*; do
+            if [ -d "$dir" ]; then
+              echo "Publishing platform package from $dir..."
+              cd "$dir"
+              npm publish --access public
+              cd - > /dev/null
+            fi
+          done
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+
+      - name: Build and Publish Main Package
+        run: |
+          npm install --ignore-scripts
+          npm run build:tsc
+          npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}

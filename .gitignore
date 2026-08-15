@@ -9,3 +9,5 @@ node_modules
 tmp
 coverage
 vcpkg_installed
+npm
+npm-artifacts

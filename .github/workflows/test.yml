@@ -1,0 +1,61 @@
+name: Test Matrix
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: Test Node ${{ matrix.node-version }} on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        node-version: [18.x, 20.x, 22.x, 24.x]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup OpenSSL (macOS)
+        if: runner.os == 'macOS'
+        run: HOMEBREW_NO_INSTALL_CLEANUP=1 brew reinstall openssl@3
+
+      - name: Setup MSVC & vcpkg OpenSSL (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          C:\vcpkg\bootstrap-vcpkg.bat
+          C:\vcpkg\vcpkg install openssl:x64-windows-static
+        shell: cmd
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install dependencies
+        run: npm install --ignore-scripts
+
+      - name: Compile Addon (Linux)
+        if: runner.os == 'Linux'
+        run: npm run compile
+
+      - name: Compile Addon (macOS)
+        if: runner.os == 'macOS'
+        run: npm run compile
+        env:
+          OPENSSL_ROOT_DIR: /opt/homebrew/opt/openssl@3
+          OPENSSL_LIBRARIES: /opt/homebrew/opt/openssl@3/lib
+
+      - name: Compile Addon (Windows)
+        if: runner.os == 'Windows'
+        run: npx cmake-js build --CDCMAKE_TOOLCHAIN_FILE="C:\vcpkg\scripts\buildsystems\vcpkg.cmake" --CDVCPKG_TARGET_TRIPLET=x64-windows-static
+        shell: cmd
+
+      - name: Build TypeScript
+        run: npm run build:tsc
+
+      - name: Run Tests
+        run: npm test

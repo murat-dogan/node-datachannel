@@ -1,23 +1,44 @@
-name: npm Publish
+name: Publish to NPM
 
 on:
   workflow_dispatch:
 
 jobs:
   npm-publish:
-    name: npm-publish
+    name: Publish Packages to NPM
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
-      - name: Set up Node.js
-        uses: actions/setup-node@v1
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 24.x
+        uses: actions/setup-node@v4
         with:
-          node-version: 20.x
+          node-version: '24.x'
           registry-url: 'https://registry.npmjs.org'
-      - name: Publish
+
+      - name: Download all platform artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: npm-artifacts
+
+      - name: Publish Platform Packages
+        run: |
+          for dir in npm-artifacts/package-*; do
+            if [ -d "$dir" ]; then
+              echo "Publishing platform package in $dir..."
+              cd "$dir"
+              npm publish --access public
+              cd - > /dev/null
+            fi
+          done
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+
+      - name: Build and Publish Root Package
         run: |
           npm install --ignore-scripts
-          npm publish
+          npm run build:tsc
+          npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}

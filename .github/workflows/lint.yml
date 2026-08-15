@@ -1,18 +1,20 @@
 name: Lint
 
 on:
+  push:
+    branches: [ master ]
   pull_request:
   workflow_dispatch:
 
 jobs:
-  build:
+  lint:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
-      - name: Use Node.js
-        uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - name: Use Node.js 24.x
+        uses: actions/setup-node@v4
         with:
-          node-version: '18'
-      - run: npm ci
+          node-version: '24.x'
+      - run: npm install --ignore-scripts
       - run: npm run lint

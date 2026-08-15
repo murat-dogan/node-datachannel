@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.15)
 cmake_policy(SET CMP0091 NEW)
 cmake_policy(SET CMP0042 NEW)
 
-project(node_datachannel VERSION 0.32.3)
+project(node_datachannel VERSION 0.33.0)
 
 # compile_commands.json
 # -----------------------------------
@@ -101,7 +101,17 @@ set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "" SUFFIX ".node")
 #     ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/binary
 # )
 
+if(NOT CMAKE_JS_INC)
+    execute_process(
+        COMMAND node -e "console.log(require('path').resolve(process.execPath, '..', '..', 'include', 'node'))"
+        OUTPUT_VARIABLE CMAKE_JS_INC
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+        ERROR_QUIET
+    )
+endif()
+
 target_include_directories(${PROJECT_NAME} PRIVATE
+    ${CMAKE_JS_INC}
     ${CMAKE_SOURCE_DIR}/node_modules/node-addon-api
     ${CMAKE_BINARY_DIR}/_deps/libdatachannel-src/include
     ${CMAKE_BINARY_DIR}/_deps/libdatachannel-src/deps/plog

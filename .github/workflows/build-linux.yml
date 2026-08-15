@@ -2,12 +2,6 @@ name: Build - Linux
 
 on:
   workflow_dispatch:
-  # push:
-  #   tags:
-  #     - v*
-
-env:
-  ACTIONS_ALLOW_UNSECURE_COMMANDS: true
 
 jobs:
   build-linux:
@@ -15,7 +9,7 @@ jobs:
     strategy:
       matrix:
         node-version: [18]
-        arch: [amd64, arm64, arm]
+        arch: [amd64, arm64]
         platform: [debian, alpine]
         include:
           # Platform-specific baselines
@@ -26,10 +20,11 @@ jobs:
             gcc_install: clang lld
             gcc: clang
             gxx: clang++
+            libc_suffix: musl
           - platform: debian
             triple: linux-gnu
             version: bullseye
-            # libc intentionally not set (prebuild requirement)
+            libc_suffix: gnu
 
           # Arch-specific baselines
           - arch: amd64
@@ -39,11 +34,6 @@ jobs:
             triple_arch: aarch64
             node_arch: arm64
             flags: -march=armv8-a -fPIC
-          - arch: arm
-            triple_arch: armv7
-            node_arch: arm
-            triple_postfix: eabihf
-            flags: -march=armv7-a -mfpu=neon-vfpv4 -mfloat-abi=hard -fPIC
 
           # Platform + Arch overrides (needed for proper toolchain)
           - arch: amd64
@@ -56,12 +46,6 @@ jobs:
             gcc_install: gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
             gcc: aarch64-linux-gnu-gcc
             gxx: aarch64-linux-gnu-g++
-          - arch: arm
-            platform: debian
-            triple_arch: arm
-            gcc_install: gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf
-            gcc: arm-linux-gnueabihf-gcc
-            gxx: arm-linux-gnueabihf-g++
 
     steps:
       - uses: actions/checkout@v4
@@ -112,7 +96,7 @@ jobs:
             --platform linux/${{ matrix.arch }} \
             -w /usr/app \
             ndc-buildroot:${{ matrix.platform }}-${{ matrix.arch }} \
-            node_modules/.bin/prebuild --arch ${{ matrix.node_arch }} -r napi --backend cmake-js -- --CDCMAKE_TOOLCHAIN_FILE:FILEPATH=./cmake/toolchain/ci.cmake
+            npx cmake-js build --CDCMAKE_TOOLCHAIN_FILE:FILEPATH=./cmake/toolchain/ci.cmake
 
       - name: Test
         run: >
@@ -123,8 +107,11 @@ jobs:
           -t ndc-buildroot:${{ matrix.platform }}-${{ matrix.arch }}
           npm run test
 
-      - name: Upload
-        run: sudo --preserve-env=CI,LIBC node_modules/.bin/prebuild --arch ${{ matrix.node_arch }} -r napi --upload -u ${{ secrets.GITHUB_TOKEN }}
-        env:
-          LIBC: ${{ matrix.libc }}
-          CI: true
+      - name: Package Platform
+        run: node scripts/prepare-platform-packages.js linux-${{ matrix.node_arch }}-${{ matrix.libc_suffix }}
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: package-linux-${{ matrix.node_arch }}-${{ matrix.libc_suffix }}
+          path: npm/linux-${{ matrix.node_arch }}-${{ matrix.libc_suffix }}
