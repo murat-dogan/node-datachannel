@@ -177,8 +177,8 @@ export const PeerConnection: {
 } = nodeDataChannel.PeerConnection;
 
 export interface IceUdpMuxListener {
-  address?: string;
-  port: number;
+  address(): string | undefined;
+  port(): number;
   stop(): void;
   onUnhandledStunRequest(cb: (req: IceUdpMuxRequest) => void): void;
 }

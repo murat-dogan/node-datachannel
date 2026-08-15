@@ -62,8 +62,17 @@ IceUdpMuxListenerWrapper::IceUdpMuxListenerWrapper(const Napi::CallbackInfo &inf
     mAddress = info[1].As<Napi::String>().ToString();
   }
 
-  iceUdpMuxListenerPtr = std::make_unique<rtc::IceUdpMuxListener>(mPort, mAddress);
-  instances.insert(this);
+  try
+  {
+    iceUdpMuxListenerPtr = std::make_unique<rtc::IceUdpMuxListener>(mPort, mAddress);
+    mPort = iceUdpMuxListenerPtr->port();
+    instances.insert(this);
+  }
+  catch (const std::exception &e)
+  {
+    Napi::Error::New(env, e.what()).ThrowAsJavaScriptException();
+    return;
+  }
 }
 
 IceUdpMuxListenerWrapper::~IceUdpMuxListenerWrapper()
@@ -89,6 +98,11 @@ void IceUdpMuxListenerWrapper::doCleanup()
 Napi::Value IceUdpMuxListenerWrapper::port(const Napi::CallbackInfo &info)
 {
   Napi::Env env = info.Env();
+
+  if (iceUdpMuxListenerPtr)
+  {
+    return Napi::Number::New(env, iceUdpMuxListenerPtr->port());
+  }
 
   return Napi::Number::New(env, mPort);
 }
