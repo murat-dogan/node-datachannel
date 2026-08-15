@@ -24,6 +24,7 @@ function getPackageName(): string | null {
   return null;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function loadBinding(): any {
   // 1. Try local build candidate paths for development, tests, and source builds
   const candidateLocalPaths = [

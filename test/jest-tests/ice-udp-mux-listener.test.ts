@@ -11,20 +11,21 @@ describe('IceUdpMuxListener', () => {
     listener.stop();
   });
 
-  it('should throw a catchable JS Error when port is already bound instead of crashing', (done) => {
+  it('should throw a catchable JS Error when port is already bound instead of crashing', async () => {
     const socket = dgram.createSocket('udp4');
-    socket.bind(0, '127.0.0.1', () => {
-      const address = socket.address();
-      const port = address.port;
+    await new Promise<void>((resolve) => {
+      socket.bind(0, '127.0.0.1', () => resolve());
+    });
+    const address = socket.address();
+    const port = address.port;
 
-      expect(() => {
-        const listener = new IceUdpMuxListener(port, '127.0.0.1');
-        listener.stop();
-      }).toThrow(/Failed to register ICE UDP mux listener/);
+    expect(() => {
+      const listener = new IceUdpMuxListener(port, '127.0.0.1');
+      listener.stop();
+    }).toThrow(/Failed to register ICE UDP mux listener/);
 
-      socket.close(() => {
-        done();
-      });
+    await new Promise<void>((resolve) => {
+      socket.close(() => resolve());
     });
   });
 });
