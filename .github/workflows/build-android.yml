@@ -48,7 +48,8 @@ jobs:
             -DCMAKE_FIND_ROOT_PATH_MODE_LIBRARY=BOTH \
             -DCMAKE_FIND_ROOT_PATH_MODE_INCLUDE=BOTH \
             -DOPENSSL_ROOT_DIR="$(pwd)/_openssl_android" \
-            -DOPENSSL_USE_STATIC_LIBS=TRUE
+            -DOPENSSL_USE_STATIC_LIBS=TRUE \
+            -DCMAKE_SHARED_LINKER_FLAGS="-Wl,-z,undefs -Wl,--allow-shlib-undefined"
           cmake --build build-android --config Release -j$(nproc)
 
       - name: Package Platform
