@@ -18,13 +18,12 @@ npm install node-datachannel
 
 ## Supported Platforms
 
-`node-datachannel` targets N-API version 8 and supports Node.js v18.20 and above. It is tested on Linux, Windows and MacOS. For N-API compatibility please check [here](https://nodejs.org/api/n-api.html#n_api_n_api_version_matrix).
+`node-datachannel` targets N-API version 8 and supports Node.js **v18.20 and above** (including Node.js 20, 22, and 24+). Prebuilt binaries are distributed automatically via platform-specific npm packages (`optionalDependencies`).
 
-|                           | Linux [x64,armv7,arm64] (1) | Windows [x86,x64] | Mac [M1,x64] |
-| ------------------------- | :-------------------------: | :---------------: | :----------: |
-| N-API v8 (>= Node.js v18) |              +              |         +         |      +       |
-
-**(1)** For Linux musl + libc
+| Architecture | Linux (glibc) | Linux (musl / Alpine) | macOS (Apple Silicon / Intel) | Windows |
+| :--- | :---: | :---: | :---: | :---: |
+| **x64** | `@node-datachannel/linux-x64-gnu` | `@node-datachannel/linux-x64-musl` | `@node-datachannel/darwin-x64` | `@node-datachannel/win32-x64-msvc` |
+| **arm64** | `@node-datachannel/linux-arm64-gnu` | `@node-datachannel/linux-arm64-musl` | `@node-datachannel/darwin-arm64` | - |
 
 ## Electron
 
