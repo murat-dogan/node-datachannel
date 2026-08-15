@@ -127,7 +127,7 @@ set(LINK_LIBRARIES
 if(APPLE)
 #
 elseif(ANDROID OR CMAKE_SYSTEM_NAME STREQUAL "Android")
-    list(APPEND LINK_LIBRARIES -static-libgcc)
+    # Android NDK uses libc++_static with -DANDROID_STL=c++_static
 elseif(UNIX)
     list(APPEND LINK_LIBRARIES -static-libgcc -static-libstdc++)
 endif()
