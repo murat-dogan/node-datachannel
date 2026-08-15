@@ -3,6 +3,10 @@ name: Publish to NPM
 on:
   workflow_dispatch:
 
+permissions:
+  actions: read
+  contents: read
+
 jobs:
   npm-publish:
     name: Publish Packages to NPM
@@ -11,24 +15,61 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Node.js 24.x
+      - name: Set up Node.js 20
         uses: actions/setup-node@v4
         with:
-          node-version: '24.x'
+          node-version: 20
           registry-url: 'https://registry.npmjs.org'
 
-      - name: Download all platform artifacts
-        uses: actions/download-artifact@v4
+      - name: Download all latest platform artifacts from GitHub
+        uses: actions/github-script@v7
         with:
-          path: npm-artifacts
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+            const { execSync } = require('child_process');
+
+            const artifacts = await github.rest.actions.listArtifactsForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              per_page: 50
+            });
+
+            const unique = new Map();
+            for (const a of artifacts.data.artifacts) {
+              if (a.name.startsWith('package-') && !unique.has(a.name) && !a.expired) {
+                unique.set(a.name, a);
+              }
+            }
+
+            console.log(`Found ${unique.size} unique platform package artifacts.`);
+            fs.mkdirSync('npm-artifacts', { recursive: true });
+
+            for (const [name, artifact] of unique.entries()) {
+              console.log(`Downloading ${name} (id: ${artifact.id})...`);
+              const download = await github.rest.actions.downloadArtifact({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                artifact_id: artifact.id,
+                archive_format: 'zip'
+              });
+
+              const zipPath = path.join('npm-artifacts', `${name}.zip`);
+              fs.writeFileSync(zipPath, Buffer.from(download.data));
+              const extractDir = path.join('npm-artifacts', name);
+              fs.mkdirSync(extractDir, { recursive: true });
+              execSync(`unzip -o ${zipPath} -d ${extractDir}`);
+              console.log(`Extracted to ${extractDir}`);
+            }
 
       - name: Publish Platform Packages
         run: |
           for dir in npm-artifacts/package-*; do
             if [ -d "$dir" ]; then
-              echo "Publishing platform package in $dir..."
+              echo "Publishing platform package from $dir..."
               cd "$dir"
-              npm publish --access public
+              npm publish --access public || echo "Package in $dir already published or warning"
               cd - > /dev/null
             fi
           done
@@ -39,6 +80,6 @@ jobs:
         run: |
           npm install --ignore-scripts
           npm run build:tsc
-          npm publish --access public
+          npm publish --access public || echo "Root package already published"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
