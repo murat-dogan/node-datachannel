@@ -51,9 +51,7 @@ jobs:
 
       - name: Build
         run: |
-          npx cmake-js build -a ${{ matrix.node_arch }} --CDCMAKE_TOOLCHAIN_FILE="C:\vcpkg\scripts\buildsystems\vcpkg.cmake" --CDVCPKG_TARGET_TRIPLET=${{ matrix.vcpkg_triplet }} --CDOPENSSL_ROOT_DIR="C:/vcpkg/installed/${{ matrix.vcpkg_triplet }}" --CDOPENSSL_USE_STATIC_LIBS=TRUE
-        env:
-          OPENSSL_ROOT_DIR: C:\vcpkg\installed\${{ matrix.vcpkg_triplet }}
+          npx cmake-js build -a ${{ matrix.node_arch }} --CDCMAKE_TOOLCHAIN_FILE="C:\vcpkg\scripts\buildsystems\vcpkg.cmake" --CDVCPKG_TARGET_TRIPLET=${{ matrix.vcpkg_triplet }}
         shell: cmd
 
       - name: Package Platform
