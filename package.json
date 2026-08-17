@@ -1,6 +1,6 @@
 {
   "name": "node-datachannel",
-  "version": "0.33.0",
+  "version": "0.33.1",
   "description": "WebRTC For Node.js and Electron. libdatachannel node bindings.",
   "main": "./dist/cjs/lib/index.cjs",
   "module": "./dist/esm/lib/index.mjs",
@@ -118,13 +118,14 @@
     "detect-libc": "^2.0.4"
   },
   "optionalDependencies": {
-    "@node-datachannel/android-arm64": "0.33.0",
-    "@node-datachannel/darwin-arm64": "0.33.0",
-    "@node-datachannel/darwin-x64": "0.33.0",
-    "@node-datachannel/linux-arm64-gnu": "0.33.0",
-    "@node-datachannel/linux-arm64-musl": "0.33.0",
-    "@node-datachannel/linux-x64-gnu": "0.33.0",
-    "@node-datachannel/linux-x64-musl": "0.33.0",
-    "@node-datachannel/win32-x64-msvc": "0.33.0"
+    "@node-datachannel/android-arm64": "0.33.1",
+    "@node-datachannel/darwin-arm64": "0.33.1",
+    "@node-datachannel/darwin-x64": "0.33.1",
+    "@node-datachannel/linux-arm64-gnu": "0.33.1",
+    "@node-datachannel/linux-arm64-musl": "0.33.1",
+    "@node-datachannel/linux-x64-gnu": "0.33.1",
+    "@node-datachannel/linux-x64-musl": "0.33.1",
+    "@node-datachannel/win32-arm64-msvc": "0.33.1",
+    "@node-datachannel/win32-x64-msvc": "0.33.1"
   }
 }

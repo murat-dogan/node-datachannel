@@ -52,6 +52,12 @@ const PLATFORMS = {
     cpu: ['x64'],
     description: 'Prebuilt native binary for node-datachannel (Windows x64)',
   },
+  'win32-arm64-msvc': {
+    name: '@node-datachannel/win32-arm64-msvc',
+    os: ['win32'],
+    cpu: ['arm64'],
+    description: 'Prebuilt native binary for node-datachannel (Windows ARM64)',
+  },
   'android-arm64': {
     name: '@node-datachannel/android-arm64',
     os: ['android'],

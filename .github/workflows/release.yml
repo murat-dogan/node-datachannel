@@ -158,37 +158,50 @@ jobs:
           path: npm/darwin-x64
 
   build-win:
-    name: Windows (win32-x64)
+    name: Windows (${{ matrix.node_arch }})
     runs-on: windows-2022
+    strategy:
+      matrix:
+        include:
+          - arch: x64
+            node_arch: x64
+            msvc_arch: x64
+            vcpkg_triplet: x64-windows-static
+            node_version: 18
+          - arch: arm64
+            node_arch: arm64
+            msvc_arch: amd64_arm64
+            vcpkg_triplet: arm64-windows-static
+            node_version: 18
     steps:
       - uses: actions/checkout@v4
-      - name: Use Node.js 18
+      - name: Use Node.js ${{ matrix.node_version }}
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: ${{ matrix.node_version }}
       - name: Setup MSVC
         uses: ilammy/msvc-dev-cmd@v1
         with:
-          arch: x64
+          arch: ${{ matrix.msvc_arch }}
       - name: Setup vcpkg & OpenSSL
         run: |
           C:\vcpkg\bootstrap-vcpkg.bat
-          C:\vcpkg\vcpkg install openssl:x64-windows-static
+          C:\vcpkg\vcpkg install openssl:${{ matrix.vcpkg_triplet }}
         shell: cmd
       - name: Install Dependencies
         run: npm install --ignore-scripts
         shell: cmd
       - name: Build
-        run: npx cmake-js build --CDCMAKE_TOOLCHAIN_FILE="C:\vcpkg\scripts\buildsystems\vcpkg.cmake" --CDVCPKG_TARGET_TRIPLET=x64-windows-static
+        run: npx cmake-js build --arch ${{ matrix.node_arch }} --CDCMAKE_TOOLCHAIN_FILE="C:\vcpkg\scripts\buildsystems\vcpkg.cmake" --CDVCPKG_TARGET_TRIPLET=${{ matrix.vcpkg_triplet }}
         shell: cmd
       - name: Package Platform
-        run: node scripts/prepare-platform-packages.js win32-x64-msvc
+        run: node scripts/prepare-platform-packages.js win32-${{ matrix.node_arch }}-msvc
         shell: cmd
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: package-win32-x64-msvc
-          path: npm/win32-x64-msvc
+          name: package-win32-${{ matrix.node_arch }}-msvc
+          path: npm/win32-${{ matrix.node_arch }}-msvc
 
   publish:
     name: Publish All Packages to NPM
