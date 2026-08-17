@@ -183,9 +183,12 @@ jobs:
         uses: ilammy/msvc-dev-cmd@v1
         with:
           arch: ${{ matrix.msvc_arch }}
-      - name: Setup vcpkg & OpenSSL
+      - name: Setup vcpkg
         run: |
           C:\vcpkg\bootstrap-vcpkg.bat
+        shell: cmd
+      - name: Install OpenSSL
+        run: |
           C:\vcpkg\vcpkg install openssl:${{ matrix.vcpkg_triplet }}
         shell: cmd
       - name: Disable Pre-installed Runner OpenSSL
@@ -197,7 +200,7 @@ jobs:
         run: npm install --ignore-scripts
         shell: cmd
       - name: Build
-        run: npx cmake-js build -a ${{ matrix.node_arch }} --CDCMAKE_TOOLCHAIN_FILE="C:\vcpkg\scripts\buildsystems\vcpkg.cmake" --CDVCPKG_TARGET_TRIPLET=${{ matrix.vcpkg_triplet }}
+        run: npx cmake-js build -a ${{ matrix.node_arch }} --CDCMAKE_TOOLCHAIN_FILE="C:\vcpkg\scripts\buildsystems\vcpkg.cmake" --CDVCPKG_TARGET_TRIPLET=${{ matrix.vcpkg_triplet }} --CDCMAKE_PREFIX_PATH="C:\vcpkg\installed\${{ matrix.vcpkg_triplet }}"
         shell: cmd
       - name: Package Platform
         run: node scripts/prepare-platform-packages.js win32-${{ matrix.node_arch }}-msvc
