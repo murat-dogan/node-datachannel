@@ -14,7 +14,6 @@ add_definitions(-DNAPI_VERSION=8)
 include_directories(${CMAKE_JS_INC})
 
 if(WIN32)
-    set(OPENSSL_MSVC_STATIC_RT TRUE)
     set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 endif()
 
