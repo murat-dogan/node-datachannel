@@ -211,9 +211,67 @@ jobs:
           name: package-win32-${{ matrix.node_arch }}-msvc
           path: npm/win32-${{ matrix.node_arch }}-msvc
 
+  build-android:
+    name: Android (android-arm64)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install --ignore-scripts
+
+      - name: Setup Android NDK
+        run: |
+          NDK_DIR=$(find $ANDROID_SDK_ROOT/ndk -maxdepth 1 -mindepth 1 | sort -V | tail -n 1)
+          echo "ANDROID_NDK_HOME=$NDK_DIR" >> $GITHUB_ENV
+          echo "Using NDK from $NDK_DIR"
+
+      - name: Build OpenSSL for Android arm64
+        run: |
+          git clone --depth 1 -b openssl-3.3.1 https://github.com/openssl/openssl.git _openssl_src
+          cd _openssl_src
+          export ANDROID_NDK_ROOT=$ANDROID_NDK_HOME
+          export PATH=$ANDROID_NDK_ROOT/toolchains/llvm/prebuilt/linux-x86_64/bin:$PATH
+          ./Configure android-arm64 -D__ANDROID_API__=24 no-shared no-unit-test no-tests --prefix=$(pwd)/../_openssl_android --libdir=lib
+          make -j$(nproc)
+          make install_sw
+          cd ..
+
+      - name: Build node-datachannel for Android arm64
+        run: |
+          cmake -B build-android \
+            -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_HOME/build/cmake/android.toolchain.cmake \
+            -DANDROID_ABI=arm64-v8a \
+            -DANDROID_PLATFORM=android-24 \
+            -DANDROID_STL=c++_static \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_FIND_ROOT_PATH="$(pwd)/_openssl_android" \
+            -DCMAKE_FIND_ROOT_PATH_MODE_PACKAGE=BOTH \
+            -DCMAKE_FIND_ROOT_PATH_MODE_LIBRARY=BOTH \
+            -DCMAKE_FIND_ROOT_PATH_MODE_INCLUDE=BOTH \
+            -DOPENSSL_ROOT_DIR="$(pwd)/_openssl_android" \
+            -DOPENSSL_USE_STATIC_LIBS=TRUE \
+            -DCMAKE_SHARED_LINKER_FLAGS="-Wl,-z,undefs -Wl,--allow-shlib-undefined"
+          cmake --build build-android --config Release -j$(nproc)
+
+      - name: Package Platform
+        run: |
+          node scripts/prepare-platform-packages.js android-arm64 build-android/node_datachannel.node
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: package-android-arm64
+          path: npm/android-arm64
+
   publish:
     name: Publish All Packages to NPM
-    needs: [build-linux, build-mac-arm64, build-mac-x64, build-win]
+    needs: [build-linux, build-mac-arm64, build-mac-x64, build-win, build-android]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
