@@ -44,6 +44,12 @@ jobs:
           C:\vcpkg\vcpkg install openssl:${{ matrix.vcpkg_triplet }}
         shell: cmd
 
+      - name: Disable Pre-installed Runner OpenSSL
+        run: |
+          if exist "C:\Program Files\OpenSSL" ren "C:\Program Files\OpenSSL" "OpenSSL_disabled"
+          if exist "C:\Program Files (x86)\OpenSSL" ren "C:\Program Files (x86)\OpenSSL" "OpenSSL_disabled"
+        shell: cmd
+
       - name: NPM Install
         run: |
           npm install --ignore-scripts
