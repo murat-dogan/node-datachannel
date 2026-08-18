@@ -8,7 +8,7 @@ jobs:
     runs-on: macos-14
     strategy:
       matrix:
-        node-version: [18]
+        node-version: [24]
 
     steps:
       - uses: actions/checkout@v4

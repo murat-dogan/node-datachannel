@@ -8,14 +8,14 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        node-version: [18]
+        node-version: [24]
         arch: [amd64, arm64]
         platform: [debian, alpine]
         include:
           # Platform-specific baselines
           - platform: alpine
             triple: alpine-linux-musl
-            version: 3.16
+            version: 3.24
             libc: musl
             gcc_install: clang lld
             gcc: clang
@@ -23,7 +23,7 @@ jobs:
             libc_suffix: musl
           - platform: debian
             triple: linux-gnu
-            version: bullseye
+            version: trixie
             libc_suffix: gnu
 
           # Arch-specific baselines
