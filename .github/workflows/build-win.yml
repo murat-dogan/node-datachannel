@@ -14,12 +14,12 @@ jobs:
             node_arch: x64
             msvc_arch: x64
             vcpkg_triplet: x64-windows-static
-            node_version: 18
+            node_version: 24
           - arch: arm64
             node_arch: arm64
             msvc_arch: amd64_arm64
             vcpkg_triplet: arm64-windows-static
-            node_version: 18
+            node_version: 24
 
     steps:
       - uses: actions/checkout@v4
