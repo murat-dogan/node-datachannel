@@ -1,19 +1,19 @@
-ARG version=bullseye
-ARG node_version=18
+ARG version=trixie
+ARG node_version=24
 
 # Accept build args
 ARG gcc_install
 
 FROM node:${node_version}-${version}
 
-RUN echo "deb https://archive.debian.org/debian bullseye-backports main" >> /etc/apt/sources.list && \
+RUN echo "deb https://deb.debian.org/debian trixie-backports main" >> /etc/apt/sources.list && \
     apt update && \
     apt install -y --no-install-recommends \
         build-essential \
         libssl-dev \
         ninja-build \
         ${gcc_install} && \
-    apt install -y --no-install-recommends -t bullseye-backports cmake && \
+    apt install -y --no-install-recommends -t trixie-backports cmake && \
     apt clean && \
     rm -rf /var/lib/apt/lists/*
 

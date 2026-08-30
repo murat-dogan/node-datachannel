@@ -9,13 +9,13 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        node-version: [18]
+        node-version: [24]
         arch: [amd64, arm64]
         platform: [debian, alpine]
         include:
           - platform: alpine
             triple: alpine-linux-musl
-            version: 3.16
+            version: 3.24
             libc: musl
             gcc_install: clang lld
             gcc: clang
@@ -23,7 +23,7 @@ jobs:
             libc_suffix: musl
           - platform: debian
             triple: linux-gnu
-            version: bullseye
+            version: trixie
             libc_suffix: gnu
           - arch: amd64
             triple_arch: x86_64
@@ -108,10 +108,10 @@ jobs:
       - uses: actions/checkout@v4
       - name: Install OpenSSL
         run: HOMEBREW_NO_INSTALL_CLEANUP=1 brew reinstall openssl@3
-      - name: Use Node.js 18
+      - name: Use Node.js 24
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 24
       - name: Install Dependencies
         run: npm install --ignore-scripts
       - name: Build
@@ -132,10 +132,10 @@ jobs:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Use Node.js 18
+      - name: Use Node.js 24
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 24
       - name: Install Dependencies
         run: npm install --ignore-scripts
       - name: Build OpenSSL for macOS x64
@@ -167,12 +167,12 @@ jobs:
             node_arch: x64
             msvc_arch: x64
             vcpkg_triplet: x64-windows-static
-            node_version: 18
+            node_version: 24
           - arch: arm64
             node_arch: arm64
             msvc_arch: amd64_arm64
             vcpkg_triplet: arm64-windows-static
-            node_version: 18
+            node_version: 24
     steps:
       - uses: actions/checkout@v4
       - name: Use Node.js ${{ matrix.node_version }}
@@ -217,10 +217,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Use Node.js 20
+      - name: Use Node.js 24
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
 
       - name: Install dependencies
         run: npm install --ignore-scripts
