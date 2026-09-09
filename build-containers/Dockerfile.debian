@@ -1,12 +1,14 @@
 ARG version=bullseye
 ARG node_version=18
 
+FROM node:${node_version}-${version}
+
 # Accept build args
 ARG gcc_install
 
-FROM node:${node_version}-${version}
-
-RUN echo "deb https://archive.debian.org/debian bullseye-backports main" >> /etc/apt/sources.list && \
+RUN echo 'Acquire::Check-Valid-Until "false";' > /etc/apt/apt.conf.d/99no-check-valid-until && \
+    sed -i '/bullseye-security/d' /etc/apt/sources.list && \
+    echo "deb https://archive.debian.org/debian bullseye-backports main" >> /etc/apt/sources.list && \
     apt update && \
     apt install -y --no-install-recommends \
         build-essential \
