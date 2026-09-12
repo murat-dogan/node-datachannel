@@ -4,8 +4,21 @@ on:
   workflow_dispatch:
 
 jobs:
+  verify:
+    name: Verify Package Versions
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Verify package versions
+        run: node scripts/verify-platform-versions.js
+
   build-linux:
     name: Linux (${{ matrix.platform }}-${{ matrix.node_arch }})
+    needs: [verify]
     runs-on: ubuntu-22.04
     strategy:
       matrix:
@@ -103,6 +116,7 @@ jobs:
 
   build-mac-arm64:
     name: macOS (darwin-arm64)
+    needs: [verify]
     runs-on: macos-14
     steps:
       - uses: actions/checkout@v4
@@ -129,6 +143,7 @@ jobs:
 
   build-mac-x64:
     name: macOS (darwin-x64)
+    needs: [verify]
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
@@ -159,6 +174,7 @@ jobs:
 
   build-win:
     name: Windows (${{ matrix.node_arch }})
+    needs: [verify]
     runs-on: windows-2022
     strategy:
       matrix:
@@ -213,6 +229,7 @@ jobs:
 
   build-android:
     name: Android (android-arm64)
+    needs: [verify]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

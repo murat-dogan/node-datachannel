@@ -1,6 +1,7 @@
 {
   "name": "node-datachannel",
-  "version": "0.33.3",
+  "version": "0.33.4",
+  "//": "NOTE: When bumping 'version', also update all @node-datachannel/* packages in 'optionalDependencies' below!",
   "description": "WebRTC For Node.js and Electron. libdatachannel node bindings.",
   "main": "./dist/cjs/lib/index.cjs",
   "module": "./dist/esm/lib/index.mjs",
@@ -41,7 +42,8 @@
     "build:tsc": "rimraf dist && rollup -c",
     "build:tsc:watch": "rollup -c -w",
     "clean": "rimraf dist build npm",
-    "lint": "eslint . --ext .ts --ext .mts",
+    "lint": "eslint . --ext .ts --ext .mts && npm run verify-versions",
+    "verify-versions": "node scripts/verify-platform-versions.js",
     "test": "NODE_OPTIONS=--experimental-vm-modules jest",
     "test:watch": "NODE_OPTIONS=--experimental-vm-modules jest --watch",
     "test:wpt": "npm run run:wpt:server & (sleep 8 && (npm run run:wpt:test | tee test/wpt-tests/last-test-results.md) )",
@@ -118,14 +120,14 @@
     "detect-libc": "^2.0.4"
   },
   "optionalDependencies": {
-    "@node-datachannel/android-arm64": "0.33.2",
-    "@node-datachannel/darwin-arm64": "0.33.2",
-    "@node-datachannel/darwin-x64": "0.33.2",
-    "@node-datachannel/linux-arm64-gnu": "0.33.2",
-    "@node-datachannel/linux-arm64-musl": "0.33.2",
-    "@node-datachannel/linux-x64-gnu": "0.33.2",
-    "@node-datachannel/linux-x64-musl": "0.33.2",
-    "@node-datachannel/win32-arm64-msvc": "0.33.2",
-    "@node-datachannel/win32-x64-msvc": "0.33.2"
+    "@node-datachannel/android-arm64": "0.33.4",
+    "@node-datachannel/darwin-arm64": "0.33.4",
+    "@node-datachannel/darwin-x64": "0.33.4",
+    "@node-datachannel/linux-arm64-gnu": "0.33.4",
+    "@node-datachannel/linux-arm64-musl": "0.33.4",
+    "@node-datachannel/linux-x64-gnu": "0.33.4",
+    "@node-datachannel/linux-x64-musl": "0.33.4",
+    "@node-datachannel/win32-arm64-msvc": "0.33.4",
+    "@node-datachannel/win32-x64-msvc": "0.33.4"
   }
 }

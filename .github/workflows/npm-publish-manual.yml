@@ -21,6 +21,9 @@ jobs:
           node-version: 20
           registry-url: 'https://registry.npmjs.org'
 
+      - name: Verify Package Versions
+        run: node scripts/verify-platform-versions.js
+
       - name: Download all latest platform artifacts from GitHub
         uses: actions/github-script@v7
         with:
