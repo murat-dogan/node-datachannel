@@ -3,6 +3,7 @@ import { expect, jest } from '@jest/globals';
 import { RTCPeerConnection } from '../../src/polyfill/index';
 import { PeerConnection } from '../../src/lib/index';
 import { eventPromise } from '../fixtures/event-promise';
+import { connect } from '../fixtures/connect';
 
 // Polyfill for Promise.withResolvers for Node < 20
 if (!Promise.withResolvers) {
@@ -327,5 +328,43 @@ describe('polyfill', () => {
     const connectionState = rtcPeerConnection.connectionState;
     expect(spy).toHaveBeenCalled();
     expect(connectionState).toEqual(originalFunc());
+  });
+
+  test('it should send mixed types in order', async () => {
+    const peer1 = new RTCPeerConnection();
+    const peer2 = new RTCPeerConnection();
+
+    await connect(peer1, peer2);
+
+    const receivedAllMessages = Promise.withResolvers<any[]>();
+
+    peer2.ondatachannel = (evt): void => {
+      const channel = evt.channel;
+      const output = [];
+
+      channel.onmessage = (evt): void => {
+        output.push(evt.data);
+
+        if (output.length === 2) {
+          receivedAllMessages.resolve(output);
+        }
+      };
+    };
+
+    const dc = peer1.createDataChannel('');
+
+    await eventPromise(dc, 'open');
+
+    dc.send(new Blob(['hello']));
+    dc.send('world');
+
+    const messages = await receivedAllMessages.promise;
+
+    expect(messages[0]).toBeInstanceOf(ArrayBuffer);
+    expect(new TextDecoder().decode(messages[0])).toEqual('hello');
+    expect(messages[1]).toEqual('world');
+
+    peer1.close();
+    peer2.close();
   });
 });
