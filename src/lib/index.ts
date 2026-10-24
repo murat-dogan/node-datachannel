@@ -208,7 +208,9 @@ export const PacingHandler: {
   new (bitsPerSecond: number, sendInterval: number): PacingHandler;
 } = nodeDataChannel.PacingHandler;
 
-export interface RtcpReceivingSession extends MediaHandler {}
+export interface RtcpReceivingSession extends MediaHandler {
+  getSyncTimestamps(): { rtpTimestamp: number; ntpTimestamp: bigint };
+}
 
 export const RtcpReceivingSession: {
   new (): RtcpReceivingSession;

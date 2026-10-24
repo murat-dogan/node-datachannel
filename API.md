@@ -245,3 +245,22 @@ Buffer level low callback
 **onMessage: (cb: (msg: string | Buffer) => void) => void**
 
 New Message callback
+
+## RtcpReceivingSession
+
+**getSyncTimestamps: () => { rtpTimestamp: number; ntpTimestamp: bigint }**
+
+Read a snapshot of the latest incoming RTCP sender report's RTP/NTP timestamp
+pair. Both fields refer to the same instant and can be used to align media tracks
+that use different RTP clocks. RTP clock rates are supplied by the media codec.
+
+`rtpTimestamp` is the unsigned 32-bit RTP timestamp. `ntpTimestamp` is the raw
+unsigned 64-bit NTP fixed-point timestamp, returned as a `bigint` to preserve all
+bits: its upper 32 bits contain seconds since 1900-01-01 and its lower 32 bits
+contain the fractional second. Both values are zero before a sender report has
+been received. The returned object is a snapshot; modifying it does not change
+the receiving session.
+
+The receiving session must be attached to the incoming track's media-handler
+chain. Reading timestamps does not replace its normal RTCP handling or receiver
+reports.
