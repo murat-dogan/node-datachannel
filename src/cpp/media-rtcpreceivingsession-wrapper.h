@@ -18,6 +18,7 @@ public:
 
   // Functions
   void addToChain(const Napi::CallbackInfo &info);
+  Napi::Value getSyncTimestamps(const Napi::CallbackInfo &info);
 
   // Callbacks
 
