@@ -11,6 +11,7 @@ Napi::Object RtcpReceivingSessionWrapper::Init(Napi::Env env, Napi::Object expor
     {
       // Instance Methods
       InstanceMethod("addToChain", &RtcpReceivingSessionWrapper::addToChain),
+      InstanceMethod("getSyncTimestamps", &RtcpReceivingSessionWrapper::getSyncTimestamps),
     });
 
   // If this is not the first call, we don't want to reassign the constructor (hot-reload problem)
@@ -37,6 +38,17 @@ RtcpReceivingSessionWrapper::~RtcpReceivingSessionWrapper()
 }
 
 std::shared_ptr<rtc::RtcpReceivingSession> RtcpReceivingSessionWrapper::getSessionInstance() { return mSessionPtr; }
+
+Napi::Value RtcpReceivingSessionWrapper::getSyncTimestamps(const Napi::CallbackInfo &info)
+{
+  auto env = info.Env();
+  auto timestamps = mSessionPtr->getSyncTimestamps();
+  auto result = Napi::Object::New(env);
+  result.Set("rtpTimestamp", Napi::Number::New(env, static_cast<double>(timestamps.rtpTimestamp)));
+  // NTP's 64-bit fixed-point timestamp must not lose precision through a JS Number.
+  result.Set("ntpTimestamp", Napi::BigInt::New(env, timestamps.ntpTimestamp));
+  return result;
+}
 
 void RtcpReceivingSessionWrapper::addToChain(const Napi::CallbackInfo &info)
 {
