@@ -47,10 +47,37 @@ void ThreadSafeCallback::callbackFunc(Napi::Env env, Napi::Function callback, Co
   {
     return;
   }
+  catch (const Napi::Error &e)
+  {
+    cleanup();
+    e.ThrowAsJavaScriptException();
+    return;
+  }
+  catch (const std::exception &e)
+  {
+    cleanup();
+    Napi::Error::New(env, e.what()).ThrowAsJavaScriptException();
+    return;
+  }
 
   if (callback)
   {
-    callback.Call(args);
+    try
+    {
+      callback.Call(args);
+    }
+    catch (const Napi::Error &e)
+    {
+      cleanup();
+      e.ThrowAsJavaScriptException();
+      return;
+    }
+    catch (const std::exception &e)
+    {
+      cleanup();
+      Napi::Error::New(env, e.what()).ThrowAsJavaScriptException();
+      return;
+    }
   }
 
   cleanup();
