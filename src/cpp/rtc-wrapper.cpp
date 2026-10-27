@@ -188,11 +188,27 @@ void RtcWrapper::setSctpSettings(const Napi::CallbackInfo &info)
     settings.maxChunksOnQueue = config.Get("maxChunksOnQueue").As<Napi::Number>().Uint32Value();
   if (config.Get("initialCongestionWindow").IsNumber())
     settings.initialCongestionWindow = config.Get("initialCongestionWindow").As<Napi::Number>().Uint32Value();
+  if (config.Get("maxBurst").IsNumber())
+    settings.maxBurst = config.Get("maxBurst").As<Napi::Number>().Uint32Value();
   if (config.Get("congestionControlModule").IsNumber())
     settings.congestionControlModule = config.Get("congestionControlModule").As<Napi::Number>().Uint32Value();
   if (config.Get("delayedSackTime").IsNumber())
     settings.delayedSackTime =
         std::chrono::milliseconds(config.Get("delayedSackTime").As<Napi::Number>().Uint32Value());
+  if (config.Get("minRetransmitTimeout").IsNumber())
+    settings.minRetransmitTimeout =
+        std::chrono::milliseconds(config.Get("minRetransmitTimeout").As<Napi::Number>().Uint32Value());
+  if (config.Get("maxRetransmitTimeout").IsNumber())
+    settings.maxRetransmitTimeout =
+        std::chrono::milliseconds(config.Get("maxRetransmitTimeout").As<Napi::Number>().Uint32Value());
+  if (config.Get("initialRetransmitTimeout").IsNumber())
+    settings.initialRetransmitTimeout =
+        std::chrono::milliseconds(config.Get("initialRetransmitTimeout").As<Napi::Number>().Uint32Value());
+  if (config.Get("maxRetransmitAttempts").IsNumber())
+    settings.maxRetransmitAttempts = config.Get("maxRetransmitAttempts").As<Napi::Number>().Uint32Value();
+  if (config.Get("heartbeatInterval").IsNumber())
+    settings.heartbeatInterval =
+        std::chrono::milliseconds(config.Get("heartbeatInterval").As<Napi::Number>().Uint32Value());
 
   rtc::SetSctpSettings(settings);
 }

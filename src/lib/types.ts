@@ -33,8 +33,14 @@ export interface SctpSettings {
   sendBufferSize?: number;
   maxChunksOnQueue?: number;
   initialCongestionWindow?: number;
+  maxBurst?: number;
   congestionControlModule?: number;
   delayedSackTime?: number;
+  minRetransmitTimeout?: number;
+  maxRetransmitTimeout?: number;
+  initialRetransmitTimeout?: number;
+  maxRetransmitAttempts?: number;
+  heartbeatInterval?: number;
 }
 
 // Proxy Server
