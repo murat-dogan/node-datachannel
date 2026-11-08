@@ -166,6 +166,12 @@ export default class RTCPeerConnection extends EventTarget implements globalThis
     this.#peerConnection.onDataChannel((channel) => {
       const dc = new RTCDataChannel(channel);
       this.#dataChannels.add(dc);
+      // as for channels created locally: forget it once closed, otherwise every
+      // channel the remote peer ever opened stays referenced until close()
+      dc.addEventListener('close', () => {
+        this.#dataChannels.delete(dc);
+        this.#dataChannelsClosed++;
+      });
       this.dispatchEvent(new RTCDataChannelEvent('datachannel', { channel: dc }));
     });
 
@@ -354,6 +360,15 @@ export default class RTCPeerConnection extends EventTarget implements globalThis
   }
 
   close(): void {
+    // close the channels first: a native data channel that is never closed
+    // stays referenced (with its callbacks) after the peer connection closes
+    for (const channel of [...this.#dataChannels]) {
+      try {
+        channel.close();
+      } catch {
+        // already closing
+      }
+    }
     this.#peerConnection.close();
   }
 

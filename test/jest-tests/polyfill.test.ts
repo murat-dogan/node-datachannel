@@ -328,4 +328,61 @@ describe('polyfill', () => {
     expect(spy).toHaveBeenCalled();
     expect(connectionState).toEqual(originalFunc());
   });
+
+  async function connectedPair(): Promise<{
+    peer1: RTCPeerConnection;
+    peer2: RTCPeerConnection;
+    dc: RTCDataChannel;
+    remote: RTCDataChannel;
+  }> {
+    const peer1 = new RTCPeerConnection();
+    const peer2 = new RTCPeerConnection();
+    peer1.addEventListener('icecandidate', (e: RTCPeerConnectionIceEvent) => {
+      peer2.addIceCandidate(e.candidate);
+    });
+    peer2.addEventListener('icecandidate', (e: RTCPeerConnectionIceEvent) => {
+      peer1.addIceCandidate(e.candidate);
+    });
+    const remote = new Promise<RTCDataChannel>((resolve) => {
+      peer2.addEventListener('datachannel', (e: RTCDataChannelEvent) => resolve(e.channel));
+    });
+    const dc: RTCDataChannel = peer1.createDataChannel('label');
+    await peer2.setRemoteDescription(await peer1.createOffer());
+    await peer1.setRemoteDescription(await peer2.createAnswer());
+    await eventPromise(dc, 'open');
+    return { peer1, peer2, dc, remote: await remote };
+  }
+
+  test('it closes its data channels when it is closed before connecting', async () => {
+    // e.g. a connection attempt that is abandoned: its channels must not outlive it
+    const peer = new RTCPeerConnection();
+    const dc: RTCDataChannel = peer.createDataChannel('label');
+    await peer.setLocalDescription(await peer.createOffer());
+
+    peer.close();
+    if (dc.readyState !== 'closed') {
+      await Promise.race([
+        eventPromise(dc, 'close'),
+        new Promise((resolve) => setTimeout(resolve, 2000)),
+      ]);
+    }
+
+    expect(dc.readyState).toEqual('closed');
+  });
+
+  test('it forgets a remotely opened data channel once it closes', async () => {
+    const { peer1, peer2, dc, remote } = await connectedPair();
+    const stats = async (pc: RTCPeerConnection): Promise<any> => (await pc.getStats()).get('P');
+    expect((await stats(peer2)).dataChannelsOpened).toEqual(1);
+
+    const closed = eventPromise(remote, 'close');
+    dc.close();
+    await closed;
+
+    expect((await stats(peer2)).dataChannelsOpened).toEqual(0);
+    expect((await stats(peer2)).dataChannelsClosed).toEqual(1);
+
+    peer1.close();
+    peer2.close();
+  });
 });
